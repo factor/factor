@@ -128,7 +128,8 @@ IN: io.sockets.secure.tests
 ] [ io-timeout? ] must-fail-with
 
 { } [
-    [ download-my-image ] with-temp-directory
+    ! Exercise an HTTPS download without requiring a published image for this CPU.
+    [ download-checksums drop ] with-temp-directory
 ] unit-test
 
 ! Numeric endpoints must validate certificates too.

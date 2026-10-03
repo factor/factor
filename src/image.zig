@@ -208,7 +208,7 @@ pub const ImageError = error{
 /// alignCell(code_size, page)) and drive an out-of-bounds read of the file
 /// body past the mapped heap. 1 TiB is safely below the point where any of
 /// that arithmetic wraps a 64-bit cell.
-pub const max_image_heap_size: Cell = 1 << 40;
+pub const max_image_heap_size: Cell = if (@sizeOf(Cell) == 8) 1 << 40 else 1 << 28;
 
 const DlsymKey = struct { symbol: Cell, library: Cell };
 
@@ -883,7 +883,7 @@ pub const ImageLoader = struct {
         // the saved FP). Must match cpu-{x86.64,arm.64}.hpp FRAME_RETURN_ADDRESS,
         // otherwise the frame chain is fixed up at the wrong slot and set-callstack
         // walks a corrupt chain.
-        const FRAME_RETURN_ADDRESS: Cell = if (builtin.cpu.arch == .aarch64) 8 else 0;
+        const FRAME_RETURN_ADDRESS = @import("contexts.zig").FRAME_RETURN_ADDRESS;
         const LEAF_FRAME_SIZE: Cell = 16;
 
         var frame_offset: Cell = 0;
@@ -1370,135 +1370,14 @@ const RelocationType = code_blocks_mod.RelocationType;
 const RelocationClass = code_blocks_mod.RelocationClass;
 const RelocationEntry = code_blocks_mod.RelocationEntry;
 pub const CodeBlock = code_blocks_mod.CodeBlock;
-const rel_arm_b_mask = code_blocks_mod.rel_arm_b_mask;
-const rel_arm_b_cond_ldr_mask = code_blocks_mod.rel_arm_b_cond_ldr_mask;
-const rel_arm_ldur_mask = code_blocks_mod.rel_arm_ldur_mask;
-const rel_arm_cmp_mask = code_blocks_mod.rel_arm_cmp_mask;
-
-fn loadRelocValueMasked(pointer: Cell, msb: u5, lsb: u5, scaling: u5) isize {
-    const ptr: [*]const u8 = @ptrFromInt(pointer - @sizeOf(u32));
-    const word = std.mem.readInt(i32, ptr[0..@sizeOf(u32)], .little);
-    const shift_left: u5 = @intCast(31 - msb);
-    // shift_right can be > 31 if msb < lsb (invalid), cap at 31 for safety
-    const shift_right_raw: u6 = @intCast(31 - msb + lsb);
-    const shift_right: u5 = if (shift_right_raw > 31) 31 else @intCast(shift_right_raw);
-    const masked: i32 = (word << shift_left) >> shift_right;
-    return @as(isize, masked) << @intCast(scaling);
-}
-
-fn storeRelocValueMasked(pointer: Cell, value: isize, mask: u32, lsb: u5, scaling: u5) void {
-    const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(u32));
-    var word = std.mem.readInt(u32, ptr[0..@sizeOf(u32)], .little);
-    const scaled: i32 = @intCast(value >> @intCast(scaling));
-    const bits: u32 = (@as(u32, @bitCast(scaled)) << lsb) & mask;
-    word = (word & ~mask) | bits;
-    std.mem.writeInt(u32, ptr[0..@sizeOf(u32)], word, .little);
-}
-
 fn loadRelocValue(pointer: Cell, rel_class: RelocationClass, relative_to: Cell) Cell {
-    return switch (rel_class) {
-        .absolute_cell => blk: {
-            const ptr: [*]const u8 = @ptrFromInt(pointer - @sizeOf(Cell));
-            break :blk std.mem.readInt(Cell, ptr[0..@sizeOf(Cell)], .little);
-        },
-        .absolute => blk: {
-            const ptr: [*]const u8 = @ptrFromInt(pointer - @sizeOf(u32));
-            break :blk std.mem.readInt(u32, ptr[0..@sizeOf(u32)], .little);
-        },
-        .relative => blk: {
-            const ptr: [*]const u8 = @ptrFromInt(pointer - @sizeOf(i32));
-            const rel_val = std.mem.readInt(i32, ptr[0..@sizeOf(i32)], .little);
-            // Relative addresses: add position to get absolute
-            break :blk @bitCast(@as(isize, rel_val) +% @as(isize, @bitCast(relative_to)));
-        },
-        .relative_arm_b => blk: {
-            const rel_val = loadRelocValueMasked(pointer, 25, 0, 2);
-            break :blk @bitCast(rel_val + @as(isize, @bitCast(relative_to)) - 4);
-        },
-        .relative_arm_b_cond_ldr => blk: {
-            const rel_val = loadRelocValueMasked(pointer, 23, 5, 2);
-            break :blk @bitCast(rel_val + @as(isize, @bitCast(relative_to)) - 4);
-        },
-        .absolute_arm_ldur => blk: {
-            const imm = loadRelocValueMasked(pointer, 20, 12, 0);
-            break :blk @bitCast(imm);
-        },
-        .absolute_arm_cmp => blk: {
-            const imm = loadRelocValueMasked(pointer, 21, 10, 0);
-            break :blk @bitCast(imm);
-        },
-        .absolute_2 => blk: {
-            const ptr: [*]const u8 = @ptrFromInt(pointer - @sizeOf(u16));
-            break :blk std.mem.readInt(u16, ptr[0..@sizeOf(u16)], .little);
-        },
-        .absolute_1 => blk: {
-            const ptr: [*]const u8 = @ptrFromInt(pointer - @sizeOf(u8));
-            break :blk ptr[0];
-        },
-        ._reserved7, ._reserved8, ._reserved9, ._reserved12, ._reserved13, ._reserved14, ._reserved15 => {
-            std.debug.print("[RELOC] FATAL: invalid relocation class {} in loadRelocValue\n", .{@intFromEnum(rel_class)});
-            unreachable;
-        },
-    };
+    const operand = code_blocks_mod.InstructionOperand.atPointer(pointer, rel_class);
+    return @bitCast(operand.loadValueRelative(relative_to));
 }
 
 fn storeRelocValue(pointer: Cell, rel_class: RelocationClass, value: Cell) void {
-    switch (rel_class) {
-        .absolute_cell => {
-            const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(Cell));
-            std.mem.writeInt(Cell, ptr[0..@sizeOf(Cell)], value, .little);
-        },
-        .absolute => {
-            const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(u32));
-            std.mem.writeInt(u32, ptr[0..@sizeOf(u32)], @truncate(value), .little);
-        },
-        .relative => {
-            const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(i32));
-            // Store relative offset
-            const rel_val: i32 = @truncate(@as(isize, @bitCast(value)) -% @as(isize, @bitCast(pointer)));
-            std.mem.writeInt(i32, ptr[0..@sizeOf(i32)], rel_val, .little);
-        },
-        .relative_arm_b => {
-            const abs_val = @as(isize, @bitCast(value));
-            const rel_val = abs_val - @as(isize, @bitCast(pointer));
-            std.debug.assert(rel_val + 4 < 0x8000000);
-            std.debug.assert(rel_val + 4 >= -0x8000000);
-            std.debug.assert((rel_val & 3) == 0);
-            storeRelocValueMasked(pointer, rel_val + 4, rel_arm_b_mask, 0, 2);
-        },
-        .relative_arm_b_cond_ldr => {
-            const abs_val = @as(isize, @bitCast(value));
-            const rel_val = abs_val - @as(isize, @bitCast(pointer));
-            std.debug.assert(rel_val + 4 < 0x2000000);
-            std.debug.assert(rel_val + 4 >= -0x2000000);
-            std.debug.assert((rel_val & 3) == 0);
-            storeRelocValueMasked(pointer, rel_val + 4, rel_arm_b_cond_ldr_mask, 5, 2);
-        },
-        .absolute_arm_ldur => {
-            const abs_val = @as(isize, @bitCast(value));
-            std.debug.assert(abs_val >= -256);
-            std.debug.assert(abs_val <= 255);
-            storeRelocValueMasked(pointer, abs_val, rel_arm_ldur_mask, 12, 0);
-        },
-        .absolute_arm_cmp => {
-            const abs_val = @as(isize, @bitCast(value));
-            std.debug.assert(abs_val >= 0);
-            std.debug.assert(abs_val <= 4095);
-            storeRelocValueMasked(pointer, abs_val, rel_arm_cmp_mask, 10, 0);
-        },
-        .absolute_2 => {
-            const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(u16));
-            std.mem.writeInt(u16, ptr[0..@sizeOf(u16)], @truncate(value), .little);
-        },
-        .absolute_1 => {
-            const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(u8));
-            ptr[0] = @truncate(value);
-        },
-        ._reserved7, ._reserved8, ._reserved9, ._reserved12, ._reserved13, ._reserved14, ._reserved15 => {
-            std.debug.print("[RELOC] FATAL: invalid relocation class {} in storeRelocValue\n", .{@intFromEnum(rel_class)});
-            unreachable;
-        },
-    }
+    var operand = code_blocks_mod.InstructionOperand.atPointer(pointer, rel_class);
+    operand.storeValue(@bitCast(value));
 }
 
 // Save the current heap to an image file

@@ -549,8 +549,8 @@ pub const GarbageCollector = struct {
     fn updateCodeBlockExternalRelocations(self: *Self) void {
         const code = self.vm.code orelse return;
         code.flushPending();
-        const cards_offset: i64 = @bitCast(self.vm.vm_asm.cards_offset);
-        const decks_offset: i64 = @bitCast(self.vm.vm_asm.decks_offset);
+        const cards_offset: layouts.Fixnum = @bitCast(self.vm.vm_asm.cards_offset);
+        const decks_offset: layouts.Fixnum = @bitCast(self.vm.vm_asm.decks_offset);
         const has_uninitialized = code.uninitialized_blocks.count() != 0;
 
         for (code.all_blocks_sorted.items) |block_addr| {

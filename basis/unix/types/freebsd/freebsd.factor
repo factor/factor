@@ -27,3 +27,5 @@ TYPEDEF: __uint64_t fsfilcnt_t
 TYPEDEF: void* posix_spawn_file_actions_t
 TYPEDEF: void* posix_spawnattr_t
 TYPEDEF: uint sigset_t
+
+TYPEDEF: long suseconds_t

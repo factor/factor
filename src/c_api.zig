@@ -456,12 +456,12 @@ pub export fn from_unsigned_cell(integer: Cell, vm_asm: *VMAssemblyFields) callc
 
 /// Convert signed 64-bit to Factor integer
 pub export fn from_signed_8(n: i64, vm_asm: *VMAssemblyFields) callconv(.c) Cell {
-    return from_signed_cell(@intCast(n), vm_asm);
+    return fixnum.fromSignedCell(vm_asm.getVM(), n);
 }
 
 /// Convert unsigned 64-bit to Factor integer
 pub export fn from_unsigned_8(n: u64, vm_asm: *VMAssemblyFields) callconv(.c) Cell {
-    return from_unsigned_cell(n, vm_asm);
+    return fixnum.fromUnsigned64(vm_asm.getVM(), n);
 }
 
 /// Convert signed 32-bit to Factor integer

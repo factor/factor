@@ -227,7 +227,7 @@ pub const CodeBlock = extern struct {
         compiler.iterateQuotation() catch {
             return 0;
         };
-        return compiler.jit.getPosition();
+        return @intCast(compiler.jit.getPosition());
     }
 
     pub fn fromAddress(addr: Cell) *Self {
@@ -410,33 +410,43 @@ pub const InstructionOperand = struct {
         };
     }
 
-    fn loadValueMasked(self: *const Self, msb: u5, lsb: u5, scaling: u5) i64 {
+    // Image relocation has an instruction address before its code block moves.
+    pub fn atPointer(pointer: Cell, rel_class: RelocationClass) Self {
+        return .{
+            .rel = RelocationEntry.init(.here, rel_class, 0),
+            .compiled = undefined,
+            .index = 0,
+            .pointer = pointer,
+        };
+    }
+
+    fn loadValueMasked(self: *const Self, msb: u5, lsb: u5, scaling: u5) layouts.Fixnum {
         const ptr: *align(1) const i32 = @ptrFromInt(self.pointer - @sizeOf(u32));
         const value = ptr.*;
 
         const shifted = value << (31 - msb);
         const extracted: i32 = shifted >> (31 - msb + lsb);
 
-        return @as(i64, extracted) << scaling;
+        return @as(layouts.Fixnum, extracted) << scaling;
     }
 
-    pub fn loadValue(self: *const Self) i64 {
+    pub fn loadValue(self: *const Self) layouts.Fixnum {
         return switch (self.rel.getClass()) {
             .absolute_cell => @bitCast(@as(*align(1) const Cell, @ptrFromInt(self.pointer - @sizeOf(Cell))).*),
-            .absolute => @as(*align(1) const u32, @ptrFromInt(self.pointer - @sizeOf(u32))).*,
+            .absolute => @bitCast(@as(Cell, @as(*align(1) const u32, @ptrFromInt(self.pointer - @sizeOf(u32))).*)),
             .absolute_2 => @as(*align(1) const u16, @ptrFromInt(self.pointer - @sizeOf(u16))).*,
             .absolute_1 => @as(*const u8, @ptrFromInt(self.pointer - @sizeOf(u8))).*, // u8 always aligned
             .relative => blk: {
                 const offset: i32 = @as(*align(1) const i32, @ptrFromInt(self.pointer - @sizeOf(i32))).*;
-                break :blk @as(i64, offset) + @as(i64, @bitCast(self.pointer));
+                break :blk @as(layouts.Fixnum, offset) +% @as(layouts.Fixnum, @bitCast(self.pointer));
             },
             .relative_arm_b => blk: {
                 const masked = self.loadValueMasked(25, 0, 2);
-                break :blk masked + @as(i64, @bitCast(self.pointer)) - 4;
+                break :blk masked +% @as(layouts.Fixnum, @bitCast(self.pointer)) -% 4;
             },
             .relative_arm_b_cond_ldr => blk: {
                 const masked = self.loadValueMasked(23, 5, 2);
-                break :blk masked + @as(i64, @bitCast(self.pointer)) - 4;
+                break :blk masked +% @as(layouts.Fixnum, @bitCast(self.pointer)) -% 4;
             },
             .absolute_arm_ldur => self.loadValueMasked(20, 12, 0),
             .absolute_arm_cmp => self.loadValueMasked(21, 10, 0) & 0xfff,
@@ -449,23 +459,23 @@ pub const InstructionOperand = struct {
         };
     }
 
-    pub fn loadValueRelative(self: *const Self, relative_to: Cell) i64 {
+    pub fn loadValueRelative(self: *const Self, relative_to: Cell) layouts.Fixnum {
         return switch (self.rel.getClass()) {
             .absolute_cell => @bitCast(@as(*align(1) const Cell, @ptrFromInt(self.pointer - @sizeOf(Cell))).*),
-            .absolute => @as(*align(1) const u32, @ptrFromInt(self.pointer - @sizeOf(u32))).*,
+            .absolute => @bitCast(@as(Cell, @as(*align(1) const u32, @ptrFromInt(self.pointer - @sizeOf(u32))).*)),
             .absolute_2 => @as(*align(1) const u16, @ptrFromInt(self.pointer - @sizeOf(u16))).*,
             .absolute_1 => @as(*const u8, @ptrFromInt(self.pointer - @sizeOf(u8))).*, // u8 always aligned
             .relative => blk: {
                 const offset: i32 = @as(*align(1) const i32, @ptrFromInt(self.pointer - @sizeOf(i32))).*;
-                break :blk @as(i64, offset) + @as(i64, @bitCast(relative_to));
+                break :blk @as(layouts.Fixnum, offset) +% @as(layouts.Fixnum, @bitCast(relative_to));
             },
             .relative_arm_b => blk: {
                 const masked = self.loadValueMasked(25, 0, 2);
-                break :blk masked + @as(i64, @bitCast(relative_to)) - 4;
+                break :blk masked +% @as(layouts.Fixnum, @bitCast(relative_to)) -% 4;
             },
             .relative_arm_b_cond_ldr => blk: {
                 const masked = self.loadValueMasked(23, 5, 2);
-                break :blk masked + @as(i64, @bitCast(relative_to)) - 4;
+                break :blk masked +% @as(layouts.Fixnum, @bitCast(relative_to)) -% 4;
             },
             .absolute_arm_ldur => self.loadValueMasked(20, 12, 0),
             .absolute_arm_cmp => self.loadValueMasked(21, 10, 0) & 0xfff,
@@ -478,18 +488,18 @@ pub const InstructionOperand = struct {
         };
     }
 
-    fn storeValueMasked(self: *Self, value: i64, mask: u32, lsb: u5, scaling: u5) void {
+    fn storeValueMasked(self: *Self, value: layouts.Fixnum, mask: u32, lsb: u5, scaling: u5) void {
         const ptr: *align(1) u32 = @ptrFromInt(self.pointer - @sizeOf(u32));
         const old = ptr.*;
 
-        const shifted_value: u32 = @truncate(@as(u64, @bitCast(value >> scaling)));
+        const shifted_value: u32 = @truncate(@as(u64, @bitCast(@as(i64, value >> scaling))));
         const positioned = (shifted_value << lsb) & mask;
 
         ptr.* = (old & ~mask) | positioned;
     }
 
-    pub fn storeValue(self: *Self, absolute_value: i64) void {
-        const relative_value = absolute_value - @as(i64, @bitCast(self.pointer));
+    pub fn storeValue(self: *Self, absolute_value: layouts.Fixnum) void {
+        const relative_value = absolute_value -% @as(layouts.Fixnum, @bitCast(self.pointer));
 
         switch (self.rel.getClass()) {
             .absolute_cell => {
@@ -498,15 +508,15 @@ pub const InstructionOperand = struct {
             },
             .absolute => {
                 const ptr: *align(1) u32 = @ptrFromInt(self.pointer - @sizeOf(u32));
-                ptr.* = @truncate(@as(u64, @bitCast(absolute_value)));
+                ptr.* = @truncate(@as(u64, @bitCast(@as(i64, absolute_value))));
             },
             .absolute_2 => {
                 const ptr: *align(1) u16 = @ptrFromInt(self.pointer - @sizeOf(u16));
-                ptr.* = @truncate(@as(u64, @bitCast(absolute_value)));
+                ptr.* = @truncate(@as(u64, @bitCast(@as(i64, absolute_value))));
             },
             .absolute_1 => {
                 const ptr: *u8 = @ptrFromInt(self.pointer - @sizeOf(u8)); // u8 always aligned
-                ptr.* = @truncate(@as(u64, @bitCast(absolute_value)));
+                ptr.* = @truncate(@as(u64, @bitCast(@as(i64, absolute_value))));
             },
             .relative => {
                 const ptr: *align(1) i32 = @ptrFromInt(self.pointer - @sizeOf(i32));
@@ -601,7 +611,7 @@ pub fn applyRelocations(block: *CodeBlock, ctx: *const RelocationContext) void {
         const entry_ptr: *const RelocationEntry = @ptrCast(@alignCast(reloc_data + i * @sizeOf(RelocationEntry)));
         var op = InstructionOperand.init(entry_ptr.*, block, param_index);
 
-        const value: i64 = switch (entry_ptr.getType()) {
+        const value: layouts.Fixnum = switch (entry_ptr.getType()) {
             .literal => @bitCast(requireLiterals(ctx, &literal_index)),
             .entry_point => blk: {
                 const lit = requireLiterals(ctx, &literal_index);
@@ -632,9 +642,9 @@ pub fn applyRelocations(block: *CodeBlock, ctx: *const RelocationContext) void {
                 std.debug.assert(layouts.hasTag(lit, .fixnum));
                 const offset = layouts.untagFixnum(lit);
                 if (offset >= 0) {
-                    break :blk @as(i64, @bitCast(block.entryPoint() + entry_ptr.getOffset())) + offset;
+                    break :blk @as(layouts.Fixnum, @bitCast(block.entryPoint() + entry_ptr.getOffset())) + offset;
                 }
-                break :blk @as(i64, @bitCast(block.entryPoint())) - offset;
+                break :blk @as(layouts.Fixnum, @bitCast(block.entryPoint())) - offset;
             },
             .this => @bitCast(block.entryPoint()),
             .untagged => blk: {
@@ -646,7 +656,7 @@ pub fn applyRelocations(block: *CodeBlock, ctx: *const RelocationContext) void {
             .vm => blk: {
                 const offset_cell = requireParameters(ctx, param_index, 1).data()[param_index];
                 std.debug.assert(layouts.hasTag(offset_cell, .fixnum));
-                break :blk @as(i64, @bitCast(ctx.vm_ptr)) + layouts.untagFixnum(offset_cell);
+                break :blk @as(layouts.Fixnum, @bitCast(ctx.vm_ptr)) + layouts.untagFixnum(offset_cell);
             },
             .cards_offset => @bitCast(ctx.cards_offset),
             .decks_offset => @bitCast(ctx.decks_offset),
@@ -654,11 +664,11 @@ pub fn applyRelocations(block: *CodeBlock, ctx: *const RelocationContext) void {
             .inline_cache_miss => @bitCast(ctx.inline_cache_miss_ptr),
             .safepoint => @bitCast(ctx.safepoint_page),
             .trampoline => if (builtin.cpu.arch == .aarch64)
-                @as(i64, @bitCast(@intFromPtr(&trampolines.trampoline)))
+                @as(layouts.Fixnum, @bitCast(@intFromPtr(&trampolines.trampoline)))
             else
                 unreachable,
             .trampoline2 => if (builtin.cpu.arch == .aarch64)
-                @as(i64, @bitCast(@intFromPtr(&trampolines.trampoline2)))
+                @as(layouts.Fixnum, @bitCast(@intFromPtr(&trampolines.trampoline2)))
             else
                 unreachable,
         };
@@ -944,7 +954,7 @@ pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, select
                                 }
                             }
                         }
-                        const new_ep_value: i64 = @bitCast(new_ep);
+                        const new_ep_value: layouts.Fixnum = @bitCast(new_ep);
                         if (op.loadValue() != new_ep_value) {
                             op.storeValue(new_ep_value);
                             modified = true;
@@ -963,7 +973,7 @@ pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, select
                     if (reset_site) {
                         const owner = codeBlockOwner(dest);
                         if (owner != layouts.false_object) {
-                            const new_ep_value: i64 = @bitCast(computeEntryPointPicAddress(owner, max_pic_size, lazy_jit_ep));
+                            const new_ep_value: layouts.Fixnum = @bitCast(computeEntryPointPicAddress(owner, max_pic_size, lazy_jit_ep));
                             if (op.loadValue() != new_ep_value) {
                                 op.storeValue(new_ep_value);
                                 modified = true;
@@ -983,7 +993,7 @@ pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, select
                     if (reset_site) {
                         const owner = codeBlockOwner(dest);
                         if (owner != layouts.false_object) {
-                            const new_ep_value: i64 = @bitCast(computeEntryPointPicTailAddress(owner, max_pic_size, lazy_jit_ep));
+                            const new_ep_value: layouts.Fixnum = @bitCast(computeEntryPointPicTailAddress(owner, max_pic_size, lazy_jit_ep));
                             if (op.loadValue() != new_ep_value) {
                                 op.storeValue(new_ep_value);
                                 modified = true;
@@ -1101,14 +1111,14 @@ test "ARM64 CMP relocation is unsigned and LDUR is signed" {
         .pointer = @intFromPtr(&instruction) + 4,
     };
     for ([_]i64{ 0, 2047, 2048, 4095 }) |value| {
-        operand.storeValue(value);
+        operand.storeValue(@intCast(value));
         try std.testing.expectEqual(value, operand.loadValue());
         try std.testing.expectEqual(value, operand.loadValueRelative(0));
     }
     instruction = 0xf8400000; // LDUR X0, [X0]
     operand.rel = RelocationEntry.init(.untagged, .absolute_arm_ldur, 4);
     for ([_]i64{ -256, -1, 0, 255 }) |value| {
-        operand.storeValue(value);
+        operand.storeValue(@intCast(value));
         try std.testing.expectEqual(value, operand.loadValue());
     }
 }

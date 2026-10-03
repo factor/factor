@@ -34,10 +34,10 @@ const vm_mod = @import("vm.zig");
 // Comptime verification of struct layouts that JIT code relies on
 comptime {
     if (@offsetOf(contexts.Context, "callstack_top") != 0) @compileError("callstack_top must be at offset 0");
-    if (@offsetOf(contexts.Context, "callstack_bottom") != 8) @compileError("callstack_bottom must be at offset 8");
-    if (@offsetOf(contexts.Context, "datastack") != 16) @compileError("datastack must be at offset 16");
-    if (@offsetOf(contexts.Context, "retainstack") != 24) @compileError("retainstack must be at offset 24");
-    if (@offsetOf(contexts.Context, "callstack_save") != 32) @compileError("callstack_save must be at offset 32");
+    if (@offsetOf(contexts.Context, "callstack_bottom") != @sizeOf(layouts.Cell)) @compileError("callstack_bottom must be at cell offset 1");
+    if (@offsetOf(contexts.Context, "datastack") != 2 * @sizeOf(layouts.Cell)) @compileError("datastack must be at cell offset 2");
+    if (@offsetOf(contexts.Context, "retainstack") != 3 * @sizeOf(layouts.Cell)) @compileError("retainstack must be at cell offset 3");
+    if (@offsetOf(contexts.Context, "callstack_save") != 4 * @sizeOf(layouts.Cell)) @compileError("callstack_save must be at cell offset 4");
 
     if (@offsetOf(vm_mod.VMAssemblyFields, "ctx") != 0) @compileError("ctx must be at offset 0 in VMAssemblyFields");
 }
@@ -263,7 +263,7 @@ fn initSpecialObjects(vm: *vm_mod.FactorVM, image_path: []const u8, executable_p
     const stderr_ptr = getCStderr();
 
     // OBJ_CELL_SIZE = 7
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.cell_size)] = layouts.tagFixnum(8);
+    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.cell_size)] = layouts.tagFixnum(@sizeOf(layouts.Cell));
 
     // OBJ_ARGS = 10 - initialized to false, will be set by passArgsToFactor
     vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.args)] = layouts.false_object;
@@ -622,7 +622,7 @@ test "passArgsToFactor survives repeated nursery collections" {
     // The minimum nursery is one deck (256 KiB). Enough aliens to collect it
     // twice exercise both hazards: re-deriving the promoted args array after
     // each allocation and remembering its later old->young stores.
-    const arg_count = 12_000;
+    const arg_count = 12_000 * 8 / @sizeOf(layouts.Cell);
     var args: [arg_count][:0]const u8 = undefined;
     @memset(&args, "gc-root");
     passArgsToFactor(vm, &args);

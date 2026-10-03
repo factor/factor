@@ -5,8 +5,8 @@ classes.struct kernel math unix.types ;
 IN: unix.time
 
 STRUCT: timeval
-    { sec long }
-    { usec long } ;
+    { sec time_t }
+    { usec suseconds_t } ;
 
 STRUCT: timespec
     { sec time_t }

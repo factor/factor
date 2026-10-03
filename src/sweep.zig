@@ -116,7 +116,7 @@ fn extractFreeRuns(
     var in_free = free_start != 0;
 
     while (pos < @bitSizeOf(Cell)) {
-        const shift: u6 = @truncate(pos);
+        const shift: layouts.CellShift = @truncate(pos);
         if (in_free) {
             // Find next set bit (end of free region)
             const remaining = mask >> shift;

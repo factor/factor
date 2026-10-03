@@ -963,7 +963,7 @@ pub fn factorbug(vm: *FactorVM) void {
             } else if (arch == .aarch64) {
                 asm volatile ("udf #0");
             } else {
-                const ptr: *volatile u8 = @ptrFromInt(0);
+                const ptr: *allowzero volatile u8 = @ptrFromInt(0);
                 _ = ptr.*;
             }
         } else if (std.mem.startsWith(u8, cmd, "d ")) {

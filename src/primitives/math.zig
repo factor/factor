@@ -660,11 +660,7 @@ pub export fn primitive_bits_float(vm_asm: *VMAssemblyFields) callconv(.c) void 
         },
         .bignum => {
             const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(int_cell));
-            var cell_val: u64 = 0;
-            const len = bn.length();
-            if (len > 0) cell_val = bn.getDigit(0);
-            if (bn.isNegative()) cell_val = ~cell_val +% 1;
-            bits = @truncate(cell_val);
+            bits = @truncate(bignum.toUint64(bn));
         },
         else => vm.typeError(.fixnum, int_cell),
     }
@@ -683,29 +679,7 @@ pub export fn primitive_double_bits(vm_asm: *VMAssemblyFields) callconv(.c) void
     const source_bits: *const u64 = @ptrCast(&boxed.n);
     const bits = source_bits.*;
 
-    // Convert u64 to Factor integer (fixnum or bignum)
-    // Check if it fits in a fixnum
-    const max_fixnum: Cell = @bitCast(@as(Fixnum, std.math.maxInt(Fixnum) >> @intCast(layouts.tag_bits)));
-    if (bits <= max_fixnum) {
-        ctx.replace(layouts.tagFixnum(@intCast(bits)));
-    } else {
-        // Need to create a bignum
-        // Determine how many digits needed (1 or 2 on 64-bit)
-        const digit_bits = bignum.DIGIT_BITS;
-        const digit_mask = bignum.DIGIT_MASK;
-
-        const low_digit = bits & digit_mask;
-        const high_digit = bits >> digit_bits;
-
-        const num_digits: Cell = if (high_digit == 0) 1 else 2;
-        const bn = allocBignumWithDigit(vm, num_digits, false, low_digit) catch vm.memoryError();
-
-        if (num_digits == 2) {
-            bn.setDigit(1, high_digit);
-        }
-
-        ctx.replace(layouts.tagBignum(bn));
-    }
+    ctx.replace(@import("../fixnum.zig").fromUnsigned64(vm, bits));
 }
 
 pub export fn primitive_bits_double(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -724,22 +698,7 @@ pub export fn primitive_bits_double(vm_asm: *VMAssemblyFields) callconv(.c) void
         },
         .bignum => {
             const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(int_cell));
-            // Extract low 64 bits from bignum magnitude.
-            const len = bn.length();
-            if (len == 0) {
-                bits = 0;
-            } else if (len == 1) {
-                bits = bn.getDigit(0);
-            } else {
-                // Use low 64 bits for oversized bignums
-                const low = bn.getDigit(0);
-                const high = bn.getDigit(1);
-                bits = (high << bignum.DIGIT_BITS) | low;
-            }
-            // Handle negative bignums: two's complement
-            if (bn.isNegative()) {
-                bits = ~bits +% 1;
-            }
+            bits = bignum.toUint64(bn);
         },
         else => vm.typeError(.fixnum, int_cell),
     }

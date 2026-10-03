@@ -1,4 +1,4 @@
-USING: accessors io io.encodings.ascii io.files io.files.temp
+USING: accessors environment io io.encodings.ascii io.files io.files.temp
 io.launcher kernel make sequences system tools.test ;
 IN: compiler.tests.callback-error
 
@@ -7,7 +7,11 @@ IN: compiler.tests.callback-error
 
 : run-vm-with-script ( -- lines )
     <process>
-        [ vm-path , callback-error-script , ] { } make >>command
+        [
+            vm-path ,
+            "FACTOR_TEST_CHILD_IMAGE" os-env [ "-i=" prepend , ] when*
+            callback-error-script ,
+        ] { } make >>command
         +closed+ >>stdin
         +stdout+ >>stderr
     ascii <process-reader> stream-lines ;

@@ -206,7 +206,7 @@ pub fn handleSafepoint(vm: *vm_mod.FactorVM, pc: Cell) !void {
 // sampleCallstacksAdd never allocates inside the safepoint handler.
 // On overflow further entries are dropped (counted in dropped_callstack_entries).
 const MAX_SAMPLE_CALLSTACK_ENTRIES: Cell = 2 * 1024 * 1024; // 16MB of cells
-pub var dropped_callstack_entries: std.atomic.Value(u64) = std.atomic.Value(u64).init(0);
+pub var dropped_callstack_entries: std.atomic.Value(Cell) = std.atomic.Value(Cell).init(0);
 
 fn sampleCallstackCapacity(samples_per_second: Cell) Cell {
     // ~10s of samples at ~64 frames each, clamped to the hard cap.

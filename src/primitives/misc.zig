@@ -76,10 +76,10 @@ pub export fn primitive_nano_count(vm_asm: *VMAssemblyFields) callconv(.c) void 
     const now_u = nanoCountMonotonic();
     // Track monotonicity
     if (now_u < vm.last_nano_count) {
-        vm.push(math.fromUnsignedCell(vm, vm.last_nano_count));
+        vm.push(math.fromUnsigned64(vm, vm.last_nano_count));
     } else {
         vm.last_nano_count = now_u;
-        vm.push(math.fromUnsignedCell(vm, now_u));
+        vm.push(math.fromUnsigned64(vm, now_u));
     }
 }
 

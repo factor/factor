@@ -326,9 +326,9 @@ pub const Interpreter = struct {
             const n_val = layouts.untagFixnum(ctx.pop());
             const x_val = layouts.untagFixnum(ctx.pop());
             const result = if (n_val >= 0)
-                if (n_val < 64) x_val << @intCast(n_val) else @as(Fixnum, 0)
+                if (n_val < @bitSizeOf(Fixnum)) x_val << @intCast(n_val) else @as(Fixnum, 0)
             else
-                x_val >> @as(u6, @intCast(@min(63, -n_val)));
+                x_val >> @as(layouts.CellShift, @intCast(@min(@bitSizeOf(Fixnum) - 1, -n_val)));
             ctx.push(layouts.tagFixnum(result));
         } else if (wordNameEquals(word, "fixnum<")) {
             const y = ctx.pop();

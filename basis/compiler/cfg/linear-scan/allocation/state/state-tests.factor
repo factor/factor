@@ -71,7 +71,7 @@ cpu x86.64? [
 
 ! assign-spill-slot
 ${
-    cpu x86.32?
+    cell 4 =
     H{
         { { 3 4 } T{ spill-slot { n 32 } } }
         { { 1234 4 } T{ spill-slot } }

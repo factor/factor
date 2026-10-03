@@ -34,14 +34,14 @@ pub const SignedDigit = Fixnum;
 pub const TwoDigit = i128;
 
 // Bit width constants.
-pub const DIGIT_BITS: u6 = @bitSizeOf(Cell) - 2;
+pub const DIGIT_BITS: layouts.CellShift = @bitSizeOf(Cell) - 2;
 
 // Radix and masks.
 pub const RADIX: Cell = @as(Cell, 1) << DIGIT_BITS;
 pub const DIGIT_MASK: Cell = RADIX - 1;
 
 // Half-digit constants for single-digit division specializations.
-pub const HALF_DIGIT_BITS: u6 = DIGIT_BITS / 2;
+pub const HALF_DIGIT_BITS: layouts.CellShift = DIGIT_BITS / 2;
 pub const HALF_DIGIT_MASK: Cell = (@as(Cell, 1) << HALF_DIGIT_BITS) - 1;
 pub const RADIX_ROOT: Cell = @as(Cell, 1) << HALF_DIGIT_BITS;
 
@@ -284,7 +284,7 @@ pub fn fromInt64(vm: *FactorVM, n: i64) !*Bignum {
 
     if (abs_n < RADIX) {
         const bn = try allocBignum(vm, 1, negative);
-        bn.setDigit(0, abs_n & DIGIT_MASK);
+        bn.setDigit(0, @intCast(abs_n & DIGIT_MASK));
         return bn;
     }
 
@@ -294,7 +294,7 @@ pub fn fromInt64(vm: *FactorVM, n: i64) !*Bignum {
     var val = abs_n;
     var i: Cell = 0;
     while (val != 0) : (i += 1) {
-        bn.setDigit(i, val & DIGIT_MASK);
+        bn.setDigit(i, @intCast(val & DIGIT_MASK));
         val >>= DIGIT_BITS;
     }
     return bn;
@@ -308,7 +308,7 @@ pub fn fromUint64(vm: *FactorVM, n: u64) !*Bignum {
 
     if (n < RADIX) {
         const bn = try allocBignum(vm, 1, false);
-        bn.setDigit(0, n & DIGIT_MASK);
+        bn.setDigit(0, @intCast(n & DIGIT_MASK));
         return bn;
     }
 
@@ -318,7 +318,7 @@ pub fn fromUint64(vm: *FactorVM, n: u64) !*Bignum {
     var val = n;
     var i: Cell = 0;
     while (val != 0) : (i += 1) {
-        bn.setDigit(i, val & DIGIT_MASK);
+        bn.setDigit(i, @intCast(val & DIGIT_MASK));
         val >>= DIGIT_BITS;
     }
     return bn;
@@ -360,12 +360,14 @@ pub fn toUint64(bn: *const Bignum) u64 {
 
     const len = bn.length();
     if (len == 1) {
-        return @intCast(bn.getDigit(0));
+        const result: u64 = @intCast(bn.getDigit(0));
+        return if (bn.isNegative()) 0 -% result else result;
     }
     if (len == 2) {
         const lo: u64 = @intCast(bn.getDigit(0));
         const hi: u64 = @intCast(bn.getDigit(1));
-        return (hi << DIGIT_BITS) | lo;
+        const result = (hi << DIGIT_BITS) | lo;
+        return if (bn.isNegative()) 0 -% result else result;
     }
 
     var result: u64 = 0;
@@ -376,7 +378,7 @@ pub fn toUint64(bn: *const Bignum) u64 {
         result = (result << DIGIT_BITS) | bn.getDigit(i);
     }
 
-    return result;
+    return if (bn.isNegative()) 0 -% result else result;
 }
 
 // Create bignum from fixnum using VM nursery
@@ -392,7 +394,7 @@ pub fn fromFixnum(vm: *FactorVM, n: Fixnum) !*Bignum {
     if (abs_n < RADIX) {
         // Single digit
         const bn = try allocBignum(vm, 1, negative);
-        bn.setDigit(0, abs_n & DIGIT_MASK);
+        bn.setDigit(0, @intCast(abs_n & DIGIT_MASK));
         return bn;
     }
 
@@ -417,7 +419,7 @@ pub fn fromCell(vm: *FactorVM, n: Cell) !*Bignum {
 
     if (n < RADIX) {
         const bn = try allocBignum(vm, 1, false);
-        bn.setDigit(0, n & DIGIT_MASK);
+        bn.setDigit(0, @intCast(n & DIGIT_MASK));
         return bn;
     }
 
@@ -427,7 +429,7 @@ pub fn fromCell(vm: *FactorVM, n: Cell) !*Bignum {
     var val = n;
     var i: Cell = 0;
     while (val != 0) : (i += 1) {
-        bn.setDigit(i, val & DIGIT_MASK);
+        bn.setDigit(i, @intCast(val & DIGIT_MASK));
         val >>= DIGIT_BITS;
     }
 
@@ -1116,7 +1118,7 @@ pub fn gcd(vm: *FactorVM, a: *const Bignum, b: *const Bignum) !*Bignum {
         const b_digits = b_bn.digits();
 
         const top_a = a_digits[size_a - 1];
-        const nbits: u6 = @intCast((@bitSizeOf(Cell) - 1) - @clz(top_a));
+        const nbits: layouts.CellShift = @intCast((@bitSizeOf(Cell) - 1) - @clz(top_a));
         const shift_left: u7 = @intCast(DIGIT_BITS - nbits);
 
         var x: TwoDigit = (@as(TwoDigit, @intCast(a_digits[size_a - 1])) << shift_left) |
@@ -1264,7 +1266,7 @@ pub fn testBit(x: *const Bignum, bit: Cell) bool {
     if (x.isZero()) return false;
 
     const digit_index = bit / DIGIT_BITS;
-    const bit_index: u6 = @intCast(bit % DIGIT_BITS);
+    const bit_index: layouts.CellShift = @intCast(bit % DIGIT_BITS);
 
     if (!x.isNegative()) {
         // Positive: simple bit test
@@ -1381,7 +1383,7 @@ pub fn fromDouble(vm: *FactorVM, x: f64) !*Bignum {
     const digits_ptr = result.digits();
 
     // Handle odd bits at the top
-    const odd_bits: u6 = @intCast(@mod(@as(i32, @intCast(exponent)), DIGIT_BITS));
+    const odd_bits: layouts.CellShift = @intCast(@mod(@as(i32, @intCast(exponent)), DIGIT_BITS));
     if (odd_bits > 0) {
         significand *= @as(f64, @floatFromInt(@as(Cell, 1) << odd_bits));
         const digit: Cell = @intFromFloat(significand);
@@ -1985,10 +1987,10 @@ fn divideBySingleDigitRemainderOnly(vm: *FactorVM, numerator_in: *const Bignum, 
         while (i > 0) {
             i -= 1;
             const digit = numerator.getDigit(i);
-            const lo: u64 = (rem_acc << DIGIT_BITS) | digit;
-            const hi: u64 = rem_acc >> @intCast(@as(u7, 64) - DIGIT_BITS);
+            const lo: u64 = (@as(u64, rem_acc) << DIGIT_BITS) | digit;
+            const hi: u64 = @as(u64, rem_acc) >> @intCast(@as(u7, 64) - DIGIT_BITS);
             const result = divmod128by64(hi, lo, divisor);
-            rem_acc = result.r;
+            rem_acc = @intCast(result.r);
         }
         break :blk rem_acc;
     };
@@ -2027,11 +2029,11 @@ fn scaleDownFull(numerator: *const Bignum, q: *Bignum, n_len: Cell, divisor: Cel
     while (i > 0) {
         i -= 1;
         const digit = numerator.getDigit(i);
-        const lo: u64 = (rem << DIGIT_BITS) | digit;
-        const hi: u64 = rem >> @intCast(@as(u7, 64) - DIGIT_BITS);
+        const lo: u64 = (@as(u64, rem) << DIGIT_BITS) | digit;
+        const hi: u64 = @as(u64, rem) >> @intCast(@as(u7, 64) - DIGIT_BITS);
         const result = divmod128by64(hi, lo, divisor);
-        q.setDigit(i, result.q);
-        rem = result.r;
+        q.setDigit(i, @intCast(result.q));
+        rem = @intCast(result.r);
     }
     return rem;
 }
@@ -2082,8 +2084,8 @@ fn divideKnuthCore(
 
     // Step D1: Normalize - find shift to make top digit of denominator >= RADIX/2
     const top_d = denominator_in.getDigit(d_len - 1);
-    const bitlen: u6 = @intCast(@bitSizeOf(Cell) - @clz(top_d));
-    const norm_shift: u6 = @intCast(DIGIT_BITS - bitlen);
+    const bitlen: layouts.CellShift = @intCast(@bitSizeOf(Cell) - @clz(top_d));
+    const norm_shift: layouts.CellShift = @intCast(DIGIT_BITS - bitlen);
 
     // Shift numerator and denominator for normalization (may GC)
     var u_cell: Cell = undefined;
@@ -2266,13 +2268,13 @@ fn divideKnuthCore(
 fn shiftRightInPlace(x: *Bignum, shift_bits: Cell) !*Bignum {
     if (shift_bits == 0) return x;
 
-    const bit_shift: u6 = @intCast(shift_bits % DIGIT_BITS);
+    const bit_shift: layouts.CellShift = @intCast(shift_bits % DIGIT_BITS);
     if (bit_shift == 0) return x;
 
     const x_len = x.length();
     const d = x.digits();
     // Process all elements except the last without a branch,
-    const complement_shift: u6 = @as(u6, DIGIT_BITS) - bit_shift;
+    const complement_shift: layouts.CellShift = @as(layouts.CellShift, DIGIT_BITS) - bit_shift;
     if (x_len > 1) {
         for (0..x_len - 1) |i| {
             d[i] = (d[i] >> bit_shift) | ((d[i + 1] << complement_shift) & DIGIT_MASK);
@@ -2293,7 +2295,7 @@ fn shiftLeft(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Bignum {
     defer _ = vm.data_roots.pop();
 
     const digit_shift = shift_bits / DIGIT_BITS;
-    const bit_shift: u6 = @intCast(shift_bits % DIGIT_BITS);
+    const bit_shift: layouts.CellShift = @intCast(shift_bits % DIGIT_BITS);
 
     const x_len = x_in.length();
     const is_neg = x_in.isNegative();
@@ -2311,7 +2313,7 @@ fn shiftLeft(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Bignum {
         for (0..x_len) |i| {
             const digit = x_digits[i];
             r_digits[i + digit_shift] = ((digit << bit_shift) | carry) & DIGIT_MASK;
-            carry = digit >> (@as(u6, DIGIT_BITS) - bit_shift);
+            carry = digit >> (@as(layouts.CellShift, DIGIT_BITS) - bit_shift);
         }
         if (carry != 0) {
             r_digits[x_len + digit_shift] = carry;
@@ -2325,7 +2327,7 @@ fn shiftLeft(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Bignum {
 
 fn shiftRight(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Bignum {
     const digit_shift = shift_bits / DIGIT_BITS;
-    const bit_shift: u6 = @intCast(shift_bits % DIGIT_BITS);
+    const bit_shift: layouts.CellShift = @intCast(shift_bits % DIGIT_BITS);
 
     const x_len = x_in.length();
     if (digit_shift >= x_len) {
@@ -2354,7 +2356,7 @@ fn shiftRight(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Bignum {
     } else {
         // Process all elements except the last: merge with next digit
         // which handles the last element outside the loop.
-        const complement_shift: u6 = @as(u6, DIGIT_BITS) - bit_shift;
+        const complement_shift: layouts.CellShift = @as(layouts.CellShift, DIGIT_BITS) - bit_shift;
         if (r_len > 1) {
             for (0..r_len - 1) |i| {
                 r_digits[i] = (x_digits[i + digit_shift] >> bit_shift) |

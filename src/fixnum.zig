@@ -7,7 +7,7 @@ const Cell = layouts.Cell;
 const Fixnum = layouts.Fixnum;
 
 // Maximum fixnum value (signed)
-pub const fixnum_max: Fixnum = (@as(Fixnum, 1) << @as(u6, @intCast(layouts.word_size - layouts.tag_bits - 1))) - 1;
+pub const fixnum_max: Fixnum = (@as(Fixnum, 1) << @as(layouts.CellShift, @intCast(layouts.word_size - layouts.tag_bits - 1))) - 1;
 pub const fixnum_min: Fixnum = -fixnum_max - 1;
 
 // Fixnum arithmetic with overflow detection
@@ -35,7 +35,7 @@ pub fn shiftLeft(a: Fixnum, shift: Fixnum) FixnumResult {
     }
 
     // mask has all bits set from bit (WORD_SIZE - 1 - TAG_BITS - shift) upward
-    const mask_shift: u6 = @intCast(@as(Fixnum, @intCast(layouts.word_size - 1 - layouts.tag_bits)) - shift);
+    const mask_shift: layouts.CellShift = @intCast(@as(Fixnum, @intCast(layouts.word_size - 1 - layouts.tag_bits)) - shift);
     const mask = -%(@as(Fixnum, 1) << mask_shift);
     if ((if (a < 0) -a else a) & mask != 0) {
         return .{ .overflow = .{ .a = a, .b = shift } };
@@ -129,15 +129,23 @@ pub fn fromUnsignedCell(vm: *FactorVM, n: Cell) Cell {
     return vm.allotBignumFromCell(n);
 }
 
+pub fn fromUnsigned64(vm: *FactorVM, n: u64) Cell {
+    if (n <= fixnum_max) return layouts.tagFixnum(@intCast(n));
+    const bn = bignum.fromUint64(vm, n) catch vm.memoryError();
+    return layouts.tagBignum(bn);
+}
+
 // Convert signed i64 to a Factor value (fixnum or bignum)
 pub fn fromSignedCell(vm: *FactorVM, n: i64) Cell {
-    const min_fixnum = std.math.minInt(Fixnum) >> @as(u6, @intCast(layouts.tag_bits));
-    const max_fixnum = std.math.maxInt(Fixnum) >> @as(u6, @intCast(layouts.tag_bits));
+    const min_fixnum = std.math.minInt(Fixnum) >> @as(layouts.CellShift, @intCast(layouts.tag_bits));
+    const max_fixnum = std.math.maxInt(Fixnum) >> @as(layouts.CellShift, @intCast(layouts.tag_bits));
     if (n >= min_fixnum and n <= max_fixnum) {
         return layouts.tagFixnum(@intCast(n));
     }
     if (n >= 0) {
-        return vm.allotBignumFromCell(@bitCast(n));
+        if (@sizeOf(Cell) == 8) return vm.allotBignumFromCell(@bitCast(n));
+        const bn = bignum.fromInt64(vm, n) catch vm.memoryError();
+        return layouts.tagBignum(bn);
     } else {
         return vm.allotBignumFromSignedCell(n);
     }
@@ -196,6 +204,7 @@ test "fixnum shifts" {
 }
 
 test "toBignum, bignum.fromFixnum and from_signed_8 accept the most negative i64" {
+    if (@sizeOf(Cell) != 8) return error.SkipZigTest;
     const data_heap_mod = @import("data_heap.zig");
     const c_api = @import("c_api.zig");
     const testing = std.testing;
@@ -234,5 +243,32 @@ test "toBignum, bignum.fromFixnum and from_signed_8 accept the most negative i64
         try testing.expect(layouts.hasTag(tagged, .bignum));
         const bn3: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(tagged));
         try testing.expectEqual(n, bignum.toInt64(bn3));
+    }
+}
+
+test "32-bit VM FFI conversions preserve signed and unsigned 64-bit values" {
+    if (@sizeOf(Cell) != 4) return error.SkipZigTest;
+    const data_heap_mod = @import("data_heap.zig");
+    const c_api = @import("c_api.zig");
+    const primitives = @import("primitives.zig");
+    const vm = try FactorVM.init(std.testing.allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    defer {
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+    }
+    const heap = try data_heap_mod.DataHeap.init(std.testing.allocator, 256 * 1024, 64 * 1024, 64 * 1024);
+    defer heap.deinit();
+    vm.setDataHeap(heap);
+    for ([_]i64{ std.math.minInt(i64), std.math.minInt(i32), -1, 0, std.math.maxInt(i32), std.math.maxInt(i64) }) |value| {
+        const tagged = c_api.from_signed_8(value, &vm.vm_asm);
+        try std.testing.expectEqual(value, primitives.to_signed_8(tagged, &vm.vm_asm));
+        try std.testing.expectEqual(@as(u64, @bitCast(value)), primitives.to_unsigned_8(tagged, &vm.vm_asm));
+    }
+    for ([_]u64{ 0, std.math.maxInt(u32), 0x8000000000000000, std.math.maxInt(u64) }) |value| {
+        const tagged = c_api.from_unsigned_8(value, &vm.vm_asm);
+        try std.testing.expectEqual(value, primitives.to_unsigned_8(tagged, &vm.vm_asm));
     }
 }

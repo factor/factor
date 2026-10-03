@@ -6,6 +6,28 @@ math.floats.small.c-types math.vectors.simd.intrinsics math.vectors.simd.intrins
 math.vectors math.vectors.simd namespaces sequences specialized-arrays tools.test ;
 IN: math.vectors.simd.intrinsics.tests
 
+! Boolean floating lanes are complete bit masks, even on CPUs that
+! canonicalize NaNs when converting between floating precisions.
+{ uint-4{ 0xffffffff 0 0xffffffff 0 } }
+[ float-4{ t f t f } uint-4-cast ] unit-test
+
+{ ulonglong-2{ 0xffffffffffffffff 0 } }
+[ double-2{ t f } ulonglong-2-cast ] unit-test
+
+{ ushort-8{ 0xffff 0 0xffff 0 0xffff 0 0xffff 0 } }
+[ half-8{ t f t f t f t f } ushort-8-cast ] unit-test
+
+{ ushort-8{ 0xffff 0 0xffff 0 0xffff 0 0xffff 0 } }
+[ bfloat-8{ t f t f t f t f } ushort-8-cast ] unit-test
+
+{ float-4{ 2.0 2.0 -4.0 -4.0 } } [
+    float-4{ t t f f } float-4{ 2.0 2.0 0.0 0.0 }
+    float-4{ -4.0 -4.0 -4.0 -4.0 }
+    t "always-inline-simd-intrinsics" [
+        [ { float-4 float-4 float-4 } declare v? ] compile-call
+    ] with-variable
+] unit-test
+
 ! Byte shuffles wrap indices modulo 16 on every backend, including PSHUFB
 ! indices with bit 7 set. Run under each SSE cap to cover the fallback too.
 { t } [
@@ -335,9 +357,13 @@ all-simd-classes [
 ] unit-test
 
 ! Matching fallback results must not conceal failed native SIMD lowering.
-{ t } [
-    [ float-4-rep (simd-vmin) ] [ ##compare-vector? ] contains-insn?
-] unit-test
-{ t } [
-    [ double-2-rep (simd-vmax) ] [ ##compare-vector? ] contains-insn?
-] unit-test
+float-4-rep %min-vector-reps member? [
+    { t } [
+        [ float-4-rep (simd-vmin) ] [ ##compare-vector? ] contains-insn?
+    ] unit-test
+] when
+double-2-rep %max-vector-reps member? [
+    { t } [
+        [ double-2-rep (simd-vmax) ] [ ##compare-vector? ] contains-insn?
+    ] unit-test
+] when

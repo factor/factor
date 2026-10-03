@@ -3,6 +3,7 @@ const std = @import("std");
 
 pub const Cell = usize;
 pub const Fixnum = isize;
+pub const CellShift = std.math.Log2Int(Cell);
 
 pub fn orderCell(context: Cell, item: Cell) std.math.Order {
     return std.math.order(context, item);
@@ -245,6 +246,7 @@ pub const Bignum = bignum.Bignum;
 pub const ByteArray = extern struct {
     header: Cell,
     capacity: Cell, // tagged
+    padding: [16 - 2 * @sizeOf(Cell)]u8 = undefined,
 
     pub const type_number = TypeTag.byte_array;
     pub const element_size: Cell = 1;

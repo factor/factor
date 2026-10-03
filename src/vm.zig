@@ -113,7 +113,7 @@ pub const GCEvent = extern struct {
     comptime {
         std.debug.assert(@sizeOf(DataHeapRoom) == 14 * @sizeOf(Cell)); // 112
         std.debug.assert(@sizeOf(AllocatorRoom) == 5 * @sizeOf(Cell)); // 40
-        std.debug.assert(@sizeOf(GCEvent) == 408);
+        std.debug.assert(@sizeOf(GCEvent) == if (@sizeOf(Cell) == 8) 408 else 216);
     }
     op: u32,
     data_heap_before: DataHeapRoom,
@@ -219,15 +219,15 @@ pub const VMAssemblyFields = extern struct {
     decks_offset: Cell,
     signal_handler_addr: Cell,
     faulting_p: bool,
-    _padding: [7]u8,
+    _padding: [@sizeOf(Cell) - 1]u8,
     special_objects: [objects.special_object_count]Cell,
 
     pub fn getVM(self: *VMAssemblyFields) *FactorVM {
-        return @fieldParentPtr("vm_asm", self);
+        return @alignCast(@fieldParentPtr("vm_asm", self));
     }
 };
 
-pub const CToFactorFuncType = *const fn (Cell) void;
+pub const CToFactorFuncType = *const fn (Cell) callconv(.c) void;
 
 pub var g_fatal_erroring_p: bool = false;
 pub const FactorVM = struct {
@@ -907,7 +907,7 @@ pub const FactorVM = struct {
         var val = value;
         var i: Cell = 0;
         while (val != 0) : (i += 1) {
-            bn.setDigit(i, val & bignum_mod.DIGIT_MASK);
+            bn.setDigit(i, @intCast(val & bignum_mod.DIGIT_MASK));
             val >>= bignum_mod.DIGIT_BITS;
         }
 
@@ -916,7 +916,7 @@ pub const FactorVM = struct {
 
     pub fn allotBignumFromSignedCell(self: *Self, value: i64) Cell {
         const bignum_mod = @import("bignum.zig");
-        const abs_value: Cell = @bitCast(if (value == std.math.minInt(i64)) value else -value);
+        const abs_value: u64 = @bitCast(-%value);
         const num_digits: Cell = bignum_mod.countDigitsUnsigned(abs_value);
         const bn = bignum_mod.allocBignum(self, num_digits, true) catch {
             self.memoryError();
@@ -924,7 +924,7 @@ pub const FactorVM = struct {
         var val = abs_value;
         var i: Cell = 0;
         while (val != 0) : (i += 1) {
-            bn.setDigit(i, val & bignum_mod.DIGIT_MASK);
+            bn.setDigit(i, @intCast(val & bignum_mod.DIGIT_MASK));
             val >>= bignum_mod.DIGIT_BITS;
         }
 

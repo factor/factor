@@ -50,7 +50,7 @@ pub const MarkBits = struct {
         @memset(self.marked, 0);
     }
 
-    pub const BitIndex = struct { cell_index: usize, bit_index: u6 };
+    pub const BitIndex = struct { cell_index: usize, bit_index: layouts.CellShift };
 
     pub fn addressToBitIndex(self: *const Self, address: Cell) ?BitIndex {
         if (address < self.start or address >= self.end) {
@@ -65,7 +65,7 @@ pub const MarkBits = struct {
     pub fn addressToBitIndexUnchecked(self: *const Self, address: Cell) BitIndex {
         const offset = (address - self.start) / layouts.data_alignment;
         const cell_index = offset / mark_bits_granularity;
-        const bit_index: u6 = @truncate(offset % mark_bits_granularity);
+        const bit_index: layouts.CellShift = @truncate(offset % mark_bits_granularity);
 
         return .{ .cell_index = cell_index, .bit_index = bit_index };
     }
@@ -88,9 +88,9 @@ pub const MarkBits = struct {
         const end_line = @min(raw_end_line, total_lines);
 
         const start_cell = start_line / mark_bits_granularity;
-        const start_bit: u6 = @truncate(start_line % mark_bits_granularity);
+        const start_bit: layouts.CellShift = @truncate(start_line % mark_bits_granularity);
         const end_cell = end_line / mark_bits_granularity;
-        const end_bit: u6 = @truncate(end_line % mark_bits_granularity);
+        const end_bit: layouts.CellShift = @truncate(end_line % mark_bits_granularity);
 
         const start_mask: Cell = (@as(Cell, 1) << start_bit) - 1;
         const end_mask: Cell = (@as(Cell, 1) << end_bit) - 1;
@@ -230,7 +230,7 @@ pub const MarkBits = struct {
 
         var index = position.cell_index;
         while (index < self.bits_size) : (index += 1) {
-            const mask: i64 = @bitCast(self.marked[index]);
+            const mask: layouts.Fixnum = @bitCast(self.marked[index]);
             const shifted_mask = mask >> @truncate(bit_index);
             if (~shifted_mask != 0) {
                 const clear_bit = @ctz(~@as(Cell, @bitCast(shifted_mask)));

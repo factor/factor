@@ -778,7 +778,7 @@ bootstrap() {
     if [[ -n ${FACTOR_UI_BACKEND:-} ]]; then
         backend_args=("-ui-backend=$FACTOR_UI_BACKEND")
     fi
-    "./$FACTOR_BINARY" -i="$BOOT_IMAGE" "${backend_args[@]}"
+    "./$FACTOR_BINARY" -i="$PWD/$BOOT_IMAGE" "${backend_args[@]}"
     check_ret "./$FACTOR_BINARY bootstrap failed"
     copy_fresh_image
 }
@@ -823,10 +823,24 @@ make_boot_image() {
 }
 
 install_deps_apt() {
-    select_ui_backend
-    local gtk_package=libgtk-4-dev
-    [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=libgtk-3-dev
-    sudo apt install --yes libpango1.0-dev "$gtk_package" libepoxy-dev wget git rlwrap libssl-dev
+    local packages=(build-essential ca-certificates git wget rlwrap libssl-dev)
+    if [[ ${1:-} != headless ]]; then
+        select_ui_backend
+        local gtk_package=libgtk-4-dev
+        [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=libgtk-3-dev
+        packages+=(libpango1.0-dev "$gtk_package" libepoxy-dev)
+    fi
+    sudo apt-get install --yes "${packages[@]}"
+    check_ret sudo
+}
+
+install_deps_apt_tests() {
+    install_deps_apt
+    sudo apt-get install --yes ripgrep libcapstone-dev xvfb xauth \
+        libgl1-mesa-dri libglu1-mesa-dev libsqlite3-dev libpq-dev libopenal-dev libsdl2-dev \
+        libyaml-dev libgsl-dev libgmp-dev libzmq3-dev libuv1-dev libglfw3-dev \
+        libcurl4-openssl-dev libmagic-dev libpcre2-dev libreadline-dev libclang-dev \
+        libbzip3-dev libblas-dev libsnappy-dev postgresql redis-server
     check_ret sudo
 }
 
@@ -877,6 +891,8 @@ usage() {
     $ECHO "usage: $0 command [optional-target]"
     $ECHO "  install - git clone, compile, bootstrap"
     $ECHO "  deps-apt - install required packages for Factor on Linux using apt"
+    $ECHO "  deps-apt-headless - install packages for command-line Factor on Linux using apt"
+    $ECHO "  deps-apt-tests - install build, UI, and additional test libraries using apt"
     $ECHO "  deps-pacman - install required packages for Factor on Linux using pacman"
     $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
     $ECHO "  deps-pkg - install required packages for Factor on FreeBSD using pkg"
@@ -904,7 +920,7 @@ usage() {
     $ECHO "To select the UI backend from the same boot image (Unix defaults to GTK4):"
     $ECHO "    $0 bootstrap -ui-backend=gtk4"
     $ECHO "    $0 bootstrap -ui-backend=gtk3"
-    $ECHO "The same option selects dependencies for deps-* commands."
+    $ECHO "The same option selects GTK dependencies for UI dependency commands."
     $ECHO "You can also set FACTOR_UI_BACKEND=gtk3 in the environment."
     $ECHO ""
     $ECHO "To build with musl libc (static linking), invoke as:"
@@ -941,6 +957,8 @@ fi
 case "$1" in
     install) install ;;
     deps-apt) install_deps_apt ;;
+    deps-apt-headless) install_deps_apt headless ;;
+    deps-apt-tests) install_deps_apt_tests ;;
     deps-pacman) install_deps_pacman ;;
     deps-macos) install_deps_macos ;;
     deps-dnf) install_deps_dnf ;;

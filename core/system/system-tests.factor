@@ -1,4 +1,4 @@
-USING: accessors arrays calendar io.encodings.utf8 io.files
+USING: accessors arrays calendar environment io.encodings.utf8 io.files
 io.launcher io.pathnames kernel locals make sequences system tools.test ;
 IN: system.tests
 
@@ -10,19 +10,24 @@ IN: system.tests
 
 :: run-exit-test ( code -- stdout stderr status )
     vm-path :> executable
-    image-path absolute-path :> image
+    "FACTOR_TEST_CHILD_IMAGE" os-env :> child-image
+    child-image [ image-path ] unless* absolute-path :> image
     "" resource-path :> resources
     [
         <process>
             [
                 executable , image "-i=" prepend ,
                 resources "-resource-path=" prepend , "-no-user-init" ,
-                "-e=USING: vocabs.loader ; \"system\" reload " code append ,
+                ! A supplied child image already contains the system code
+                ! under test. Reload source when using the local VM image.
+                child-image [ code ] [
+                    "USING: vocabs.loader ; \"system\" reload " code append
+                ] if "-e=" prepend ,
             ] { } make >>command
             "stdout" >>stdout "stderr" >>stderr +closed+ >>stdin
-            ! Includes image startup and reloading system on slower CI hosts,
-            ! not just the exit call whose output and status we check below.
-            60 seconds >>timeout
+            ! Reloading CPU classes can recompile the image under emulation.
+            ! Include that work in the deadline for the child exit checks.
+            5 minutes >>timeout
         run-process wait-for-process
         [ "stdout" utf8 file-contents "stderr" utf8 file-contents ] dip
     ] with-test-directory ;

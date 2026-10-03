@@ -10,14 +10,14 @@ const Cell = layouts.Cell;
 // C library function declarations
 extern "c" fn fgetc(stream: *std.c.FILE) c_int;
 extern "c" fn fputc(c: c_int, stream: *std.c.FILE) c_int;
-extern "c" fn ftell(stream: *std.c.FILE) c_long;
+extern "c" fn ftello(stream: *std.c.FILE) std.c.off_t;
 extern "c" fn _ftelli64(stream: *std.c.FILE) i64;
 extern "c" fn _fseeki64(stream: *std.c.FILE, offset: i64, whence: c_int) c_int;
 extern "c" fn fflush(stream: *std.c.FILE) c_int;
 extern "c" fn feof(stream: *std.c.FILE) c_int;
 extern "c" fn ferror(stream: *std.c.FILE) c_int;
 extern "c" fn clearerr(stream: *std.c.FILE) void;
-extern "c" fn fseek(stream: *std.c.FILE, offset: c_long, whence: c_int) c_int;
+extern "c" fn fseeko(stream: *std.c.FILE, offset: std.c.off_t, whence: c_int) c_int;
 
 // C constants
 const EOF: c_int = -1;
@@ -239,7 +239,7 @@ pub fn safeFwrite(ptr: *const anyopaque, size: usize, nitems: usize, stream: *st
 // Safe ftell - retries on EINTR
 pub fn safeFtell(stream: *std.c.FILE) !i64 {
     while (true) {
-        const offset = if (builtin.os.tag == .windows) _ftelli64(stream) else ftell(stream);
+        const offset = if (builtin.os.tag == .windows) _ftelli64(stream) else ftello(stream);
         if (offset != -1) {
             return offset;
         }
@@ -266,7 +266,7 @@ pub fn safeFseek(stream: *std.c.FILE, offset: i64, whence: i32) !void {
     };
 
     while (true) {
-        const result = if (builtin.os.tag == .windows) _fseeki64(stream, offset, c_whence) else fseek(stream, offset, c_whence);
+        const result = if (builtin.os.tag == .windows) _fseeki64(stream, offset, c_whence) else fseeko(stream, offset, c_whence);
         if (result == 0) {
             return;
         }

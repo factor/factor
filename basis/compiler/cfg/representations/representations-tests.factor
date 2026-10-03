@@ -830,7 +830,7 @@ cpu x86.64? [
 ] unit-test
 
 ${
-    complex-addressing?
+    10 tag-fixnum immediate-bitwise?
     V{
         T{ ##peek f 0 D: 0 }
         T{ ##peek f 1 D: 1 }

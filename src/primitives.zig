@@ -391,7 +391,7 @@ pub fn callPrimitive(vm: *FactorVM, index: u16) void {
 
 pub export fn to_unsigned_8(n: Cell, vm_asm: *VMAssemblyFields) callconv(.c) u64 {
     switch (layouts.typeTag(n)) {
-        .fixnum => return layouts.untagFixnumUnsigned(n),
+        .fixnum => return @bitCast(@as(i64, layouts.untagFixnum(n))),
         .bignum => {
             const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(n));
             return bignum.toUint64(bn);

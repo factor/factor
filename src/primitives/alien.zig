@@ -221,7 +221,7 @@ pub export fn primitive_alien_signed_4(vm_asm: *VMAssemblyFields) callconv(.c) v
     const vm = vm_asm.getVM();
     const ptr = alienPointer(vm);
     const typed_ptr: *align(1) const i32 = @ptrCast(ptr);
-    vm.push(layouts.tagFixnum(@intCast(typed_ptr.*)));
+    vm.push(math_mod.fromSignedCell(vm, typed_ptr.*));
 }
 
 pub export fn primitive_set_alien_signed_4(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -244,7 +244,7 @@ pub export fn primitive_set_alien_signed_8(vm_asm: *VMAssemblyFields) callconv(.
     const ptr = alienPointer(vm);
     const value_cell = vm.pop();
     const typed_ptr: *align(1) i64 = @ptrCast(ptr);
-    typed_ptr.* = @intCast(toFixnum(vm, value_cell));
+    typed_ptr.* = math_mod.toSignedCell(vm, value_cell);
 }
 
 pub export fn primitive_alien_unsigned_1(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -263,7 +263,7 @@ pub export fn primitive_set_alien_unsigned_1(vm_asm: *VMAssemblyFields) callconv
     else
         @call(.never_inline, toFixnum, .{ vm, value_cell });
     const typed_ptr: *u8 = @ptrCast(ptr);
-    typed_ptr.* = @truncate(@as(u64, @bitCast(value)));
+    typed_ptr.* = @truncate(@as(u64, @bitCast(@as(i64, value))));
 }
 
 pub export fn primitive_alien_unsigned_2(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -278,14 +278,14 @@ pub export fn primitive_set_alien_unsigned_2(vm_asm: *VMAssemblyFields) callconv
     const ptr = alienPointer(vm);
     const value_cell = vm.pop();
     const typed_ptr: *align(1) u16 = @ptrCast(ptr);
-    typed_ptr.* = @truncate(@as(u64, @bitCast(toFixnum(vm, value_cell))));
+    typed_ptr.* = @truncate(@as(u64, @bitCast(@as(i64, toFixnum(vm, value_cell)))));
 }
 
 pub export fn primitive_alien_unsigned_4(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     const ptr = alienPointer(vm);
     const typed_ptr: *align(1) const u32 = @ptrCast(ptr);
-    vm.push(layouts.tagFixnum(@intCast(typed_ptr.*)));
+    vm.push(math_mod.fromUnsignedCell(vm, typed_ptr.*));
 }
 
 pub export fn primitive_set_alien_unsigned_4(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -293,14 +293,14 @@ pub export fn primitive_set_alien_unsigned_4(vm_asm: *VMAssemblyFields) callconv
     const ptr = alienPointer(vm);
     const value_cell = vm.pop();
     const typed_ptr: *align(1) u32 = @ptrCast(ptr);
-    typed_ptr.* = @truncate(@as(u64, @bitCast(toFixnum(vm, value_cell))));
+    typed_ptr.* = @truncate(@as(u64, @bitCast(@as(i64, toFixnum(vm, value_cell)))));
 }
 
 pub export fn primitive_alien_unsigned_8(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     const ptr = alienPointer(vm);
     const typed_ptr: *align(1) const u64 = @ptrCast(ptr);
-    vm.push(math_mod.fromUnsignedCell(vm, typed_ptr.*));
+    vm.push(math_mod.fromUnsigned64(vm, typed_ptr.*));
 }
 
 pub export fn primitive_set_alien_unsigned_8(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -308,7 +308,7 @@ pub export fn primitive_set_alien_unsigned_8(vm_asm: *VMAssemblyFields) callconv
     const ptr = alienPointer(vm);
     const value_cell = vm.pop();
     const typed_ptr: *align(1) u64 = @ptrCast(ptr);
-    typed_ptr.* = @bitCast(toFixnum(vm, value_cell));
+    typed_ptr.* = @bitCast(math_mod.toSignedCell(vm, value_cell));
 }
 
 pub export fn primitive_alien_float(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -385,16 +385,47 @@ pub export fn primitive_set_alien_cell(vm_asm: *VMAssemblyFields) callconv(.c) v
 }
 
 // Signed/unsigned cell primitives — read/write cell-sized integers (not alien pointers).
-pub const primitive_alien_signed_cell = primitive_alien_signed_8;
-pub const primitive_set_alien_signed_cell = primitive_set_alien_signed_8;
-pub const primitive_alien_unsigned_cell = primitive_alien_unsigned_8;
-pub const primitive_set_alien_unsigned_cell = primitive_set_alien_unsigned_8;
+pub const primitive_alien_signed_cell = if (@sizeOf(Cell) == 4) primitive_alien_signed_4 else primitive_alien_signed_8;
+pub const primitive_set_alien_signed_cell = if (@sizeOf(Cell) == 4) primitive_set_alien_signed_4 else primitive_set_alien_signed_8;
+pub const primitive_alien_unsigned_cell = if (@sizeOf(Cell) == 4) primitive_alien_unsigned_4 else primitive_alien_unsigned_8;
+pub const primitive_set_alien_unsigned_cell = if (@sizeOf(Cell) == 4) primitive_set_alien_unsigned_4 else primitive_set_alien_unsigned_8;
 
 comptime {
-    @export(&primitive_alien_signed_8, .{ .name = "primitive_alien_signed_cell", .linkage = .strong });
-    @export(&primitive_set_alien_signed_8, .{ .name = "primitive_set_alien_signed_cell", .linkage = .strong });
-    @export(&primitive_alien_unsigned_8, .{ .name = "primitive_alien_unsigned_cell", .linkage = .strong });
-    @export(&primitive_set_alien_unsigned_8, .{ .name = "primitive_set_alien_unsigned_cell", .linkage = .strong });
+    @export(&primitive_alien_signed_cell, .{ .name = "primitive_alien_signed_cell", .linkage = .strong });
+    @export(&primitive_set_alien_signed_cell, .{ .name = "primitive_set_alien_signed_cell", .linkage = .strong });
+    @export(&primitive_alien_unsigned_cell, .{ .name = "primitive_alien_unsigned_cell", .linkage = .strong });
+    @export(&primitive_set_alien_unsigned_cell, .{ .name = "primitive_set_alien_unsigned_cell", .linkage = .strong });
+}
+
+test "alien integer cells use native width without overwriting the next cell" {
+    const vm = try FactorVM.init(std.testing.allocator);
+    const heap = try @import("../data_heap.zig").DataHeap.init(std.testing.allocator, 4096, 4096, 8192);
+    defer heap.deinit();
+    defer vm.deinit();
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    vm.setDataHeap(heap);
+
+    var cells = [_]Cell{ std.math.maxInt(Cell), 0x5a5a5a5a };
+    const address = @intFromPtr(&cells[0]);
+    vm.push(vm.allotAlien(layouts.false_object, address));
+    vm.push(layouts.tagFixnum(0));
+    primitive_alien_unsigned_cell(&vm.vm_asm);
+    try std.testing.expectEqual(std.math.maxInt(Cell), math_mod.toUnsignedCell(vm, vm.pop()));
+
+    vm.push(vm.allotAlien(layouts.false_object, address));
+    vm.push(layouts.tagFixnum(0));
+    primitive_alien_signed_cell(&vm.vm_asm);
+    try std.testing.expectEqual(@as(i64, -1), math_mod.toSignedCell(vm, vm.pop()));
+
+    inline for (.{ primitive_set_alien_signed_cell, primitive_set_alien_unsigned_cell }) |setter| {
+        vm.push(layouts.tagFixnum(-23));
+        vm.push(vm.allotAlien(layouts.false_object, address));
+        vm.push(layouts.tagFixnum(0));
+        setter(&vm.vm_asm);
+        try std.testing.expectEqual(@as(Cell, @bitCast(@as(Fixnum, -23))), cells[0]);
+        try std.testing.expectEqual(@as(Cell, 0x5a5a5a5a), cells[1]);
+    }
 }
 
 pub export fn primitive_dlopen(vm_asm: *VMAssemblyFields) callconv(.c) void {

@@ -50,9 +50,7 @@ directory and run:
 
 Now you should have a complete Factor system ready to run.
 
-Factor does not yet work on arm64 cpus. There is an arm64 assembler
-in `cpu.arm.64.assembler` and we are working on a port and also looking for
-contributors.
+The ARM64 assembler and compiler backend are in `cpu.arm.64`.
 
 More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)
 and [system requirements](https://concatenative.org/wiki/view/Factor/Requirements).
@@ -157,9 +155,18 @@ example, on Linux x86-64, build both images from the matching boot image:
 The build script accepts both explicit choices:
 `./build.sh bootstrap -ui-backend=gtk4` and
 `./build.sh bootstrap -ui-backend=gtk3`. Without that option,
-`./build.sh bootstrap` uses GTK4. You can also set `FACTOR_UI_BACKEND`
-to `gtk4` or `gtk3` in the environment. The same option makes `deps-*` commands
-install the selected GTK version.
+`./build.sh bootstrap` uses GTK4 on 64-bit Linux and GTK3 on 32-bit Linux.
+You can also set `FACTOR_UI_BACKEND`
+to `gtk4` or `gtk3` in the environment. The same option makes UI dependency
+commands install the selected GTK version.
+
+On Debian/Ubuntu, `./build.sh deps-apt` installs the compiler, build tools,
+OpenSSL development libraries, and the selected GTK dependencies. For a
+command-line development environment, use `./build.sh deps-apt-headless`
+to install the build tools and OpenSSL without the UI dependencies. Run
+`sudo apt-get update` first on a fresh installation.
+`./build.sh deps-apt-tests` adds Capstone, Xvfb, and libraries used by the
+database, audio, graphics, and other optional vocabulary tests.
 
 Then run the image you want:
 
@@ -168,7 +175,8 @@ Then run the image you want:
 ./factor -i=factor-gtk3.image
 ```
 
-An ordinary bootstrap without `-ui-backend` creates a GTK4 `factor.image`.
+An ordinary 64-bit Linux bootstrap without `-ui-backend` creates a GTK4
+`factor.image`; 32-bit Linux uses GTK3.
 Existing GTK3 images keep using GTK3 until rebuilt. The `-ui-backend` option
 is a bootstrap option; it does not switch an already-built image. GTK3
 requires `libgtk-3-dev` on Debian/Ubuntu, `gtk3-devel` on Fedora, or `gtk3`

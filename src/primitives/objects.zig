@@ -17,7 +17,7 @@ const Fixnum = layouts.Fixnum;
 const FactorVM = vm_mod.FactorVM;
 const VMAssemblyFields = vm_mod.VMAssemblyFields;
 
-const array_size_max: Cell = @as(Cell, 1) << (64 - layouts.tag_bits - 2);
+const array_size_max: Cell = @as(Cell, 1) << (@bitSizeOf(Cell) - layouts.tag_bits - 2);
 
 // Validate and unbox an array size from a cell value.
 // For bignums that don't fit in fixnum, throws out_of_fixnum_range.

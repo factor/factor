@@ -1,4 +1,4 @@
-USING: accessors calendar concurrency.futures continuations
+USING: accessors calendar concurrency.futures continuations destructors
 http.client http.server io.servers io.sockets
 io.sockets.secure io.sockets.secure.openssl io.timeouts kernel
 math math.parser sequences strings tools.test ;
@@ -25,18 +25,24 @@ IN: io.sockets.secure.openssl.tests
     ] must-fail-with
 ] times
 
-[ "test" 33 <ssl-handle> handle>> check-subject-name ]
-[ certificate-missing-error? ] must-fail-with
-
 { f } [ "badssl.com" "*.badssl.com" subject-names-match? ] unit-test
 { t } [ "www.badssl.com" "*.badssl.com" subject-names-match? ] unit-test
 { f } [ "foo.bar.badssl.com" "*.badssl.com" subject-names-match? ] unit-test
 { f } [ ".com" "*.badssl.com" subject-names-match? ] unit-test
 
-TUPLE: fake-fd fd ;
+TUPLE: fake-fd < disposable fd ;
+
+: <fake-fd> ( -- fd ) fake-fd new-disposable 33 >>fd ;
 
 M: fake-fd cancel-operation ( obj -- ) drop ;
+M: fake-fd dispose* ( obj -- ) drop ;
+
+[
+    "test" <fake-fd> <ssl-handle>
+    [ handle>> check-subject-name ] with-disposal
+] [ certificate-missing-error? ] must-fail-with
 
 { f } [
-    33 fake-fd boa <ssl-handle> [ maybe-handshake ] ignore-errors connected>>
+    <fake-fd> <ssl-handle>
+    [ [ maybe-handshake ] ignore-errors connected>> ] with-disposal
 ] unit-test

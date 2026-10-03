@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct unix.types ;
+USING: alien.c-types alien.syntax classes.struct kernel layouts
+literals unix.types ;
 IN: unix.statvfs.linux
 
 STRUCT: statvfs64
@@ -13,6 +14,8 @@ STRUCT: statvfs64
     { f_ffree __fsfilcnt64_t }
     { f_favail __fsfilcnt64_t }
     { f_fsid ulong }
+    ! glibc reserves one int here when its syscall word size is 32.
+    { __f_unused { int $[ cell 4 = 1 0 ? ] } }
     { f_flag ulong }
     { f_namemax ulong }
     { __f_spare int[6] } ;

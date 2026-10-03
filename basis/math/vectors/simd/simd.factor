@@ -27,23 +27,20 @@ PRIVATE>
 
 ! Helper for boolean vector literals
 
-: vector-true-value ( class -- value )
-    { c:float c:double } member? [ -1 bits>double ] [ -1 ] if ; foldable
-
-: vector-false-value ( type -- value )
-    { c:float c:double } member? [ 0.0 ] [ 0 ] if ; foldable
-
-: boolean>element ( bool/elt type -- elt )
-    swap {
-        { t [ vector-true-value  ] }
-        { f [ vector-false-value ] }
-        [ nip ]
-    } case ; inline
-
 :: set-vector-element ( value index data type -- )
-    type { half bfloat } member? value { t f } member? and
-    [ value -1 0 ? data index 2 * set-alien-unsigned-2 ]
-    [ value type boolean>element index data type c:set-alien-element ] if ; inline
+    ! Store boolean masks as raw bits. Floating conversions can canonicalize
+    ! the all-ones NaN, losing the mask's sign and payload bits.
+    value { t f } member?
+    [
+        value -1 0 ? data index type c:heap-size *
+        type c:heap-size {
+            { 1 [ set-alien-unsigned-1 ] }
+            { 2 [ set-alien-unsigned-2 ] }
+            { 4 [ set-alien-unsigned-4 ] }
+            { 8 [ set-alien-unsigned-8 ] }
+        } case
+    ]
+    [ value index data type c:set-alien-element ] if ; inline
 
 PRIVATE>
 

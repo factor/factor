@@ -265,43 +265,8 @@ fn storeCallbackOperand(stub: *code_blocks.CodeBlock, special_objects: *const [o
     const entry_ptr: *const code_blocks.RelocationEntry = @ptrCast(@alignCast(reloc_data + index * @sizeOf(code_blocks.RelocationEntry)));
     const entry = entry_ptr.*;
 
-    const pointer = stub.entryPoint() + entry.getOffset();
-
-    switch (entry.getClass()) {
-        .absolute_cell => {
-            const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(Cell));
-            std.mem.writeInt(Cell, ptr[0..@sizeOf(Cell)], value, .little);
-        },
-        .absolute => {
-            const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(u32));
-            std.mem.writeInt(u32, ptr[0..@sizeOf(u32)], @truncate(value), .little);
-        },
-        .absolute_2 => {
-            const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(u16));
-            std.mem.writeInt(u16, ptr[0..@sizeOf(u16)], @truncate(value), .little);
-        },
-        .absolute_1 => {
-            const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(u8));
-            ptr[0] = @truncate(value);
-        },
-        .relative => {
-            const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(i32));
-            const rel_value: i32 = @truncate(@as(i64, @bitCast(value)) - @as(i64, @bitCast(pointer)));
-            std.mem.writeInt(i32, ptr[0..@sizeOf(i32)], rel_value, .little);
-        },
-        .relative_arm_b,
-        .relative_arm_b_cond_ldr,
-        .absolute_arm_ldur,
-        .absolute_arm_cmp,
-        ._reserved7,
-        ._reserved8,
-        ._reserved9,
-        ._reserved12,
-        ._reserved13,
-        ._reserved14,
-        ._reserved15,
-        => unreachable,
-    }
+    var operand = code_blocks.InstructionOperand.init(entry, stub, 0);
+    operand.storeValue(@bitCast(value));
 }
 
 pub const AllocatorRoom = struct {
