@@ -250,12 +250,12 @@ SYMBOL: escaped-copy
 [ va-list-outside-callback-scope? ] must-fail-with
 
 { t t f } [
-    va_list native-va-list-type? cpu arm.64? =
-    va_list lookup-c-type native-va-list-type? cpu arm.64? =
+    va_list native-va-list-type? cpu arm.64? cpu riscv? or =
+    va_list lookup-c-type native-va-list-type? cpu arm.64? cpu riscv? or =
     int native-va-list-type?
 ] unit-test
 
-cpu arm.64? [
+cpu arm.64? cpu riscv? or [
     ! Keep declarations in a separately loaded file: parser words inside a
     ! false quotation still execute while the surrounding source is parsed.
     "resource:basis/alien/varargs/native/forwarding.factor" run-test-file

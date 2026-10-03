@@ -33,6 +33,12 @@ pub fn flushICache(start: Cell, size: Cell) void {
         .aarch64 => {
             flushICacheARM64(start, end);
         },
+        .riscv64, .riscv32 => {
+            const flush = struct {
+                extern "c" fn __riscv_flush_icache(start: *const anyopaque, end: *const anyopaque, flags: c_ulong) c_int;
+            }.__riscv_flush_icache;
+            if (flush(@ptrFromInt(start), @ptrFromInt(end), 0) != 0) @panic("RISC-V instruction cache flush failed");
+        },
         else => {
             // Unknown architecture - skip flush
             // This may cause issues on platforms with split I/D caches

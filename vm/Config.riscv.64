@@ -1,0 +1,4 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-riscv.64.o $(BUILD_DIR)/cpu-riscv.64-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-riscv.64.hpp vm/riscv.hpp
+CFLAGS += -march=rv64gc -mabi=lp64d
+CXXFLAGS += -march=rv64gc -mabi=lp64d

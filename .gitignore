@@ -19,6 +19,8 @@ boot.*.image.*
 *.obj
 *.res
 *.s
+!vm/cpu-riscv.64-trampoline.S
+!vm/cpu-riscv.32-trampoline.S
 *.so
 *~
 .#*
@@ -48,3 +50,6 @@ zig-out
 
 # Zig package downloads
 /zig-pkg/
+
+/factor-rv32-cpp
+/build-riscv32-zig

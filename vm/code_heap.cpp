@@ -11,7 +11,7 @@ thread_local bool jit_thread_writable = false;
 code_heap::code_heap(cell size) {
   if (size > ((uint64_t)1 << (sizeof(cell) * 8 - 5)))
     fatal_error("Heap too large", size);
-#ifdef FACTOR_ARM64
+#if defined(FACTOR_ARM64)
   if (size > 0x8000000)
     fatal_error("Heap too large", size);
 #endif
@@ -122,7 +122,7 @@ code_block* code_heap::code_block_for_address(cell address) {
 }
 
 cell code_heap::frame_predecessor(cell frame_top) {
-#ifdef FACTOR_ARM64
+#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
   return *(cell*)frame_top;
 #else
   cell addr = *(cell*)frame_top;

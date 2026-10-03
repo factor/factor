@@ -196,11 +196,27 @@ const Linux_aarch64_ucontext = extern struct {
     uc_mcontext: Linux_aarch64_mcontext,
 };
 
+// glibc RV64 ucontext: the FP union reserves space for the Q extension.
+const Linux_riscv_mcontext = extern struct {
+    gregs: [32]Cell,
+    fpregs: [528]u8 align(16),
+};
+const Linux_riscv_ucontext = extern struct {
+    uc_flags: c_ulong,
+    uc_link: ?*Linux_riscv_ucontext,
+    uc_stack: std.posix.stack_t,
+    uc_sigmask: std.c.sigset_t,
+    padding: [128 - @sizeOf(std.c.sigset_t)]u8,
+    uc_mcontext: Linux_riscv_mcontext,
+};
+
 // Platform-specific ucontext_t type alias
 const Linux_ucontext_t = if (builtin.cpu.arch == .x86_64)
     Linux_x86_64_ucontext
 else if (builtin.cpu.arch == .aarch64)
     Linux_aarch64_ucontext
+else if (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)
+    Linux_riscv_ucontext
 else
     @compileError("Unsupported architecture for Linux signal handling");
 
@@ -268,6 +284,9 @@ fn getProgramCounter(ucontext_ptr: *anyopaque) *Cell {
         } else if (builtin.cpu.arch == .aarch64) {
             const ucontext: *Linux_aarch64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
             return @ptrCast(&ucontext.uc_mcontext.pc);
+        } else if (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
+            const ucontext: *Linux_riscv_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            return @ptrCast(&ucontext.uc_mcontext.gregs[0]);
         }
     }
     @panic("Unsupported architecture for signal handling");
@@ -293,6 +312,9 @@ fn getStackPointer(ucontext_ptr: *anyopaque) *Cell {
         } else if (builtin.cpu.arch == .aarch64) {
             const ucontext: *Linux_aarch64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
             return @ptrCast(&ucontext.uc_mcontext.sp);
+        } else if (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
+            const ucontext: *Linux_riscv_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            return @ptrCast(&ucontext.uc_mcontext.gregs[2]);
         }
     }
     @panic("Unsupported architecture for signal handling");
@@ -334,6 +356,9 @@ fn getFPUStatus(ucontext_ptr: *anyopaque) u32 {
         } else if (builtin.cpu.arch == .aarch64) {
             const ucontext: *Linux_aarch64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
             return linux_arm64_fpsimd.status(&ucontext.uc_mcontext.reserved);
+        } else if (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
+            const ucontext: *Linux_riscv_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            return std.mem.readInt(u32, ucontext.uc_mcontext.fpregs[256..][0..4], .little);
         }
     }
     return 0;
@@ -367,6 +392,10 @@ fn clearFPUStatus(ucontext_ptr: *anyopaque) void {
         } else if (builtin.cpu.arch == .aarch64) {
             const ucontext: *Linux_aarch64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
             linux_arm64_fpsimd.clearStatus(&ucontext.uc_mcontext.reserved);
+        } else if (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
+            const ucontext: *Linux_riscv_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            const fp = ucontext.uc_mcontext.fpregs[256..][0..4];
+            std.mem.writeInt(u32, fp, std.mem.readInt(u32, fp, .little) & ~@as(u32, 0x1f), .little);
         }
     }
 }
@@ -388,6 +417,12 @@ pub fn processFPUStatus(status: u32) u32 {
         if (status & 0x04 != 0) r |= FP_TRAP_OVERFLOW;
         if (status & 0x08 != 0) r |= FP_TRAP_UNDERFLOW;
         if (status & 0x10 != 0) r |= FP_TRAP_INEXACT;
+    } else if (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
+        if (status & 0x10 != 0) r |= FP_TRAP_INVALID_OPERATION;
+        if (status & 0x08 != 0) r |= FP_TRAP_ZERO_DIVIDE;
+        if (status & 0x04 != 0) r |= FP_TRAP_OVERFLOW;
+        if (status & 0x02 != 0) r |= FP_TRAP_UNDERFLOW;
+        if (status & 0x01 != 0) r |= FP_TRAP_INEXACT;
     } else {
         r = status & 0x1F;
     }
@@ -756,7 +791,7 @@ fn leafSignalHandlerAvailable(vm: *vm_mod.FactorVM) bool {
 fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: Cell) void {
     vm.vm_asm.signal_handler_addr = handler;
 
-    if (builtin.cpu.arch == .aarch64) {
+    if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
         // Match C++ dispatch_resumable_signal (vm/cpu-arm.64.cpp).
         const code_heap = vm.code orelse fatalError("Signal without code heap", 0);
         const block = code_heap.codeBlockForAddress(pc.*) orelse
@@ -765,7 +800,7 @@ fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: 
             leafSignalHandlerAvailable(vm);
         const word_object: objects.SpecialObject = if (frameless) .leaf_signal_handler_word else .signal_handler_word;
         sp.* -= if (frameless) 16 + code_blocks.CodeBlock.LEAF_FRAME_SIZE else 16;
-        @as(*Cell, @ptrFromInt(sp.* + 8)).* = pc.*;
+        @as(*Cell, @ptrFromInt(sp.* + @import("contexts.zig").FRAME_RETURN_ADDRESS)).* = pc.*;
 
         const handler_word_cell = vm.vm_asm.special_objects[@intFromEnum(word_object)];
         if (!layouts.hasTag(handler_word_cell, .word)) {
@@ -1131,6 +1166,18 @@ fn unwindNativeFrames(vm: *vm_mod.FactorVM, quot: Cell, to: Cell) noreturn {
               [cachemiss] "{x6}" (cachemiss_val),
               [megahits] "{x7}" (megahits_val),
         );
+    } else if (comptime builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
+        // The unwind word restores the linked frame and every VM register.
+        const unwind_word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(unwind_word_cell));
+        asm volatile (
+            \\mv s4, a2
+            \\jr t0
+            :
+            : [vm_asm] "{a2}" (vm_asm_ptr),
+              [entry] "{t0}" (unwind_word.entry_point),
+              [quot_in] "{a0}" (quot),
+              [to_in] "{a1}" (to),
+        );
     } else @compileError("Unsupported architecture for unwindNativeFrames");
 
     // If we get here, something went wrong - the unwind word should never return
@@ -1420,4 +1467,22 @@ pub fn deinitSignals(vm: *vm_mod.FactorVM) void {
     }
 
     unregisterVmFromThread();
+}
+
+test "Linux RISC-V signal context follows native glibc layout" {
+    if (builtin.os.tag != .linux or (builtin.cpu.arch != .riscv32 and builtin.cpu.arch != .riscv64)) return error.SkipZigTest;
+    const gregs_offset = @offsetOf(Linux_riscv_ucontext, "uc_mcontext");
+    const fpregs_offset = gregs_offset + @offsetOf(Linux_riscv_mcontext, "fpregs");
+    try std.testing.expectEqual(@as(usize, if (@sizeOf(Cell) == 4) 160 else 176), gregs_offset);
+    try std.testing.expectEqual(@as(usize, if (@sizeOf(Cell) == 4) 288 else 432), fpregs_offset);
+    try std.testing.expectEqual(@as(usize, if (@sizeOf(Cell) == 4) 816 else 960), @sizeOf(Linux_riscv_ucontext));
+    var context = std.mem.zeroes(Linux_riscv_ucontext);
+    context.uc_mcontext.gregs[0] = 0x12345678;
+    context.uc_mcontext.gregs[2] = 0x87654320;
+    std.mem.writeInt(u32, context.uc_mcontext.fpregs[256..][0..4], 0x9f, .little);
+    try std.testing.expectEqual(@as(Cell, 0x12345678), getProgramCounter(&context).*);
+    try std.testing.expectEqual(@as(Cell, 0x87654320), getStackPointer(&context).*);
+    try std.testing.expectEqual(@as(u32, 0x9f), getFPUStatus(&context));
+    clearFPUStatus(&context);
+    try std.testing.expectEqual(@as(u32, 0x80), getFPUStatus(&context));
 }

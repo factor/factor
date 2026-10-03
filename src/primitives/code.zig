@@ -1083,7 +1083,7 @@ pub export fn primitive_callstack_for(vm_asm: *VMAssemblyFields) callconv(.c) vo
         // them back (FP = top + delta). Mirrors C++ capture_callstack
         // (vm/callstack.cpp) and the FACTOR_ARM64 block there. Without this the
         // restore loop follows garbage frame pointers and overruns the stack.
-        if (builtin.cpu.arch == .aarch64) {
+        if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
             var scan_top = top;
             var scan_dst = callstack.top();
             while (scan_top < bottom) {

@@ -721,6 +721,8 @@ pub const FactorVM = struct {
                     : [quot] "r" (quot_val),
                       [func] "r" (func_addr),
                     : .{ .x0 = true, .x1 = true, .x2 = true, .x3 = true, .x4 = true, .x5 = true, .x6 = true, .x7 = true, .x8 = true, .x9 = true, .x10 = true, .x11 = true, .x12 = true, .x13 = true, .x14 = true, .x15 = true, .x16 = true, .x17 = true, .x30 = true, .memory = true });
+            } else if (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
+                func(quot_val);
             } else {
                 @compileError("Unsupported architecture for callback");
             }

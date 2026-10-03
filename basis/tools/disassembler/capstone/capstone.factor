@@ -1,9 +1,9 @@
 ! Copyright (C) 2023 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data
-alien.destructors alien.libraries alien.strings alien.syntax
+alien.destructors alien.enums alien.libraries alien.strings alien.syntax
 arrays classes.struct combinators destructors hex-strings kernel
-math namespaces sequences specialized-arrays system
+math math.bitwise namespaces sequences specialized-arrays system
 tools.disassembler.private tools.memory ;
 IN: tools.disassembler.capstone
 
@@ -169,6 +169,8 @@ DESTRUCTOR: cs_close
         { x86.64 [ CS_ARCH_X86 CS_MODE_64 ] }
         { arm.32 [ CS_ARCH_ARM CS_MODE_ARM ] }
         { arm.64 [ CS_ARCH_ARM64 CS_MODE_ARM ] }
+        { riscv.32 [ CS_ARCH_RISCV CS_MODE_RISCV32 CS_MODE_RISCVC [ enum>number ] bi@ bitor ] }
+        { riscv.64 [ CS_ARCH_RISCV CS_MODE_RISCV64 CS_MODE_RISCVC [ enum>number ] bi@ bitor ] }
     } case 0 csh <ref> [ cs_open CS_ERR_OK assert= ] keep ;
 
 : with-csh ( ..a quot: ( ..a csh -- ..b ) -- ..b )

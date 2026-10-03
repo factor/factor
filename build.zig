@@ -9,6 +9,9 @@ pub fn build(b: *std.Build) void {
     // Use native target by default. The VM architecture must match the boot image.
     // Override with -Dtarget= if cross-compiling.
     const target = b.standardTargetOptions(.{});
+    const native_target = target.result.cpu.arch == b.graph.host.result.cpu.arch and
+        target.result.os.tag == b.graph.host.result.os.tag and
+        target.result.abi == b.graph.host.result.abi;
     const optimize = b.standardOptimizeOption(.{});
     const keep_symbols = b.option(bool, "keep_symbols", "Keep symbol names in release builds for debugging") orelse false;
 
@@ -104,7 +107,7 @@ pub fn build(b: *std.Build) void {
     // zig-out/bin/factor lacks; without it Cocoa/UI code hangs headless.
     // We copy from the freshly-built artifact (not ./factor) so we never mv the
     // symlink over the real binary.
-    if (target.result.os.tag == .macos) {
+    if (native_target and target.result.os.tag == .macos) {
         // Run with cwd = build root, so the bundle paths stay relative.
         const mkdir_bundle = b.addSystemCommand(&.{ "mkdir", "-p", "Factor.app/Contents/MacOS", "Factor.app/Contents/Frameworks" });
         mkdir_bundle.setCwd(b.path("."));
@@ -133,7 +136,7 @@ pub fn build(b: *std.Build) void {
         link_factor.setCwd(b.path("."));
         link_factor.step.dependOn(&codesign.step);
         b.getInstallStep().dependOn(&link_factor.step);
-    } else {
+    } else if (native_target) {
         // On non-macOS platforms there's no app bundle, so just drop the
         // freshly-built binary at the build root as ./factor (mirroring `make`'s
         // default target). Use the build system's own file-copy step rather than

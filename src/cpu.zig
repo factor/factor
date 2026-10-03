@@ -5,6 +5,8 @@ pub const Arch = enum {
     x86,
     x86_64,
     aarch64,
+    riscv64,
+    riscv32,
     unsupported,
 
     pub fn current() Arch {
@@ -12,6 +14,8 @@ pub const Arch = enum {
             .x86 => .x86,
             .x86_64 => .x86_64,
             .aarch64 => .aarch64,
+            .riscv64 => .riscv64,
+            .riscv32 => .riscv32,
             else => .unsupported,
         };
     }

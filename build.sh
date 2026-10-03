@@ -307,8 +307,8 @@ select_ui_backend() {
     find_os
     find_architecture
     find_word_size
-    # GTK4 is unavailable on 32-bit x86 Linux.
-    if [[ $OS = linux && $ARCH = x86 && $WORD = 32 ]]; then
+    # Use GTK3 on 32-bit x86 and RISC-V Linux.
+    if [[ $OS = linux && $WORD = 32 && ( $ARCH = x86 || $ARCH = riscv ) ]]; then
         FACTOR_UI_BACKEND=gtk3
     fi
 }
@@ -368,6 +368,7 @@ find_architecture() {
        *86_64) ARCH=x86 ;;
        aarch64) ARCH=arm ;;
        arm64) ARCH=arm ;;
+       riscv64|riscv32) ARCH=riscv ;;
        iPhone5*[3-9]) ARCH=arm ;;
        iPhone[6-9]*) ARCH=arm ;;
        iPhone[1-9][0-9]*) ARCH=arm ;;
@@ -398,8 +399,8 @@ find_word_size() {
 }
 
 find_word_size_cpp() {
-    SIXTY_FOUR='defined(__aarch64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(__PPC64__) || defined(__64BIT__)'
-    THIRTY_TWO='defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86)'
+    SIXTY_FOUR='defined(__aarch64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(__PPC64__) || defined(__64BIT__) || (defined(__riscv) && __riscv_xlen == 64)'
+    THIRTY_TWO='defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86) || (defined(__riscv) && __riscv_xlen == 32)'
     $CC -E -xc <(echo -e "#if ${SIXTY_FOUR}\n64\n#elif ${THIRTY_TWO}\n32\n#endif") | tail -1
 }
 

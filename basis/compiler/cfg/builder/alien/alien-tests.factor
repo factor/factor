@@ -9,6 +9,8 @@ cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
 cpu.arm.64.assembler.registers kernel layouts literals make namespaces
 sequences stack-checker.alien system tools.test vocabs.loader words ;
 IN: compiler.cfg.builder.alien.tests
+QUALIFIED-WITH: cpu.riscv.64.assembler.registers rv
+QUALIFIED-WITH: cpu.riscv.32.assembler.registers rv32
 
 ! During refresh, hats can re-enter the builder before it has generated a
 ! newly added instruction helper. Reproduce that state without an old image.
@@ -141,6 +143,8 @@ ${
         { x86.32 [ { { 1 int-rep EAX } } { { 2 double-rep ST0 } } ] }
         { x86.64 [ { { 1 int-rep RAX } } { { 2 double-rep XMM0 } } ] }
         { arm.64 [ { ${ 1 int-rep X0 } } { ${ 2 double-rep V0 } } ] }
+        { riscv.64 [ { ${ 1 int-rep rv:A0 } } { ${ 2 double-rep rv:FA0 } } ] }
+        { riscv.32 [ { ${ 1 int-rep rv32:A0 } } { ${ 2 double-rep rv32:FA0 } } ] }
     } case
 } [
     T{ alien-invoke-params { return int } } prepare-caller-return
@@ -149,8 +153,29 @@ ${
 
 ! unbox-parameters
 
-! unboxing ints is only needed on 32bit archs
-cpu x86.32?
+! RV32 converts integer and pointer parameters to their full ABI width.
+cpu riscv.32? [
+    {
+        { 3 6 }
+        { { int-rep f f 4 } { int-rep f f 4 } }
+        V{
+            T{ ##unbox-any-c-ptr { dst 2 } { src 1 } }
+            T{ ##convert-integer { dst 3 } { src 2 } { c-type $[ c-string base-type ] } }
+            T{ ##unbox { dst 5 } { src 4 } { unboxer "to_signed_4" } { rep int-rep } }
+            T{ ##convert-integer { dst 6 } { src 5 } { c-type $[ int base-type ] } }
+        }
+    }
+] [ cpu riscv.64? [
+    {
+        { 2 5 }
+        { { int-rep f f $[ cell ] } { int-rep f f 4 } }
+        V{
+            T{ ##unbox-any-c-ptr { dst 2 } { src 1 } }
+            T{ ##convert-integer { dst 4 } { src 3 } { c-type $[ int base-type ] } }
+            T{ ##convert-integer { dst 5 } { src 4 } { c-type $[ int base-type ] } }
+        }
+    }
+] [ cpu x86.32?
 {
     { 2 4 }
     { { int-rep f f $[ cell ] } { int-rep f f 4 } }
@@ -168,7 +193,7 @@ cpu x86.32?
     { 2 3 }
     { { int-rep f f $[ cell ] } { int-rep f f 4 } }
     V{ T{ ##unbox-any-c-ptr { dst 2 } { src 1 } } }
-} ? [
+} ? ] if ] if [
     [ { c-string int } unbox-parameters ] V{ } make
 ] cfg-unit-test
 

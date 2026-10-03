@@ -29,6 +29,18 @@ FACTOR_EXPORT VAROUT_NOINLINE double varout_hfas(struct varout_small_hfa named, 
   double d = va_arg(ap, double); va_end(ap);
   return named.x + 2*named.y + 3*tag + 4*p.x + 5*p.y + 6*h.x + 7*h.y + 8*h.z + 9*d;
 }
+/* RV32 passes this composite by pointer in the next available GP register.
+ * Its eight-byte value alignment must not force that pointer to an even pair. */
+FACTOR_EXPORT VAROUT_NOINLINE double varout_indirect_alignment(int tag, ...) {
+  va_list ap; va_start(ap, tag);
+  struct varout_pair p = va_arg(ap, struct varout_pair);
+  double tail = va_arg(ap, double); va_end(ap);
+  return tag + 2*p.x + 3*p.y + 4*tail;
+}
+FACTOR_EXPORT VAROUT_NOINLINE double varout_indirect_alignment_control(void) {
+  struct varout_pair p = {4,5};
+  return varout_indirect_alignment(1,p,6.0);
+}
 FACTOR_EXPORT VAROUT_NOINLINE double varout_split(int a, int b, int c, int d, int e, int f, int g, ...) {
   va_list ap; va_start(ap, g);
   struct varout_pair p = va_arg(ap, struct varout_pair);

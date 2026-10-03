@@ -327,6 +327,7 @@ M: struct update-tuple
 
     c-type class typedef
     class slot-specs define-accessors
+    class f "union-struct" set-word-prop
     class size "struct-size" set-word-prop
     class dup make-struct-prototype "prototype" set-word-prop
     class define-struct-methods ; inline
@@ -346,10 +347,11 @@ PRIVATE>
     [ compute-struct-offsets ] [ drop 1 ]
     (define-struct-class) ;
 
-: define-union-struct-class ( class slots -- )
-    make-slots
+:: define-union-struct-class ( class slots -- )
+    class slots make-slots
     [ compute-union-offsets ] [ struct-alignment ]
-    (define-struct-class) ;
+    (define-struct-class)
+    class t "union-struct" set-word-prop ;
 
 ERROR: invalid-struct-slot token ;
 
@@ -363,7 +365,7 @@ M: struct-class reset-class
         [ forget-struct-slot-accessors ]
         [ forget-struct-slot-values-method ]
         [ forget-clone-method ]
-        [ { "c-type" "layout" "struct-size" } remove-word-props ]
+        [ { "c-type" "layout" "struct-size" "union-struct" } remove-word-props ]
         [ call-next-method ]
     } cleave ;
 

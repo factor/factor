@@ -383,6 +383,11 @@ pub const CallSitePatcher = struct {
                 break :blk opcode == call_opcode or opcode == jmp_opcode;
             },
             .aarch64 => (armCallSiteInsn(return_address) & arm_b_mask) == arm_b_pattern,
+            .riscv64, .riscv32 => blk: {
+                const p: *align(1) const [2]u32 = @ptrFromInt(return_address - 8);
+                break :blk (p[0] & 0xfff) == 0x297 and
+                    ((p[1] & 0xfffff) == 0x280e7 or (p[1] & 0xfffff) == 0x28067);
+            },
             else => @compileError("Unsupported architecture for call site patching"),
         };
     }
@@ -412,6 +417,8 @@ pub const CallSitePatcher = struct {
                 // while callers pass the address of the following instruction.
                 break :blk @intCast(@as(i64, @intCast(return_address - 4)) + signed_imm26 * 4);
             },
+            .riscv32 => return_address -% 8 +% @as(u32, @truncate(@as(u64, @bitCast(@import("riscv.zig").pairDisplacement(@ptrFromInt(return_address - 8)))))),
+            .riscv64 => @intCast(@as(i64, @intCast(return_address - 8)) + @import("riscv.zig").pairDisplacement(@ptrFromInt(return_address - 8))),
             else => @compileError("Unsupported architecture for call site patching"),
         };
     }
@@ -435,6 +442,14 @@ pub const CallSitePatcher = struct {
                 insn_ptr.* = (insn & 0xfc000000) | (imm26 & 0x03ffffff);
                 icache.flushICache(return_address - 4, 4);
             },
+            .riscv32 => {
+                @import("riscv.zig").storePair32(@ptrFromInt(return_address - 8), target -% (return_address - 8));
+                icache.flushICache(return_address - 8, 8);
+            },
+            .riscv64 => {
+                @import("riscv.zig").storePair(@ptrFromInt(return_address - 8), @as(i64, @intCast(target)) - @as(i64, @intCast(return_address - 8)));
+                icache.flushICache(return_address - 8, 8);
+            },
             else => @compileError("Unsupported architecture for call site patching"),
         }
     }
@@ -443,6 +458,7 @@ pub const CallSitePatcher = struct {
         return switch (builtin.cpu.arch) {
             .x86, .x86_64 => x86CallSiteOpcode(return_address) == jmp_opcode,
             .aarch64 => (armCallSiteInsn(return_address) >> 31) == 0,
+            .riscv64, .riscv32 => (@as(*align(1) const u32, @ptrFromInt(return_address - 4)).* & 0xf80) == 0,
             else => @compileError("Unsupported architecture for call site patching"),
         };
     }
@@ -525,6 +541,22 @@ test "call site patcher" {
             try std.testing.expect(CallSitePatcher.isValidCallSite(b_return_address));
             try std.testing.expect(CallSitePatcher.isTailCallSite(b_return_address));
             try std.testing.expectEqual(b_return_address - 4, CallSitePatcher.getCallTarget(b_return_address));
+        },
+        .riscv64, .riscv32 => {
+            var call = [_]u32{ 0x00000297, 0x000280e7 };
+            const return_address = @intFromPtr(&call) + @sizeOf(@TypeOf(call));
+            try std.testing.expect(CallSitePatcher.isValidCallSite(return_address));
+            try std.testing.expect(!CallSitePatcher.isTailCallSite(return_address));
+            try std.testing.expectEqual(return_address - 8, CallSitePatcher.getCallTarget(return_address));
+            for ([_]isize{ 16, -2048, 2048, -4096 }) |offset| {
+                const target = @as(usize, @bitCast(@as(isize, @bitCast(return_address)) + offset));
+                CallSitePatcher.setCallTarget(return_address, target);
+                try std.testing.expectEqual(target, CallSitePatcher.getCallTarget(return_address));
+            }
+            call[1] &= ~@as(u32, 0x80); // JALR x0 is a tail call.
+            try std.testing.expect(CallSitePatcher.isTailCallSite(return_address));
+            call[0] = 0x00000013;
+            try std.testing.expect(!CallSitePatcher.isValidCallSite(return_address));
         },
         else => return error.SkipZigTest,
     }

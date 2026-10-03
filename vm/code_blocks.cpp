@@ -252,7 +252,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
       return (cell)&factor::inline_cache_miss;
     case RT_SAFEPOINT:
       return code->safepoint_page;
-#ifdef FACTOR_ARM64
+#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
     case RT_TRAMPOLINE:
       return (cell)&factor::trampoline;
     case RT_TRAMPOLINE2:
@@ -449,7 +449,7 @@ void factor_vm::undefined_symbol() {
   cell library = false_object;
 
   auto find_symbol_at_address_visitor = [&](instruction_operand op) {
-#ifdef FACTOR_ARM64
+#if defined(FACTOR_ARM64)
     static const cell offset = 0xc;
 #else
     static const cell offset = 0;

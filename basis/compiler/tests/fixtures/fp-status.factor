@@ -15,7 +15,9 @@ FUNCTION: double ffi_fp_divide ( double a, double b )
 ] unit-test
 { 2.0 } [ 4.0 2.0 ffi_fp_divide fp-status-case ] unit-test
 
-{ +fp-zero-divide+ } [ +fp-zero-divide+ fp-traps member? ] with-fp-traps [
+fp-traps-supported? [
+    { +fp-zero-divide+ } [ +fp-zero-divide+ fp-traps member? ] with-fp-traps
+] [ f ] if [
     [ { +fp-zero-divide+ } [ 1.0 0.0 ffi_fp_divide drop ] with-fp-traps ]
     [ +fp-zero-divide+ vm-error-exception-flag? ] must-fail-with
     { 2.0 } [ 4.0 2.0 ffi_fp_divide fp-status-case ] unit-test

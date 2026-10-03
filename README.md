@@ -50,13 +50,140 @@ directory and run:
 
 Now you should have a complete Factor system ready to run.
 
-The ARM64 assembler and compiler backend are in `cpu.arm.64`.
+The ARM64 assembler and compiler backend are in `cpu.arm.64`. RISC-V Linux
+development targets RV64GC with the LP64D ABI and RV32GC with the ILP32D ABI.
+Their assemblers and compiler backends are in `cpu.riscv.64` and `cpu.riscv.32`.
+
+To create a RISC-V seed image, run this in a working Factor checkout:
+
+```bash
+./factor -no-user-init -e='USING: bootstrap.image ; "unix-riscv.64" make-image'
+```
+
+Copy `boot.unix-riscv.64.image` into the RISC-V checkout. On a Debian
+`riscv64` system, including a QEMU system guest, build and bootstrap with:
+
+```bash
+sudo apt-get update
+./build.sh deps-apt
+CC=gcc CXX=g++ ./build.sh compile
+./factor -i="$PWD/boot.unix-riscv.64.image" -no-user-init -output-image=factor.image
+```
+
+To validate the compiler and I/O vocabularies after bootstrap:
+
+```bash
+./build.sh deps-apt-tests
+./factor -i="$PWD/factor.image" -no-user-init -run=tools.test compiler io
+```
+
+For the complete vocabulary suite, keep PostgreSQL and Redis running in the
+test environment. PostgreSQL's local login role needs permission to create
+databases; the tests use a database name that includes the CPU architecture.
+Redis tests clear database 0, so use a dedicated test instance. For a fresh
+Debian test guest:
+
+```bash
+sudo -u postgres createuser --createdb "$(id -un)"
+xvfb-run -a ./factor -i="$PWD/factor.image" -no-user-init -e='USING: assocs compiler.errors db.postgresql io kernel math namespaces prettyprint sequences system tools.test vocabs.hierarchy ; <postgresql-db> \ postgresql-db set-global load-all test-all :test-failures compiler-errors get assoc-size . test-failures get length compiler-errors get assoc-size + zero? [ 0 ] [ 1 ] if exit'
+```
+
+The legacy `pcre` vocabulary also needs PCRE1. On Debian releases without its
+package, build the shared PCRE 8.45 library with `--enable-utf` and
+`--enable-unicode-properties` and run `ldconfig` after installing it. The RV32
+environment script builds this library automatically. Use GCC for the native
+FFI test library so its packed-struct fixtures match the GNU RISC-V ABI oracle.
+
+For RV32, `misc/riscv32/build.sh` creates a Buildroot Linux environment with a
+cross compiler and the runtime dependencies. Run it on a Linux builder, then
+start the resulting guest with `misc/riscv32/run-qemu.sh`. Both scripts describe
+their prerequisites and SSH options. Generate the seed image on the host with:
+
+```bash
+./factor -no-user-init -e='USING: bootstrap.image ; "unix-riscv.32" make-image'
+```
+
+Cross-compile the VM with the generated toolchain, copy the checkout and seed
+image into the guest, then bootstrap and test there:
+
+```bash
+# On the Linux builder, in the target checkout:
+CC=/absolute/path/to/rv32-output/host/bin/riscv32-buildroot-linux-gnu-gcc \
+CXX=/absolute/path/to/rv32-output/host/bin/riscv32-buildroot-linux-gnu-g++ \
+make linux-riscv-32
+# In the RV32 guest:
+./factor -i="$PWD/boot.unix-riscv.32.image" -no-user-init -output-image=factor.image
+./factor -i="$PWD/factor.image" -no-user-init -run=tools.test compiler io
+```
+
+To run either target under QEMU user emulation on a Linux builder, use
+`misc/riscv/test-qemu.sh`. It runs the default bootstrap, both assembler suites,
+the compiler and I/O suites, standard `load-all`, and standard `test-all`.
+Prepare a target root filesystem with the dependencies above, install
+`qemu-user-static` on the builder, and cross-build the target executable and
+GNU FFI test library in a separate checkout. RV32 can use the Buildroot
+`OUTPUT_DIR/target` directory; RV64 can use a Debian riscv64 root filesystem.
+Use a Git clone with history and install Git in the target root filesystem;
+the contributors test reads the repository log.
+The Linux kernel must support user namespaces and namespaced `binfmt_misc`.
+The script uses passwordless sudo to create private mount, PID and user
+namespaces, without registering a global QEMU handler.
+Child Factor processes use the current stage image through a private default-image
+mount beside the executable.
+
+QEMU 10.0.13 user emulation returns `ENOTTY` for unsupported ioctl requests
+before checking whether the descriptor is valid. Linux returns `EBADF` first,
+which the input-event tests verify. Build the pinned static interpreters with
+the included correction and select them with `--qemu`; system QEMU and native
+Linux do not need this user-emulation correction.
+
+```bash
+sudo apt-get install build-essential curl xz-utils patch python3-venv \
+    libglib2.0-dev zlib1g-dev pkg-config ninja-build
+misc/riscv/build-qemu.sh /absolute/path/to/qemu-tools
+```
+
+```bash
+# Dedicated reachable PostgreSQL and Redis instances for vocabulary tests:
+export PGHOST=127.0.0.1 PGPORT=5432 PGUSER=factor_test
+export PGPASSWORD='your-test-password'
+export REDIS_HOST=127.0.0.1 REDIS_PORT=6380
+
+misc/riscv/test-qemu.sh --qemu /absolute/path/to/qemu-tools/bin/qemu-riscv32 \
+    32 /absolute/path/to/rv32-output/target /absolute/path/to/rv32-checkout
+misc/riscv/test-qemu.sh --qemu /absolute/path/to/qemu-tools/bin/qemu-riscv64 \
+    64 /absolute/path/to/debian-riscv64-root /absolute/path/to/rv64-checkout
+```
+
+The seed image defaults to `boot.unix-riscv.32.image` or
+`boot.unix-riscv.64.image` in the target checkout. Results go to a timestamped
+`build/riscv-qemu/` directory containing stage logs, exit codes, and verified
+images. A failed stage stops the run. Resume from a successful image with
+`--image FILE --stage load-all` or `--image FILE --stage test-all`;
+when restoring a loaded image for `test-all`, also pass `--gui-image FILE`
+with a clean, current bootstrap image for GUI and exit-test child processes.
+The default `all` run provides its fresh bootstrap image automatically.
+`--stage bootstrap`, `--stage prefixes`, and `--stage probe` run individual
+checks. `--stage essentials` loads and tests every `core/` vocabulary and the
+full compiler, I/O, and UI prefixes. `--output DIR` selects a results directory inside the target checkout,
+and `--vm factor-zig32-release` selects another target executable. Run the two
+widths sequentially when they share a Redis test instance or network namespace;
+some I/O tests bind fixed ports.
+Validation failures also save a separate `.failed.image` for diagnosis and
+recovery after fixing the source; it does not count as a successful stage.
 
 More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)
 and [system requirements](https://concatenative.org/wiki/view/Factor/Requirements).
 
 The experimental Zig VM requires Zig 0.17.0. Use `zig build` to build it and
-`zig build test` to run its native tests. To compile the VM and tests for
+`zig build test` to run its native tests. RISC-V cross-builds must select the
+RVGC instruction extensions; for example:
+
+```bash
+zig build -Dtarget=riscv64-linux-gnu -Dcpu=generic_rv64+m+a+f+d+c
+```
+
+To compile the VM and tests for
 Windows without running them, use `zig build check -Dtarget=x86_64-windows-gnu`
 or `zig build check -Dtarget=aarch64-windows-gnu`. On Windows,
 `zig build test-process-wait` runs the process notification tests separately.

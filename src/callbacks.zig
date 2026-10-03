@@ -12,7 +12,7 @@ const segments = @import("segments.zig");
 const Cell = layouts.Cell;
 
 pub export fn arm64_variadic_callbacks_supported() callconv(.c) bool {
-    return builtin.cpu.arch == .aarch64;
+    return (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32);
 }
 
 fn returnTakesParam() bool {
@@ -104,7 +104,7 @@ pub const CallbackHeap = struct {
         var stub_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(callback_stub));
         std.debug.assert(layouts.untagFixnumUnsigned(stub_array.capacity) >= 2);
 
-        const variadic = builtin.cpu.arch == .aarch64 and return_rewind == std.math.maxInt(Cell);
+        const variadic = (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) and return_rewind == std.math.maxInt(Cell);
         if (variadic) {
             if (layouts.untagFixnumUnsigned(stub_array.capacity) < 3) {
                 @constCast(vm).generalError(.ffi, layouts.false_object, layouts.false_object);
@@ -134,7 +134,7 @@ pub const CallbackHeap = struct {
 
         storeCallbackOperand(stub, special_objects, 0, vm_ptr);
 
-        if (builtin.cpu.arch == .aarch64) {
+        if ((builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)) {
             const trampolines = @import("trampolines.zig");
             const c_api = @import("c_api.zig");
             if (vm.code) |code| {
@@ -167,7 +167,7 @@ pub const CallbackHeap = struct {
         const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(stub.owner));
         const special_objects = &vm.vm_asm.special_objects;
 
-        if (builtin.cpu.arch == .aarch64) {
+        if ((builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)) {
             storeCallbackOperand(stub, special_objects, 6, word.entry_point);
         } else {
             storeCallbackOperand(stub, special_objects, 1, word.entry_point);

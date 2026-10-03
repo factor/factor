@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs cpu.architecture fry kernel layouts locals
-math math.order namespaces sequences vectors ;
+math math.order namespaces sequences system vectors ;
 IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
@@ -69,7 +69,11 @@ SYMBOLS: stack-values reg-values ;
 ! ARM64 composite arguments are assigned as a group. If there are not
 ! enough registers, the entire argument and later arguments of that class
 ! use the stack (AAPCS64 C.2/C.3 and C.12/C.13).
+HOOK: prepare-abi-parameter-group cpu ( rep-tuple -- )
+M: object prepare-abi-parameter-group drop ;
+
 :: prepare-parameter-group ( rep-tuple -- )
+    rep-tuple prepare-abi-parameter-group
     rep-tuple length 4 > [
         rep-tuple first reg-class-of get :> regs
         4 rep-tuple nth :> count

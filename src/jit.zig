@@ -233,6 +233,15 @@ fn patchRelativeJump(code_buffer: []u8, patch_offset: usize, target_pos: usize) 
             // Write back
             std.mem.writeInt(u32, @as(*[4]u8, @ptrCast(insn_ptr)), insn, .little);
         },
+        .riscv64, .riscv32 => {
+            if (patch_offset + 8 > code_buffer.len) return error.PatchOffsetOutOfBounds;
+            const pair: *align(1) [2]u32 = @ptrCast(code_buffer.ptr + patch_offset);
+            if (builtin.cpu.arch == .riscv32) {
+                @import("riscv.zig").storePair32(pair, @as(u32, @intCast(target_pos)) -% @as(u32, @intCast(patch_offset)));
+            } else {
+                @import("riscv.zig").storePair(pair, @as(i64, @intCast(target_pos)) - @as(i64, @intCast(patch_offset)));
+            }
+        },
         .unsupported => return error.UnsupportedArchitecture,
     }
 }
@@ -786,8 +795,8 @@ pub const Jit = struct {
 
 // Stack frame size constants
 // Must match cpu-{x86.64,arm.64}.hpp. arm64 frames differ from x86-64.
-pub const JIT_FRAME_SIZE: Cell = if (builtin.cpu.arch == .aarch64) 16 else 32;
-pub const SIGNAL_HANDLER_STACK_FRAME_SIZE: Cell = if (builtin.cpu.arch == .aarch64) 288 else 192;
+pub const JIT_FRAME_SIZE: Cell = if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) 16 else 32;
+pub const SIGNAL_HANDLER_STACK_FRAME_SIZE: Cell = if (builtin.cpu.arch == .riscv32) 416 else if (builtin.cpu.arch == .riscv64) 544 else if (builtin.cpu.arch == .aarch64) 288 else 192;
 
 // Quotation-specific JIT compiler
 // This implements the non-optimizing compiler that compiles quotations by
@@ -1112,7 +1121,7 @@ pub const QuotationJit = struct {
     fn wordJump(self: *Self, word_cell: Cell) !void {
         // On 32-bit platforms, emit an extra literal for xt_tail_pic_offset
         const is_64bit = @sizeOf(Cell) == 8;
-        if (!is_64bit) {
+        if (!is_64bit and builtin.cpu.arch != .riscv32) {
             const xt_tail_pic_offset: Fixnum = if (comptime cpu.Arch.current().isX86Family()) 5 else 4;
             try self.jit.literal(layouts.tagFixnum(xt_tail_pic_offset));
         }

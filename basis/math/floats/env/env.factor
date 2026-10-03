@@ -47,6 +47,16 @@ UNION: fp-denormal-mode
     +denormal-keep+
     +denormal-flush+ ;
 
+HOOK: fp-traps-supported? cpu ( -- ? )
+M: object fp-traps-supported? t ;
+M: riscv.64 fp-traps-supported? f ;
+M: riscv.32 fp-traps-supported? f ;
+
+HOOK: denormal-flush-supported? cpu ( -- ? )
+M: object denormal-flush-supported? t ;
+M: riscv.64 denormal-flush-supported? f ;
+M: riscv.32 denormal-flush-supported? f ;
+
 <PRIVATE
 
 HOOK: (fp-env-registers) cpu ( -- registers )
@@ -157,5 +167,7 @@ PRIVATE>
     { [ cpu x86? ] [ "math.floats.env.x86" require ] }
     { [ cpu ppc? ] [ "math.floats.env.ppc" require ] }
     { [ cpu arm.64? ] [ "math.floats.env.arm.64" require ] }
+    { [ cpu riscv.32? ] [ "math.floats.env.riscv.32" require ] }
+    { [ cpu riscv.64? ] [ "math.floats.env.riscv.64" require ] }
     [ "CPU architecture unsupported by math.floats.env" throw ]
 } cond

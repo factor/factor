@@ -333,7 +333,7 @@ pub const CodeHeap = struct {
 
     // Get the predecessor frame (caller's frame) given the current frame top
     pub fn framePredecessor(self: *Self, frame_top: Cell) Cell {
-        if (builtin.cpu.arch == .aarch64) {
+        if ((builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)) {
             // ARM64: frame_top[0] contains the saved frame pointer (x29)
             // which points directly to the previous frame
             return @as(*const Cell, @ptrFromInt(frame_top)).*;

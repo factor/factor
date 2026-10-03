@@ -17,14 +17,14 @@ inline cell log2(cell x) {
   asm("bsr %1, %0;" : "=r"(n) : "r"(x));
 #endif
 
-#elif defined(FACTOR_ARM32)
+#elif defined(FACTOR_ARM32) || defined(FACTOR_RISCV32)
 #if defined(_MSC_VER)
   _BitScanReverse((unsigned long*)&n, x);
 #else
   n = (31 - __builtin_clz(x));
 #endif
 
-#elif defined(FACTOR_ARM64)
+#elif defined(FACTOR_ARM64) || defined(FACTOR_RISCV64)
 #if defined(_MSC_VER)
   n = 0;
   _BitScanReverse64((unsigned long*)&n, x);

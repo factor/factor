@@ -34,7 +34,7 @@ static bool variadic_callback_p(code_block* stub) {
 }
 
 VM_C_API bool arm64_variadic_callbacks_supported() {
-#ifdef FACTOR_ARM64
+#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
   return true;
 #else
   return false;
@@ -61,7 +61,7 @@ void callback_heap::store_callback_operand(code_block* stub, cell index,
 
 void callback_heap::update(code_block* stub) {
   word* w = untag<word>(stub->owner);
-#ifdef FACTOR_ARM64
+#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
   store_callback_operand(stub, 6, w->entry_point);
 #else
   store_callback_operand(stub, 1, w->entry_point);
@@ -105,7 +105,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   // optional third element contains the corresponding variadic template.
   tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
   bool variadic = false;
-#ifdef FACTOR_ARM64
+#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
   variadic = return_rewind == (cell)-1;
   if (variadic) {
     if (array_capacity(code_template.untagged()) < 3)
@@ -159,7 +159,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
 
   // Store VM pointer in two relocations.
   store_callback_operand(stub, 0, (cell)parent);
-#ifdef FACTOR_ARM64
+#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
   store_callback_operand(stub, 1, parent->code->safepoint_page);
   store_callback_operand(stub, 2, (cell)&factor::trampoline);
   store_callback_operand(stub, 3, (cell)&factor::trampoline2);

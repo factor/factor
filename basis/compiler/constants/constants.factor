@@ -49,8 +49,13 @@ CONSTANT: rc-relative-arm-b 3
 CONSTANT: rc-relative-arm-b.cond/ldr 4
 CONSTANT: rc-absolute-arm-ldur 5
 CONSTANT: rc-absolute-arm-cmp 6
+CONSTANT: rc-relative-riscv 7
+CONSTANT: rc-relative-riscv-jal 8
+CONSTANT: rc-relative-riscv-branch 9
 CONSTANT: rc-absolute-2 10
 CONSTANT: rc-absolute-1 11
+CONSTANT: rc-absolute-riscv-i 12
+CONSTANT: rc-absolute-riscv-li 13
 
 CONSTANT: rt-dlsym 0
 CONSTANT: rt-entry-point 1
@@ -77,4 +82,6 @@ CONSTANT: rt-safepoint 15
         $ rc-absolute-arm-cmp
         $ rc-absolute-2
         $ rc-absolute-1
+        $ rc-absolute-riscv-i
+        $ rc-absolute-riscv-li
     } member? ;

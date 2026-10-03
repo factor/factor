@@ -3,7 +3,7 @@
 USING: accessors alien alien.accessors alien.arrays alien.c-types
 alien.c-types.varargs alien.data alien.private arrays byte-arrays
 classes.struct combinators combinators.short-circuit compiler.units continuations
-cpu.architecture cpu.arm.64.abi grouping kernel libc locals math math.order
+cpu.architecture cpu.arm.64.abi grouping kernel layouts libc locals math math.order
 namespaces sequences system threads words ;
 IN: alien.varargs
 
@@ -38,8 +38,11 @@ PRIVATE>
         gr-offs >>gr-offs vr-offs >>vr-offs platform >>platform
         active-va-lifetime >>lifetime ;
 
+: va-platform ( -- platform ) cpu riscv? [ cpu ] [ os ] if ;
+
 : <va-cursor> ( stack gr-top vr-top gr-offs vr-offs -- cursor )
-    cpu arm.64? [ os <platform-va-cursor> ] [ unsupported-va-list-platform ] if ;
+    cpu arm.64? cpu riscv? or
+    [ va-platform <platform-va-cursor> ] [ unsupported-va-list-platform ] if ;
 
 : check-va-list ( cursor -- )
     lifetime>> {
@@ -66,9 +69,13 @@ TUPLE: va-layout size alignment members aggregate? homogeneous? ;
 : align-va-pointer ( ptr alignment -- ptr' )
     [ alien-address ] dip align <alien> ;
 
+! Synthetic platform cursors retain their target slot width even when
+! tests run on a host with a different cell size.
+: va-abi-cell ( cursor -- n ) platform>> riscv.32? 4 8 ? ;
+
 :: va-stack-address ( cursor size alignment -- ptr )
-    cursor stack>> alignment 8 max align-va-pointer :> ptr
-    cursor size 8 align ptr <displaced-alien> >>stack drop
+    cursor stack>> alignment cursor va-abi-cell max align-va-pointer :> ptr
+    cursor size cursor va-abi-cell align ptr <displaced-alien> >>stack drop
     ptr ;
 
 :: va-gpr-address ( cursor size alignment -- ptr/f )
@@ -97,11 +104,11 @@ TUPLE: va-layout size alignment members aggregate? homogeneous? ;
     bytes ;
 
 :: va-indirect? ( cursor layout -- ? )
-    layout aggregate?>> layout size>> 16 > and
-    cursor platform>> windows? layout homogeneous?>> not or and ;
+    layout aggregate?>> layout size>> cursor va-abi-cell 2 * > and
+    cursor platform>> dup windows? swap riscv? or layout homogeneous?>> not or and ;
 
 :: va-linux-address ( cursor layout indirect? -- ptr )
-    indirect? [ 8 8 ] [ layout size>> layout alignment>> ] if :> ( size alignment )
+    indirect? [ cursor va-abi-cell dup ] [ layout size>> layout alignment>> ] if :> ( size alignment )
     layout homogeneous?>> indirect? not and [
         cursor layout members>> length va-vr-address [
             layout aggregate?>> [ layout reassemble-va-hfa ] when
@@ -115,7 +122,7 @@ TUPLE: va-layout size alignment members aggregate? homogeneous? ;
     cursor check-va-list
     cursor layout va-indirect? :> indirect?
     cursor platform>> linux? [ cursor layout indirect? va-linux-address ] [
-        cursor indirect? [ 8 8 ] [ layout size>> layout alignment>> ] if
+        cursor indirect? [ cursor va-abi-cell dup ] [ layout size>> layout alignment>> ] if
         cursor platform>> windows? [ 8 min ] when
         va-stack-address
     ] if
@@ -127,7 +134,7 @@ MACRO: va-arg ( c-type -- quot: ( cursor -- value ) )
     promote-vararg-type [ <va-layout> ] [ ] bi
     '[ _ va-arg-address 0 _ alien-copy-value ] ;
 
-! Linux's va_list is a structure passed according to normal aggregate ABI
+! ARM64 Linux's va_list is a structure passed according to normal aggregate ABI
 ! rules. Apple and Windows use a pointer. These are parameter types, not a
 ! portable void* alias: in particular, Linux passes this 32-byte value by
 ! reference to a copy made by the caller.
@@ -139,8 +146,8 @@ STRUCT: native-va-list-storage
     { vr-offs int } ;
 
 :: native-va-list>cursor ( ptr -- cursor )
-    cpu arm.64? [
-        os linux? [
+    cpu arm.64? cpu riscv? or [
+        os linux? cpu arm.64? and [
             ptr 0 alien-cell ptr 8 alien-cell ptr 16 alien-cell
             ptr 24 alien-signed-4 ptr 28 alien-signed-4 <va-cursor>
         ] [ ptr f f 0 0 <va-cursor> ] if
@@ -148,9 +155,9 @@ STRUCT: native-va-list-storage
 
 :: cursor>native-va-list ( cursor -- ptr )
     cursor check-va-list
-    cursor platform>> os = [ unsupported-va-list-platform ] unless
-    cpu arm.64? [
-        os linux? [
+    cursor platform>> va-platform = [ unsupported-va-list-platform ] unless
+    cpu arm.64? cpu riscv? or [
+        os linux? cpu arm.64? and [
             native-va-list-storage <struct> :> native
             native
                 cursor stack>> >>stack cursor gr-top>> >>gr-top
@@ -162,8 +169,8 @@ STRUCT: native-va-list-storage
 SYMBOL: va_list
 
 [
-    cpu arm.64? [
-        os linux? [ native-va-list-storage ] [ void* ] if
+    cpu arm.64? cpu riscv? or [
+        os linux? cpu arm.64? and [ native-va-list-storage ] [ void* ] if
         lookup-c-type clone
             va-cursor >>boxed-class
             [ native-va-list>cursor ] >>boxer-quot
@@ -173,7 +180,7 @@ SYMBOL: va_list
 ] with-compilation-unit
 
 : native-va-list-type? ( type -- ? )
-    cpu arm.64? [
+    cpu arm.64? cpu riscv? or [
         dup abstract-c-type? [ lookup-c-type ] unless
         va_list lookup-c-type eq?
     ] [ drop f ] if ;

@@ -1,0 +1,5 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-riscv.32.o $(BUILD_DIR)/cpu-riscv.32-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-riscv.32.hpp vm/riscv.hpp
+CFLAGS += -march=rv32gc -mabi=ilp32d
+CXXFLAGS += -march=rv32gc -mabi=ilp32d
+ASFLAGS += -march=rv32gc -mabi=ilp32d

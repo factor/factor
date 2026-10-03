@@ -217,26 +217,26 @@ pub const ImageLoader = struct {
     const Self = @This();
 
     test "ARM64 saved callstack relocation follows relative frame links" {
-        if (builtin.cpu.arch != .aarch64) return error.SkipZigTest;
+        if (builtin.cpu.arch != .aarch64 and builtin.cpu.arch != .riscv64 and builtin.cpu.arch != .riscv32) return error.SkipZigTest;
         var vm: vm_mod.FactorVM = undefined;
         vm.code = null;
         var loader: Self = undefined;
         loader.vm = &vm;
         // The first frame spans 32 bytes, including two ordinary spill cells.
         // Metadata-based stepping with the leaf fallback would relocate them.
-        var storage = [_]Cell{
-            0,      layouts.tagFixnum(48),
-            32,     0x1000,
-            0xaaaa, 0xbbbb,
-            16,     0x2000,
-        };
+        var storage = [_]Cell{0} ** (2 + 48 / @sizeOf(Cell));
+        storage[1] = layouts.tagFixnum(48);
+        storage[2] = 32;
+        storage[3] = 0x1000;
+        const outer_frame = 2 + 32 / @sizeOf(Cell);
+        for (storage[4..outer_frame], 0..) |*slot, index| slot.* = 0xaaaa + index;
+        storage[outer_frame] = 16;
+        storage[outer_frame + 1] = 0x2000;
+        var expected = storage;
+        expected[3] = 0x5000;
+        expected[outer_frame + 1] = 0x6000;
         loader.fixupCallstackObject(@ptrCast(&storage), 0x4000);
-        try std.testing.expectEqualSlices(Cell, &.{
-            0,      layouts.tagFixnum(48),
-            32,     0x5000,
-            0xaaaa, 0xbbbb,
-            16,     0x6000,
-        }, &storage);
+        try std.testing.expectEqualSlices(Cell, &expected, &storage);
     }
 
     vm: *vm_mod.FactorVM,
@@ -903,7 +903,7 @@ pub const ImageLoader = struct {
             // Translate the address by adding code_offset
             const fixed_addr = old_addr +% code_offset;
 
-            if (builtin.cpu.arch == .aarch64) {
+            if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
                 const frame_size = @as(*const Cell, @ptrFromInt(frame_top)).*;
                 std.debug.assert(frame_size >= 16 and frame_size % 16 == 0);
                 std.debug.assert(frame_size <= frame_length - frame_offset);
@@ -1049,8 +1049,8 @@ pub const ImageLoader = struct {
                     self.dlsym_cache.put(self.vm.allocator, key, result) catch {};
                     break :blk result;
                 },
-                .trampoline => if (builtin.cpu.arch == .aarch64) @intFromPtr(&trampolines.trampoline) else unreachable,
-                .trampoline2 => if (builtin.cpu.arch == .aarch64) @intFromPtr(&trampolines.trampoline2) else unreachable,
+                .trampoline => if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) @intFromPtr(&trampolines.trampoline) else unreachable,
+                .trampoline2 => if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) @intFromPtr(&trampolines.trampoline2) else unreachable,
                 .megamorphic_cache_hits => @intFromPtr(&self.vm.dispatch_stats.megamorphic_cache_hits),
                 .vm => blk: {
                     // VM address + offset from parameter

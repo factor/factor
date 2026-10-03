@@ -73,7 +73,7 @@ ERROR: invalid-varargs-count count parameters ;
 
 :: prepare-varargs ( params -- params )
     params varargs?>> :> count
-    count t eq? os macos? cpu arm.64? and and
+    count t eq? os macos? cpu arm.64? and cpu riscv? or and
     [ missing-varargs-count ] when
     count integer? [
         count 0 params parameters>> length between? [
@@ -208,7 +208,7 @@ M: callable wrap-callback-quot
     pop-literal :> quot
     alien-callback-params new varargs? >>varargs?
     pop-abi pop-params pop-return :> params
-    varargs? cpu arm.64? not and
+    varargs? cpu arm.64? cpu riscv? or not and
     [ variadic-callback-architecture-unsupported ] when
     params callback-bottom
     params dup dup quot wrap-callback-quot infer-callback-quot

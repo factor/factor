@@ -44,8 +44,10 @@ SYMBOL: varargs-named-count
     named integer? [
         groups [| reps i |
             i named >= [ reps i parameters nth base-type
-                dup struct-c-type? [ frob-struct ] when
-                c-type-align mark-vararg-group ] [ reps ] if
+                t varargs-parameter? [
+                    dup struct-c-type? [ frob-struct ] when
+                    c-type-align
+                ] with-variable mark-vararg-group ] [ reps ] if
         ] map-index
     ] [ groups ] if ;
 
@@ -71,7 +73,17 @@ SYMBOL: varargs-named-count
 
 :: unbox-parameters ( parameters -- vregs reps )
     parameters length <iota> <reversed> parameters
-    [ [ <ds-loc> peek-loc ] [ base-type ] bi* unbox-parameter ]
+    [| index type |
+        varargs-named-count get :> named
+        named integer?
+        [ parameters length 1 - index - named >= ] [ f ] if
+        varargs-parameter? [
+            index <ds-loc> peek-loc type base-type unbox-parameter
+            int-reg-reps get float-reg-reps get
+        ] with-variable
+        ! Keep register-bank counts across the per-parameter scope.
+        float-reg-reps set int-reg-reps set
+    ]
     2 2 mnmap parameters mark-varargs [ concat ] bi@
     windows-arm64-varargs? get [ windows-vararg-parameters ] when
     parameters length neg <ds-loc> inc-stack ;
@@ -88,21 +100,32 @@ SYMBOL: varargs-named-count
         ] if* result
     ] [ vregs reps f ] if ;
 
-: handle-macos-arm64-varargs ( params -- )
-    varargs?>> os macos? cpu arm.64? and [ drop f ] unless
+: handle-varargs-named-count ( params -- )
+    varargs?>> os macos? cpu arm.64? and cpu riscv? or [ drop f ] unless
     varargs-named-count set ;
 
 : start-vararg ( alignment -- )
-    ! Apple rounds the named stack area and each variadic argument to
-    ! eight-byte slots; over-aligned aggregates also retain their C alignment.
-    int-regs get delete-all float-regs get delete-all
-    8 max '[ _ align ] stack-params swap change ;
+    cpu riscv? [
+        ! Double-XLEN variadic values start at an even argument register.
+        dup cell 2 * >= int-regs get empty? not and [
+            int-regs get length odd? [ int-regs get pop* ] when
+        ] when
+        int-regs get empty? [ cell max '[ _ align ] stack-params swap change ] [ drop ] if
+    ] [
+        ! Apple rounds the named stack area and each variadic argument to
+        ! eight-byte slots; over-aligned aggregates retain their C alignment.
+        int-regs get delete-all float-regs get delete-all
+        8 max '[ _ align ] stack-params swap change
+    ] if ;
 
 :: caller-parameter ( vreg rep -- )
     rep length 8 = [ 5 rep nth [ 7 rep nth start-vararg ] when ] when
     rep prepare-parameter-group
     vreg rep first3 rep param-natural-size next-parameter
-    rep length 8 = [ 6 rep nth [ stack-params [ 8 align ] change ] when ] when ;
+    cpu riscv? rep length 8 = and [
+        stack-params get 0 > [ int-regs get delete-all ] when
+    ] when
+    rep length 8 = [ 6 rep nth [ stack-params [ cell align ] change ] when ] when ;
 
 : (caller-parameters) ( vregs reps -- )
     [ caller-parameter ] 2each ;
@@ -114,12 +137,14 @@ SYMBOL: varargs-named-count
     {
         [ abi>> ]
         [ ]
+        [ return>> large-struct? ]
         [ windows-arm64-varargs-call? ]
         [ parameters>> ]
         [ return>> ]
     } cleave
     '[
-        _ handle-macos-arm64-varargs
+        _ handle-varargs-named-count
+        _ cpu riscv? and [ 1 int-reg-reps set ] when
         _ windows-arm64-varargs? [ _ unbox-parameters ] with-variable
         _ prepare-struct-caller struct-return-area set
         (caller-parameters)
@@ -157,7 +182,7 @@ SYMBOL: varargs-named-count
     ] if-void ;
 
 : ?insert-trampoline ( stack-size -- stack-size' )
-    cpu arm.64? [ dup 0 = [ 16 align 16 + ] unless ] when ;
+    cpu arm.64? cpu riscv? or [ dup 0 = [ 16 align 16 + ] unless ] when ;
 
 : params>alien-insn-params ( params --
                              varargs? reg-inputs stack-inputs
@@ -231,9 +256,10 @@ M: #alien-assembly emit-node
 :: callee-parameters ( params -- vregs reps layout reg-outputs stack-outputs )
     params abi>> [
         params return>> prepare-struct-callee struct-return-area set
+        cpu riscv? struct-return-area get and [ 1 int-reg-reps set ] when
         params named-callee-parameters
         params varargs?>> [
-            stack-params get 8 align
+            stack-params get cpu riscv.32? 4 8 ? align
             int-regs get length float-regs get length 3array
         ] [ f ] if
     ] with-param-regs ;
@@ -258,10 +284,10 @@ SYMBOL: callback-struct-return-area
     ! regenerating its words. The instruction constructor is already defined,
     ! but the new ^^callback-stack helper may not exist until that reload ends.
     next-vreg dup ##callback-stack, :> entry-sp
-    os windows? gp-left 0 > and
-    [ entry-sp gp-left 8 * ^^sub-imm ]
+    os windows? cpu riscv? or gp-left 0 > and
+    [ entry-sp gp-left cells ^^sub-imm ]
     [ entry-sp stack-offset ^^add-imm ] if ^^box-alien ds-push
-    os linux? [
+    os linux? cpu arm.64? and [
         entry-sp ^^box-alien ds-push
         entry-sp 64 ^^sub-imm ^^box-alien ds-push
         gp-left -8 * ^^load-literal ds-push
@@ -275,7 +301,7 @@ SYMBOL: callback-struct-return-area
     params callee-parameters :> ( vregs reps layout reg-outputs stack-outputs )
     struct-return-area get callback-struct-return-area set
     reg-outputs stack-outputs layout [
-        [ first4 [ 192 + ] dip 4array ] map
+        [ first4 [ cpu riscv? [ 8 cells ] [ 192 ] if + ] dip 4array ] map
     ] when ##callback-inputs,
     vregs reps params box-parameters
     layout [ emit-va-cursor-inputs ] when* ;

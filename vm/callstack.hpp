@@ -15,7 +15,7 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
   fixnum stack_length = untag_fixnum(stack->length);
   fixnum stack_offset = 0;
 
-#ifdef FACTOR_ARM64
+#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
   while (stack_offset < stack_length) {
     cell frame_top = stack->frame_top_at(stack_offset);
     cell frame_size = *(cell*)frame_top;
@@ -66,7 +66,7 @@ void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
   // be empty.
   FACTOR_ASSERT(!Fixup::translated_code_block_map || top == bottom);
 
-#ifdef FACTOR_ARM64
+#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
   while (top < bottom) {
     cell addr = *(cell*)(top + FRAME_RETURN_ADDRESS);
     FACTOR_ASSERT(addr != 0);

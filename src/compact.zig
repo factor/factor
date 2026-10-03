@@ -167,7 +167,7 @@ fn fixupCallstackSlots(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
     if (top == 0 or bottom == 0 or top >= bottom) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
-    const is_arm64 = builtin.cpu.arch == .aarch64;
+    const linked_frames = builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32;
 
     while (top < bottom) {
         // Return address: frame_top+0 (x86-64) / frame_top+8 (arm64, where +0
@@ -175,13 +175,13 @@ fn fixupCallstackSlots(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
         const addr = @as(*const Cell, @ptrFromInt(top + contexts.FRAME_RETURN_ADDRESS)).*;
         if (addr == 0) break;
 
-        // arm64 live frames are chained by absolute frame pointer at *(top).
-        const next_top: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(top)).* else 0;
+        // Linked live frames are chained by absolute frame pointer at *(top).
+        const next_top: Cell = if (linked_frames) @as(*const Cell, @ptrFromInt(top)).* else 0;
 
         // Binary search all_blocks_sorted (old addresses)
         const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
         if (ub == 0) {
-            if (is_arm64) {
+            if (linked_frames) {
                 if (next_top <= top) break;
                 top = next_top;
             } else {
@@ -212,7 +212,7 @@ fn fixupCallstackSlots(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
             }
         }
 
-        if (is_arm64) {
+        if (linked_frames) {
             if (next_top <= top) break;
             top = next_top;
         } else {
@@ -230,23 +230,23 @@ fn fixupCallstackObjectSlots(gc: *GC, stack: *layouts.Callstack, fixup: *Compact
     if (frame_length == 0) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
-    const is_arm64 = builtin.cpu.arch == .aarch64;
+    const linked_frames = builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32;
     var frame_offset: Cell = 0;
 
     while (frame_offset < frame_length) {
         const frame_top = stack.frameTopAt(frame_offset);
 
-        // arm64 callstack objects store the (relative) frame size at slot 0, and
+        // Linked callstack objects store the (relative) frame size at slot 0, and
         // the return address at +8; x86-64 stores the return address at +0.
-        const arm_frame_size: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
-        if (is_arm64 and (arm_frame_size == 0 or frame_offset + arm_frame_size > frame_length)) break;
+        const linked_frame_size: Cell = if (linked_frames) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
+        if (linked_frames and (linked_frame_size == 0 or frame_offset + linked_frame_size > frame_length)) break;
 
         const addr = @as(*const Cell, @ptrFromInt(frame_top + contexts.FRAME_RETURN_ADDRESS)).*;
         if (addr == 0) break;
 
         const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
         if (ub == 0) {
-            frame_offset += if (is_arm64) arm_frame_size else LEAF_FRAME_SIZE;
+            frame_offset += if (linked_frames) linked_frame_size else LEAF_FRAME_SIZE;
             continue;
         }
         const old_block_addr = blocks[ub - 1];
@@ -271,8 +271,8 @@ fn fixupCallstackObjectSlots(gc: *GC, stack: *layouts.Callstack, fixup: *Compact
             }
         }
 
-        if (is_arm64) {
-            frame_offset += arm_frame_size;
+        if (linked_frames) {
+            frame_offset += linked_frame_size;
         } else {
             const old_entry_point2 = old_block.entryPoint();
             const delta = if (addr > old_entry_point2) addr - old_entry_point2 else 0;
@@ -292,7 +292,7 @@ fn fixupCallstackReturnAddresses(gc: *GC, ctx: *Context, fixup: *CompactionFixup
     if (top == 0 or bottom == 0 or top >= bottom) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
-    const is_arm64 = builtin.cpu.arch == .aarch64;
+    const linked_frames = builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32;
 
     while (top < bottom) {
         // Return address slot: top+0 (x86-64) / top+8 (arm64).
@@ -301,12 +301,12 @@ fn fixupCallstackReturnAddresses(gc: *GC, ctx: *Context, fixup: *CompactionFixup
         if (addr == 0) break;
 
         // Read the predecessor frame pointer (arm64) before mutating the frame.
-        const next_top: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(top)).* else 0;
+        const next_top: Cell = if (linked_frames) @as(*const Cell, @ptrFromInt(top)).* else 0;
 
         // Binary search all_blocks_sorted (old addresses) to find the owner
         const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
         if (ub == 0) {
-            if (is_arm64) {
+            if (linked_frames) {
                 if (next_top <= top) break;
                 top = next_top;
             } else {
@@ -325,7 +325,7 @@ fn fixupCallstackReturnAddresses(gc: *GC, ctx: *Context, fixup: *CompactionFixup
         // Update return address to point into the new block
         addr_ptr.* = new_block.entryPoint() + offset;
 
-        if (is_arm64) {
+        if (linked_frames) {
             if (next_top <= top) break;
             top = next_top;
         } else {
@@ -343,15 +343,15 @@ fn fixupCallstackObjectReturnAddresses(gc: *GC, stack: *layouts.Callstack, fixup
     if (frame_length == 0) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
-    const is_arm64 = builtin.cpu.arch == .aarch64;
+    const linked_frames = builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32;
     var frame_offset: Cell = 0;
 
     while (frame_offset < frame_length) {
         const frame_top = stack.frameTopAt(frame_offset);
 
-        // arm64 objects: (relative) frame size at slot 0, return address at +8.
-        const arm_frame_size: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
-        if (is_arm64 and (arm_frame_size == 0 or frame_offset + arm_frame_size > frame_length)) break;
+        // Linked frame objects: (relative) frame size at slot 0, return address at +8.
+        const linked_frame_size: Cell = if (linked_frames) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
+        if (linked_frames and (linked_frame_size == 0 or frame_offset + linked_frame_size > frame_length)) break;
 
         const addr_ptr: *Cell = @ptrFromInt(frame_top + contexts.FRAME_RETURN_ADDRESS);
         const addr = addr_ptr.*;
@@ -359,7 +359,7 @@ fn fixupCallstackObjectReturnAddresses(gc: *GC, stack: *layouts.Callstack, fixup
 
         const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
         if (ub == 0) {
-            frame_offset += if (is_arm64) arm_frame_size else LEAF_FRAME_SIZE;
+            frame_offset += if (linked_frames) linked_frame_size else LEAF_FRAME_SIZE;
             continue;
         }
         const old_block_addr = blocks[ub - 1];
@@ -371,8 +371,8 @@ fn fixupCallstackObjectReturnAddresses(gc: *GC, stack: *layouts.Callstack, fixup
         const new_entry_point = new_block_addr + @sizeOf(code_blocks.CodeBlock);
         addr_ptr.* = new_entry_point + offset;
 
-        if (is_arm64) {
-            frame_offset += arm_frame_size;
+        if (linked_frames) {
+            frame_offset += linked_frame_size;
         } else {
             const natural_frame_size = old_block.stackFrameSize();
             frame_offset += if (natural_frame_size > 0 and offset > 0) natural_frame_size else LEAF_FRAME_SIZE;
@@ -480,8 +480,8 @@ fn computeExternalRelocationValue(gc: *GC, block: *code_blocks.CodeBlock, rel_ty
         .megamorphic_cache_hits => megamorphic_hits,
         .inline_cache_miss => inline_cache_miss,
         .safepoint => safepoint_page,
-        .trampoline => if (builtin.cpu.arch == .aarch64) @intFromPtr(&trampolines.trampoline) else unreachable,
-        .trampoline2 => if (builtin.cpu.arch == .aarch64) @intFromPtr(&trampolines.trampoline2) else unreachable,
+        .trampoline => if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) @intFromPtr(&trampolines.trampoline) else unreachable,
+        .trampoline2 => if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) @intFromPtr(&trampolines.trampoline2) else unreachable,
         .entry_point,
         .entry_point_pic,
         .entry_point_pic_tail,
@@ -511,7 +511,7 @@ fn updateInstructionOperandsForCompaction(gc: *GC, block: *code_blocks.CodeBlock
         // Validate class - assert on entries with reserved/invalid class values
         const raw_class = @as(u4, @truncate((entry_ptr.value & 0x0F000000) >> 24));
         const valid_class = switch (raw_class) {
-            0, 1, 2, 3, 4, 5, 6, 10, 11 => true,
+            0...13 => true,
             else => false,
         };
         std.debug.assert(valid_class);

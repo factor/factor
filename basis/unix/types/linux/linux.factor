@@ -1,4 +1,5 @@
-USING: alien.syntax alien.c-types classes.struct layouts literals math ;
+USING: alien.syntax alien.c-types classes.struct kernel layouts literals math
+system vocabs ;
 IN: unix.types
 
 TYPEDEF: int clockid_t
@@ -64,3 +65,6 @@ STRUCT: posix_spawnattr_t
   { __sp sched_param }
   { __policy int }
   { __pad int[16] } ;
+
+cpu riscv.64? [ "unix.types.linux.riscv.64" require ] when
+cpu riscv.32? [ "unix.types.linux.riscv.32" require ] when

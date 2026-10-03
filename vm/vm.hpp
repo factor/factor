@@ -634,7 +634,7 @@ struct factor_vm {
 
   // cpu-*
   void dispatch_signal_handler(cell* sp, cell* pc, cell newpc);
-#if defined(FACTOR_X86) || defined(FACTOR_64)
+#if defined(FACTOR_X86) || defined(FACTOR_64) || defined(FACTOR_RISCV32)
   void dispatch_non_resumable_signal(cell* sp, cell* pc,
                                      cell handler,
                                      cell limit);

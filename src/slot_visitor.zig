@@ -235,7 +235,7 @@ pub fn visitCallstackObjectRoots(
     if (frame_length == 0) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
-    const is_arm64 = builtin.cpu.arch == .aarch64;
+    const linked_frames = builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32;
     var frame_offset: Cell = 0;
 
     while (frame_offset < frame_length) {
@@ -243,18 +243,18 @@ pub fn visitCallstackObjectRoots(
 
         // arm64 callstack objects store the (relative) frame size at slot 0 and
         // the return address at +8; x86-64 stores the return address at +0.
-        const arm_frame_size: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
-        if (is_arm64 and (arm_frame_size == 0 or frame_offset + arm_frame_size > frame_length)) break;
+        const linked_frame_size: Cell = if (linked_frames) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
+        if (linked_frames and (linked_frame_size == 0 or frame_offset + linked_frame_size > frame_length)) break;
 
         const addr = @as(*const Cell, @ptrFromInt(frame_top + contexts.FRAME_RETURN_ADDRESS)).*;
         if (addr == 0) break;
 
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
-            frame_offset += if (is_arm64) arm_frame_size else LEAF_FRAME_SIZE;
+            frame_offset += if (linked_frames) linked_frame_size else LEAF_FRAME_SIZE;
             continue;
         };
 
-        const advance = if (is_arm64) arm_frame_size else owner.stackFrameSizeForAddress(addr);
+        const advance = if (linked_frames) linked_frame_size else owner.stackFrameSizeForAddress(addr);
 
         if (comptime @hasDecl(Fixup, "visitCodeBlockOwner")) {
             fixup.visitCodeBlockOwner(owner);
@@ -306,7 +306,7 @@ pub fn visitLiveCallstackRoots(
     if (top == 0 or bottom == 0 or top >= bottom) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
-    const is_arm64 = builtin.cpu.arch == .aarch64;
+    const linked_frames = builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32;
 
     while (top < bottom) {
         // Return address: frame_top+0 on x86-64, frame_top+8 on arm64.
@@ -314,10 +314,10 @@ pub fn visitLiveCallstackRoots(
         if (addr == 0) break;
 
         // arm64 frames are chained: *(top) is the predecessor frame top.
-        const next_top: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(top)).* else 0;
+        const next_top: Cell = if (linked_frames) @as(*const Cell, @ptrFromInt(top)).* else 0;
 
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
-            if (is_arm64) {
+            if (linked_frames) {
                 if (next_top <= top) break;
                 top = next_top;
             } else {
@@ -348,7 +348,7 @@ pub fn visitLiveCallstackRoots(
             lookup.cached_callsite_index = null;
         }
 
-        if (is_arm64) {
+        if (linked_frames) {
             if (next_top <= top) break;
             top = next_top;
         } else {

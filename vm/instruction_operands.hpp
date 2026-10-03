@@ -51,10 +51,15 @@ enum relocation_class {
   RC_ABSOLUTE_ARM_LDUR,
   // absolute value in an ARM CMP instruction
   RC_ABSOLUTE_ARM_CMP,
+  RC_RELATIVE_RISCV,
+  RC_RELATIVE_RISCV_JAL,
+  RC_RELATIVE_RISCV_BRANCH,
   // absolute address in a 2 byte location
   RC_ABSOLUTE_2 = 10,
   // absolute address in a 1 byte location
-  RC_ABSOLUTE_1
+  RC_ABSOLUTE_1,
+  RC_ABSOLUTE_RISCV_I,
+  RC_ABSOLUTE_RISCV_LI
 };
 
 static const cell rel_arm_b_mask = 0x03ffffff;

@@ -3,6 +3,14 @@
 USING: help.markup help.syntax kernel math.floats.env quotations ;
 IN: math.floats.env
 
+HELP: fp-traps-supported?
+{ $values { "?" boolean } }
+{ $description "Tests whether the current CPU supports enabling floating-point exception traps. RISC-V accrues exception flags without hardware traps." } ;
+
+HELP: denormal-flush-supported?
+{ $values { "?" boolean } }
+{ $description "Tests whether the current CPU supports flushing subnormal floating-point values to zero. Standard RISC-V floating-point operations preserve subnormals." } ;
+
 HELP: fp-exception
 { $class-description "Symbols of this type represent floating-point exceptions. They are used to get and set the floating-point unit's exception flags (using " { $link fp-exception-flags } " and " { $link set-fp-exception-flags } ") and to control processor traps (using " { $link with-fp-traps } "). The following symbols are defined:"
 { $list

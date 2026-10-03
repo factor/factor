@@ -1,3 +1,4 @@
+#include "riscv.hpp"
 #if defined(WINDOWS)
   #if defined(WINNT)
     #include "os-windows.hpp"
@@ -54,6 +55,10 @@
         #include "os-linux-arm.32.hpp"
       #elif defined(FACTOR_ARM64)
         #include "os-linux-arm.64.hpp"
+      #elif defined(FACTOR_RISCV32)
+        #include "os-linux-riscv.32.hpp"
+      #elif defined(FACTOR_RISCV64)
+        #include "os-linux-riscv.64.hpp"
       #elif defined(FACTOR_AMD64)
         #include "os-linux-x86.64.hpp"
       #else
@@ -75,6 +80,10 @@
   #include "cpu-arm.32.hpp"
 #elif defined(FACTOR_ARM64)
   #include "cpu-arm.64.hpp"
+#elif defined(FACTOR_RISCV32)
+  #include "cpu-riscv.32.hpp"
+#elif defined(FACTOR_RISCV64)
+  #include "cpu-riscv.64.hpp"
 #else
   #error "Unsupported CPU"
 #endif

@@ -67,6 +67,20 @@ fixnum instruction_operand::load_value(cell relative_to) {
       return load_value_masked(20, 12, 0);
     case RC_ABSOLUTE_ARM_CMP:
       return (load_unaligned<uint32_t>(pointer - sizeof(uint32_t)) >> 10) & 0xfff;
+    case RC_RELATIVE_RISCV:
+      return relative_to - 8 + riscv_pair_displacement((uint32_t*)(pointer - 8));
+    case RC_RELATIVE_RISCV_JAL:
+      return relative_to - 4 + riscv_jal_displacement(load_unaligned<uint32_t>(pointer - 4));
+    case RC_RELATIVE_RISCV_BRANCH:
+      return relative_to - 4 + riscv_branch_displacement(load_unaligned<uint32_t>(pointer - 4));
+    case RC_ABSOLUTE_RISCV_I:
+      return riscv_signed_field(load_unaligned<uint32_t>(pointer - 4) >> 20, 12);
+    case RC_ABSOLUTE_RISCV_LI:
+#if defined(FACTOR_RISCV32)
+      return riscv_load_li32((uint32_t*)(pointer - 8));
+#else
+      return riscv_load_li((uint32_t*)(pointer - 32));
+#endif
     default:
       critical_error("Bad rel class", rel.klass());
       return 0;
@@ -132,6 +146,32 @@ void instruction_operand::store_value(fixnum absolute_value) {
       FACTOR_ASSERT(absolute_value >= 0);
       FACTOR_ASSERT(absolute_value <= 4095);
       store_value_masked(absolute_value, rel_arm_cmp_mask, 10, 0);
+      break;
+    case RC_RELATIVE_RISCV:
+#if defined(FACTOR_RISCV32)
+      riscv_store_pair32((uint32_t*)(pointer - 8), cell(relative_value) + 8);
+#else
+      riscv_store_pair((uint32_t*)(pointer - 8), relative_value + 8);
+#endif
+      break;
+    case RC_RELATIVE_RISCV_JAL:
+      store_unaligned<uint32_t>(pointer - 4,
+          (load_unaligned<uint32_t>(pointer - 4) & 0xfff) | riscv_jal_bits(relative_value + 4));
+      break;
+    case RC_RELATIVE_RISCV_BRANCH:
+      store_unaligned<uint32_t>(pointer - 4,
+          (load_unaligned<uint32_t>(pointer - 4) & 0x01fff07f) | riscv_branch_bits(relative_value + 4));
+      break;
+    case RC_ABSOLUTE_RISCV_I:
+      FACTOR_ASSERT(absolute_value >= -2048 && absolute_value <= 2047);
+      store_value_masked(absolute_value, 0xfff00000, 20, 0);
+      break;
+    case RC_ABSOLUTE_RISCV_LI:
+#if defined(FACTOR_RISCV32)
+      riscv_store_li32((uint32_t*)(pointer - 8), absolute_value);
+#else
+      riscv_store_li((uint32_t*)(pointer - 32), absolute_value);
+#endif
       break;
     default:
       critical_error("Bad rel class", rel.klass());

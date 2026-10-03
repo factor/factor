@@ -25,7 +25,7 @@ pub fn iterateCallstackObject(vm: *FactorVM, cs_cell: *Cell, comptime Iterator: 
     const frame_length = layouts.untagFixnum(@as(*const layouts.Callstack, @ptrFromInt(layouts.UNTAG(cs_cell.*))).length);
     var frame_offset: Cell = 0;
 
-    if (builtin.cpu.arch == .aarch64) {
+    if ((builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)) {
         while (frame_offset < frame_length) {
             const callstack: *const layouts.Callstack = @ptrFromInt(layouts.UNTAG(cs_cell.*));
             const frame_top = callstack.frameTopAt(frame_offset);
@@ -62,7 +62,7 @@ pub fn iterateCallstack(vm: *FactorVM, ctx: *const contexts.Context, comptime It
 
     const code = vm.code orelse return;
 
-    if (builtin.cpu.arch == .aarch64) {
+    if ((builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)) {
         while (top < bottom) {
             const ret_addr = @as(*const Cell, @ptrFromInt(top + FRAME_RETURN_ADDRESS)).*;
             if (ret_addr == 0) break;

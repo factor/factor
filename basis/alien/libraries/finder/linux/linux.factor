@@ -11,13 +11,15 @@ IN: alien.libraries.finder.linux
 
 CONSTANT: elf-machine-map {
     { ppc.32 20 } { ppc.64 21 } { x86.32 3 }
-    { x86.64 62 } { arm.64 183 }
+    { x86.64 62 } { arm.64 183 } { riscv.32 243 } { riscv.64 243 }
 }
 
 CONSTANT: emulation-map {
     { x86.32 "elf_i386" }
     { x86.64 "elf_x86_64" }
     { arm.64 "aarch64linux" }
+    { riscv.32 "elf32lriscv" }
+    { riscv.64 "elf64lriscv" }
 }
 
 : parse-ldconfig-lines ( string -- triple )
@@ -117,6 +119,7 @@ CONSTANT: emulation-map {
     ] [ { } ] if*
     {
         { x86.64 "x86_64" } { x86.32 "i386" } { arm.64 "aarch64" }
+        { riscv.32 "riscv32" } { riscv.64 "riscv64" }
         { ppc.32 "powerpc" } { ppc.64 "powerpc64" }
     } cpu of [
         "/etc/ld-musl-" ".path" surround
@@ -126,6 +129,8 @@ CONSTANT: emulation-map {
     {
         { x86.64 "x86_64-linux-gnu" } { x86.32 "i386-linux-gnu" }
         { arm.64 "aarch64-linux-gnu" }
+        { riscv.32 "riscv32-linux-gnu" }
+        { riscv.64 "riscv64-linux-gnu" }
     } cpu of [
         [ "/lib" swap append-path ] [ "/usr/lib" swap append-path ] bi 2array append
     ] when* members ;

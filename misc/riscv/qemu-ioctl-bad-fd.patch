@@ -1,0 +1,11 @@
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -5710,3 +5710,8 @@ static abi_long do_ioctl(int fd, int cmd, abi_long arg)
++    /* Linux checks the descriptor before decoding the ioctl request. */
++    if (fcntl(fd, F_GETFD) == -1) {
++        return get_errno(-1);
++    }
++
+     ie = ioctl_entries;
+     for(;;) {
+         if (ie->target_cmd == 0) {

@@ -436,3 +436,4 @@ void* bug1021_test_3(int x) {
 #include "ffi_test_varargs_outgoing.c"
 #include "ffi_test_varargs_promotions.c"
 #include "ffi_test_arm64_unions.c"
+#include "ffi_test_riscv.c"

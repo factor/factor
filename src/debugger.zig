@@ -962,6 +962,8 @@ pub fn factorbug(vm: *FactorVM) void {
                 asm volatile ("ud2");
             } else if (arch == .aarch64) {
                 asm volatile ("udf #0");
+            } else if (arch == .riscv64 or arch == .riscv32) {
+                asm volatile ("unimp");
             } else {
                 const ptr: *allowzero volatile u8 = @ptrFromInt(0);
                 _ = ptr.*;

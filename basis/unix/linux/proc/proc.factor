@@ -50,7 +50,15 @@ TUPLE: processor-info
     { power-management string }
     { tlb-size string }
     { bugs string }
-    { vmx-flags string } ;
+    { vmx-flags string }
+    { hart integer }
+    { isa string }
+    { hart-isa string }
+    { mmu string }
+    { uarch string }
+    { mvendorid integer }
+    { marchid integer }
+    { mimpid integer } ;
 
 
 ERROR: unknown-cpuinfo-line string ;
@@ -91,16 +99,24 @@ ERROR: unknown-cpuinfo-line string ;
         { "fpu" [ "yes" = >>fpu? ] }
         { "fpu_exception" [ "yes" = >>fpu-exception? ] }
         { "hlt_bug" [ "yes" = >>hlt-bug? ] }
+        { "hart" [ string>number >>hart ] }
+        { "hart isa" [ >>hart-isa ] }
         { "initial apicid" [ string>number >>initial-apicid ] }
+        { "isa" [ >>isa ] }
+        { "marchid" [ string>number >>marchid ] }
         { "microcode" [ string>number >>microcode ] }
+        { "mimpid" [ string>number >>mimpid ] }
+        { "mmu" [ >>mmu ] }
         { "model" [ string>number >>model ] }
         { "model name" [ >>model-name ] }
+        { "mvendorid" [ string>number >>mvendorid ] }
         { "physical id" [ string>number >>physical-id ] }
         { "power management" [ >>power-management ] }
         { "processor" [ string>number >>processor ] }
         { "siblings" [ string>number >>siblings ] }
         { "stepping" [ string>number >>stepping ] }
         { "TLB size" [ >>tlb-size ] }
+        { "uarch" [ >>uarch ] }
         { "vendor_id" [ >>vendor-id ] }
         { "vmx flags" [ >>vmx-flags ] }
         { "wp" [ "yes" = >>wp? ] }

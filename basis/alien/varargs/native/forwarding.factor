@@ -1,4 +1,4 @@
-USING: alien alien.accessors alien.c-types alien.libraries alien.strings alien.syntax
+USING: accessors alien alien.accessors alien.c-types alien.libraries alien.strings alien.syntax
 alien.varargs byte-arrays combinators io.encodings.utf8 io.pathnames
 kernel locals system tools.test ;
 IN: alien.varargs.tests
@@ -23,7 +23,8 @@ FUNCTION-ALIAS: va-test-vsnprintf-pointer void* va_vsnprintf_pointer ( )
     [| mem |
         7 mem 0 set-alien-signed-4 2.5 mem 64 set-alien-double
         7 mem 256 set-alien-signed-4 2.5 mem 264 set-alien-double
-        mem os cursor-at :> cursor
+        cpu riscv? [ 2.5 mem 8 set-alien-double ] when
+        mem va-platform cursor-at cpu riscv? [ mem >>stack ] when :> cursor
         32 <byte-array> :> output
         output 32 "%d/%.2f" cursor va-test-vsnprintf
         output utf8 alien>string
@@ -36,7 +37,7 @@ FUNCTION-ALIAS: va-test-vsnprintf-pointer void* va_vsnprintf_pointer ( )
 { 7 7 } [
     [| mem |
         7 mem 0 set-alien-signed-4 7 mem 256 set-alien-signed-4
-        mem os cursor-at :> cursor
+        mem va-platform cursor-at cpu riscv? [ mem >>stack ] when :> cursor
         cursor cursor>native-va-list native-va-list>cursor int va-arg
         cursor int va-arg
     ] with-va-memory

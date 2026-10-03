@@ -33,6 +33,11 @@ const vm_mod = @import("vm.zig");
 
 // Comptime verification of struct layouts that JIT code relies on
 comptime {
+    if (builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .riscv64) {
+        if (!std.Target.riscv.featureSetHasAll(builtin.cpu.features, &.{ .m, .a, .f, .d })) {
+            @compileError("Factor RISC-V requires M, A, F, and D extensions; use -Dcpu=generic_rv32+m+a+f+d+c or -Dcpu=generic_rv64+m+a+f+d+c");
+        }
+    }
     if (@offsetOf(contexts.Context, "callstack_top") != 0) @compileError("callstack_top must be at offset 0");
     if (@offsetOf(contexts.Context, "callstack_bottom") != @sizeOf(layouts.Cell)) @compileError("callstack_bottom must be at cell offset 1");
     if (@offsetOf(contexts.Context, "datastack") != 2 * @sizeOf(layouts.Cell)) @compileError("datastack must be at cell offset 2");
@@ -128,6 +133,8 @@ const build_options = @import("build_options");
 const FACTOR_CPU_STRING = switch (builtin.cpu.arch) {
     .x86_64 => "x86.64",
     .aarch64 => "arm.64",
+    .riscv64 => "riscv.64",
+    .riscv32 => "riscv.32",
     .x86 => "x86.32",
     else => @compileError("unsupported CPU architecture"),
 };

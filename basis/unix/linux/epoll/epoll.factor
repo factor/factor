@@ -21,7 +21,7 @@ UNION-STRUCT: epoll-data
     "data" epoll-data [ f <struct-slot-spec> ] 2bi@ 2array
 {
     { [ cpu x86? ] [ define-packed-struct-class ] }
-    { [ cpu arm.64? ] [ define-struct-class ] }
+    { [ cpu arm.64? cpu riscv? or ] [ define-struct-class ] }
 } cond
 >>
 

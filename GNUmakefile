@@ -253,6 +253,8 @@ help:
 	@echo "linux-ppc-64"
 	@echo "linux-arm-32"
 	@echo "linux-arm-64"
+	@echo "linux-riscv-32"
+	@echo "linux-riscv-64"
 	@echo "freebsd-x86-32"
 	@echo "freebsd-x86-64"
 	@echo "macos-x86-32"
@@ -298,6 +300,12 @@ linux-arm-32:
 
 linux-arm-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
+
+linux-riscv-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.riscv.32
+
+linux-riscv-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.riscv.64
 
 linux-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32
@@ -348,7 +356,7 @@ $(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
 $(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $@
 
-$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c vm/ffi_test.h vm/ffi_test_features.h vm/ffi_test_small.h vm/ffi_test_arm64.c vm/ffi_test_arm64.h vm/tests/ffi_uint_callback.c vm/tests/ffi_array_struct.c vm/tests/ffi_fp_status.c vm/ffi_test_varargs.c vm/ffi_test_varargs.h vm/ffi_test_varargs_outgoing.c vm/ffi_test_varargs_promotions.c vm/ffi_test_arm64_unions.c | $(BUILD_DIR)
+$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c vm/ffi_test.h vm/ffi_test_features.h vm/ffi_test_small.h vm/ffi_test_arm64.c vm/ffi_test_arm64.h vm/tests/ffi_uint_callback.c vm/tests/ffi_array_struct.c vm/tests/ffi_fp_status.c vm/ffi_test_varargs.c vm/ffi_test_varargs.h vm/ffi_test_varargs_outgoing.c vm/ffi_test_varargs_promotions.c vm/ffi_test_arm64_unions.c vm/ffi_test_riscv.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
 macos.app: $(EXECUTABLE)
@@ -399,6 +407,15 @@ test-diagnostics: $(BUILD_DIR)/diagnostics-tests$(EXE_EXTENSION)
 
 test-vm: test-diagnostics
 
+$(BUILD_DIR)/riscv-tests$(EXE_EXTENSION): vm/tests/riscv.cpp vm/riscv.hpp | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) -o $@ $<
+
+.PHONY: test-riscv
+test-riscv: $(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
+	./$(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
+
+test-vm: test-riscv
+
 ifneq ($(filter $(BUILD_DIR)/os-unix.o,$(DLL_OBJS)),)
 $(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION): vm/tests/unix_signals.cpp $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(DLL_OBJS) $(LIBS)
@@ -442,4 +459,4 @@ clean:
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
 .PHONY: factor-executable factor-lib factor-console factor-ffi-test test-vm tags clean help macos.app
-.PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64
+.PHONY: linux-riscv-32 linux-riscv-64 linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64

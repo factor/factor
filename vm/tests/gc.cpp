@@ -387,11 +387,48 @@ static void test_arm64_relocations() {
   }
 }
 
+#if defined(FACTOR_RISCV32)
+static void test_riscv32_cell_relocation() {
+  struct {
+    code_block block;
+    uint32_t code[2];
+    uint32_t guard[6];
+  } buffer = {};
+  buffer.code[0] = 0x537;
+  buffer.code[1] = 0x50513;
+  std::fill(buffer.guard, buffer.guard + 6, 0xdeadbeef);
+  instruction_operand op(
+      relocation_entry(RT_UNTAGGED, RC_ABSOLUTE_RISCV_LI, 8), &buffer.block, 0);
+  for (cell value : {cell(0), cell(2048), cell(0x7ffff800),
+                    cell(0x80000000), cell(0xffffffff)}) {
+    op.store_value(fixnum(value));
+    check(cell(op.load_value(0)) == value,
+          "RV32 literal relocation did not round trip a cell");
+    for (uint32_t guard : buffer.guard)
+      check(guard == 0xdeadbeef, "RV32 literal relocation overwrote its 8-byte stub");
+  }
+  op.rel = relocation_entry(RT_HERE, RC_RELATIVE_RISCV, 8);
+  buffer.code[0] = 0x297;
+  buffer.code[1] = 0x280e7;
+  for (cell offset : {cell(0), cell(-4), cell(2048), cell(0x7ffff800),
+                     cell(0x80000000), cell(0xffffffff)}) {
+    cell target = buffer.block.entry_point() + offset;
+    op.store_value(fixnum(target));
+    check(cell(op.load_value(op.pointer)) == target,
+          "RV32 AUIPC relocation did not wrap its 32-bit displacement");
+  }
+}
+#endif
+
 int main(int argc, char** argv) {
   if (argc == 1 || strcmp(argv[1], "arm64-relocations") == 0)
     test_arm64_relocations();
   if (argc == 1 || strcmp(argv[1], "stack-frame-size") == 0)
     test_stack_frame_size_header();
+#if defined(FACTOR_RISCV32)
+  if (argc == 1 || strcmp(argv[1], "riscv32-relocations") == 0)
+    test_riscv32_cell_relocation();
+#endif
   if (argc == 1 || strcmp(argv[1], "alien") == 0)
     test_compact_alien();
   if (argc == 1 || strcmp(argv[1], "become") == 0)

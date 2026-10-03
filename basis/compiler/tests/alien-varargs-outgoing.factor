@@ -13,6 +13,8 @@ STRUCT: varout-hfa { x double } { y double } { z double } ;
 STRUCT: varout-small-hfa { x float } { y float } ;
 FUNCTION: double varout_mixed ( float first, double second, int tag, ... int i, double d, longlong l, double e, int j, double f )
 FUNCTION: double varout_hfas ( varout-small-hfa named, int tag, ... varout-pair p, varout-hfa h, double d )
+FUNCTION: double varout_indirect_alignment ( int tag, ... varout-pair p, double tail )
+FUNCTION: double varout_indirect_alignment_control ( )
 FUNCTION: double varout_split ( int a, int b, int c, int d, int e, int f, int g, ... varout-pair p, double tail )
 FUNCTION: varout-hfa varout_return ( int tag, ... varout-hfa h )
 FUNCTION: double varout_control ( )
@@ -26,6 +28,10 @@ varout_split_caller_supported 0 > [
 ] if
 { 285.0 } [ 1 2 3 4 5 6 7 8 9 varout_mixed ] unit-test
 { 285.0 } [ 1 2 varout-small-hfa boa 3 4 5 varout-pair boa 6 7 8 varout-hfa boa 9 varout_hfas ] unit-test
+cpu riscv? [
+    { 48.0 } [ varout_indirect_alignment_control ] unit-test
+    { 48.0 } [ 1 4 5 varout-pair boa 6 varout_indirect_alignment ] unit-test
+] when
 ! This is the ARM64 X7/stack boundary regression. The original x86 image
 ! independently fails this signature (317 -> 365); retain its C-only control
 ! above without broadening this ARM64 change into an x86 ABI repair.

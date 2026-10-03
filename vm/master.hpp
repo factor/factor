@@ -71,6 +71,11 @@
 #elif defined(__aarch64__) || defined(_M_ARM64)
 #define FACTOR_ARM64
 #define FACTOR_64
+#elif defined(__riscv) && __riscv_xlen == 32
+#define FACTOR_RISCV32
+#elif defined(__riscv) && __riscv_xlen == 64
+#define FACTOR_RISCV64
+#define FACTOR_64
 #elif defined(__amd64__) || defined(__x86_64__) || defined(_M_AMD64)
 #define FACTOR_AMD64
 #define FACTOR_64

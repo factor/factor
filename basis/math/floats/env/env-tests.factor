@@ -123,6 +123,7 @@ set-default-fp-env
 : test-traps-compiled ( traps inputs quot -- quot' fail-quot )
     swapd '[ @ [ _ _ with-fp-traps ] compile-call ] [ fp-trap-error? ] ;
 
+fp-traps-supported? [
 { +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps must-fail-with
 { +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps must-fail-with
 { +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps must-fail-with
@@ -134,6 +135,7 @@ set-default-fp-env
 { +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps-compiled must-fail-with
 { +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps-compiled must-fail-with
 { +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps-compiled must-fail-with
+] when
 
 ! Ensure ordered comparisons raise traps
 :: test-comparison-quot ( word -- quot )
@@ -148,7 +150,7 @@ set-default-fp-env
 : test-comparison-compiled ( inputs word -- quot fail-quot )
     test-comparison-quot '[ @ _ compile-call ] [ fp-trap-error? ] ;
 
-\ float< "intrinsic" word-prop [
+\ float< "intrinsic" word-prop fp-traps-supported? and [
     [ 0/0. -15.0 ] \ < test-comparison must-fail-with
     [ 0/0. -15.0 ] \ < test-comparison-compiled must-fail-with
     [ -15.0 0/0. ] \ < test-comparison must-fail-with
@@ -193,7 +195,7 @@ set-default-fp-env
 { { } } [ fp-traps ] unit-test
 
 { } [
-    all-fp-exceptions [ compact-gc ] with-fp-traps
+    fp-traps-supported? all-fp-exceptions { } ? [ compact-gc ] with-fp-traps
 ] unit-test
 
 ! In case the tests screw up the FP env because of bugs in math.floats.env
