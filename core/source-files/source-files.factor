@@ -63,11 +63,11 @@ SYMBOL: current-source-file
 
 : with-source-file ( name quot -- )
     ! Should be called from inside with-compilation-unit.
-    H{ } clone [
+    [
         [
             path>source-file
             [ current-source-file namespaces:set ]
             [ definitions>> old-definitions namespaces:set ] bi
         ] dip
         [ wrap-source-file-error ] recover
-    ] with-variables ; inline
+    ] with-scope ; inline

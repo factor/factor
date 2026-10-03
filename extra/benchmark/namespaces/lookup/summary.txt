@@ -1,0 +1,1 @@
+Dynamic variable reads across scope depths

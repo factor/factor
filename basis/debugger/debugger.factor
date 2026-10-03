@@ -39,7 +39,7 @@ M: string error. print ;
     error-continuation get call>> callstack. ;
 
 : :get ( variable -- value )
-    error-continuation get name>> assoc-stack ;
+    error-continuation get name>> namestack>vector assoc-stack ;
 
 : :res ( n -- * )
     1 - restarts [ nth f ] change-global

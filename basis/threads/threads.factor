@@ -32,7 +32,7 @@ PRIMITIVE: context-object-for ( n context -- obj )
 
 ! Context introspection
 : namestack-for ( context -- namestack )
-    [ CONTEXT-OBJ-NAMESTACK ] dip context-object-for ;
+    [ CONTEXT-OBJ-NAMESTACK ] dip context-object-for snapshot-namestack ;
 
 : catchstack-for ( context -- catchstack )
     [ CONTEXT-OBJ-CATCHSTACK ] dip context-object-for ;
@@ -235,7 +235,7 @@ M: real sleep
     >integer nano-count + sleep-until ;
 
 : (spawn) ( thread -- )
-    [ register-thread ] [ [ get-namestack ] dip resume-with ] bi ;
+    [ register-thread ] [ [ capture-namestack ] dip resume-with ] bi ;
 
 : spawn ( quot name -- thread )
     <thread> [ (spawn) ] keep ;

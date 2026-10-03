@@ -51,6 +51,7 @@ PRIVATE>
 M: tuple error. describe ;
 
 : vars-in-scope ( seq -- alist )
+    namestack>vector
     [ [ global eq? ] reject [ keys ] gather ] keep
     '[ dup _ assoc-stack ] H{ } map>assoc ;
 

@@ -88,13 +88,13 @@ PRIVATE>
     dup error-destructors get push ; inline
 
 : with-destructors ( quot -- )
-    H{ } clone
-    V{ } clone always-destructors pick set-at
-    V{ } clone error-destructors pick set-at [
+    [
+        V{ } clone always-destructors namespaces:set
+        V{ } clone error-destructors namespaces:set
         [ do-always-destructors ]
         [ do-error-destructors ]
         cleanup
-    ] with-variables ; inline
+    ] with-scope ; inline
 
 STARTUP-HOOK: [
     HS{ } clone disposables set-global

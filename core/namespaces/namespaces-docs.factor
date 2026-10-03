@@ -1,4 +1,4 @@
-USING: assocs help.markup help.syntax kernel math
+USING: assocs help.markup help.syntax kernel math namespaces.contexts
 namespaces.private quotations words words.symbol ;
 IN: namespaces
 
@@ -31,15 +31,18 @@ ARTICLE: "namespaces-global" "Global variables"
 } ;
 
 ARTICLE: "namespaces.private" "Namespace implementation details"
-"The namestack holds namespaces."
+"The VM context holds an indexed namespace context: a stack of scopes and a hashtable of binding stacks. Owned scopes keep their bindings indexed; supplied or exported mutable assocs are searched live. Internal captures copy scope topology and share binding cells, without exporting assocs."
 { $subsections
     get-namestack
     set-namestack
+    capture-namestack
+    namestack>vector
     namespace
 }
 "A pair of words push and pop namespaces on the namestack."
 { $subsections
     >n
+    >scope
     ndrop
 } ;
 
@@ -166,20 +169,38 @@ HELP: set-global
 { $side-effects "variable" } ;
 
 HELP: (get-namestack)
-{ $values { "namestack" "a vector of assocs" } }
-{ $description "Outputs the current namestack." } ;
+{ $values { "context" namespace-context } }
+{ $description "Outputs the current indexed namespace context. Use " { $link get-namestack } " to obtain a vector of mutable assocs." } ;
 
 HELP: get-namestack
 { $values { "namestack" "a vector of assocs" } }
-{ $description "Outputs a copy of the current namestack." } ;
+{ $description "Outputs a copy of the current scope stack as a vector of assocs. The assocs retain their identity and can be mutated directly. Exporting owned scopes switches their lookups to the live assoc path." } ;
 
 HELP: set-namestack
-{ $values { "namestack" "a vector of assocs" } }
-{ $description "Replaces the namestack with a copy of the given vector." } ;
+{ $values { "namestack" "a vector of assocs or an internal namespace snapshot" } }
+{ $description "Replaces the namestack with a copy of the given scope topology. Assocs and existing bindings remain shared. An internal snapshot can be restored repeatedly." } ;
+
+HELP: capture-namestack
+{ $values { "snapshot" namespace-context } }
+{ $description "Copies scope topology for thread inheritance or continuation capture, preserving indexed bindings. Values and frames remain shared. Indexes copy on topology mutation and rebuild lazily when shared frames change." }
+$low-level-note ;
+
+HELP: snapshot-namestack
+{ $values { "namestack" "a namespace context or vector of assocs" } { "snapshot" namespace-context } }
+{ $description "Copies namespace topology without exposing its mutable assocs. Used for suspended-thread continuation capture." }
+$low-level-note ;
+
+HELP: namestack>vector
+{ $values { "namestack" "a namespace context or vector of assocs" } { "vector" "a vector of mutable assocs" } }
+{ $description "Converts a captured namespace context to a vector of assocs for inspection. Assocs retain their identity and support direct mutation." }
+$low-level-note ;
 
 HELP: >n
 { $values { "namespace" assoc } }
 { $description "Pushes a namespace on the namestack." } ;
+
+HELP: >scope
+{ $description "Pushes a fresh owned scope with indexed bindings." } ;
 
 HELP: ndrop
 { $description "Pops a namespace from the namestack." } ;

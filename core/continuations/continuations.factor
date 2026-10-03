@@ -46,7 +46,7 @@ TUPLE: continuation data call retain name catch ;
 C: <continuation> continuation
 
 : current-continuation ( -- continuation )
-    get-datastack get-callstack get-retainstack get-namestack get-catchstack
+    get-datastack get-callstack get-retainstack capture-namestack get-catchstack
     <continuation> ;
 
 <PRIVATE

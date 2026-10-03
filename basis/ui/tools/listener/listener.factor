@@ -47,7 +47,7 @@ SLOT: manifest
 
 M: interactor manifest>>
     dup interactor-busy? [ drop f ] [
-        interactor-continuation name>>
+        interactor-continuation name>> namestack>vector
         manifest swap assoc-stack
     ] if ;
 

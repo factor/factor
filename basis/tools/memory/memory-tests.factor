@@ -28,7 +28,7 @@ ${ 64-bit? 80 64 ? } [ "hello \u{snowman}" total-size ] unit-test
 ! A retained failure must not keep the full code-heap snapshot alive.
 { f } [
     [ [ "code-block snapshot test" throw ] with-code-blocks ] [
-        drop error-continuation get name>>
+        drop error-continuation get name>> namestack>vector
         [ \ code-blocks swap at code-blocks? ] any?
     ] recover
 ] unit-test

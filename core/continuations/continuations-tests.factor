@@ -1,6 +1,6 @@
-USING: accessors continuations debugger eval io kernel kernel.private
-math math.ratios memory namespaces sequences tools.test vectors words
-;
+USING: accessors arrays continuations debugger eval io kernel
+kernel.private locals math math.ratios memory namespaces sequences
+tools.test vectors words ;
 IN: continuations.tests
 
 : (callcc1-test) ( n obj -- n' obj )
@@ -24,6 +24,22 @@ IN: continuations.tests
 
 { t } [ 10 callcc1-test 10 <iota> reverse >vector = ] unit-test
 { t } [ callcc-namespace-test ] unit-test
+
+SYMBOL: multishot-namespace-key
+:: multishot-namespace-test ( -- values )
+    V{ } clone :> holder V{ } clone :> results
+    [
+        2 multishot-namespace-key set
+        [ ] callcc1 dup continuation? [ holder push ] [
+            drop multishot-namespace-key get results push
+        ] if
+        results length 2 < [
+            [ 9 multishot-namespace-key set f holder first continue-with ] with-scope
+        ] when
+    ] with-scope
+    results >array ;
+
+{ { 2 2 } } [ multishot-namespace-test ] unit-test
 
 [ 5 throw ] [ 5 = ] must-fail-with
 

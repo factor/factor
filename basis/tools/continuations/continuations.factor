@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators continuations
 continuations.private effects fry generic generic.single kernel
-kernel.private macros macros.private make math namespaces namespaces.private
+kernel.private macros macros.private make math namespaces
+namespaces.contexts namespaces.private
 quotations sequences sequences.private threads threads.private
 tools.crossref words ;
 IN: tools.continuations
@@ -133,7 +134,8 @@ PRIVATE>
     dup '[ _ execute break ] "step-into" set-word-prop ;
 
 {
-    >n ndrop recover
+    >n >scope ndrop get set namespace recover
+    context-push-scope context-get context-set context-namespace
     continue continue-with
     stop suspend (spawn)
     set-context start-context

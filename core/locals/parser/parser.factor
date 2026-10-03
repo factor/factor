@@ -38,10 +38,11 @@ M: lambda-parser literal>object
     [ swap pad-slots swap tuple-template boa ] [ boa>object ] if ;
 
 : with-lambda-scope ( assoc reader-quot: ( -- quot ) -- quot )
-    H{
-        { in-lambda? t }
-        { quotation-parser lambda-parser }
-    } -rot '[ _ _ with-words ] with-variables ; inline
+    [
+        t in-lambda? set
+        lambda-parser quotation-parser set
+        with-words
+    ] with-scope ; inline
 
 : with-fry-scope ( quot: ( -- quot ) -- quot )
     in-lambda? get [ call ] [

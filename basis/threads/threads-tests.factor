@@ -62,6 +62,21 @@ yield
 
 { t } [ spawn-namespace-test ] unit-test
 
+! New bindings in an inherited scope remain visible after the child has indexed it.
+SYMBOL: inherited-new-key
+:: inherited-binding-test ( -- value )
+    <promise> :> ready <promise> :> proceed <promise> :> result
+    [
+        [
+            inherited-new-key get ready fulfill
+            proceed ?promise drop inherited-new-key get result fulfill
+        ] "Inherited bindings" spawn drop
+        ready ?promise drop 42 inherited-new-key set t proceed fulfill
+        result ?promise
+    ] with-scope ;
+
+{ 42 } [ inherited-binding-test ] unit-test
+
 [ "a" [ 1 1 + ] spawn 100 sleep ] must-fail
 
 { } [ 0.1 seconds sleep ] unit-test

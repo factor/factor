@@ -3,7 +3,8 @@
 USING: accessors arrays assocs assocs.private classes
 classes.tuple.private compiler.units cpu.architecture generic hashtables
 hashtables.private io kernel libc math math.parser memory
-namespaces namespaces.private quotations quotations.private
+namespaces namespaces.contexts namespaces.contexts.private
+namespaces.private quotations quotations.private
 sbufs sequences sequences.private splitting system vectors
 vocabs vocabs.loader words ;
 FROM: compiler => enable-optimizer ;
@@ -72,6 +73,16 @@ gc
 
     ! Hash-table growth and mutation remain separate calls in compiler code.
     M\ hashtable delete-at \ grow-hash \ maybe-set-at 3array compile-unoptimized
+
+    ! Dynamic reads and scope transitions are hot during compiler bootstrap.
+    ! Optimize the indexed implementation before compiling its callers.
+    {
+        namespace-context? check-index rebuild-index binding-at
+        key-in-frame? borrowed-get* context-get context-set
+        index-binding push-index-binding writable-index
+        unindex-binding context-push context-push-scope
+        context-pop context-snapshot capture-namestack >scope
+    } compile-unoptimized
 
     {
         bitand bitor bitxor bitnot

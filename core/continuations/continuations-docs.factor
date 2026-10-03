@@ -1,5 +1,6 @@
 USING: continuations.private help.markup help.syntax kernel
-kernel.private lexer namespaces quotations sequences vectors ;
+kernel.private lexer namespaces namespaces.contexts quotations
+sequences vectors ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
@@ -78,6 +79,8 @@ ARTICLE: "continuations.private" "Continuation implementation details"
     get-callstack
     set-callstack
     get-namestack
+    capture-namestack
+    namestack>vector
     set-namestack
     get-catchstack
     set-catchstack
@@ -142,7 +145,7 @@ HELP: continuation
 { $class-description "The class of reified continuation objects." } ;
 
 HELP: >continuation<
-{ $values { "continuation" continuation } { "data" vector } { "call" vector } { "retain" vector } { "name" vector } { "catch" vector } }
+{ $values { "continuation" continuation } { "data" vector } { "call" vector } { "retain" vector } { "name" namespace-context } { "catch" vector } }
 { $description "Takes a continuation apart into its constituents." } ;
 
 HELP: ifcc

@@ -218,19 +218,20 @@ M: nesting-observer definitions-changed
 PRIVATE>
 
 : with-nested-compilation-unit ( quot -- )
-    H{ } clone
-    HS{ } clone changed-definitions pick set-at
-    HS{ } clone maybe-changed pick set-at
-    HS{ } clone changed-effects pick set-at
-    HS{ } clone outdated-generics pick set-at
-    H{ } clone outdated-tuples pick set-at
-    HS{ } clone new-words pick set-at
-    [ with-pending-new-words ] with-variables ; inline
+    [
+        HS{ } clone changed-definitions namespaces:set
+        HS{ } clone maybe-changed namespaces:set
+        HS{ } clone changed-effects namespaces:set
+        HS{ } clone outdated-generics namespaces:set
+        H{ } clone outdated-tuples namespaces:set
+        HS{ } clone new-words namespaces:set
+        with-pending-new-words
+    ] with-scope ; inline
 
 : with-compilation-unit ( quot -- )
-    H{ } clone
-    <definitions> new-definitions pick set-at
-    <definitions> old-definitions pick set-at
-    HS{ } clone forgotten-definitions pick set-at [
+    [
+        <definitions> new-definitions namespaces:set
+        <definitions> old-definitions namespaces:set
+        HS{ } clone forgotten-definitions namespaces:set
         with-nested-compilation-unit
-    ] with-variables ; inline
+    ] with-scope ; inline
