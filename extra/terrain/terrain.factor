@@ -1,13 +1,13 @@
 ! Copyright (C) 2009 Joe Groff, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators combinators.short-circuit
-destructors game.input game.input.scancodes game.loop
+USING: accessors arrays assocs bit-arrays combinators combinators.short-circuit
+destructors game.input game.input.scancodes game.loop images
 game.worlds grid-meshes grouping kernel literals math
 math.functions math.matrices.simd math.order
-math.vectors math.vectors.simd noise opengl
+math.vectors math.vectors.simd namespaces noise opengl
 opengl.capabilities opengl.gl opengl.shaders opengl.textures
-sequences specialized-arrays terrain.generation terrain.shaders
-typed ui ui.gadgets.worlds ui.gestures ui.pixel-formats ;
+sequences specialized-arrays system terrain.generation terrain.shaders
+typed ui ui.backend.input-state ui.gadgets.worlds ui.gestures ui.pixel-formats ui.render ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 IN: terrain
@@ -50,7 +50,7 @@ TUPLE: terrain-world < game-world
     player new
         PLAYER-START-LOCATION >>location
         0.0 >>yaw
-        0.0 >>pitch
+        20.0 >>pitch
         float-4{ 0.0 0.0 0.0 1.0 } >>velocity
         VELOCITY-MODIFIER-NORMAL >>velocity-modifier ;
 
@@ -67,6 +67,34 @@ TUPLE: terrain-world < game-world
     [ pitch>> 1.0 0.0 0.0 glRotatef ]
     [ yaw>> 0.0 1.0 0.0 glRotatef ]
     [ location>> vneg first3 glTranslatef ] tri ;
+
+: terrain-projection ( dim -- matrix )
+    dup first2 min v/n NEAR-PLANE FOV / v*n first2
+    0.0 0.0 float-4-boa NEAR-PLANE FAR-PLANE frustum-matrix4 ;
+
+: terrain-modelview ( player -- matrix )
+    [ float-4{ 1.0 0.0 0.0 0.0 } swap pitch>> deg>rad rotation-matrix4 ]
+    [ float-4{ 0.0 1.0 0.0 0.0 } swap yaw>> deg>rad rotation-matrix4 m4. ]
+    [ location>> vneg translation-matrix4 m4. ] tri ;
+
+:: set-terrain-matrices ( world program -- )
+    program "projection" glGetUniformLocation
+    1 GL_FALSE world dim>> terrain-projection glUniformMatrix4fv
+    program "modelview" glGetUniformLocation
+    1 GL_FALSE world player>> terrain-modelview glUniformMatrix4fv ;
+
+: make-terrain-texture ( image -- texture )
+    gl3-mode? get-global [ make-texture-gl3 ] [ make-texture ] if ;
+
+: <terrain-core-program> ( -- program )
+    terrain-core-vertex-shader <vertex-shader> check-gl-shader
+    terrain-core-pixel-shader <fragment-shader> check-gl-shader
+    2array [ 0 "position" glBindAttribLocation ] (gl-program) check-gl-program ;
+
+: draw-terrain-sky ( world -- )
+    gl3-mode? get-global [
+        terrain-mesh>> vertex-array>> [ GL_TRIANGLES 0 3 glDrawArrays ] with-vertex-array
+    ] [ drop { -1.0 -1.0 } { 2.0 2.0 } gl-fill-rect ] if ;
 
 TYPED: eye-rotate ( yaw: float pitch: float v: float-4 -- v': float-4 )
     [ float-4{  0.0 -1.0 0.0 0.0 } swap deg>rad rotation-matrix4 ]
@@ -111,11 +139,45 @@ terrain-world H{
     { T{ key-down { mods { A+ } } { sym "RET" } } [ toggle-fullscreen ] }
 } set-gestures
 
+! Cocoa virtual keycodes for the demo's physical controls. Window events
+! remain available when macOS denies global HID Input Monitoring.
+CONSTANT: terrain-cocoa-keys H{
+    { 13 $ key-w } { 1 $ key-s } { 0 $ key-a } { 2 $ key-d }
+    { 12 $ key-q } { 14 $ key-e }
+    { 123 $ key-left-arrow } { 124 $ key-right-arrow }
+    { 125 $ key-down-arrow } { 126 $ key-up-arrow }
+    { 49 $ key-space } { 53 $ key-escape }
+    { 18 $ key-1 } { 19 $ key-2 } { 20 $ key-3 }
+    { 21 $ key-4 } { 23 $ key-5 }
+    { 56 $ key-left-shift } { 60 $ key-right-shift }
+}
+
+:: cocoa-terrain-keys ( keycodes -- keys )
+    256 <bit-array> :> keys
+    terrain-cocoa-keys [| code hid |
+        code keycodes key? [ t hid keys set-nth ] when
+    ] assoc-each
+    keys ;
+
+: terrain-keys ( -- keys )
+    os macos?
+    [ current-input-state get-global keycodes>> cocoa-terrain-keys ]
+    [ read-keyboard keys>> ] if ;
+
+: terrain-mouse ( -- mouse )
+    os macos? [
+        current-input-state get-global
+        [ motion>> first2 ] [ scroll>> first2 ] [ buttons>> ] tri mouse-state boa
+    ] [ read-mouse ] if ;
+
+: reset-terrain-mouse ( -- )
+    os macos? [ reset-pointer-deltas ] [ reset-mouse ] if ;
+
 :: handle-input ( world -- )
     world player>> :> player
-    read-keyboard keys>> :> keys
+    terrain-keys :> keys
 
-    key-left-shift keys nth
+    key-left-shift keys nth key-right-shift keys nth or
     VELOCITY-MODIFIER-FAST VELOCITY-MODIFIER-NORMAL ? player velocity-modifier<<
 
     {
@@ -138,8 +200,8 @@ terrain-world H{
     key-up-arrow keys nth [ player -1 look-vertically ] when
     key-space keys nth [ player jump ] when
     key-escape keys nth [ world close-window ] when
-    player read-mouse rotate-with-mouse
-    reset-mouse ;
+    player terrain-mouse rotate-with-mouse
+    reset-terrain-mouse ;
 
 : apply-friction ( velocity -- velocity' )
     FRICTION v* ;
@@ -233,19 +295,25 @@ M: terrain-world begin-game-world
     "2.0" { "GL_ARB_vertex_buffer_object" "GL_ARB_shader_objects" }
     require-gl-version-or-extensions
     GL_DEPTH_TEST glEnable
-    GL_TEXTURE_2D glEnable
-    GL_VERTEX_ARRAY glEnableClientState
+    gl3-mode? get-global [
+        GL_TEXTURE_2D glEnable
+        GL_VERTEX_ARRAY glEnableClientState
+    ] unless
     <player> >>player
     V{ } clone >>history
     <perlin-noise-table> 0.01 float-4-with scale-matrix4 { 512 512 } perlin-noise-image
+    gl3-mode? get-global [ R >>component-order ] when
     [ >>sky-image ] keep
-    make-texture [ set-texture-parameters ] keep >>sky-texture
+    make-terrain-texture [ set-texture-parameters ] keep >>sky-texture
     <terrain> [ >>terrain ] keep
     float-4{ 0.0 0.0 0.0 1.0 } terrain-segment [ >>terrain-segment ] keep
-    make-texture [ set-texture-parameters ] keep >>terrain-texture
-    sky-vertex-shader sky-pixel-shader <simple-gl-program>
+    make-terrain-texture [ set-texture-parameters ] keep >>terrain-texture
+    gl3-mode? get-global
+    [ sky-core-vertex-shader sky-core-pixel-shader ]
+    [ sky-vertex-shader sky-pixel-shader ] if <simple-gl-program>
     >>sky-program
-    terrain-vertex-shader terrain-pixel-shader <simple-gl-program>
+    gl3-mode? get-global [ <terrain-core-program> ]
+    [ terrain-vertex-shader terrain-pixel-shader <simple-gl-program> ] if
     >>terrain-program
     terrain-vertex-size <grid-mesh> >>terrain-mesh
     drop ;
@@ -260,23 +328,29 @@ M: terrain-world end-game-world
     } cleave ;
 
 M: terrain-world resize-world
-    GL_PROJECTION glMatrixMode
-    glLoadIdentity
-    dim>> [ [ { 0 0 } ] dip gl-viewport ]
-    [ frustum glFrustum ] bi ;
+    dim>> dup [ { 0 0 } ] dip gl-viewport
+    gl3-mode? get-global [ drop ] [
+        GL_PROJECTION glMatrixMode
+        glLoadIdentity frustum glFrustum
+    ] if ;
 
 M: terrain-world draw-world*
     {
-        [ set-modelview-matrix ]
+        [ gl3-mode? get-global
+            [ drop GL_DEPTH_BUFFER_BIT glClear ] [ set-modelview-matrix ] if ]
         [ terrain-texture>> GL_TEXTURE_2D GL_TEXTURE0 bind-texture-unit ]
         [ sky-texture>> GL_TEXTURE_2D GL_TEXTURE1 bind-texture-unit ]
         [ GL_DEPTH_TEST glDisable dup sky-program>> [
-            [ nip "sky" glGetUniformLocation 1 glUniform1i ]
-            [ "sky_gradient" glGetUniformLocation swap sky-gradient glUniform1f ]
-            [ "sky_theta" glGetUniformLocation swap sky-theta glUniform1f ] 2tri
-            { -1.0 -1.0 } { 2.0 2.0 } gl-fill-rect
+            gl3-mode? get-global [ 2dup set-terrain-matrices ] when
+            over [
+                [ nip "sky" glGetUniformLocation 1 glUniform1i ]
+                [ "sky_gradient" glGetUniformLocation swap sky-gradient glUniform1f ]
+                [ "sky_theta" glGetUniformLocation swap sky-theta glUniform1f ] 2tri
+            ] dip
+            draw-terrain-sky
         ] with-gl-program ]
         [ GL_DEPTH_TEST glEnable dup terrain-program>> [
+            gl3-mode? get-global [ 2dup set-terrain-matrices ] when
             [ "heightmap" glGetUniformLocation 0 glUniform1i ]
             [ "component_scale" glGetUniformLocation COMPONENT-SCALE first4 glUniform4f ] bi
             terrain-mesh>> draw-grid-mesh
@@ -291,7 +365,7 @@ GAME: terrain-game {
             double-buffered
             T{ depth-bits { value 24 } }
         } }
-        { use-game-input? t }
+        { use-game-input? $[ os macos? not ] }
         { grab-input? t }
         { pref-dim { 1024 768 } }
         { tick-interval-nanos $[ 60 fps ] }

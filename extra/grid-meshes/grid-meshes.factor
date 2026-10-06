@@ -1,13 +1,13 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data.map destructors grouping kernel math
-math.vectors.simd opengl opengl.gl ranges sequences
+math.vectors.simd namespaces opengl opengl.gl ranges sequences
 specialized-arrays ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float-4
 IN: grid-meshes
 
-TUPLE: grid-mesh dim buffer row-length ;
+TUPLE: grid-mesh dim buffer row-length vertex-array ;
 
 <PRIVATE
 
@@ -29,16 +29,35 @@ TUPLE: grid-mesh dim buffer row-length ;
 
 PRIVATE>
 
-: draw-grid-mesh ( grid-mesh -- )
+: draw-grid-mesh-rows ( grid-mesh -- )
+    dup dim>> second <iota> [ draw-vertex-buffer-row ] with each ;
+
+: draw-grid-mesh-legacy ( grid-mesh -- )
     GL_ARRAY_BUFFER over buffer>> [
         [ 4 GL_FLOAT 0 f glVertexPointer ] dip
-        dup dim>> second <iota> [ draw-vertex-buffer-row ] with each
+        draw-grid-mesh-rows
     ] with-gl-buffer ;
+
+: draw-grid-mesh ( grid-mesh -- )
+    dup vertex-array>>
+    [ [ draw-grid-mesh-rows ] with-vertex-array ]
+    [ draw-grid-mesh-legacy ] if* ;
+
+: init-grid-mesh-vertex-array ( grid-mesh -- grid-mesh )
+    gen-vertex-array >>vertex-array
+    dup vertex-array>> [
+        GL_ARRAY_BUFFER over buffer>> [
+            0 4 GL_FLOAT GL_FALSE 0 f glVertexAttribPointer
+            0 glEnableVertexAttribArray
+        ] with-gl-buffer
+    ] with-vertex-array ;
 
 : <grid-mesh> ( dim -- grid-mesh )
     [ ] [ vertex-array >vertex-buffer ] [ first 1 + 2 * ] tri
-    grid-mesh boa ;
+    f grid-mesh boa
+    gl3-mode? get-global [ init-grid-mesh-vertex-array ] when ;
 
 M: grid-mesh dispose
+    [ [ delete-vertex-array ] when* f ] change-vertex-array
     [ [ delete-gl-buffer ] when* f ] change-buffer
     drop ;

@@ -7,10 +7,10 @@ cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.touchbar
 cocoa.types cocoa.views combinators continuations
 core-foundation.strings core-graphics core-graphics.types
 core-text debugger io.encodings.string io.encodings.utf16
-io.encodings.utf8 kernel literals math math.order math.parser
+io.encodings.utf8 kernel literals math math.bitwise math.order math.parser
 math.rectangles math.vectors namespaces opengl sequences
 splitting system threads ui.backend.cocoa.input-methods
-ui.commands ui.gadgets ui.gadgets.editors
+ui.backend.input-state ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.line-support ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.private ui.theme ui.theme.switching words ;
 
@@ -19,6 +19,8 @@ IN: ui.backend.cocoa.views
 SLOT: window
 
 : send-mouse-moved ( view event -- )
+    dup [ -> deltaX ] [ -> deltaY ] bi 2array
+    current-input-state get-global swap '[ _ v+ ] change-motion drop
     [ mouse-location ] [ drop window ] 2bi
     [ move-hand fire-motion yield ] [ drop ] if* ;
 
@@ -92,12 +94,18 @@ CONSTANT: key-codes
     NSArray swap -> arrayWithObject: -> interpretKeyEvents: ;
 
 : send-key-down-event ( view event -- )
+    dup -> keyCode t record-key
     [ key-event>gesture <key-down> send-key-event ]
     [ interpret-key-event ]
     2bi ;
 
 : send-key-up-event ( view event -- )
+    dup -> keyCode f record-key
     key-event>gesture <key-up> send-key-event ;
+
+: record-shift-state ( event -- )
+    -> modifierFlags NSShiftKeyMask bitand zero? not
+    dup 56 swap record-key 60 swap record-key ;
 
 : cocoa-input-text ( str -- str/f )
     ! Cocoa can send control characters for unbound Ctrl-Option keys.
@@ -385,6 +393,8 @@ PRIVATE>
     METHOD: void keyDown: id event [ self event send-key-down-event ] ;
 
     METHOD: void keyUp: id event [ self event send-key-up-event ] ;
+
+    METHOD: void flagsChanged: id event [ event record-shift-state ] ;
 
     METHOD: char validateUserInterfaceItem: id event
     [
@@ -699,12 +709,14 @@ PRIVATE>
 
     METHOD: void windowDidBecomeKey: id notification
     [
+        clear-input-state
         notification -> object -> contentView window
         [ focus-world ] when*
     ] ;
 
     METHOD: void windowDidResignKey: id notification
     [
+        clear-input-state
         forget-rollover
         notification -> object -> contentView :> view
         view window :> window
