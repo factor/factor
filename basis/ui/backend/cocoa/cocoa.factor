@@ -13,9 +13,12 @@ ui.gadgets.worlds ui.pixel-formats ui.private ui.render ui.theme
 ui.theme.switching ;
 IN: ui.backend.cocoa
 
-TUPLE: window-handle view window ;
+IMPORT: NSCursor
 
-C: <window-handle> window-handle
+TUPLE: window-handle view window { input-grabbed? boolean } ;
+
+: <window-handle> ( view window -- handle )
+    f window-handle boa ;
 
 SINGLETON: cocoa-ui-backend
 
@@ -146,26 +149,32 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     window f -> makeKeyAndOrderFront:
     t world active?<< ;
 
+M: cocoa-ui-backend (grab-input)
+    dup input-grabbed?>> [ drop ] [
+        0 CGAssociateMouseAndMouseCursorPosition drop
+        dup window>> -> frame CGRect>rect rect-center
+        NSScreen -> screens 0 -> objectAtIndex: -> frame CGRect-h
+        [ drop first ] [ swap second - ] 2bi <CGPoint>
+        [ GetCurrentButtonState zero? not ] [ yield ] while
+        CGWarpMouseCursorPosition drop
+        NSCursor -> hide
+        t >>input-grabbed? drop
+    ] if ;
+
+M: cocoa-ui-backend (ungrab-input)
+    dup input-grabbed?>> [
+        1 CGAssociateMouseAndMouseCursorPosition drop
+        NSCursor -> unhide
+        f >>input-grabbed? drop
+    ] [ drop ] if ;
+
 M: cocoa-ui-backend (close-window)
+    dup (ungrab-input)
     [
         view>> dup -> isInFullScreenMode zero?
         [ drop ]
         [ f -> exitFullScreenModeWithOptions: ] if
     ] [ window>> -> release ] bi ;
-
-M: cocoa-ui-backend (grab-input)
-    0 CGAssociateMouseAndMouseCursorPosition drop
-    CGMainDisplayID CGDisplayHideCursor drop
-    window>> -> frame CGRect>rect rect-center
-    NSScreen -> screens 0 -> objectAtIndex: -> frame CGRect-h
-    [ drop first ] [ swap second - ] 2bi <CGPoint>
-    [ GetCurrentButtonState zero? not ] [ yield ] while
-    CGWarpMouseCursorPosition drop ;
-
-M: cocoa-ui-backend (ungrab-input)
-    drop
-    CGMainDisplayID CGDisplayShowCursor drop
-    1 CGAssociateMouseAndMouseCursorPosition drop ;
 
 M: cocoa-ui-backend close-window
     find-world [

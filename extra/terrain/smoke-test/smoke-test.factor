@@ -7,6 +7,8 @@ opengl.gl sequences sets system terrain threads ui ui.backend ui.backend.input-s
 ui.gadgets.worlds ;
 IN: terrain.smoke-test
 
+SLOT: input-grabbed?
+
 : smoke-error ( error -- )
     print-error nl flush 1 exit ;
 
@@ -54,6 +56,18 @@ IN: terrain.smoke-test
 
 :: check-terrain ( world -- )
     1 seconds sleep
+    world raise-window
+    100 milliseconds sleep
+    world handle>> :> handle
+    os macos? [
+        handle input-grabbed?>> t assert=
+        handle (grab-input)
+        handle (ungrab-input)
+        handle (ungrab-input)
+        handle input-grabbed?>> f assert=
+        handle (grab-input)
+        handle (grab-input)
+    ] when
     world game-loop>> tick#>> 0 > t assert=
     world game-loop>> stop-loop
     world player>> 45.0 >>pitch drop
@@ -64,14 +78,15 @@ IN: terrain.smoke-test
     world check-terrain-frame
     world close-window
     world promise>> ?promise drop
+    os macos? [ handle input-grabbed?>> f assert= ] when
     world terrain-mesh>> [ buffer>> ] [ vertex-array>> ] bi [ f assert= ] bi@
-    "Terrain smoke test passed (ground, sky, resize, controls, game loop, cleanup)" print flush
+    "Terrain smoke test passed (ground, sky, resize, controls, capture, cleanup)" print flush
     0 exit ;
 
 : terrain-smoke-test ( -- )
     [ smoke-error ] ui-error-hook set-global
     [
-        terrain-game-attributes clone f >>grab-input? start-game
+        terrain-game-attributes start-game
         '[ _ [ check-terrain ] [ smoke-error ] recover ]
         "Terrain smoke test" spawn drop
     ] with-ui ;
