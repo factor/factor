@@ -1,9 +1,9 @@
 ! Copyright (C) 2023 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs colors kernel math math.parser sequences
+USING: accessors assocs colors colors.contrast kernel math math.parser sequences
 ui ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.labels ui.gadgets.tracks ui.pens.solid webbrowser ;
+ui.gadgets.labels ui.gadgets.tracks ui.pens ui.pens.solid webbrowser ;
 
 IN: periodic-table
 
@@ -161,6 +161,13 @@ CONSTANT: periodic-table {
     f
 }
 
+! Keep text readable on the categorical swatches in every theme.
+TUPLE: element-pen < solid ;
+
+M: element-pen pen-foreground nip color>> contrast-text-color ;
+
+: <element-pen> ( color -- pen ) element-pen new swap >>color ;
+
 :: <element-label> ( atomic-number symbol name -- gadget )
     vertical <track>
     atomic-number number>string <label>
@@ -175,8 +182,8 @@ CONSTANT: periodic-table {
     ] [
         "" <label> f
     ] if*
-    [ { 40 35 } >>pref-dim { 5 5 } <border> ]
-    [ [ <solid> >>interior ] when* ] bi* ;
+    [ { 60 35 } >>pref-dim { 5 5 } <border> ]
+    [ [ <element-pen> >>interior ] when* ] bi* ;
 
 : <element-button> ( atomic-number/f -- element )
     [ <element> ] keep [
@@ -189,7 +196,7 @@ CONSTANT: periodic-table {
     horizontal <track> { 3 3 } >>gap
     group-colors [
         [ name>> rest but-last <label> { 3 3 } <border> ]
-        [ <solid> >>interior ] bi*
+        [ <element-pen> >>interior ] bi*
         f track-add
     ] assoc-each ;
 

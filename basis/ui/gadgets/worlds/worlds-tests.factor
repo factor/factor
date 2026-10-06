@@ -1,6 +1,6 @@
-USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
+USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test sequences
 namespaces models kernel accessors arrays continuations locals
-ui.backend ui.render ;
+ui.backend ui.render ui.theme colors ;
 IN: ui.gadgets.worlds.tests
 
 ! Context selection must restore the window's GL objects, even when another
@@ -104,3 +104,15 @@ M: focus-test focusable-child* gadget-child ;
 { t } [ "f" get focus>> "f" get gadget-child eq? ] unit-test
 
 { t } [ "f" get gadget-child focusing? ] unit-test
+
+! Ordinary windows must match their theme fonts; textured windows remain transparent.
+{ t t } [
+    { light-theme dark-theme } [
+        theme [ <world-attributes> initial-background-color content-background color= ] with-variable
+    ] map first2
+] unit-test
+
+{ 0.0 } [
+    <world-attributes> { textured-background } >>window-controls
+    initial-background-color alpha>>
+] unit-test

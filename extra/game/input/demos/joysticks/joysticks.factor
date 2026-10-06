@@ -2,7 +2,7 @@ USING: accessors arrays assocs calendar colors combinators
 game.input grouping kernel math math.parser math.vectors
 sequences threads timers ui ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.packs
-ui.pens.polygon ui.pens.solid ;
+ui.pens.polygon ui.pens.solid ui.theme ;
 
 IN: game.input.demos.joysticks
 
@@ -57,11 +57,11 @@ CONSTANT: pov-polygons
     z  gadget z-indicator>> loc<< ;
 
 : move-pov ( gadget pov -- )
-    swap pov>> [ interior>> -rot = COLOR: gray COLOR: white ? >>color drop ]
+    swap pov>> [ interior>> -rot = text-color content-background ? >>color drop ]
     with assoc-each ;
 
 :: add-pov-gadget ( gadget direction polygon -- gadget direction gadget )
-    gadget COLOR: white polygon <polygon-gadget> [ add-gadget ] keep
+    gadget content-background polygon <polygon-gadget> [ add-gadget ] keep
     direction swap ;
 
 : add-pov-gadgets ( gadget -- gadget )
@@ -70,14 +70,14 @@ CONSTANT: pov-polygons
 : <axis-gadget> ( -- gadget )
     axis-gadget new
     add-pov-gadgets
-    COLOR: black <indicator-gadget> [ >>z-indicator ] [ add-gadget ] bi
+    text-color <indicator-gadget> [ >>z-indicator ] [ add-gadget ] bi
     COLOR: red   <indicator-gadget> [ >>indicator   ] [ add-gadget ] bi
     dup [ 0.0 0.0 0.0 move-axis ] [ f move-pov ] bi ;
 
 TUPLE: joystick-demo-gadget < pack axis raxis controller buttons timer ;
 
 : add-gadget-with-border ( parent child -- parent )
-    { 2 2 } <border> COLOR: gray <solid> >>boundary add-gadget ;
+    { 2 2 } <border> line-color <solid> >>boundary add-gadget ;
 
 : add-controller-label ( gadget controller -- gadget )
     [ >>controller ] [ product-string <label> add-gadget ] bi ;
@@ -118,7 +118,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons timer ;
     [ >>selected? drop ] 2each ;
 
 : kill-update-axes ( gadget -- )
-    COLOR: gray <solid> >>interior
+    line-color <solid> >>interior
     [ [ stop-timer ] when* f ] change-timer
     relayout-1 ;
 

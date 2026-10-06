@@ -2,12 +2,12 @@
 ! See https://factorcode.org/license.txt for BSD license.
 ! Requires a display. Run with -run=demos.smoke-test [vocab ...].
 USING: accessors arrays assocs byte-arrays calendar command-line
-combinators concurrency.promises continuations debugger demos game.input
+combinators compiler.errors concurrency.promises continuations debugger demos game.input
  game.loop game.worlds gpu.demos.bunny gpu.util.wasd grouping io
 io.streams.string kernel literals locals math models namespaces opengl
-opengl.gl sequences sets sorting system terrain terrain.smoke-test threads timers circular
+opengl.gl sequences sets sorting system terrain terrain.smoke-test threads timers circular tools.errors
 ui ui.backend ui.backend.input-state ui.gadgets ui.gadgets.books
-ui.gadgets.labels ui.gadgets.worlds ui.private ui-demo vocabs vocabs.loader words ;
+ui.gadgets.labels ui.gadgets.worlds ui.private ui.theme ui.theme.switching ui-demo vocabs vocabs.loader words ;
 QUALIFIED: bunny
 QUALIFIED: trails
 IN: demos.smoke-test
@@ -55,6 +55,18 @@ CONSTANT: blank-window-titles {
     sort demo-vocabs sort assert= ;
 
 : smoke-error ( error -- ) print-error nl flush 1 exit ;
+
+! Libraries unrelated to a demo may already have optional linkage errors.
+! Fail on errors introduced while loading or running this demo.
+: demo-errors ( -- seq )
+    compiler-errors get-global values
+    linkage-errors get-global values append ;
+
+: demo-error-assets ( -- seq ) demo-errors [ asset>> ] map ;
+
+:: check-demo-errors ( baseline -- )
+    demo-errors [ asset>> baseline member-eq? not ] filter
+    dup empty? [ drop ] [ errors. "Demo compilation or linkage failed" throw ] if ;
 
 : open-worlds ( -- seq ) worlds get-global values ;
 
@@ -124,8 +136,10 @@ CONSTANT: blank-window-titles {
 
 :: check-ui-quotation ( name quot -- )
     name print flush
+    demo-error-assets :> baseline-errors
     open-worlds :> baseline
     quot call( -- )
+    baseline-errors check-demo-errors
     500 milliseconds sleep
     open-worlds [ baseline member-eq? not ] filter :> windows
     windows [ handle>> ] map :> handles
@@ -143,6 +157,7 @@ CONSTANT: blank-window-titles {
         window handle>> f assert=
     ] each
     os macos? [ handles [ input-grabbed?>> f assert= ] each ] when
+    baseline-errors check-demo-errors
     name "PASS: " prepend print flush ;
 
 : check-ui-demo ( name -- ) dup '[ _ run ] check-ui-quotation ;
@@ -166,12 +181,19 @@ CONSTANT: blank-window-titles {
         dup "Bubble Chamber: " prepend swap
         '[ _ "bubble-chamber" lookup-word execute( -- ) ] check-ui-quotation
     ] each
+    ! Render controller indicators without requiring a connected controller.
+    "Joystick indicators" [ "game.input.demos.joysticks" require
+        "<axis-gadget>" "game.input.demos.joysticks" lookup-word
+        execute( -- gadget ) "Joystick indicators" open-window ]
+    check-ui-quotation
     "OpenGL triangle" [ "opengl.demos.gl4" require
         "gl4demo" "opengl.demos.gl4" lookup-word execute( -- ) ]
     check-ui-quotation ;
 
 :: check-console-demo ( name input -- )
+    demo-error-assets :> baseline-errors
     [ input [ name run ] with-string-reader ] with-string-writer drop
+    baseline-errors check-demo-errors
     name "PASS: " prepend print flush ;
 
 : check-external-demos ( -- )
@@ -181,13 +203,30 @@ CONSTANT: blank-window-titles {
         reason print flush
     ] assoc-each ;
 
-: check-demos ( -- )
-    command-line get dup empty? [
+! Construct fresh windows after switching, so styles and fonts agree.
+: check-graphical-demos ( names -- )
+    dup empty? [
         drop graphical-demos [ check-ui-demo ] each
         check-ui-pages check-submenus
+    ] [ [ check-ui-demo ] each ] if ;
+
+:: check-themed-demos ( names -- )
+    { light-theme dark-theme } [| selected-theme |
+        close-all-windows
+        selected-theme switch-theme
+        selected-theme name>> print flush
+        "Checking theme..." <label> "Demo smoke tests" open-window
+        names check-graphical-demos
+    ] each ;
+
+: check-demos ( -- )
+    command-line get dup "--themes" swap member? [
+        "--themes" swap remove dup check-themed-demos
+    ] [ dup check-graphical-demos ] if
+    empty? [
         console-demos [ check-console-demo ] assoc-each
         check-external-demos
-    ] [ [ check-ui-demo ] each ] if
+    ] when
     close-all-windows
     "Demo smoke tests passed" print flush 0 exit ;
 

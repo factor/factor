@@ -1,6 +1,6 @@
 ! Copyright (C) 2016 Nicolas Pénet.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: hashtables kernel namespaces sequences ui.theme ui.theme.base16
+USING: fonts hashtables kernel namespaces sequences ui.theme ui.theme.base16
 ui.theme.wombat vocabs.loader ;
 IN: ui.theme.switching
 
@@ -14,7 +14,10 @@ t default-theme? set-global
     \ update-stylesheet get [ execute( -- ) ] each ;
 
 : switch-theme ( theme -- )
-    theme set-global update-stylesheet
+    theme set-global
+    text-color \ default-font-foreground set-global
+    content-background \ default-font-background set-global
+    update-stylesheet
     f default-theme? set-global ;
 
 : switch-theme-if-default ( theme -- )

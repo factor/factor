@@ -34,7 +34,8 @@ M: color-preview model-changed
     0 0 0 255 1 <range> ;
 
 : <color-label> ( text -- label )
-    [ <label> dup font>> ] [ ?named-color [ >>foreground ] when* drop ] bi ;
+    ! Channel names remain legible; the preview displays the chosen color.
+    <label> ;
 
 :: <color-sliders> ( constructor -- gadget model )
     constructor def>> first ?wrapped :> color-class

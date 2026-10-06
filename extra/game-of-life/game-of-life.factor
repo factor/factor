@@ -5,7 +5,7 @@ USING: accessors arrays assocs bit-arrays byte-arrays calendar
 colors combinators io kernel kernel.private make math math.order
 math.private namespaces opengl random sequences
 sequences.private timers ui ui.commands ui.gadgets
-ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render ui.theme words
 ;
 
 IN: game-of-life
@@ -99,7 +99,7 @@ M: grid-gadget gadget-text*
     ] when ;
 
 :: draw-cells ( gadget -- )
-    COLOR: black gl-color
+    text-color gl-color
     gadget size>> :> size
     { size size } :> dim
     gadget grid>> { array } declare [| row j |
@@ -113,7 +113,7 @@ M: grid-gadget gadget-text*
 :: draw-lines ( gadget -- )
     gadget size>> :> size
     gadget grid>> grid-dim :> ( rows cols )
-    COLOR: gray gl-color
+    line-color gl-color
     cols rows [ size * ] bi@ :> ( w h )
     rows 1 + [| j |
         j size * :> y

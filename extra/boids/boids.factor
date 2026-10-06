@@ -136,7 +136,7 @@ M: range-observer model-changed
 
     { 5 5 } <border> white-interior
 
-    behavior class-of name>> heading-color <framed-labeled-gadget> ;
+    behavior class-of name>> toolbar-background <framed-labeled-gadget> ;
 
 :: set-population ( n boids-gadget -- )
     boids-gadget [
@@ -184,7 +184,7 @@ PRIVATE>
 
     { 5 5 } <border> add-gadget
 
-    "simulation" heading-color <framed-labeled-gadget> ;
+    "simulation" toolbar-background <framed-labeled-gadget> ;
 
 TUPLE: boids-frame < pack ;
 
