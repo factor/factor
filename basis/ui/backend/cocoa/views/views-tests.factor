@@ -1,7 +1,7 @@
 IN: ui.backend.cocoa.views.tests
-USING: accessors arrays assocs continuations kernel locals math.rectangles
+USING: accessors arrays assocs combinators continuations kernel locals math.rectangles
 namespaces opengl sequences tools.test ui.backend
-ui.backend.cocoa.views ui.backend.cocoa.views.private ui.gadgets
+ui.backend.cocoa.views ui.backend.cocoa.views.private ui.backend.input-state ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.private vectors vocabs
 vocabs.loader ;
 
@@ -12,6 +12,20 @@ vocabs.loader ;
 { "\t\n\r" } [ "\t\n\r" cocoa-input-text ] unit-test
 { "日本語 é 🍆 —" } [ "日本語 é 🍆 —" cocoa-input-text ] unit-test
 { "" } [ "" cocoa-input-text ] unit-test
+
+! Native modifiers must preserve left/right identity and release state.
+{ t f t f } [
+    clear-input-state
+    0x2002 record-modifier-flags
+    current-input-state get-global keycodes>>
+    { [ 56 swap key? ] [ 60 swap key? ]
+      [ 62 swap key? ] [ 59 swap key? ] } cleave
+] unit-test
+
+{ 0 } [
+    0 record-modifier-flags
+    current-input-state get-global keycodes>> assoc-size
+] unit-test
 
 { t } [
     T{ rect

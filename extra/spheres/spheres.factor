@@ -299,6 +299,7 @@ MAIN-WINDOW: spheres-window {
         { world-class spheres-world }
         { title "Spheres" }
         { pixel-format-attributes {
+            legacy-context
             windowed
             double-buffered
             T{ depth-bits { value 16 } }

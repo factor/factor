@@ -73,6 +73,7 @@ MAIN-WINDOW: run4
         { title "NeHe Tutorial 4" }
         { pref-dim { $ width $ height } }
         { pixel-format-attributes {
+            legacy-context
             windowed
             double-buffered
             T{ depth-bits { value 16 } }

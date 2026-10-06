@@ -7,7 +7,7 @@ TUPLE: bunny-fixed-pipeline < disposable ;
 
 : <bunny-fixed-pipeline> ( gadget -- draw )
     drop
-    bunny-fixed-pipeline new ;
+    bunny-fixed-pipeline new-disposable ;
 
 M: bunny-fixed-pipeline draw-bunny
     drop

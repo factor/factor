@@ -120,6 +120,7 @@ GAME: raytrace-game {
         { world-class raytrace-world }
         { title "Raytracing" }
         { pixel-format-attributes {
+            legacy-context
             windowed
             double-buffered
         } }

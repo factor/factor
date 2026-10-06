@@ -17,6 +17,7 @@ ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"
     offscreen
     fullscreen
     windowed
+    legacy-context
     accelerated
     software-rendered
     backing-store
@@ -67,6 +68,9 @@ M: picky-depth-buffered-world check-world-pixel-format
 
 HELP: double-buffered
 { $description "Requests a double-buffered pixel format." } ;
+
+HELP: legacy-context
+{ $description "Requests a compatibility OpenGL context for applications that use the fixed-function pipeline. On macOS, this selects the legacy profile instead of the default core profile." } ;
 HELP: stereo
 { $description "Requests a stereoscopic pixel format." } ;
 

@@ -1,5 +1,5 @@
 USING: accessors kernel literals math opengl.demo-support
-opengl.gl opengl.glu ui ui.gadgets ui.render ;
+opengl.gl opengl.glu ui ui.gadgets ui.pixel-formats ui.render ;
 IN: nehe.3
 
 TUPLE: nehe3-gadget < gadget ;
@@ -43,5 +43,12 @@ M: nehe3-gadget draw-gadget* ( gadget -- )
     -1.0 -1.0 0.0 glVertex3f
   ] do-state ;
 
-MAIN-WINDOW: run3 { { title "NeHe Tutorial 3" } { pref-dim { $ width $ height } } }
+MAIN-WINDOW: run3 {
+    { title "NeHe Tutorial 3" }
+    { pref-dim { $ width $ height } }
+    { pixel-format-attributes {
+        legacy-context windowed double-buffered
+        T{ depth-bits { value 16 } }
+    } }
+}
   <nehe3-gadget> >>gadgets ;

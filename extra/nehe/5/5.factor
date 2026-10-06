@@ -125,6 +125,7 @@ MAIN-WINDOW: run5
         { title "NeHe Tutorial 5" }
         { pref-dim { $ width $ height } }
         { pixel-format-attributes {
+            legacy-context
             windowed
             double-buffered
             T{ depth-bits { value 16 } }

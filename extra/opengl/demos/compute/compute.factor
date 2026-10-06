@@ -2,7 +2,7 @@
 USING: accessors alien.c-types alien.data arrays colors
 combinators game.input game.input.scancodes game.loop
 game.worlds kernel literals math multiline opengl opengl.gl
-opengl.shaders opengl.textures sequences
+opengl.capabilities opengl.shaders opengl.textures sequences system
 specialized-arrays.instances.alien.c-types.float ui
 ui.gadgets.worlds ui.pixel-formats ;
 IN: opengl.demos.compute
@@ -68,6 +68,7 @@ TUPLE: gl4compute-world < game-world
   { frame-count fixnum initial: 0 } ;
 
 M: gl4compute-world begin-game-world
+  "4.5" require-gl-version
   vertex-shader fragment-shader <simple-gl-program> >>program
   compute-shader <compute-program> >>compute-program
 
@@ -143,7 +144,7 @@ M: gl4compute-world draw-world*
 
   drop ;
 
-GAME: gl4compute {
+GAME: gl4compute-window {
   { world-class gl4compute-world }
   { title "gl4 compute demo" }
   { pixel-format-attributes { 
@@ -156,3 +157,14 @@ GAME: gl4compute {
   { pref-dim { 1280 720 } }
   { tick-interval-nanos $[ 60 fps ] }
 } ;
+
+ALIAS: gl4compute-attributes gl4compute-window-attributes
+
+: gl4compute ( -- )
+  os macos? [
+    [ "Compute demo unavailable"
+      "This demo requires OpenGL 4.5. macOS supports OpenGL up to 4.1."
+      system-alert ] with-ui
+  ] [ gl4compute-window ] if ;
+
+MAIN: gl4compute

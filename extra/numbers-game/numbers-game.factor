@@ -4,8 +4,12 @@ IN: numbers-game
 : guess-banner ( -- )
     "I'm thinking of a number between 0 and 100." print flush ;
 
-: guess-number ( -- n )
-    "Enter your guess: " write flush readln string>number ;
+: guess-number ( -- n/f )
+    "Enter your guess: " write flush readln [
+        string>number dup [ ] [
+            drop "Please enter a number." print flush guess-number
+        ] if
+    ] [ f ] if* ;
 
 : correct? ( actual guess -- ? )
     <=> {
@@ -15,7 +19,7 @@ IN: numbers-game
     } case ;
 
 : numbers-game-loop ( actual -- )
-    [ dup guess-number correct? not ] loop drop ;
+    [ dup guess-number [ correct? not ] [ drop f ] if* ] loop drop ;
 
 : numbers-game ( -- )
     guess-banner 100 random numbers-game-loop ;

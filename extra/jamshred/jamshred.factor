@@ -3,7 +3,7 @@
 USING: accessors arrays calendar jamshred.game jamshred.gl
 jamshred.player kernel math math.constants math.vectors
 namespaces sequences threads ui ui.gadgets ui.gadgets.worlds
-ui.gestures ui.render ;
+ui.gestures ui.pixel-formats ui.render ;
 IN: jamshred
 
 TUPLE: jamshred-gadget < gadget { jamshred jamshred } last-hand-loc ;
@@ -83,5 +83,11 @@ jamshred-gadget H{
     { mouse-scroll [ handle-mouse-scroll ] }
 } set-gestures
 
-MAIN-WINDOW: jamshred-window { { title "Jamshred" } }
+MAIN-WINDOW: jamshred-window {
+    { title "Jamshred" }
+    { pixel-format-attributes {
+        legacy-context windowed double-buffered
+        T{ depth-bits { value 16 } }
+    } }
+}
     <jamshred> <jamshred-gadget> >>gadgets ;

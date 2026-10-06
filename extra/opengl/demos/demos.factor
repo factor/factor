@@ -6,8 +6,8 @@ IN: opengl.demos
 
 MAIN-WINDOW: nehe-window { { title "Nehe Examples" } }
     <filled-pile>
-        "OpenGL 4" [ drop gl4demo ] <border-button> add-gadget
-        "OpenGL 4 Compute" [ drop gl4compute ] <border-button> add-gadget
+        "OpenGL Triangle" [ drop gl4demo ] <border-button> add-gadget
+        "OpenGL Compute (4.5)" [ drop gl4compute ] <border-button> add-gadget
     { 2 2 } <border> >>gadgets ;
 
 MAIN: nehe-window

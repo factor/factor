@@ -44,6 +44,7 @@ MAIN-WINDOW: run2
         { title "NeHe Tutorial 2" }
         { pref-dim { $ width $ height } }
         { pixel-format-attributes {
+            legacy-context
             windowed
             double-buffered
             T{ depth-bits { value 16 } }

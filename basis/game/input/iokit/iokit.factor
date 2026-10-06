@@ -2,8 +2,8 @@ USING: accessors alien alien.c-types arrays assocs bit-arrays
 cocoa.application cocoa.enumeration cocoa.plists combinators
 combinators.short-circuit core-foundation core-foundation.data
 core-foundation.run-loop core-foundation.strings destructors
-game.input hints iokit iokit.hid kernel math namespaces
-sequences vectors ;
+game.input game.input.cocoa hints iokit iokit.hid kernel math namespaces
+sequences ui.backend.input-state ui.private vectors ;
 IN: game.input.iokit
 
 SINGLETON: iokit-game-input-backend
@@ -199,9 +199,11 @@ HINTS: record-keyboard { bit-array alien } ;
 HINTS: record-mouse { mouse-state alien } ;
 
 M: iokit-game-input-backend read-mouse
-    +mouse-state+ get-global ;
+    ui-running get-global
+    [ cocoa-mouse ] [ +mouse-state+ get-global ] if ;
 
 M: iokit-game-input-backend reset-mouse
+    reset-pointer-deltas
     +mouse-state+ get-global
         0 >>dx
         0 >>dy
@@ -306,8 +308,14 @@ M: iokit-game-input-backend (open-game-input)
         [ device-matched-callback f IOHIDManagerRegisterDeviceMatchingCallback ]
         [ device-removed-callback f IOHIDManagerRegisterDeviceRemovalCallback ]
         [ device-input-callback f IOHIDManagerRegisterInputValueCallback ]
+        [
+            game-devices-matching-seq
+            ui-running get-global [
+                ! Cocoa supplies keyboard and mouse events for UI games.
+                [ "DeviceUsage" of { 4 5 8 } member? ] filter
+            ] when set-hid-manager-matching
+        ]
         [ 0 IOHIDManagerOpen mach-error ]
-        [ game-devices-matching-seq set-hid-manager-matching ]
         [
             CFRunLoopGetMain CFRunLoopDefaultMode
             IOHIDManagerScheduleWithRunLoop
@@ -357,7 +365,9 @@ M: iokit-game-input-backend read-controller
     handle>> +controller-states+ get-global at clone ;
 
 M: iokit-game-input-backend read-keyboard
-    +keyboard-state+ get-global clone keyboard-state boa ;
+    ui-running get-global [ cocoa-keyboard ] [
+        +keyboard-state+ get-global clone keyboard-state boa
+    ] if ;
 
 M: iokit-game-input-backend calibrate-controller
     drop ;

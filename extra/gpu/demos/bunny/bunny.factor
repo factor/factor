@@ -298,6 +298,7 @@ GAME: bunny-game {
         { world-class bunny-world }
         { title "Bunny" }
         { pixel-format-attributes {
+            legacy-context
             windowed
             double-buffered
             T{ depth-bits { value 24 } }

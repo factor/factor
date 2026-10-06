@@ -1,7 +1,7 @@
 
 USING: accessors arrays colors kernel math math.constants
 math.functions math.order namespaces opengl.gl processing.shapes
-sequences ui ui.gadgets.cartesian ;
+sequences ui ui.gadgets.cartesian ui.pixel-formats ;
 
 IN: golden-section
 
@@ -32,5 +32,8 @@ IN: golden-section
         [ golden-section ] >>action ;
 
 MAIN-WINDOW: golden-section-window
-    { { title "Golden Section" } }
+    {
+    { title "Golden Section" }
+    { pixel-format-attributes { legacy-context windowed double-buffered } }
+}
     <golden-section> >>gadgets ;

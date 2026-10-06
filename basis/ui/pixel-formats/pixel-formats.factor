@@ -10,6 +10,7 @@ SYMBOLS:
     offscreen
     fullscreen
     windowed
+    legacy-context
     accelerated
     software-rendered
     backing-store

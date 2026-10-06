@@ -6,7 +6,7 @@ cocoa.runtime cocoa.subclassing cocoa.views cocoa.windows
 combinators continuations core-foundation.run-loop
 core-foundation.strings core-graphics core-graphics.types debugger
 io.thread kernel
-literals math math.bitwise math.rectangles namespaces sequences
+literals math math.bitwise math.rectangles namespaces opengl sequences
 threads ui
 ui.backend ui.backend.cocoa.views ui.backend.cocoa.views.private ui.clipboards
 ui.gadgets.worlds ui.pixel-formats ui.private ui.render ui.theme
@@ -15,10 +15,11 @@ IN: ui.backend.cocoa
 
 IMPORT: NSCursor
 
-TUPLE: window-handle view window { input-grabbed? boolean } ;
+TUPLE: window-handle view window
+    { input-grabbed? boolean } { legacy-context? boolean } ;
 
 : <window-handle> ( view window -- handle )
-    f window-handle boa ;
+    f f window-handle boa ;
 
 SINGLETON: cocoa-ui-backend
 
@@ -33,6 +34,10 @@ CONSTANT: attrib-table H{
     { offscreen { $ NSOpenGLPFAOffScreen } }
     { fullscreen { $ NSOpenGLPFAFullScreen } }
     { windowed { } }
+    { legacy-context {
+          $ NSOpenGLPFAOpenGLProfile
+          $ NSOpenGLProfileVersionLegacy }
+    }
     { accelerated { $ NSOpenGLPFAAccelerated } }
     { software-rendered {
           $ NSOpenGLPFARendererID
@@ -54,7 +59,9 @@ CONSTANT: attrib-table H{
 }
 
 M: cocoa-ui-backend (make-pixel-format)
-    nip perm-attribs attrib-table pixel-format-attributes>int-array
+    nip dup legacy-context swap member?
+    [ { } ] [ perm-attribs ] if
+    attrib-table pixel-format-attributes>int-array
     NSOpenGLPixelFormat -> alloc swap -> initWithAttributes: ;
 
 M: cocoa-ui-backend (free-pixel-format)
@@ -145,7 +152,9 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     window world window-loc>> auto-position
     world window save-position
     window install-window-delegate
-    view window <window-handle> world handle<<
+    view window <window-handle>
+    world pixel-format-attributes>> legacy-context swap member?
+    >>legacy-context? world handle<<
     window f -> makeKeyAndOrderFront:
     t world active?<< ;
 
@@ -191,7 +200,11 @@ M: cocoa-ui-backend raise-window*
 
 M: window-handle select-gl-context
     [ window>> -> backingScaleFactor set-scale-factor ]
-    [ view>> -> openGLContext -> makeCurrentContext ] bi ;
+    [ view>> -> openGLContext -> makeCurrentContext ]
+    [
+        legacy-context?>> not dup gl3-mode? get-global =
+        [ drop ] [ [ setup-gl3-hooks ] [ setup-legacy-hooks ] if ] if
+    ] tri ;
 
 : display-asleep? ( -- ? )
     CGMainDisplayID CGDisplayIsAsleep c-bool> ;

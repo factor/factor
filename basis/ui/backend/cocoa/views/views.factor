@@ -103,9 +103,19 @@ CONSTANT: key-codes
     dup -> keyCode f record-key
     key-event>gesture <key-up> send-key-event ;
 
-: record-shift-state ( event -- )
-    -> modifierFlags NSShiftKeyMask bitand zero? not
-    dup 56 swap record-key 60 swap record-key ;
+CONSTANT: cocoa-modifier-masks H{
+    { 54 0x10 } { 55 0x08 }
+    { 56 0x02 } { 60 0x04 }
+    { 58 0x20 } { 61 0x40 }
+    { 59 0x01 } { 62 0x2000 }
+    { 57 $ NSAlphaShiftKeyMask }
+}
+
+:: record-modifier-flags ( flags -- )
+    ! IOLLEvent.h device bits distinguish the left and right modifiers.
+    cocoa-modifier-masks [| code mask |
+        code flags mask bitand zero? not record-key
+    ] assoc-each ;
 
 : cocoa-input-text ( str -- str/f )
     ! Cocoa can send control characters for unbound Ctrl-Option keys.
@@ -394,7 +404,7 @@ PRIVATE>
 
     METHOD: void keyUp: id event [ self event send-key-up-event ] ;
 
-    METHOD: void flagsChanged: id event [ event record-shift-state ] ;
+    METHOD: void flagsChanged: id event [ event -> modifierFlags record-modifier-flags ] ;
 
     METHOD: char validateUserInterfaceItem: id event
     [

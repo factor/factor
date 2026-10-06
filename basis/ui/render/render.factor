@@ -925,3 +925,12 @@ M: multi-texture draw-texture-gl3
     [ make-texture-gl3 ] make-texture-hook set-global
     [ draw-texture-gl3 ] draw-texture-hook set-global
     t gl3-mode? set-global ;
+
+: setup-legacy-hooks ( -- )
+    {
+        gl-init-hook gl-draw-init-hook gl-color-hook
+        gl-fill-rect-hook gl-rect-hook gl-line-hook
+        gl-translate-hook with-translation-hook gl-scale-2d-hook
+        gl-rectf-hook with-matrix-hook gl-draw-lines-hook
+        make-texture-hook draw-texture-hook gl3-mode?
+    } [ f swap set-global ] each ;

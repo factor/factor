@@ -1,7 +1,7 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
 USING: accessors arrays kernel math math.order math.vectors
 namespaces opengl.demo-support opengl.gl random sequences ui
-ui.gadgets ui.gadgets.canvas ui.gestures ui.render ;
+ui.gadgets ui.gadgets.canvas ui.gestures ui.pixel-formats ui.render ;
 IN: maze
 
 CONSTANT: line-width 8
@@ -62,5 +62,8 @@ M: maze handle-gesture
     over T{ button-down { # 1 } } =
     [ nip relayout f ] [ call-next-method ] if ;
 
-MAIN-WINDOW: maze-window { { title "Maze" } }
+MAIN-WINDOW: maze-window {
+    { title "Maze" }
+    { pixel-format-attributes { legacy-context windowed double-buffered } }
+}
     <maze> >>gadgets ;

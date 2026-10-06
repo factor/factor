@@ -14,7 +14,9 @@ SYMBOL: has-vertex-array-objects?
 
 : set-gpu-api ( -- )
     "2.0" require-gl-version
-    "3.0" { { "GL_ARB_vertex_array_object" "GL_APPLE_vertex_array_object" } }
+    ! APPLE_vertex_array_object uses different entry points from core/ARB
+    ! VAOs. Use the collection fallback on those legacy contexts.
+    "3.0" { "GL_ARB_vertex_array_object" }
     has-gl-version-or-extensions? has-vertex-array-objects? set-global
     "3.0" has-gl-version? opengl-3 opengl-2 ? gpu-api set-global ;
 
@@ -32,7 +34,7 @@ PRIVATE>
     init-gpu-api ;
 
 : reset-gpu ( -- )
-    "3.0" { { "GL_APPLE_vertex_array_object" "GL_ARB_vertex_array_object" } }
+    "3.0" { "GL_ARB_vertex_array_object" }
     has-gl-version-or-extensions?
     [ 0 glBindVertexArray ] when
 

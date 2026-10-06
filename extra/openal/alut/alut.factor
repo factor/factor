@@ -71,28 +71,38 @@ SYMBOL: init
 : throw-alut-error ( -- )
     alutGetError alutGetErrorString throw ;
 
+M: object init-alut
+    f f alutInit 0 = [ throw-alut-error ] when ;
+
+M: object exit-alut
+    alutExit 0 = [ throw-alut-error ] when ;
+
+M: object load-alut-buffer
+    alutCreateBufferFromFile dup AL_NONE = [ throw-alut-error ] when ;
+
+M: object load-wav-buffer
+    gen-buffer dup rot load-wav-file
+    [ alBufferData ] 4keep alutUnloadWAV ;
+
+os macos? "openal.alut.macos" "openal.alut.other" ? require
+
 : init-openal ( -- )
     init get-global expired? [
-        f f alutInit 0 = [ throw-alut-error ] when
+        init-alut
         1337 <alien> init set-global
     ] when ;
 
 : exit-openal ( -- )
     init get-global expired? [
-        alutExit 0 = [ throw-alut-error ] when
+        exit-alut
         f init set-global
     ] unless ;
 
 : create-buffer-from-file ( filename -- buffer )
-    alutCreateBufferFromFile dup AL_NONE = [
-        throw-alut-error
-    ] when ;
-
-os macos? "openal.alut.macos" "openal.alut.other" ? require
+    load-alut-buffer ;
 
 : create-buffer-from-wav ( filename -- buffer )
-    gen-buffer dup rot load-wav-file
-    [ alBufferData ] 4keep alutUnloadWAV ;
+    load-wav-buffer ;
 
 : check-error ( -- )
     alGetError dup ALUT_ERROR_NO_ERROR = [

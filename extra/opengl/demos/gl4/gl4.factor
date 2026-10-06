@@ -1,14 +1,14 @@
 ! upgraded to opengl4 factor port of https://learnopengl.com/Getting-started/Hello-Triangle
 USING: accessors alien.c-types alien.data colors game.input
 game.input.scancodes game.loop game.worlds kernel literals math
-multiline opengl opengl.gl opengl.shaders sequences
+multiline opengl opengl.capabilities opengl.gl opengl.shaders sequences
 specialized-arrays.instances.alien.c-types.float ui
 ui.gadgets.worlds ui.pixel-formats ;
 IN: opengl.demos.gl4
 
 STRING: testing-vertex-shader
-  #version 450 core
-  layout (location = 0) in vec3 aPos;
+  #version 150
+  in vec3 aPos;
   
   void main () {
     gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
@@ -16,7 +16,7 @@ STRING: testing-vertex-shader
 ;
 
 STRING: testing-fragment-shader
-  #version 450 core
+  #version 150
   out vec4 FragColor;
  
   void main () {
@@ -31,21 +31,24 @@ TUPLE: gl4demo-world < game-world
   testing-program
   vertices vbo vao ;
 
-M: gl4demo-world begin-game-world 
+M: gl4demo-world begin-game-world
+  "3.2" require-gl-version
   testing-vertex-shader testing-fragment-shader <simple-gl-program> >>testing-program 
   float-array{ -0.5 -0.5 0.0   0.5 -0.5 0.0   0.0 0.5 0.0 } >>vertices
   
-  1 0 uint [ glCreateVertexArrays ] ref >>vao
-  1 0 uint [ glCreateBuffers ] ref >>vbo
+  gen-vertex-array >>vao
+  gen-gl-buffer >>vbo
 
-  dup [ vbo>> ] [ vertices>> length 4 * ] [ vertices>> ] tri GL_STATIC_DRAW glNamedBufferData
+  dup vao>> glBindVertexArray
+  dup vbo>> GL_ARRAY_BUFFER swap glBindBuffer
+  dup [ vertices>> length 4 * ] [ vertices>> ] bi
+  [ GL_ARRAY_BUFFER ] 2dip GL_STATIC_DRAW glBufferData
   
-  dup [ vao>> 0 ] [ vbo>> ] bi 0 3 4 * glVertexArrayVertexBuffer
-  
-  dup vao>> 0 glEnableVertexArrayAttrib
-  dup vao>> 0 3 GL_FLOAT GL_FALSE 0 glVertexArrayAttribFormat
-  
-  dup vao>> 0 0 glVertexArrayAttribBinding
+  dup testing-program>> "aPos" glGetAttribLocation
+  dup glEnableVertexAttribArray
+  3 GL_FLOAT GL_FALSE 0 f glVertexAttribPointer
+  GL_ARRAY_BUFFER 0 glBindBuffer
+  0 glBindVertexArray
 
   drop ;
 
@@ -73,7 +76,7 @@ M: gl4demo-world draw-world*
 
 GAME: gl4demo {
   { world-class gl4demo-world }
-  { title "gl4demo" }
+  { title "OpenGL Triangle" }
   { pixel-format-attributes { 
     windowed 
     double-buffered

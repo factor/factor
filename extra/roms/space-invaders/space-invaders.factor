@@ -4,8 +4,9 @@
 ! Space Invaders: https://www.emuparadise.me/M.A.M.E._-_Multiple_Arcade_Machine_Emulator_ROMs/Space_Invaders_--_Space_Invaders_M/13774
 USING: accessors alien.c-types alien.data arrays
 combinators cpu.8080 cpu.8080.emulator io.pathnames kernel
-math math.order openal openal.alut opengl.gl sequences
-specialized-arrays ui ui.gadgets ui.gestures ui.render ;
+locals math math.order openal openal.alut opengl.gl sequences
+specialized-arrays ui ui.gadgets ui.gadgets.worlds ui.gestures
+ui.pixel-formats ui.render ;
 QUALIFIED: threads
 QUALIFIED: system
 SPECIALIZED-ARRAY: uchar
@@ -360,8 +361,12 @@ M: invaders-gadget graft*
 M: invaders-gadget ungraft*
     t swap quit?<< ;
 
-: run-rom ( title cpu rom-info -- )
-    over load-rom* <invaders-gadget> t >>windowed? swap open-window ;
+:: run-rom ( title cpu rom-info -- )
+    rom-info cpu load-rom*
+    cpu <invaders-gadget> t >>windowed?
+    <world-attributes> title >>title
+    { legacy-context windowed double-buffered } >>pixel-format-attributes
+    open-window ;
 
 CONSTANT: rom-info {
       { 0x0000 "invaders/invaders.h" }
