@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 ! Run with a UI image and Raylib installed: -run=raylib.live-coding.smoke-test
 USING: accessors alien calendar continuations debugger io

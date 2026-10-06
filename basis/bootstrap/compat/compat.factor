@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 ! Source-level additions needed before older seed images load FFI syntax.
 USING: alien fry kernel parser vocabs words ;

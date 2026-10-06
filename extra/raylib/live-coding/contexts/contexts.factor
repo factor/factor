@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: combinators continuations kernel locals system vocabs vocabs.loader ;
 IN: raylib.live-coding.contexts

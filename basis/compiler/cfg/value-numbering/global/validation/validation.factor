@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: compiler.units kernel locals math math.bitwise ranges
 sequences stack-checker typed words ;

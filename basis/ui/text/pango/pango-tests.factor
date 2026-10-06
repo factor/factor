@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors continuations destructors fonts images kernel
 locals math math.rectangles namespaces opengl sequences strings tools.test

@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 ! Loaded only when an old ARM64 seed needs its variadic callback template.
 ! classes.struct declares the forward references needed by stack-checker.

@@ -1,4 +1,4 @@
-! Copyright (C) 2011 Alex Vondrak, 2026 Factor contributors.
+! Copyright (C) 2011 Alex Vondrak, 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces ;
 QUALIFIED: compiler.cfg.value-numbering

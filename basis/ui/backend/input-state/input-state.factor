@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 ! Raw input snapshots shared by the UI and the optional game-input backend.
 USING: accessors arrays assocs init kernel locals math math.vectors

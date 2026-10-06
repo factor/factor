@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: game.input game.input.x11 kernel namespaces tools.test x11 ;
 IN: game.input.x11.tests

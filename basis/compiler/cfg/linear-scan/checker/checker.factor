@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.ranges kernel locals math sequences sorting ;

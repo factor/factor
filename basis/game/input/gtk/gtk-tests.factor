@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators game.input game.input.gtk
 game.input.scancodes kernel namespaces sequences tools.test

@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.cfg compiler.cfg.def-use
 compiler.cfg.build-stack-frame compiler.cfg.comparisons

@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.libraries alien.syntax
 combinators kernel locals math sequences system raylib.live-coding.contexts ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel locals math math.order sequences vectors ;
 IN: compiler.cfg.register-allocation.greedy.regions

@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays byte-arrays classes
 classes.algebra compiler.cfg.instructions compiler.test cpu.architecture fry kernel kernel.private math math.order

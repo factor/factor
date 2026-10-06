@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays binary-search io.encodings.utf8 kernel
 locals math math.order sequences strings vectors ;

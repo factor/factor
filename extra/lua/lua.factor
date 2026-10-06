@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Erik Charlebois.
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 ! Lua 5.5, with the default double / 64-bit integer configuration.
 USING: accessors alien alien.accessors alien.c-types

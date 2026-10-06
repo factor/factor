@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.loop-detection compiler.cfg.rpo

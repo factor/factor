@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io.encodings.string io.encodings.utf16
 io.encodings.utf8 kernel locals math sequences strings tools.test ui.text.index-maps ;

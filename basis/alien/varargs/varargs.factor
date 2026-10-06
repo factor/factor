@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.arrays alien.c-types
 alien.c-types.varargs alien.data alien.private arrays byte-arrays

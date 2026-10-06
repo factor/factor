@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.syntax kernel opengl.gl.windows
 raylib.live-coding.contexts system windows.errors

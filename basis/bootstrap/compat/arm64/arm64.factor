@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 ! Keep the current-seed path independent of image building and the compiler.
 USING: kernel kernel.private math parser sequences system ;

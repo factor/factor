@@ -1,4 +1,4 @@
-! Copyright (C) 2010, 2026 Factor contributors.
+! Copyright (C) 2010, 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.enums arrays assocs classes.mixin continuations
 destructors game.input init io.encodings.binary io.files kernel libc linux.input-events

@@ -1,4 +1,4 @@
-! Copyright (C) 2014, 2026 Factor contributors.
+! Copyright (C) 2014, 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces ui.backend vocabs ;
 IN: file-picker.linux

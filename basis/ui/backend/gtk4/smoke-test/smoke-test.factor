@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor contributors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 ! Run with a GTK4 image and a display: -run=ui.backend.gtk4.smoke-test
 USING: accessors alien.c-types alien.data arrays calendar combinators continuations debugger
