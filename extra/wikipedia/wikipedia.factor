@@ -19,7 +19,7 @@ language [ "en" ] initialize
 <PRIVATE
 
 : wikipedia-url ( path -- url )
-    language get swap "https://%s.wikipedia.org/%s" sprintf >url ;
+    language get swap "https://%s.wikipedia.org/%s?action=render" sprintf >url ;
 
 : header. ( string -- )
     H{ { font-size 20 } { font-style bold } } format nl ;
@@ -69,16 +69,19 @@ language [ "en" ] initialize
     historical-url http-get nip string>xml ;
 
 : historical-get-events ( timestamp -- alist )
-    historical-get "ul" deep-tags-named
-    [ second items>sequence ] [ 4 7 rot subseq ] bi zip ;
+    historical-get
+    [ "h3" deep-tags-named 0 3 rot subseq [ deep-children>string ] map ]
+    [ "ul" deep-tags-named 0 3 rot subseq ] bi zip ;
 
 : historical-get-births ( timestamp -- alist )
-    historical-get "ul" deep-tags-named
-    [ third items>sequence ] [ 7 10 rot subseq ] bi zip ;
+    historical-get
+    [ "h3" deep-tags-named 3 6 rot subseq [ deep-children>string ] map ]
+    [ "ul" deep-tags-named 3 6 rot subseq ] bi zip ;
 
 : historical-get-deaths ( timestamp -- alist )
-    historical-get "ul" deep-tags-named
-    [ fourth items>sequence ] [ 10 13 rot subseq ] bi zip ;
+    historical-get
+    [ "h3" deep-tags-named 6 9 rot subseq [ deep-children>string ] map ]
+    [ "ul" deep-tags-named 6 9 rot subseq ] bi zip ;
 
 PRIVATE>
 
