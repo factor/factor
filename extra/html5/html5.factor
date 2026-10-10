@@ -4,7 +4,7 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit io.encodings.utf8
 io.files json kernel locals math math.order math.parser math.bitwise memoize modern.slices namespaces splitting
-sequences sequences.extras strings unicode words ;
+sequences sequences.extras sets strings unicode words ;
 
 IN: html5
 
@@ -345,10 +345,11 @@ TUPLE: doctype
 : new-doctype-with-quirks ( document -- )
     <doctype> t >>quirks? >>doctype drop ;
 
-TUPLE: tag self-closing? name attributes children end-tag ;
+TUPLE: tag self-closing? name attributes children end-tag namespace ;
 
 : <tag> ( -- tag )
     tag new
+        html-namespace >>namespace
         SBUF" " clone >>name
         V{ } clone >>attributes
         V{ } clone >>children ;
@@ -421,7 +422,7 @@ TUPLE: processing-instruction target data ;
     { [ comment? ] [ processing-instruction? ] } 1|| ;
 
 ! Tree construction. Active formatting reconstruction, template contents,
-! and foreign-content parsing are not yet implemented.
+! and frameset parsing are not yet implemented.
 CONSTANT: void-elements {
     "area" "base" "br" "col" "embed" "hr" "img" "input" "link"
     "meta" "param" "source" "track" "wbr"
@@ -432,10 +433,12 @@ CONSTANT: void-elements {
 
 CONSTANT: table-text-elements { "table" "tbody" "tfoot" "thead" "tr" }
 
+: html-element? ( element -- ? ) namespace>> html-namespace = ;
+
 :: append-node ( document obj -- )
     obj dup integer? [ 1string ] when :> node
     document fostering-parent?>>
-    document open-elements>> ?last [ name>> table-text-elements member? ] [ f ] if* and [
+    document open-elements>> ?last [ { [ html-element? ] [ name>> table-text-elements member? ] } 1&& ] [ f ] if* and [
         document open-elements>> :> stack
         stack [ name>> "table" = ] find-last drop :> table-index
         table-index [
@@ -449,13 +452,15 @@ CONSTANT: table-text-elements { "table" "tbody" "tfoot" "thead" "tr" }
 
 :: insert-element ( document element -- )
     document element append-node
-    element name>> void-elements member? [
+    element namespace>> html-namespace = [
+        element name>> void-elements member?
+    ] [ element self-closing?>> ] if [
         element document open-elements>> push
     ] unless ;
 
 :: close-element ( document token -- )
     document open-elements>> :> stack
-    stack [ name>> token name>> sequence= ] find-last drop [
+    stack [ { [ html-element? ] [ name>> token name>> sequence= ] } 1&& ] find-last drop [
         dup stack nth token >>end-tag drop
         stack shorten
     ] when* ;
@@ -471,6 +476,177 @@ DEFER: tree-insert
     document open-elements>> [ name>> token name>> = ] find-last nip
     [ token >>end-tag drop ] when* ;
 
+! Namespace-aware names are used for foreign attributes; HTML attributes
+! retain their existing string keys.
+TUPLE: foreign-attribute prefix name namespace ;
+
+CONSTANT: svg-tag-adjustments H{
+    { "altglyph" "altGlyph" }
+    { "altglyphdef" "altGlyphDef" }
+    { "altglyphitem" "altGlyphItem" }
+    { "animatecolor" "animateColor" }
+    { "animatemotion" "animateMotion" }
+    { "animatetransform" "animateTransform" }
+    { "clippath" "clipPath" }
+    { "feblend" "feBlend" }
+    { "fecolormatrix" "feColorMatrix" }
+    { "fecomponenttransfer" "feComponentTransfer" }
+    { "fecomposite" "feComposite" }
+    { "feconvolvematrix" "feConvolveMatrix" }
+    { "fediffuselighting" "feDiffuseLighting" }
+    { "fedisplacementmap" "feDisplacementMap" }
+    { "fedistantlight" "feDistantLight" }
+    { "fedropshadow" "feDropShadow" }
+    { "feflood" "feFlood" }
+    { "fefunca" "feFuncA" }
+    { "fefuncb" "feFuncB" }
+    { "fefuncg" "feFuncG" }
+    { "fefuncr" "feFuncR" }
+    { "fegaussianblur" "feGaussianBlur" }
+    { "feimage" "feImage" }
+    { "femerge" "feMerge" }
+    { "femergenode" "feMergeNode" }
+    { "femorphology" "feMorphology" }
+    { "feoffset" "feOffset" }
+    { "fepointlight" "fePointLight" }
+    { "fespecularlighting" "feSpecularLighting" }
+    { "fespotlight" "feSpotLight" }
+    { "fetile" "feTile" }
+    { "feturbulence" "feTurbulence" }
+    { "foreignobject" "foreignObject" }
+    { "glyphref" "glyphRef" }
+    { "lineargradient" "linearGradient" }
+    { "radialgradient" "radialGradient" }
+    { "textpath" "textPath" }
+}
+
+CONSTANT: svg-attribute-adjustments H{
+    { "attributename" "attributeName" }
+    { "attributetype" "attributeType" }
+    { "basefrequency" "baseFrequency" }
+    { "baseprofile" "baseProfile" }
+    { "calcmode" "calcMode" }
+    { "clippathunits" "clipPathUnits" }
+    { "diffuseconstant" "diffuseConstant" }
+    { "edgemode" "edgeMode" }
+    { "filterunits" "filterUnits" }
+    { "glyphref" "glyphRef" }
+    { "gradienttransform" "gradientTransform" }
+    { "gradientunits" "gradientUnits" }
+    { "kernelmatrix" "kernelMatrix" }
+    { "kernelunitlength" "kernelUnitLength" }
+    { "keypoints" "keyPoints" }
+    { "keysplines" "keySplines" }
+    { "keytimes" "keyTimes" }
+    { "lengthadjust" "lengthAdjust" }
+    { "limitingconeangle" "limitingConeAngle" }
+    { "markerheight" "markerHeight" }
+    { "markerunits" "markerUnits" }
+    { "markerwidth" "markerWidth" }
+    { "maskcontentunits" "maskContentUnits" }
+    { "maskunits" "maskUnits" }
+    { "numoctaves" "numOctaves" }
+    { "pathlength" "pathLength" }
+    { "patterncontentunits" "patternContentUnits" }
+    { "patterntransform" "patternTransform" }
+    { "patternunits" "patternUnits" }
+    { "pointsatx" "pointsAtX" }
+    { "pointsaty" "pointsAtY" }
+    { "pointsatz" "pointsAtZ" }
+    { "preservealpha" "preserveAlpha" }
+    { "preserveaspectratio" "preserveAspectRatio" }
+    { "primitiveunits" "primitiveUnits" }
+    { "refx" "refX" }
+    { "refy" "refY" }
+    { "repeatcount" "repeatCount" }
+    { "repeatdur" "repeatDur" }
+    { "requiredextensions" "requiredExtensions" }
+    { "requiredfeatures" "requiredFeatures" }
+    { "specularconstant" "specularConstant" }
+    { "specularexponent" "specularExponent" }
+    { "spreadmethod" "spreadMethod" }
+    { "startoffset" "startOffset" }
+    { "stddeviation" "stdDeviation" }
+    { "stitchtiles" "stitchTiles" }
+    { "surfacescale" "surfaceScale" }
+    { "systemlanguage" "systemLanguage" }
+    { "tablevalues" "tableValues" }
+    { "targetx" "targetX" }
+    { "targety" "targetY" }
+    { "textlength" "textLength" }
+    { "viewbox" "viewBox" }
+    { "viewtarget" "viewTarget" }
+    { "xchannelselector" "xChannelSelector" }
+    { "ychannelselector" "yChannelSelector" }
+    { "zoomandpan" "zoomAndPan" }
+}
+
+CONSTANT: foreign-attribute-adjustments H{
+    { "xlink:actuate" { "xlink" "actuate" } }
+    { "xlink:arcrole" { "xlink" "arcrole" } }
+    { "xlink:href" { "xlink" "href" } }
+    { "xlink:role" { "xlink" "role" } }
+    { "xlink:show" { "xlink" "show" } }
+    { "xlink:title" { "xlink" "title" } }
+    { "xlink:type" { "xlink" "type" } }
+    { "xml:lang" { "xml" "lang" } }
+    { "xml:space" { "xml" "space" } }
+    { "xmlns" { f "xmlns" } }
+    { "xmlns:xlink" { "xmlns" "xlink" } }
+}
+
+: ascii-downcase ( string -- string' )
+    [ dup CHAR: A CHAR: Z between? [ 0x20 + ] when ] map ;
+
+: attribute-namespace ( prefix/f -- namespace )
+    { { "xlink" [ xlink-namespace ] } { "xml" [ xml-namespace ] }
+      [ drop xmlns-namespace ] } case ;
+
+: adjust-foreign-attribute ( name -- name' )
+    dup foreign-attribute-adjustments at [
+        nip first2 foreign-attribute new swap >>name swap >>prefix
+        dup prefix>> attribute-namespace >>namespace
+    ] when* ;
+
+:: adjust-foreign-element ( element namespace -- element )
+    namespace svg-namespace = [
+        element dup name>> svg-tag-adjustments at [ >>name ] when* drop
+    ] when
+    element attributes>> [
+        first2 swap
+        namespace svg-namespace = [
+            dup svg-attribute-adjustments at [ nip ] when*
+        ] when
+        namespace mathml-namespace = over "definitionurl" = and [ drop "definitionURL" ] when
+        adjust-foreign-attribute swap 2array
+    ] map element swap >>attributes namespace >>namespace ;
+
+:: insert-foreign-element ( document element namespace -- )
+    document element namespace adjust-foreign-element insert-element ;
+
+: mathml-text-integration-point? ( element -- ? )
+    { [ namespace>> mathml-namespace = ] [ name>> { "mi" "mo" "mn" "ms" "mtext" } member? ] } 1&& ;
+
+: html-integration-point? ( element -- ? )
+    {
+        [ { [ namespace>> svg-namespace = ] [ name>> { "foreignObject" "desc" "title" } member? ] } 1&& ]
+        [ { [ namespace>> mathml-namespace = ] [ name>> "annotation-xml" = ]
+            [ attributes>> "encoding" of [ ascii-downcase { "text/html" "application/xhtml+xml" } member? ] [ f ] if* ]
+        } 1&& ]
+    } 1|| ;
+
+:: foreign-token? ( document obj -- ? )
+    document open-elements>> ?last [
+        :> current
+        current html-element? not obj f = not and
+        current mathml-text-integration-point? obj integer? and not and
+        current mathml-text-integration-point?
+        obj tag? [ obj name>> { "mglyph" "malignmark" } member? not ] [ f ] if and not and
+        current html-integration-point? obj tag? obj integer? or and not and
+        current namespace>> mathml-namespace = current name>> "annotation-xml" = and
+        obj tag? [ obj name>> "svg" = ] [ f ] if and not and
+    ] [ f ] if* ;
+
 CONSTANT: scope-boundaries {
     "applet" "caption" "html" "table" "td" "th" "marquee" "object" "template"
 }
@@ -483,12 +659,18 @@ CONSTANT: heading-elements { "h1" "h2" "h3" "h4" "h5" "h6" }
 CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp" "rt" "rtc" }
 
 :: element-in-scope? ( document name boundaries -- ? )
-    document open-elements>> [ name>> ] map reverse
-    [ dup name = swap boundaries member? or ] find nip name = ;
+    document open-elements>> reverse [
+        dup html-element? [ name>> dup name = swap boundaries member? or ] [
+            { [ mathml-text-integration-point? ]
+              [ { [ namespace>> mathml-namespace = ] [ name>> "annotation-xml" = ] } 1&& ]
+              [ { [ namespace>> svg-namespace = ] [ name>> { "foreignObject" "desc" "title" } member? ] } 1&& ]
+            } 1||
+        ] if
+    ] find nip [ { [ html-element? ] [ name>> name = ] } 1&& ] [ f ] if* ;
 
 :: generate-implied-end-tags ( document except -- )
     document open-elements>> :> stack
-    [ stack ?last [ name>> dup except = not swap implied-end-elements member? and ] [ f ] if* ] [
+    [ stack ?last [ { [ html-element? ] [ name>> dup except = not swap implied-end-elements member? and ] } 1&& ] [ f ] if* ] [
         stack pop drop
     ] while ;
 
@@ -531,11 +713,14 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
         ] when
     ] when
     name { "rb" "rp" "rt" "rtc" } member? [ document "" generate-implied-end-tags ] when
-    document element insert-element
+    name { "svg" "math" } member? [
+        document element name "svg" = [ svg-namespace ] [ mathml-namespace ] if insert-foreign-element
+    ] [ document element insert-element ] if
     name { "pre" "listing" "textarea" } member? [ document t >>skip-leading-newline? drop ] when ;
 
 :: end-body-element ( document token -- )
     token name>> :> name
+    name "br" = [ document <tag> "br" >>name insert-element ] [
     name "p" = [
         document "p" scope-boundaries "button" suffix element-in-scope? [
             document "p" implied-element
@@ -546,7 +731,7 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
             document name generate-implied-end-tags
             document token close-element
         ] when
-    ] if ;
+    ] if ] if ;
 
 :: ordinary-body-token ( document obj -- document )
     obj {
@@ -572,7 +757,7 @@ CONSTANT: table-section-elements { "tbody" "thead" "tfoot" }
 CONSTANT: table-cell-elements { "td" "th" }
 
 : table-context ( document -- name/f )
-    open-elements>> [ name>> ] map reverse
+    open-elements>> [ html-element? ] filter [ name>> ] map reverse
     [ table-context-elements member? ] find nip ;
 
 :: clear-to-table-context ( document names -- )
@@ -717,7 +902,7 @@ DEFER: table-token
     document insertion-mode>> { before-html-mode before-head-mode after-head-mode } member? and
     obj end-tag? [ obj name>> { "head" "body" "html" "br" } member? not ] [ f ] if and ;
 
-:: tree-insert ( document obj -- document )
+:: html-tree-insert ( document obj -- document )
     document obj ignored-early-end-tag? [ document ] [
         document insertion-mode>> {
             { initial-mode [
@@ -821,6 +1006,64 @@ DEFER: table-token
         } case
     ] if ;
 
+CONSTANT: foreign-breakout-elements {
+    "b" "big" "blockquote" "body" "br" "center" "code" "dd" "div" "dl" "dt"
+    "em" "embed" "h1" "h2" "h3" "h4" "h5" "h6" "head" "hr" "i" "img" "li"
+    "listing" "menu" "meta" "nobr" "ol" "p" "pre" "ruby" "s" "small" "span"
+    "strong" "strike" "sub" "sup" "table" "tt" "u" "ul" "var"
+}
+
+: foreign-breakout? ( obj -- ? )
+    {
+        [ { [ tag? ] [ name>> foreign-breakout-elements member? ] } 1&& ]
+        [ { [ tag? ] [ name>> "font" = ] [ attributes>> keys { "color" "face" "size" } intersects? ] } 1&& ]
+        [ { [ end-tag? ] [ name>> { "br" "p" } member? ] } 1&& ]
+    } 1|| ;
+
+:: leave-foreign-content ( document -- )
+    document open-elements>> :> stack
+    [ stack ?last [
+        { [ html-element? ] [ mathml-text-integration-point? ] [ html-integration-point? ] } 1|| not
+    ] [ f ] if* ] [ stack pop drop ] while ;
+
+:: foreign-end-tag ( document token -- document )
+    document open-elements>> :> stack
+    stack length 1 - :> i!
+    f :> done!
+    [ i 0 > done not and ] [
+        i stack nth :> node
+        node name>> ascii-downcase token name>> = [
+            node token >>end-tag drop
+            i stack shorten t done!
+        ] [
+            i 1 - i!
+            i stack nth html-element? [
+                document token html-tree-insert drop t done!
+            ] when
+        ] if
+    ] while document ;
+
+:: foreign-tree-insert ( document obj -- document )
+    obj foreign-breakout? [
+        "unexpected-html-token-in-foreign-content" report-parse-error
+        document leave-foreign-content
+        document obj html-tree-insert
+    ] [
+        obj {
+            { [ dup tag? ] [
+                document swap document open-elements>> last namespace>> insert-foreign-element document
+            ] }
+            { [ dup end-tag? ] [ document swap foreign-end-tag ] }
+            { [ dup doctype? ] [ drop document ] }
+            [ document swap append-node document ]
+        } cond
+    ] if ;
+
+:: tree-insert ( document obj -- document )
+    document obj foreign-token? [
+        document obj foreign-tree-insert
+    ] [ document obj html-tree-insert ] if ;
+
 MEMO: load-entities ( -- assoc )
     "vocab:html5/entities.json" utf8 file-contents json> ;
 
@@ -861,10 +1104,19 @@ ERROR: invalid-return-state obj ;
 
 : emit-eof ( document -- ) dup flush-table-characters f tree-insert drop ;
 :: emit-char ( char document -- )
+    char CHAR: \0 = [
+        document char foreign-token? [
+            "unexpected-null-character" report-parse-error
+            document CHAR: replacement-character tree-insert drop
+        ] when
+    ] [
     document skip-leading-newline?>> char CHAR: \n = and :> skip?
     document f >>skip-leading-newline? drop
     skip? [
-        document open-elements>> ?last [ name>> table-text-elements member? ] [ f ] if* [
+        document char foreign-token? [
+            document char tree-insert drop
+        ] [
+        document open-elements>> ?last [ { [ html-element? ] [ name>> table-text-elements member? ] } 1&& ] [ f ] if* [
             char document pending-table-characters>> push
         ] [
         document open-elements>> ?last [
@@ -873,7 +1125,8 @@ ERROR: invalid-return-state obj ;
             document char tree-insert drop
         ] [ document char append-node ] if
         ] if
-    ] unless ;
+        ] if
+    ] unless ] if ;
 : emit-string ( string document -- ) swap append-node ;
 
 : emit-tag ( document -- )
@@ -940,26 +1193,33 @@ ERROR: invalid-return-state obj ;
     execute( document n/f string -- document n'/f string ) ;
 
 : tag-data-state ( document n/f string -- document n'/f string )
-    pick open-elements>> ?last [ name>> ] [ "" ] if* {
-        { "noscript" [ pick scripting?>> [ rawtext-state ] [ data-state ] if ] }
-        { "title" [ rcdata-state ] }
-        { "textarea" [ rcdata-state ] }
-        { "style" [ rawtext-state ] }
-        { "xmp" [ rawtext-state ] }
-        { "iframe" [ rawtext-state ] }
-        { "noembed" [ rawtext-state ] }
-        { "noframes" [ rawtext-state ] }
-        { "script" [ script-data-state ] }
-        { "plaintext" [ plaintext-state ] }
-        [ drop data-state ]
-    } case ;
+    pick open-elements>> ?last [ html-element? ] [ t ] if* [
+        pick open-elements>> ?last [ name>> ] [ "" ] if* {
+            { "noscript" [ pick scripting?>> [ rawtext-state ] [ data-state ] if ] }
+            { "title" [ rcdata-state ] }
+            { "textarea" [ rcdata-state ] }
+            { "style" [ rawtext-state ] }
+            { "xmp" [ rawtext-state ] }
+            { "iframe" [ rawtext-state ] }
+            { "noembed" [ rawtext-state ] }
+            { "noframes" [ rawtext-state ] }
+            { "script" [ script-data-state ] }
+            { "plaintext" [ plaintext-state ] }
+            [ drop data-state ]
+        } case
+    ] [ data-state ] if ;
 
 
 : (data-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: & = ] [ drop [ \ data-state >>return-state ] 2dip character-reference-state ] }
         { [ dup CHAR: < = ] [ drop tag-open-state ] }
-        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error data-state ] }
+        { [ dup CHAR: \0 = ] [
+            "unexpected-null-character" report-parse-error
+            reach over foreign-token? [
+                drop CHAR: replacement-character reach emit-char
+            ] [ drop ] if data-state
+        ] }
         { [ dup f = ] [ drop pick emit-eof ] }
         [ reach emit-char data-state ]
     } cond ;
@@ -1543,8 +1803,12 @@ ERROR: invalid-return-state obj ;
         { [ "--" take-markup? ] [ comment-start-state ] }
         { [ "DOCTYPE" take-from-insensitive? ] [ pick <doctype> >>doctype drop doctype-state ] }
         { [ "[CDATA[" take-markup? ] [
-            "cdata-in-html-content" report-parse-error
-            "[CDATA[" reach push-all-comment-token bogus-comment-state
+            pick open-elements>> ?last [ html-element? not ] [ f ] if* [
+                cdata-section-state
+            ] [
+                "cdata-in-html-content" report-parse-error
+                "[CDATA[" reach push-all-comment-token bogus-comment-state
+            ] if
         ] }
         [
             "incorrectly-opened-comment" report-parse-error bogus-comment-state

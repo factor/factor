@@ -173,3 +173,73 @@ DEFER: node-text
 { "colgroup" } [
     "<table><col>" body-root child-tags first child-tags first name>>
 ] unit-test
+
+! Foreign content preserves namespaces, case, and self-closing elements.
+{ t } [ "<svg/>" body-root child-tags first namespace>> svg-namespace = ] unit-test
+{ t } [ "<math/>" body-root child-tags first namespace>> mathml-namespace = ] unit-test
+{ { "svg" "p" } } [
+    "<svg/><p>x" body-root child-tags [ name>> ] map
+] unit-test
+{ { "path" "g" } } [
+    "<svg><path/><g/>" body-root child-tags first child-tags [ name>> ] map
+] unit-test
+{ "linearGradient" } [
+    "<svg><lineargradient/>" body-root child-tags first child-tags first name>>
+] unit-test
+{ { { "viewBox" "0 0 10 10" } { "filterres" "2" } } } [
+    "<svg viewbox='0 0 10 10' filterRes='2' />" body-root child-tags first attributes>> >array
+] unit-test
+{ { { "definitionURL" "x" } } } [
+    "<math definitionurl=x>" body-root child-tags first attributes>> >array
+] unit-test
+{ "xlink" "href" t "x" } [
+    "<svg xlink:href=x>" body-root child-tags first attributes>> first first2
+    [ [ prefix>> ] [ name>> ] [ namespace>> xlink-namespace = ] tri ] dip
+] unit-test
+{ f "xmlns" t } [
+    "<math xmlns=x>" body-root child-tags first attributes>> first first
+    [ prefix>> ] [ name>> ] [ namespace>> xmlns-namespace = ] tri
+] unit-test
+{ t } [
+    "<svg xml:base=x>" body-root child-tags first attributes>> first first string?
+] unit-test
+{ t } [
+    "<svg><foreignObject><div>x" body-root child-tags first child-tags first
+    child-tags first namespace>> html-namespace =
+] unit-test
+{ t } [
+    "<math><mtext><span>x" body-root child-tags first child-tags first
+    child-tags first namespace>> html-namespace =
+] unit-test
+{ t } [
+    "<math><mi><mglyph/>" body-root child-tags first child-tags first
+    child-tags first namespace>> mathml-namespace =
+] unit-test
+{ t } [
+    "<math><annotation-xml encoding='TEXT/HTML'><div>" body-root child-tags first
+    child-tags first child-tags first namespace>> html-namespace =
+] unit-test
+{ t } [
+    "<math><annotation-xml><svg/>" body-root child-tags first child-tags first
+    child-tags first namespace>> svg-namespace =
+] unit-test
+{ { "svg" "p" } } [
+    "<svg><g><p>x" body-root child-tags [ name>> ] map
+] unit-test
+{ { "svg" "br" "foo" } } [
+    "<svg></br><foo>" body-root child-tags [ name>> ] map
+] unit-test
+{ "<b>�x" } [
+    "<svg><![CDATA[<b>\0x]]>" body-root node-text
+] unit-test
+{ "x" } [
+    "<svg><title><b>x</b></title></svg>" body-root node-text
+] unit-test
+{ "a" } [
+    "<p><svg><foreignObject><p>a" body-root child-tags first child-tags first
+    child-tags first child-tags first node-text
+] unit-test
+{ "a" } [
+    "<div><svg><foreignObject><p></div>a" body-root child-tags first child-tags first
+    child-tags first child-tags first node-text
+] unit-test
