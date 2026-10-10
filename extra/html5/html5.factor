@@ -442,6 +442,21 @@ CONSTANT: table-text-elements { "table" "tbody" "tfoot" "thead" "tr" }
 
 : html-element? ( element -- ? ) namespace>> html-namespace = ;
 
+:: html-element-named? ( element name -- ? )
+    element { [ html-element? ] [ name>> name = ] } 1&& ;
+
+:: start-tag-named? ( obj name -- ? )
+    obj { [ tag? ] [ name>> name = ] } 1&& ;
+
+:: end-tag-named? ( obj name -- ? )
+    obj { [ end-tag? ] [ name>> name = ] } 1&& ;
+
+:: current-element-matches? ( document quot -- ? )
+    document open-elements>> ?last quot [ f ] if* ; inline
+
+:: current-element-named? ( document name -- ? )
+    document [ name>> name = ] current-element-matches? ;
+
 ! Formatting list and open-stack membership use node identity.
 :: node-index ( node sequence -- index/f )
     sequence [ node eq? ] find drop ;
@@ -471,28 +486,35 @@ CONSTANT: formatting-marker-elements { "applet" "object" "marquee" "template" "t
     f :> done!
     [ entries empty? not done not and ] [ entries pop f = done! ] while ;
 
+:: insert-before-node ( node sibling -- )
+    sibling parent>> :> parent
+    parent parent-children :> children
+    sibling children node-index :> position
+    node parent set-node-parent
+    node position children insert-nth! ;
+
+:: foster-node ( document node fallback -- )
+    document open-elements>> :> stack
+    stack [ "table" html-element-named? ] find-last drop :> table-index
+    stack [ "template" html-element-named? ] find-last drop :> template-index
+    {
+        { [ template-index [ table-index [ template-index table-index > ] [ t ] if ] [ f ] if ]
+          [ node template-index stack nth attach-node ] }
+        { [ table-index ] [
+            table-index stack nth :> table
+            table parent>> [ node table insert-before-node ] [ node stack first attach-node ] if
+        ] }
+        [ node fallback attach-node ]
+    } cond ;
+
 :: append-node ( document obj -- )
     obj dup integer? [ 1string ] when :> node
+    document open-elements>> ?last [ ] [ document ] if* :> parent
     document fostering-parent?>>
-    document open-elements>> ?last [ { [ html-element? ] [ name>> table-text-elements member? ] } 1&& ] [ f ] if* and [
-        document open-elements>> :> stack
-        stack [ { [ html-element? ] [ name>> "table" = ] } 1&& ] find-last drop :> table-index
-        stack [ { [ html-element? ] [ name>> "template" = ] } 1&& ] find-last drop :> template-index
-        template-index [ drop table-index [ drop template-index table-index > ] [ t ] if* ] [ f ] if* [
-            node template-index stack nth attach-node
-        ] [
-            table-index [
-                table-index stack nth :> table
-                table parent>> [
-                    :> parent
-                    parent parent-children :> children
-                    table children node-index :> position
-                    node parent set-node-parent
-                    node position children insert-nth!
-                ] [ node stack first attach-node ] if*
-            ] [ node stack ?last [ ] [ document ] if* attach-node ] if
-        ] if
-    ] [ node document open-elements>> ?last [ ] [ document ] if* attach-node ] if ;
+    document [ { [ html-element? ] [ name>> table-text-elements member? ] } 1&& ]
+    current-element-matches? and [
+        document node parent foster-node
+    ] [ node parent attach-node ] if ;
 
 :: insert-element ( document element -- )
     document element append-node
@@ -692,7 +714,7 @@ CONSTANT: foreign-attribute-adjustments H{
         obj tag? [ obj name>> { "mglyph" "malignmark" } member? not ] [ f ] if and not and
         current html-integration-point? obj tag? obj integer? or and not and
         current namespace>> mathml-namespace = current name>> "annotation-xml" = and
-        obj tag? [ obj name>> "svg" = ] [ f ] if and not and
+        obj "svg" start-tag-named? and not and
     ] [ f ] if* ;
 
 CONSTANT: scope-boundaries {
@@ -707,14 +729,14 @@ CONSTANT: heading-elements { "h1" "h2" "h3" "h4" "h5" "h6" }
 CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp" "rt" "rtc" }
 
 :: element-in-scope? ( document name boundaries -- ? )
-    document open-elements>> reverse [
+    document open-elements>> [
         dup html-element? [ name>> dup name = swap boundaries member? or ] [
             { [ mathml-text-integration-point? ]
               [ { [ namespace>> mathml-namespace = ] [ name>> "annotation-xml" = ] } 1&& ]
               [ { [ namespace>> svg-namespace = ] [ name>> { "foreignObject" "desc" "title" } member? ] } 1&& ]
             } 1|| "td" boundaries member? and
         ] if
-    ] find nip [ { [ html-element? ] [ name>> name = ] } 1&& ] [ f ] if* ;
+    ] find-last nip [ { [ html-element? ] [ name>> name = ] } 1&& ] [ f ] if* ;
 
 :: generate-implied-end-tags ( document except -- )
     document open-elements>> :> stack
@@ -729,9 +751,12 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
     ] when ;
 
 :: close-list-item ( document name -- )
-    document open-elements>> [ name>> ] map reverse
-    [ dup name = swap { "html" "table" "td" "th" "applet" "object" "marquee" "template" "ol" "ul" "dl" } member? or ] find nip
-    name = [ document <end-tag> name >>name close-element ] when ;
+    document open-elements>> [
+        name>> dup name = swap
+        { "html" "table" "td" "th" "applet" "object" "marquee" "template" "ol" "ul" "dl" } member? or
+    ] find-last nip [ name>> name = ] [ f ] if* [
+        document <end-tag> name >>name close-element
+    ] when ;
 
 CONSTANT: formatting-elements { "a" "b" "big" "code" "em" "font" "i" "nobr" "s" "small" "strike" "strong" "tt" "u" }
 CONSTANT: special-html-elements {
@@ -763,15 +788,15 @@ CONSTANT: special-html-elements {
     entries [ dup f = [ drop t ] [ name>> name = ] if ] find-last drop
     dup [ dup entries nth f = [ drop f ] when ] when ;
 
-:: formatting-equivalent? ( a b -- ? )
-    a name>> b name>> = a namespace>> b namespace>> = and
-    a attributes>> b attributes>> assoc= and ;
+: formatting-equivalent? ( a b -- ? )
+    { [ [ name>> ] bi@ = ] [ [ namespace>> ] bi@ = ]
+      [ [ attributes>> ] bi@ assoc= ] } 2&& ;
 
 :: push-formatting ( document element -- )
     document active-formatting-elements>> :> entries
     entries [ f = ] find-last drop [ 1 + ] [ 0 ] if* :> start
-    entries length <iota> [ start >= ] filter
-    [ entries nth element formatting-equivalent? ] filter :> matches
+    entries length <iota>
+    [ dup start >= [ entries nth element formatting-equivalent? ] [ drop f ] if ] filter :> matches
     matches length 3 >= [ matches first entries remove-nth! drop ] when
     element entries push ;
 
@@ -790,7 +815,7 @@ CONSTANT: special-html-elements {
     ] while ;
 
 :: node-in-scope? ( document target -- ? )
-    document open-elements>> reverse [
+    document open-elements>> [
         dup target eq? [ drop t ] [
             dup html-element? [ name>> scope-boundaries member? ] [
                 { [ mathml-text-integration-point? ] [ html-integration-point? ]
@@ -798,12 +823,12 @@ CONSTANT: special-html-elements {
                 } 1||
             ] if
         ] if
-    ] find nip target eq? ;
+    ] find-last nip target eq? ;
 
 :: other-formatting-end-tag ( document token -- )
-    document open-elements>> reverse [
+    document open-elements>> [
         { [ { [ html-element? ] [ name>> token name>> = ] } 1&& ] [ special-element? ] } 1||
-    ] find nip [
+    ] find-last nip [
         dup html-element? over name>> token name>> = and [
             drop document token name>> generate-implied-end-tags
             document token close-element
@@ -892,22 +917,7 @@ CONSTANT: frameset-blocking-elements {
     ] when ;
 
 :: adoption-foster-node ( document node -- )
-    document open-elements>> :> stack
-    stack [ { [ html-element? ] [ name>> "table" = ] } 1&& ] find-last drop :> table-index
-    stack [ { [ html-element? ] [ name>> "template" = ] } 1&& ] find-last drop :> template-index
-    template-index [ drop table-index [ drop template-index table-index > ] [ t ] if* ] [ f ] if* [
-        node template-index stack nth attach-node
-    ] [
-        table-index [
-            stack nth :> table
-            table parent>> [
-                :> parent
-                table parent parent-children node-index :> position
-                node parent set-node-parent
-                node position parent parent-children insert-nth!
-            ] [ node stack first attach-node ] if*
-        ] [ node stack first attach-node ] if*
-    ] if ;
+    document node document open-elements>> first foster-node ;
 
 :: adoption-insert ( document node ancestor -- )
     node detach-node
@@ -945,41 +955,57 @@ CONSTANT: frameset-blocking-elements {
         ] if
     ] while last-node bookmark ;
 
-:: adoption-pass ( document token -- continue? )
-    document active-formatting-elements>> :> entries
+:: move-children ( source target -- )
+    source children>> clone [
+        dup tag? [ dup detach-node ] when
+        target attach-node
+    ] each
+    source children>> delete-all ;
+
+:: replace-formatting-entry ( formatting replacement bookmark entries -- )
+    formatting entries node-index bookmark < [ bookmark 1 - ] [ bookmark ] if :> index
+    formatting entries remove-node
+    replacement index entries insert-nth! ;
+
+:: replace-adopted-element ( formatting replacement block stack -- )
+    formatting stack remove-node
+    replacement block stack node-index 1 + stack insert-nth! ;
+
+:: adopt-formatting-block ( document formatting block index -- )
     document open-elements>> :> stack
+    index 1 - stack nth :> ancestor
+    document formatting block adoption-inner-loop :> bookmark :> last-node
+    document last-node ancestor adoption-insert
+    formatting clone-formatting-element :> replacement
+    block replacement move-children
+    replacement block attach-node
+    formatting replacement bookmark document active-formatting-elements>> replace-formatting-entry
+    formatting replacement block stack replace-adopted-element ;
+
+:: adopt-open-formatting ( document formatting index -- continue? )
+    document open-elements>> :> stack
+    index 1 + stack [ special-element? ] find-from nip [
+        document formatting rot index adopt-formatting-block t
+    ] [
+        index stack shorten
+        formatting document active-formatting-elements>> remove-node f
+    ] if* ;
+
+:: adopt-formatting ( document formatting -- continue? )
+    formatting document open-elements>> node-index [
+        :> index
+        document formatting node-in-scope? [
+            document formatting index adopt-open-formatting
+        ] [ "formatting-element-out-of-scope" report-parse-error f ] if
+    ] [
+        formatting document active-formatting-elements>> remove-node
+        "formatting-element-not-open" report-parse-error f
+    ] if* ;
+
+:: adoption-pass ( document token -- continue? )
     document token name>> formatting-index [
-        entries nth :> formatting
-        formatting stack node-index [
-            :> formatting-index
-            document formatting node-in-scope? [
-                formatting-index 1 + stack [ special-element? ] find-from nip [
-                    :> block
-                    formatting-index 1 - stack nth :> ancestor
-                    document formatting block adoption-inner-loop :> bookmark :> last-node
-                    document last-node ancestor adoption-insert
-                    formatting clone-formatting-element :> replacement
-                    block children>> clone [
-                        dup tag? [ dup detach-node ] when
-                        replacement attach-node
-                    ] each
-                    block children>> delete-all
-                    replacement block attach-node
-                    formatting entries node-index :> old-index
-                    old-index bookmark < [ bookmark 1 - ] [ bookmark ] if :> new-bookmark
-                    formatting entries remove-node
-                    replacement new-bookmark entries insert-nth!
-                    formatting stack remove-node
-                    replacement block stack node-index 1 + stack insert-nth!
-                    t
-                ] [
-                    formatting-index stack shorten
-                    formatting entries remove-node f
-                ] if*
-            ] [ "formatting-element-out-of-scope" report-parse-error f ] if
-        ] [
-            formatting entries remove-node "formatting-element-not-open" report-parse-error f
-        ] if*
+        document active-formatting-elements>> nth
+        document swap adopt-formatting
     ] [ document token other-formatting-end-tag f ] if* ;
 
 :: adoption-agency ( document token -- )
@@ -1020,11 +1046,11 @@ CONSTANT: frameset-blocking-elements {
         ] when
     ] when
     name { "option" "optgroup" } member? [
-        document open-elements>> ?last [ name>> "option" = ] [ f ] if* [
+        document "option" current-element-named? [
             document open-elements>> pop drop
         ] when
         name "optgroup" = [
-            document open-elements>> ?last [ name>> "optgroup" = ] [ f ] if* [
+            document "optgroup" current-element-named? [
                 document open-elements>> pop drop
             ] when
         ] when
@@ -1208,61 +1234,64 @@ DEFER: table-token
         ] if
     ] if document ;
 
+:: table-cell-token ( document obj context -- document )
+    obj tag? [ obj name>> { "caption" "col" "colgroup" "tbody" "td" "tfoot" "th" "thead" "tr" } member? ] [ f ] if
+    obj end-tag? [ obj name>> { "table" "tbody" "thead" "tfoot" "tr" "td" "th" } member? ] [ f ] if or [
+        obj end-tag? [
+            document obj name>> { "html" "table" "template" } element-in-scope?
+        ] [ t ] if [
+            document context generate-implied-end-tags
+            document context close-table-element
+            document obj body-token
+        ] [ document ] if
+    ] [ document obj ordinary-body-token ] if ;
+
+:: table-caption-token ( document obj -- document )
+    obj tag? [ obj name>> table-context-elements member? ] [ f ] if
+    obj end-tag? [ obj name>> { "table" "caption" } member? ] [ f ] if or [
+        document "caption" generate-implied-end-tags
+        document "caption" close-table-element
+        obj "caption" end-tag-named? [
+            document
+        ] [ document obj body-token ] if
+    ] [ document obj ordinary-body-token ] if ;
+
+:: leave-table-colgroup ( document obj -- document )
+    document "colgroup" close-table-element
+    document "template" current-element-named? [
+        document in-table-mode >>insertion-mode drop
+        document template-insertion-modes>> pop drop
+        in-table-mode document template-insertion-modes>> push
+    ] when
+    obj "colgroup" end-tag-named? [ document ] [ document obj body-token ] if ;
+
+:: table-colgroup-token ( document obj -- document )
+    {
+        { [ obj "col" start-tag-named? obj misc-node? or obj html-space? or obj f = or ]
+          [ document obj ordinary-body-token ] }
+        { [ obj "col" end-tag-named? obj "html" start-tag-named? or
+            document "template" current-element-named? or ] [ document ] }
+        [ document obj leave-table-colgroup ]
+    } cond ;
+
+:: ordinary-table-token ( document obj -- document )
+    obj {
+        { [ dup tag? ] [ document swap table-start-tag ] }
+        { [ dup end-tag? ] [ document swap table-end-tag ] }
+        { [ dup misc-node? ] [ document swap ordinary-body-token ] }
+        { [ dup doctype? ] [ drop document ] }
+        { [ dup f = ] [ drop document ] }
+        [ document swap foster-body-token ]
+    } cond ;
+
 :: table-token ( document obj -- document )
     document table-context :> context
-    context table-cell-elements member? [
-        obj tag? [ obj name>> { "caption" "col" "colgroup" "tbody" "td" "tfoot" "th" "thead" "tr" } member? ] [ f ] if
-        obj end-tag? [ obj name>> { "table" "tbody" "thead" "tfoot" "tr" "td" "th" } member? ] [ f ] if or [
-            obj end-tag? [
-                document obj name>> { "html" "table" "template" } element-in-scope?
-            ] [ t ] if [
-                document context generate-implied-end-tags
-                document context close-table-element
-                document obj body-token
-            ] [ document ] if
-        ] [ document obj ordinary-body-token ] if
-    ] [
-        context "caption" = [
-            obj tag? [ obj name>> table-context-elements member? ] [ f ] if
-            obj end-tag? [ obj name>> { "table" "caption" } member? ] [ f ] if or [
-                document "caption" generate-implied-end-tags
-                document "caption" close-table-element
-                obj end-tag? [ obj name>> "caption" = ] [ f ] if [
-                    document
-                ] [ document obj body-token ] if
-            ] [ document obj ordinary-body-token ] if
-        ] [
-            context "colgroup" = [
-                obj tag? [ obj name>> "col" = ] [ f ] if
-                obj misc-node? or obj html-space? or obj f = or [
-                    document obj ordinary-body-token
-                ] [
-                    obj end-tag? [ obj name>> "col" = ] [ f ] if
-                    obj tag? [ obj name>> "html" = ] [ f ] if or
-                    document open-elements>> ?last [ name>> "template" = ] [ f ] if* or [
-                        document
-                    ] [
-                    document "colgroup" close-table-element
-                    document open-elements>> ?last [ name>> "template" = ] [ f ] if* [
-                        document in-table-mode >>insertion-mode drop
-                        document template-insertion-modes>> pop drop
-                        in-table-mode document template-insertion-modes>> push
-                    ] when
-                    obj end-tag? [ obj name>> "colgroup" = ] [ f ] if [ document ] [ document obj body-token ] if
-                    ] if
-                ] if
-            ] [
-                obj {
-                    { [ dup tag? ] [ document swap table-start-tag ] }
-                    { [ dup end-tag? ] [ document swap table-end-tag ] }
-                    { [ dup misc-node? ] [ document swap ordinary-body-token ] }
-                    { [ dup doctype? ] [ drop document ] }
-                    { [ dup f = ] [ drop document ] }
-                    [ document swap foster-body-token ]
-                } cond
-            ] if
-        ] if
-    ] if ;
+    {
+        { [ context table-cell-elements member? ] [ document obj context table-cell-token ] }
+        { [ context "caption" = ] [ document obj table-caption-token ] }
+        { [ context "colgroup" = ] [ document obj table-colgroup-token ] }
+        [ document obj ordinary-table-token ]
+    } cond ;
 
 :: body-token ( document obj -- document )
     document table-context [ document obj table-token ] [
@@ -1321,106 +1350,103 @@ CONSTANT: frameset-modes { in-frameset-mode after-frameset-mode after-after-fram
         [ drop "unexpected-token-in-frameset" report-parse-error ]
     } cond document ;
 
+:: initial-token ( document obj -- document )
+    {
+        { [ obj doctype? ] [ document obj >>tree-doctype before-html-mode >>insertion-mode ] }
+        { [ obj misc-node? ] [ document obj append-node document ] }
+        { [ obj html-space? ] [ document ] }
+        [ document t >>quirks-mode? before-html-mode >>insertion-mode obj tree-insert ]
+    } cond ;
+
+:: before-html-token ( document obj -- document )
+    {
+        { [ obj misc-node? ] [ document obj append-node document ] }
+        { [ obj html-space? ] [ document ] }
+        { [ obj "html" start-tag-named? ] [
+            document obj insert-element document before-head-mode >>insertion-mode
+        ] }
+        [ document "html" implied-element
+          document before-head-mode >>insertion-mode obj tree-insert ]
+    } cond ;
+
+:: before-head-token ( document obj -- document )
+    {
+        { [ obj html-space? ] [ document ] }
+        { [ obj misc-node? ] [ document obj append-node document ] }
+        { [ obj "head" start-tag-named? ] [
+            document obj insert-element
+            document obj >>head-element-pointer in-head-mode >>insertion-mode
+        ] }
+        [ document "head" implied-element
+          document dup open-elements>> last >>head-element-pointer
+          in-head-mode >>insertion-mode obj tree-insert ]
+    } cond ;
+
+:: in-head-token ( document obj -- document )
+    obj {
+        { [ dup html-space? ] [ document swap append-node document ] }
+        { [ dup misc-node? ] [ document swap append-node document ] }
+        { [ dup doctype? ] [ drop document ] }
+        { [ dup tag? [ dup name>> {
+            "base" "basefont" "bgsound" "link" "meta" "title"
+            "style" "script" "noscript" "noframes" "template"
+        } member? ] [ f ] if ] [
+            document swap insert-element document
+        ] }
+        { [ dup end-tag? [ dup name>> { "head" "body" "html" "br" } member? not ] [ f ] if ] [
+            document swap close-element document
+        ] }
+        { [ dup end-tag? [ dup name>> "head" = ] [ f ] if ] [
+            document swap close-element
+            document after-head-mode >>insertion-mode
+        ] }
+        [
+            document <end-tag> "head" >>name close-element
+            document after-head-mode >>insertion-mode swap tree-insert
+        ]
+    } cond ;
+
+:: after-head-token ( document obj -- document )
+    {
+        { [ obj html-space? obj misc-node? or ] [ document obj append-node document ] }
+        { [ obj "body" start-tag-named? ] [
+            document obj insert-element document in-body-mode >>insertion-mode f >>frameset-ok?
+        ] }
+        [ document "body" implied-element
+          document in-body-mode >>insertion-mode t >>frameset-ok? obj tree-insert ]
+    } cond ;
+
+:: after-body-token ( document obj -- document )
+    obj misc-node? [
+        obj document open-elements>> first children>> push document
+    ] [
+        obj "html" end-tag-named? [
+            document obj mark-end-tag
+            document after-after-body-mode >>insertion-mode
+        ] [
+            obj html-space? obj doctype? or [ document obj body-token ] [
+                document in-body-mode >>insertion-mode obj tree-insert
+            ] if
+        ] if
+    ] if ;
+
+:: after-after-body-token ( document obj -- document )
+    obj misc-node? [ obj document tree>> push document ] [
+        obj html-space? obj doctype? or [ document obj body-token ] [
+            document in-body-mode >>insertion-mode obj tree-insert
+        ] if
+    ] if ;
+
 :: (html-tree-insert) ( document obj -- document )
     document obj ignored-early-end-tag? [ document ] [
         document insertion-mode>> {
-            { initial-mode [
-                obj doctype? [
-                    document obj >>tree-doctype before-html-mode >>insertion-mode
-                ] [
-                    obj misc-node? [ document obj append-node document ] [
-                        obj html-space? [ document ] [
-                            document t >>quirks-mode? before-html-mode >>insertion-mode
-                            obj tree-insert
-                        ] if
-                    ] if
-                ] if
-            ] }
-            { before-html-mode [
-                obj misc-node? [ document obj append-node document ] [
-                    obj html-space? [ document ] [
-                        obj tag? [ obj name>> "html" = ] [ f ] if [
-                            document obj insert-element
-                            document before-head-mode >>insertion-mode
-                        ] [
-                            document "html" implied-element
-                            document before-head-mode >>insertion-mode obj tree-insert
-                        ] if
-                    ] if
-                ] if
-            ] }
-            { before-head-mode [
-                obj html-space? [ document ] [
-                    obj misc-node? [ document obj append-node document ] [
-                        obj tag? [ obj name>> "head" = ] [ f ] if [
-                            document obj insert-element
-                            document obj >>head-element-pointer in-head-mode >>insertion-mode
-                        ] [
-                            document "head" implied-element
-                            document dup open-elements>> last >>head-element-pointer
-                            in-head-mode >>insertion-mode obj tree-insert
-                        ] if
-                    ] if
-                ] if
-            ] }
-            { in-head-mode [
-                obj {
-                    { [ dup html-space? ] [ document swap append-node document ] }
-                    { [ dup misc-node? ] [ document swap append-node document ] }
-                    { [ dup doctype? ] [ drop document ] }
-                    { [ dup tag? [ dup name>> {
-                        "base" "basefont" "bgsound" "link" "meta" "title"
-                        "style" "script" "noscript" "noframes" "template"
-                    } member? ] [ f ] if ] [
-                        document swap insert-element document
-                    ] }
-                    { [ dup end-tag? [ dup name>> { "head" "body" "html" "br" } member? not ] [ f ] if ] [
-                        document swap close-element document
-                    ] }
-                    { [ dup end-tag? [ dup name>> "head" = ] [ f ] if ] [
-                        document swap close-element
-                        document after-head-mode >>insertion-mode
-                    ] }
-                    [
-                        document <end-tag> "head" >>name close-element
-                        document after-head-mode >>insertion-mode swap tree-insert
-                    ]
-                } cond
-            ] }
-            { after-head-mode [
-                obj html-space? [ document obj append-node document ] [
-                    obj misc-node? [ document obj append-node document ] [
-                        obj tag? [ obj name>> "body" = ] [ f ] if [
-                            document obj insert-element
-                            document in-body-mode >>insertion-mode f >>frameset-ok?
-                        ] [
-                            document "body" implied-element
-                            document in-body-mode >>insertion-mode t >>frameset-ok? obj tree-insert
-                        ] if
-                    ] if
-                ] if
-            ] }
-            { after-body-mode [
-                obj misc-node? [
-                    obj document open-elements>> first children>> push document
-                ] [
-                    obj end-tag? [ obj name>> "html" = ] [ f ] if [
-                        document obj mark-end-tag
-                        document after-after-body-mode >>insertion-mode
-                    ] [
-                        obj html-space? obj doctype? or [ document obj body-token ] [
-                            document in-body-mode >>insertion-mode obj tree-insert
-                        ] if
-                    ] if
-                ] if
-            ] }
-            { after-after-body-mode [
-                obj misc-node? [ obj document tree>> push document ] [
-                    obj html-space? obj doctype? or [ document obj body-token ] [
-                        document in-body-mode >>insertion-mode obj tree-insert
-                    ] if
-                ] if
-            ] }
+            { initial-mode [ document obj initial-token ] }
+            { before-html-mode [ document obj before-html-token ] }
+            { before-head-mode [ document obj before-head-token ] }
+            { in-head-mode [ document obj in-head-token ] }
+            { after-head-mode [ document obj after-head-token ] }
+            { after-body-mode [ document obj after-body-token ] }
+            { after-after-body-mode [ document obj after-after-body-token ] }
             [ drop document obj body-token ]
         } case
     ] if ;
@@ -1430,9 +1456,11 @@ CONSTANT: frameset-modes { in-frameset-mode after-frameset-mode after-after-fram
     { [ html-element? ] [ name>> "template" = ] } 1&& ;
 
 :: reset-template-insertion-mode ( document -- )
-    document open-elements>> [ html-element? ] filter reverse
-    [ name>> { "template" "head" "body" "html" "table" "td" "th" "tr" "tbody" "thead" "tfoot" "colgroup" "caption" } member? ] find nip
-    [ name>> ] [ "html" ] if* {
+    document open-elements>> [
+        { [ html-element? ]
+          [ name>> { "template" "head" "body" "html" "table" "td" "th" "tr" "tbody" "thead" "tfoot" "colgroup" "caption" } member? ]
+        } 1&&
+    ] find-last nip [ name>> ] [ "html" ] if* {
         { "template" [ document template-insertion-modes>> last ] }
         { "head" [ in-head-mode ] }
         { "html" [ after-head-mode ] }
@@ -1490,7 +1518,7 @@ CONSTANT: frameset-modes { in-frameset-mode after-frameset-mode after-after-fram
 DEFER: html-tree-insert
 :: html-tree-insert ( document obj -- document )
     {
-        { [ obj tag? [ obj name>> "html" = ] [ f ] if
+        { [ obj "html" start-tag-named?
             document open-elements>> empty? not and ] [
             document template-insertion-modes>> empty? [
                 document open-elements>> first obj merge-element-attributes
@@ -1499,7 +1527,7 @@ DEFER: html-tree-insert
         { [ document insertion-mode>> frameset-modes member? ] [
             document obj frameset-token
         ] }
-        { [ obj tag? [ obj name>> "frameset" = ] [ f ] if
+        { [ obj "frameset" start-tag-named?
             document insertion-mode>> after-head-mode = and ] [
             document obj insert-element document in-frameset-mode >>insertion-mode
         ] }
@@ -1511,10 +1539,10 @@ DEFER: html-tree-insert
         { [ document insertion-mode>> { initial-mode before-html-mode before-head-mode } member? ] [
             document obj (html-tree-insert)
         ] }
-        { [ obj tag? [ obj name>> "template" = ] [ f ] if ] [
+        { [ obj "template" start-tag-named? ] [
             document obj start-template
         ] }
-        { [ obj end-tag? [ obj name>> "template" = ] [ f ] if ] [
+        { [ obj "template" end-tag-named? ] [
             document obj end-template
         ] }
         { [ document insertion-mode>> in-template-mode = ] [
@@ -1623,57 +1651,59 @@ ERROR: invalid-return-state obj ;
     document reset-attribute ;
 
 : emit-eof ( document -- ) dup flush-table-characters f tree-insert drop ;
+:: scripted-noscript? ( element document -- ? )
+    element name>> "noscript" = document scripting?>> and ;
+
+:: character-blocks-frameset? ( document -- ? )
+    document [
+        { [ html-element? ]
+          [ { [ name>> { "title" "style" "script" "noframes" "noembed" } member? ]
+              [ document scripted-noscript? ] } 1|| ]
+        } 1&&
+    ] current-element-matches? not ;
+
+:: reconstruct-for-character? ( document -- ? )
+    document open-elements>> last :> current
+    current html-element? [
+        current name>> { "title" "textarea" "style" "script" "xmp" "iframe" "noframes" "noembed" "plaintext" } member? not
+        current document scripted-noscript? not and
+    ] [ current { [ mathml-text-integration-point? ] [ html-integration-point? ] } 1|| ] if ;
+
+:: character-needs-tree-routing? ( document char -- ? )
+    {
+        [ document insertion-mode>> frameset-modes member?
+          document "noframes" current-element-named? not and ]
+        [ document insertion-mode>> in-column-group-mode =
+          document "template" current-element-named? and ]
+        [ document char foreign-token? ]
+    } 0|| ;
+
+:: body-character ( document char -- )
+    document insertion-mode>> in-body-mode = document character-blocks-frameset? and [
+        document char update-frameset-for-character
+    ] when
+    {
+        { [ document char character-needs-tree-routing? ] [ document char tree-insert drop ] }
+        { [ document [ { [ html-element? ] [ name>> table-text-elements member? ] } 1&& ] current-element-matches? ]
+          [ char document pending-table-characters>> push ] }
+        { [ document open-elements>> ?last [ name>> { "html" "head" } member? ] [ t ] if* ]
+          [ document char tree-insert drop ] }
+        [ document reconstruct-for-character? [ document reconstruct-formatting ] when
+          document char append-node ]
+    } cond ;
+
+:: emit-null-character ( document -- )
+    document CHAR: \0 foreign-token? [
+        "unexpected-null-character" report-parse-error
+        document CHAR: replacement-character append-node
+    ] when ;
+
 :: emit-char ( char document -- )
-    char CHAR: \0 = [
-        document char foreign-token? [
-            "unexpected-null-character" report-parse-error
-            document CHAR: replacement-character append-node
-        ] when
-    ] [
-    document skip-leading-newline?>> char CHAR: \n = and :> skip?
-    document f >>skip-leading-newline? drop
-    skip? [
-        document insertion-mode>> in-body-mode = [
-            document open-elements>> ?last [
-                { [ html-element? ]
-                  [ dup name>> { "title" "style" "script" "noframes" "noembed" } member?
-                    swap name>> "noscript" = document scripting?>> and or ]
-                } 1&&
-            ] [ f ] if* [ document char update-frameset-for-character ] unless
-        ] when
-        document insertion-mode>> frameset-modes member?
-        document open-elements>> ?last [ name>> "noframes" = ] [ f ] if* not and [
-            document char tree-insert drop
-        ] [
-        document insertion-mode>> in-column-group-mode =
-        document open-elements>> ?last [ name>> "template" = ] [ f ] if* and [
-            document char tree-insert drop
-        ] [
-        document char foreign-token? [
-            document char tree-insert drop
-        ] [
-        document open-elements>> ?last [ { [ html-element? ] [ name>> table-text-elements member? ] } 1&& ] [ f ] if* [
-            char document pending-table-characters>> push
-        ] [
-        document open-elements>> ?last [
-            name>> { "html" "head" } member?
-        ] [ t ] if* [
-            document char tree-insert drop
-        ] [
-            document open-elements>> last :> current
-            current html-element? [
-                current name>> { "title" "textarea" "style" "script" "xmp" "iframe" "noframes" "noembed" "plaintext" } member? not
-                current name>> "noscript" = document scripting?>> and not and
-            ] [ current mathml-text-integration-point? current html-integration-point? or ] if [
-                document reconstruct-formatting
-            ] when
-            document char append-node
-        ] if
-        ] if
-        ] if
-        ] if
-        ] if
-    ] unless ] if ;
+    char CHAR: \0 = [ document emit-null-character ] [
+        document skip-leading-newline?>> char CHAR: \n = and :> skip?
+        document f >>skip-leading-newline? drop
+        skip? [ document char body-character ] unless
+    ] if ;
 : emit-string ( string document -- ) [ emit-char ] curry each ;
 
 : emit-tag ( document -- )
@@ -1895,17 +1925,22 @@ ERROR: invalid-return-state obj ;
     take-char (rcdata-end-tag-open-state) ;
 
 
+: end-tag-name-delimiter ( document n/f string ch -- document n'/f string )
+    {
+        { CHAR: > [ pick emit-end-tag data-state ] }
+        { CHAR: / [ self-closing-start-tag-state ] }
+        [ drop before-attribute-name-state ]
+    } case ;
+
+: push-end-tag-letter ( ch document -- )
+    [ [ dup ascii-upper-alpha? [ 0x20 + ] when ] dip push-tag-name ] [ push-temporary-buffer ] 2bi ;
+
 : (rcdata-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s/>" member? [ reach appropriate-end-tag-token? ] [ f ] if ] [
-            {
-                { CHAR: > [ pick emit-end-tag data-state ] }
-                { CHAR: / [ self-closing-start-tag-state ] }
-                [ drop before-attribute-name-state ]
-            } case
+            end-tag-name-delimiter
         ] }
-        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi rcdata-end-tag-name-state ] }
-        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi rcdata-end-tag-name-state ] }
+        { [ dup ascii-alpha? ] [ reach push-end-tag-letter rcdata-end-tag-name-state ] }
         [ [ "</" reach emit-temporary-buffer-with ] dip (rcdata-state) ]
     } cond ;
 
@@ -1936,14 +1971,9 @@ ERROR: invalid-return-state obj ;
 : (rawtext-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s/>" member? [ reach appropriate-end-tag-token? ] [ f ] if ] [
-            {
-                { CHAR: > [ pick emit-end-tag data-state ] }
-                { CHAR: / [ self-closing-start-tag-state ] }
-                [ drop before-attribute-name-state ]
-            } case
+            end-tag-name-delimiter
         ] }
-        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi rawtext-end-tag-name-state ] }
-        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi rawtext-end-tag-name-state ] }
+        { [ dup ascii-alpha? ] [ reach push-end-tag-letter rawtext-end-tag-name-state ] }
         [ [ "</" reach emit-temporary-buffer-with ] dip (rawtext-state) ]
     } cond ;
 
@@ -1975,14 +2005,9 @@ ERROR: invalid-return-state obj ;
 : (script-data-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s/>" member? [ reach appropriate-end-tag-token? ] [ f ] if ] [
-            {
-                { CHAR: > [ pick emit-end-tag data-state ] }
-                { CHAR: / [ self-closing-start-tag-state ] }
-                [ drop before-attribute-name-state ]
-            } case
+            end-tag-name-delimiter
         ] }
-        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-end-tag-name-state ] }
-        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-end-tag-name-state ] }
+        { [ dup ascii-alpha? ] [ reach push-end-tag-letter script-data-end-tag-name-state ] }
         [ [ "</" reach emit-temporary-buffer-with ] dip (script-data-state) ]
     } cond ;
 
@@ -2074,14 +2099,9 @@ ERROR: invalid-return-state obj ;
 : (script-data-escaped-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s/>" member? [ reach appropriate-end-tag-token? ] [ f ] if ] [
-            {
-                { CHAR: > [ pick emit-end-tag data-state ] }
-                { CHAR: / [ self-closing-start-tag-state ] }
-                [ drop before-attribute-name-state ]
-            } case
+            end-tag-name-delimiter
         ] }
-        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-escaped-end-tag-name-state ] }
-        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-escaped-end-tag-name-state ] }
+        { [ dup ascii-alpha? ] [ reach push-end-tag-letter script-data-escaped-end-tag-name-state ] }
         [ [ "</" reach emit-temporary-buffer-with ] dip (script-data-escaped-state) ]
     } cond ;
 
