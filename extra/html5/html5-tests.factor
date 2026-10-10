@@ -629,3 +629,150 @@ DEFER: tag-shape
     "<head><noscript><style>x</style><meta></noscript><p>body" head-root child-tags first
     child-tags [ name>> ] map
 ] unit-test
+
+! Select recovery, ordinary end tags, and misplaced table columns.
+{ { { "li" { { "search" { { "li" {  } } } } } } } } [
+    "<!doctype html><li>a<search><li>b" body-shapes
+] unit-test
+{ { { "dd" { { "search" { { "dt" {  } } } } } } } } [
+    "<!doctype html><dd>a<search><dt>b" body-shapes
+] unit-test
+{ { { "x" { { "search" {  } } } } } } [
+    "<!doctype html><x><search></x>y" body-shapes
+] unit-test
+{ { { "span" { { "button" {  } } } } } } [
+    "<!DOCTYPE html><span><button>foo</span>bar" body-shapes
+] unit-test
+{ { { "select" { { "b" { { "option" {  } } } } } } { "b" { { "option" {  } } } } } } [
+    "<select><b><option><select><option></b></select>X" body-shapes
+] unit-test
+{ { { "b" { { "cite" { { "div" {  } } } } } } } } [
+    "<b>A<cite>B<div>C</cite>D" body-shapes
+] unit-test
+{ { { "ul" { { "li" { { "ul" { { "li" {  } } } } } } } } } } [
+    "<ul><li><ul></li><li>a</li></ul></li></ul>" body-shapes
+] unit-test
+{ { { "table" { { "colgroup" { { "col" {  } } } } { "tbody" {  } } { "colgroup" { { "col" {  } } } } { "tbody" { { "tr" {  } } } } { "colgroup" { { "col" {  } } } } { "tbody" { { "tr" { { "td" {  } } } } } } { "colgroup" { { "col" {  } } } } } } } } [
+    "<table><col><tbody><col><tr><col><td><col></table><col>" body-shapes
+] unit-test
+{ { { "table" { { "colgroup" {  } } { "tbody" {  } } { "colgroup" {  } } { "tbody" { { "tr" {  } } } } { "colgroup" {  } } { "tbody" { { "tr" { { "td" {  } } } } } } { "colgroup" {  } } } } } } [
+    "<table><colgroup><tbody><colgroup><tr><colgroup><td><colgroup></table><colgroup>" body-shapes
+] unit-test
+{ { { "select" {  } } } } [
+    "<!doctype html><select><tr>" body-shapes
+] unit-test
+{ { { "select" {  } } } } [
+    "<!doctype html><select><caption>" body-shapes
+] unit-test
+{ { { "select" { { "optgroup" { { "option" {  } } } } { "option" {  } } } } { "option" {  } } } } [
+    "<!DOCTYPE html><select><optgroup><option></optgroup><option><select><option>" body-shapes
+] unit-test
+{ { { "select" {  } } { "input" {  } } } } [
+    "<!doctype html><select><input>X" body-shapes
+] unit-test
+{ { { "select" { { "option" {  } } { "hr" {  } } } } } } [
+    "<select><option><hr>" body-shapes
+] unit-test
+{ { { "select" { { "optgroup" { { "option" {  } } } } { "hr" {  } } } } } } [
+    "<select><optgroup><option><hr>" body-shapes
+] unit-test
+{ { { "select" { { "button" {  } } } } } } [
+    "<select><button><select></select></button></select>" body-shapes
+] unit-test
+{ { { "select" { { "button" { { "div" {  } } } } } } } } [
+    "<select><button><div><select></select>" body-shapes
+] unit-test
+{ { { "select" { { "button" { { "selectedcontent" {  } } } } { "option" {  } } } } } } [
+    "<select><button><selectedcontent></button><option>X" body-shapes
+] unit-test
+{ { { "select" { { "button" { { "selectedcontent" { { "i" { { "b" {  } } } } { "b" {  } } } } } } { "option" { { "i" { { "b" {  } } } } { "b" {  } } } } } } } } [
+    "<select><button><selectedcontent></button><option>x<i>i<b>ib</i>b" body-shapes
+] unit-test
+{ "foo" } [
+    "<table><colgroup> foo</colgroup></table>" body-root children>> [ string? ] filter concat
+] unit-test
+{ " " } [
+    "<table><colgroup> foo</colgroup></table>" body-root child-tags first child-tags first node-text
+] unit-test
+{ { "select" "table" } } [
+    "<table><select><option>A<tr><td>B</table>" body-root child-tags [ name>> ] map
+] unit-test
+{ "B" } [
+    "<table><select><option>A<tr><td>B</table>" body-root child-tags last node-text
+] unit-test
+{ { "td" "td" } } [
+    "<table><tr><td><select><td>" body-root child-tags first child-tags first child-tags first
+    child-tags [ name>> ] map
+] unit-test
+
+: select-display ( string -- tag )
+    body-root child-tags first child-tags first child-tags first ;
+: select-display-text ( string -- text ) select-display node-text >string ;
+{ "" } [
+    "<select><button><selectedcontent>authored</selectedcontent></button>" select-display-text
+] unit-test
+{ "X" } [
+    "<select><button><selectedcontent>authored</selectedcontent></button><option>X" select-display-text
+] unit-test
+{ "X" } [
+    "<select><button><selectedcontent>authored</selectedcontent></button><option>X<option>Y" select-display-text
+] unit-test
+{ "Y" } [
+    "<select><button><selectedcontent>authored</selectedcontent></button><option>X<option selected>Y" select-display-text
+] unit-test
+{ "Y" } [
+    "<select><button><selectedcontent>authored</selectedcontent></button><option selected>X<option selected>Y" select-display-text
+] unit-test
+{ "Y" } [
+    "<select><button><selectedcontent>authored</selectedcontent></button><option disabled>X<option>Y" select-display-text
+] unit-test
+{ "Y" } [
+    "<select><button><selectedcontent>authored</selectedcontent></button><optgroup disabled><option>X</optgroup><option>Y" select-display-text
+] unit-test
+{ "X" } [
+    "<select><button><selectedcontent>authored</selectedcontent></button><option disabled selected>X<option>Y" select-display-text
+] unit-test
+{ "Y" } [
+    "<select><button><selectedcontent>authored</selectedcontent></button><datalist><option selected>X</option></datalist><option>Y" select-display-text
+] unit-test
+{ "authored" } [
+    "<select multiple><button><selectedcontent>authored</selectedcontent></button><option selected>X" select-display-text
+] unit-test
+{ "" } [
+    "<select size=2><button><selectedcontent>authored</selectedcontent></button><option>X" select-display-text
+] unit-test
+{ "X" } [
+    "<select size=2><button><selectedcontent>authored</selectedcontent></button><option selected>X" select-display-text
+] unit-test
+{ t } [
+    "<select><button><selectedcontent></button><option><b class=x>X" body-root child-tags first
+    dup child-tags first child-tags first child-tags first
+    swap child-tags last child-tags first eq? not
+] unit-test
+{ t } [
+    "<select><button><selectedcontent></button><option><b>X" select-display
+    dup child-tags first parent>> eq?
+] unit-test
+{ { { "class" "x" } } } [
+    "<select><button><selectedcontent></button><option><b class=x>X" select-display
+    child-tags first attributes>> >array
+] unit-test
+{ "http://www.w3.org/2000/svg" } [
+    "<select><button><selectedcontent></button><option><svg><circle/>" select-display
+    child-tags first namespace>>
+] unit-test
+{ t } [
+    "<template><select><button><selectedcontent></button><option>X" head-root child-tags first
+    template-content-tags first child-tags first child-tags first children>> empty?
+] unit-test
+{ "" } [
+    "<select size=' +2junk'><button><selectedcontent></button><option>X" select-display-text
+] unit-test
+{ "X" } [
+    "<select size=bad><button><selectedcontent></button><option>X" select-display-text
+] unit-test
+{ t } [
+    "<select><button><selectedcontent></button><option><b class=x>X" body-root child-tags first
+    dup child-tags first child-tags first child-tags first attributes>> first
+    swap child-tags last child-tags first attributes>> first eq? not
+] unit-test

@@ -751,13 +751,21 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
         document <end-tag> "p" >>name close-element
     ] when ;
 
+DEFER: special-element?
+
 :: close-list-item ( document name -- )
+    name { "dd" "dt" } member? [ { "dd" "dt" } ] [ name 1array ] if :> names
     document open-elements>> [
-        name>> dup name = swap
-        { "html" "table" "td" "th" "applet" "object" "marquee" "template" "ol" "ul" "dl" } member? or
-    ] find-last nip [ name>> name = ] [ f ] if* [
-        document <end-tag> name >>name close-element
-    ] when ;
+        { [ { [ html-element? ] [ name>> names member? ] } 1&& ]
+          [ { [ special-element? ] [ name>> { "address" "div" "p" } member? not ] } 1&& ]
+        } 1||
+    ] find-last nip [
+        dup html-element? over name>> names member? and [
+            name>> :> found
+            document found generate-implied-end-tags
+            document <end-tag> found >>name close-element
+        ] [ drop ] if
+    ] when* ;
 
 CONSTANT: formatting-elements { "a" "b" "big" "code" "em" "font" "i" "nobr" "s" "small" "strike" "strong" "tt" "u" }
 CONSTANT: special-html-elements {
@@ -1057,6 +1065,44 @@ CONSTANT: frameset-blocking-elements {
         ] [ "unexpected-form-end-tag" report-parse-error ] if
     ] if ;
 
+:: select-in-scope? ( document -- ? )
+    document "select" scope-boundaries element-in-scope? ;
+
+:: close-select ( document -- )
+    document <end-tag> "select" >>name close-element ;
+
+DEFER: start-body-element
+:: start-body-select ( document element -- )
+    document select-in-scope? [
+        "nested-select" report-parse-error document close-select
+    ] [ document element start-body-element ] if ;
+
+:: start-body-input ( document element -- )
+    document select-in-scope? [
+        "input-in-select" report-parse-error document close-select
+    ] when
+    document element start-body-element ;
+
+:: prepare-option ( document name -- )
+    document select-in-scope? [
+        document name "option" = [ "optgroup" ] [ "" ] if generate-implied-end-tags
+    ] [
+        document "option" current-element-named? [ document open-elements>> pop drop ] when
+    ] if ;
+
+CONSTANT: scoped-end-elements {
+    "address" "article" "aside" "blockquote" "button" "center" "details" "dialog"
+    "dir" "div" "dl" "fieldset" "figcaption" "figure" "footer" "header" "hgroup"
+    "listing" "main" "menu" "nav" "ol" "pre" "search" "section" "summary" "ul"
+    "applet" "marquee" "object" "select" "option" "optgroup"
+}
+
+:: scoped-end-tag ( document token boundaries -- )
+    document token name>> boundaries element-in-scope? [
+        document token name>> generate-implied-end-tags
+        document token close-element
+    ] [ "end-tag-out-of-scope" report-parse-error ] if ;
+
 :: start-body-element ( document element -- )
     element name>> "image" = [ element "img" >>name drop ] when
     element name>> :> name
@@ -1070,9 +1116,6 @@ CONSTANT: frameset-blocking-elements {
     name { "pre" "listing" "hr" "xmp" "plaintext" } member? or [ document close-paragraph ] when
     name { "li" "dd" "dt" } member? [
         document name close-list-item
-        name { "dd" "dt" } member? [
-            document name "dd" = [ "dt" ] [ "dd" ] if close-list-item
-        ] when
         document close-paragraph
     ] when
     name heading-elements member? [
@@ -1080,16 +1123,8 @@ CONSTANT: frameset-blocking-elements {
             document open-elements>> pop drop
         ] when
     ] when
-    name { "option" "optgroup" } member? [
-        document "option" current-element-named? [
-            document open-elements>> pop drop
-        ] when
-        name "optgroup" = [
-            document "optgroup" current-element-named? [
-                document open-elements>> pop drop
-            ] when
-        ] when
-    ] when
+    name { "option" "optgroup" } member? [ document name prepare-option ] when
+    name "hr" = document select-in-scope? and [ document "" generate-implied-end-tags ] when
     name { "rb" "rp" "rt" "rtc" } member? [ document "" generate-implied-end-tags ] when
     document element prepare-formatting-start
     name { "svg" "math" } member? [
@@ -1113,12 +1148,10 @@ CONSTANT: frameset-blocking-elements {
             ] unless
             document close-paragraph
         ] }
-        [
-            drop document name scope-boundaries element-in-scope? [
-                document name generate-implied-end-tags
-                document token close-element
-            ] when
-        ]
+        { [ dup "li" = ] [ drop document token scope-boundaries { "ol" "ul" } append scoped-end-tag ] }
+        { [ dup { "dd" "dt" } member? ] [ drop document token scope-boundaries scoped-end-tag ] }
+        { [ dup scoped-end-elements member? ] [ drop document token scope-boundaries scoped-end-tag ] }
+        [ drop document token other-formatting-end-tag ]
     } cond ;
 
 :: ordinary-body-token ( document obj -- document )
@@ -1132,6 +1165,17 @@ CONSTANT: frameset-blocking-elements {
                 { "frame" [ drop ] }
                 { "frameset" [ document swap start-body-frameset ] }
                 { "form" [ document swap start-body-form ] }
+                { "select" [ document swap start-body-select ] }
+                { "input" [ document swap start-body-input ] }
+                { "caption" [ drop ] }
+                { "col" [ drop ] }
+                { "colgroup" [ drop ] }
+                { "tbody" [ drop ] }
+                { "td" [ drop ] }
+                { "tfoot" [ drop ] }
+                { "th" [ drop ] }
+                { "thead" [ drop ] }
+                { "tr" [ drop ] }
                 [ drop document swap start-body-element ]
             } case
         ] }
@@ -1322,8 +1366,8 @@ DEFER: table-token
 
 :: table-colgroup-token ( document obj -- document )
     {
-        { [ obj "col" start-tag-named? obj misc-node? or obj html-space? or obj f = or ]
-          [ document obj ordinary-body-token ] }
+        { [ obj "col" start-tag-named? ] [ document obj insert-element document ] }
+        { [ obj misc-node? obj html-space? or obj f = or ] [ document obj ordinary-body-token ] }
         { [ obj "col" end-tag-named? obj "html" start-tag-named? or
             document "template" current-element-named? or ] [ document ] }
         [ document obj leave-table-colgroup ]
@@ -1348,8 +1392,24 @@ DEFER: table-token
         [ document obj ordinary-table-token ]
     } cond ;
 
+:: select-table-token? ( obj -- ? )
+    obj {
+        [ { [ tag? ] [ name>> { "caption" "col" "colgroup" "tbody" "td" "tfoot" "th" "thead" "tr" "table" } member? ] } 1&& ]
+        [ { [ end-tag? ] [ name>> { "caption" "tbody" "td" "tfoot" "th" "thead" "tr" "table" } member? ] } 1&& ]
+    } 1|| ;
+
+:: select-in-table-token ( document obj -- document )
+    obj select-table-token? [
+        obj end-tag? [ document obj name>> { "html" "template" } element-in-scope? ] [ t ] if [
+            "table-token-in-select" report-parse-error
+            document close-select document obj table-token
+        ] [ document ] if
+    ] [ document obj ordinary-body-token ] if ;
+
 :: body-token ( document obj -- document )
-    document table-context [ document obj table-token ] [
+    document table-context [
+        document select-in-scope? [ document obj select-in-table-token ] [ document obj table-token ] if
+    ] [
         document template-insertion-modes>> empty? not
         obj tag? [ obj name>> { "caption" "col" "colgroup" "tbody" "td" "tfoot" "th" "thead" "tr" } member? ] [ f ] if and [
             document
@@ -1780,6 +1840,7 @@ ERROR: invalid-return-state obj ;
 :: character-needs-tree-routing? ( document char -- ? )
     {
         [ document insertion-mode>> in-head-noscript-mode = ]
+        [ document [ "colgroup" html-element-named? ] current-element-matches? ]
         [ document insertion-mode>> frameset-modes member?
           document "noframes" current-element-named? not and ]
         [ document insertion-mode>> in-column-group-mode =
@@ -3072,11 +3133,99 @@ CONSTANT: numeric-reference-replacements H{
 : numeric-character-reference-end-state ( document n/f string -- document n'/f string )
     pick [ finish-numeric-reference ] [ flush-temporary-buffer ] bi return-state ;
 
+! Resolve selectedcontent from the completed tree; this parser does not
+! execute scripts or expose intermediate DOM mutations.
+DEFER: collect-tree-elements
+:: collect-tree-elements ( nodes elements -- )
+    nodes [
+        :> node
+        node tag? [
+            node elements push
+            node children>> elements collect-tree-elements
+        ] when
+    ] each ;
+
+: tree-elements ( nodes -- elements )
+    V{ } clone [ collect-tree-elements ] keep ;
+
+:: node-ancestors ( node -- ancestors )
+    V{ } clone :> ancestors
+    node parent>> :> parent!
+    [ parent tag? ] [ parent ancestors push parent parent>> parent! ] while
+    ancestors ;
+
+:: option-select ( option -- select/f )
+    option node-ancestors :> ancestors
+    ancestors [ "select" html-element-named? ] find nip :> select
+    select [
+        ancestors select ancestors node-index head :> parents
+        parents [ { [ html-element? ] [ name>> { "option" "datalist" "hr" } member? ] } 1&& ] any?
+        parents [ "optgroup" html-element-named? ] count 1 > or
+        [ f ] [ select ] if
+    ] [ f ] if ;
+
+: option-disabled? ( option -- ? )
+    { [ attributes>> "disabled" swap key? ]
+      [ node-ancestors [ { [ html-element? ] [ name>> { "optgroup" "select" "hr" "datalist" "option" } member? ] } 1&& ] find nip
+        [ { [ "optgroup" html-element-named? ] [ attributes>> "disabled" swap key? ] } 1&& ] [ f ] if* ]
+    } 1|| ;
+
+: select-display-size ( select -- n )
+    attributes>> "size" of [
+        [ html-space? ] trim-head
+        dup ?first CHAR: + = [ rest ] when
+        [ ascii-digit? ] take-while >string string>number
+    ] [ f ] if* [ ] [ 1 ] if* ;
+
+:: selected-option ( select elements -- option/f )
+    elements [ { [ "option" html-element-named? ] [ option-select select eq? ] } 1&& ] filter :> options
+    options [ attributes>> "selected" swap key? ] find-last nip [ ] [
+        select select-display-size 1 = [ options [ option-disabled? not ] find nip ] [ f ] if
+    ] if* ;
+
+:: selectedcontent-enabled? ( element select -- ? )
+    element node-ancestors :> ancestors
+    ancestors [ "select" html-element-named? ] count 1 =
+    ancestors [ { [ html-element? ] [ name>> { "option" "selectedcontent" } member? ] } 1&& ] any? not and
+    select ancestors node-member? and ;
+
+DEFER: clone-tree-node
+:: clone-tree-node ( node -- copy )
+    node clone :> copy
+    node tag? [
+        copy f >>parent V{ } clone >>children
+        node attributes>> [ clone ] map >>attributes drop
+        node template-contents>> [
+            copy V{ } clone >>template-contents drop
+            [ clone-tree-node copy attach-node ] each
+        ] when*
+        node children>> [ clone-tree-node copy attach-node ] each
+    ] when copy ;
+
+:: update-selectedcontent ( select -- )
+    select attributes>> "multiple" swap key? [
+        select children>> tree-elements :> elements
+        elements [ { [ "selectedcontent" html-element-named? ] [ select selectedcontent-enabled? ] } 1&& ] filter :> contents
+        contents empty? [
+            select elements selected-option :> option
+            contents [
+                :> content
+                content children>> clone [ dup tag? [ detach-node ] [ drop ] if ] each
+                content children>> delete-all
+                option [ option children>> [ clone-tree-node content attach-node ] each ] when
+            ] each
+        ] unless
+    ] unless ;
+
+: resolve-selectedcontent ( document -- )
+    tree>> tree-elements [ "select" html-element-named? ] filter [ update-selectedcontent ] each ;
+
 :: parse-html5-with-scripting ( string scripting? -- document )
     <document> scripting? >>scripting? :> document
     document current-html5-document [
         document 0 string "\r\n" "\n" replace "\r" "\n" replace data-state 2drop
-    ] with-variable ;
+    ] with-variable
+    dup resolve-selectedcontent ;
 
 : parse-html5 ( string -- document )
     f parse-html5-with-scripting ;
