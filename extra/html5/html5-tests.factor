@@ -475,3 +475,56 @@ DEFER: tag-shape
     "<template><a><table><a>" head-root child-tags first template-content-tags first
     dup child-tags last parent>> eq?
 ] unit-test
+
+! Form pointers, scope, and table insertion.
+{ { { "form" {  } } } } [
+    "<form><form>" body-shapes
+] unit-test
+{ { { "form" { { "div" { { "div" {  } } } } } } } } [
+    "<!doctype html><form><div></form><div>" body-shapes
+] unit-test
+{ { { "p" {  } } { "form" {  } } } } [
+    "<p>one<form>two" body-shapes
+] unit-test
+{ { { "form" { { "p" {  } } } } { "div" {  } } } } [
+    "<form><p>one</form><div>two" body-shapes
+] unit-test
+{ { { "form" { { "table" {  } } { "form" {  } } } } } } [
+    "<form><table></form></table><form>" body-shapes
+] unit-test
+{ { { "table" { { "form" {  } } } } } } [
+    "<table><form><form>" body-shapes
+] unit-test
+{ { { "table" { { "form" {  } } } } } } [
+    "<table><form></table><form>" body-shapes
+] unit-test
+{ { { "table" { { "form" {  } } } } { "form" {  } } } } [
+    "<table><form></form></table><form>" body-shapes
+] unit-test
+{ { { "input" {  } } { "div" {  } } { "table" { { "form" {  } } { "input" {  } } } } } } [
+    "<table><form><input type=hidden><input></form><div></div></table>" body-shapes
+] unit-test
+{ { { "table" { { "input" {  } } } } } } [
+    "<table><input type=hidDEN></table>" body-shapes
+] unit-test
+{ f } [
+    "<form><table></form>" parse-html5 form-element-pointer>>
+] unit-test
+{ { "form" "form" } } [
+    "<form><template><form></form></template></form><form>" body-root child-tags [ name>> ] map
+] unit-test
+{ "form" } [
+    "<form><template><form></template>" body-root child-tags first child-tags first
+    template-content-tags first name>>
+] unit-test
+{ f } [
+    "<template><form></template>" parse-html5 form-element-pointer>>
+] unit-test
+{ { "form" "div" } } [
+    "<template><form><div></form><div>" head-root child-tags first template-content-tags
+    [ name>> ] map
+] unit-test
+{ { "form" "input" } } [
+    "<template><table><form><input type=hidden>" head-root child-tags first
+    template-content-tags first child-tags [ name>> ] map
+] unit-test

@@ -274,6 +274,7 @@ fostering-parent?
 tree
 tree-doctype
 head-element-pointer ! set during insertion time
+form-element-pointer
 parser-cannot-change-mode-flag
 insertion-mode
 original-insertion-mode
@@ -1022,6 +1023,40 @@ CONSTANT: frameset-blocking-elements {
         ] while
     ] if ;
 
+! Forms inside templates do not change the document's form pointer.
+: parsing-template? ( document -- ? ) template-insertion-modes>> empty? not ;
+
+: form-start-ignored? ( document -- ? )
+    { [ form-element-pointer>> ] [ parsing-template? not ] } 1&& ;
+
+:: insert-form ( document element -- )
+    document element insert-element
+    document parsing-template? [ document element >>form-element-pointer drop ] unless ;
+
+:: start-body-form ( document element -- )
+    document form-start-ignored? [ "unexpected-form-start-tag" report-parse-error ] [
+        document close-paragraph
+        document element insert-form
+    ] if ;
+
+:: end-body-form ( document token -- )
+    document parsing-template? [
+        document "form" scope-boundaries element-in-scope? [
+            document "" generate-implied-end-tags
+            document "form" current-element-named? [ "unexpected-form-end-tag" report-parse-error ] unless
+            document token close-element
+        ] [ "unexpected-form-end-tag" report-parse-error ] if
+    ] [
+        document form-element-pointer>> :> form
+        document f >>form-element-pointer drop
+        form [ document form node-in-scope? ] [ f ] if [
+            document "" generate-implied-end-tags
+            document open-elements>> last form eq? [ "unexpected-form-end-tag" report-parse-error ] unless
+            form token >>end-tag drop
+            form document open-elements>> remove-node
+        ] [ "unexpected-form-end-tag" report-parse-error ] if
+    ] if ;
+
 :: start-body-element ( document element -- )
     element name>> "image" = [ element "img" >>name drop ] when
     element name>> :> name
@@ -1068,6 +1103,7 @@ CONSTANT: frameset-blocking-elements {
     name {
         { [ dup formatting-elements member? ] [ drop document token adoption-agency ] }
         { [ dup heading-elements member? ] [ drop document token close-heading ] }
+        { [ dup "form" = ] [ drop document token end-body-form ] }
         { [ dup "br" = ] [
             drop document <tag> "br" >>name start-body-element
         ] }
@@ -1095,6 +1131,7 @@ CONSTANT: frameset-blocking-elements {
                 { "head" [ drop ] }
                 { "frame" [ drop ] }
                 { "frameset" [ document swap start-body-frameset ] }
+                { "form" [ document swap start-body-form ] }
                 [ drop document swap start-body-element ]
             } case
         ] }
@@ -1164,9 +1201,27 @@ DEFER: table-token
     obj name>> { "caption" "col" "colgroup" "tbody" "thead" "tfoot" } member? and
     document context { "html" "template" } element-in-scope? not and ;
 
+:: start-table-form ( document element -- document )
+    "form-start-tag-in-table" report-parse-error
+    document form-start-ignored? [
+        document element insert-form
+        document open-elements>> pop drop
+    ] unless document ;
+
+: hidden-input? ( element -- ? )
+    attributes>> "type" of [ ascii-downcase "hidden" = ] [ f ] if* ;
+
+:: start-table-input ( document element -- document )
+    element hidden-input? [
+        "hidden-input-in-table" report-parse-error
+        document element insert-element document
+    ] [ document element foster-body-token ] if ;
+
 :: table-start-tag ( document obj -- document )
     document obj template-table-start-ignored? [ document ] [
         obj name>> {
+            { "form" [ document obj start-table-form ] }
+            { "input" [ document obj start-table-input ] }
             { "caption" [
                 document { "table" } clear-to-table-context
                 document obj insert-element document
