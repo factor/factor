@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs combinators
-combinators.short-circuit io io.encodings.utf8 io.files json
-kernel math math.order memoize modern.slices prettyprint
-sequences sequences.extras strings suffix-arrays words ;
+combinators.short-circuit html.entities io.encodings.utf8
+io.files json kernel locals math math.order memoize modern.slices
+sequences sequences.extras strings words ;
 
 IN: html5
 
@@ -394,371 +394,152 @@ TUPLE: comment open payload close ;
 : push-doctype-system-identifier ( ch document -- )
     doctype>> system-identifier>> push ;
 
-! XXX: not html5 spec, fix
-ERROR: unmatched-closing-tag-error stack tag ;
+! Tree construction for ordinary HTML documents. Specialized HTML5
+! recovery (formatting reconstruction and foster parenting) is not yet implemented.
+CONSTANT: void-elements {
+    "area" "base" "br" "col" "embed" "hr" "img" "input" "link"
+    "meta" "param" "source" "track" "wbr"
+}
 
-: unclosed-tag? ( obj -- ? )
-    { [ tag? ] [ end-tag>> not ] } 1&& ; inline
+: current-children ( document -- children )
+    dup open-elements>> ?last [ nip children>> ] [ tree>> ] if* ;
 
-:: find-matching-tag ( name stack -- seq )
-    stack [ { [ unclosed-tag? ] [ name>> name = ] } 1&& ] find-last drop [
-        stack swap shorten*
-    ] [
-        stack name unmatched-closing-tag-error
-    ] if* ;
+:: append-node ( document obj -- )
+    obj dup integer? [ 1string ] when document current-children push ;
+
+:: insert-element ( document element -- )
+    document element append-node
+    element name>> void-elements member? [
+        element document open-elements>> push
+    ] unless ;
+
+:: close-element ( document token -- )
+    document open-elements>> :> stack
+    stack [ name>> token name>> sequence= ] find-last drop [
+        dup stack nth token >>end-tag drop
+        stack shorten
+    ] when* ;
+
+:: implied-element ( document name -- )
+    document <tag> name >>name insert-element ;
+
+: html-space? ( obj -- ? ) "\t\n\f\r\s" member? ;
 
 DEFER: tree-insert
-GENERIC: tree-insert* ( document obj insertion-mode -- document )
 
-: limited-quirks-mode? ( doctype -- ? )
-    {
-        [ public-identifier>> "-//W3C//DTD XHTML 1.0 Frameset//" head? ]
-        [ public-identifier>> "-//W3C//DTD XHTML 1.0 Transitional//" head? ]
-        [ { [ system-identifier>> ] [ public-identifier>> "-//W3C//DTD HTML 4.01 Frameset//" head? ] } 1&& ]
-        [ { [ system-identifier>> ] [ public-identifier>> "-//W3C//DTD HTML 4.01 Transitional//" head? ] } 1&& ]
-    } 1|| ;
+:: mark-end-tag ( document token -- )
+    document open-elements>> [ name>> token name>> = ] find-last nip
+    [ token >>end-tag drop ] when* ;
 
-! https://html.spec.whatwg.org/multipage/parsing.html#the-initial-insertion-mode
-M: initial-mode tree-insert*
-    drop {
-        { [ dup "\t\n\f\r\s" member? ] [ drop ] }
-        { [ dup doctype? ] [
-            >>tree-doctype before-html-mode >>insertion-mode
-        ] }
-        { [ dup comment? ] [ over tree>> push ] }
-        { [ dup tag? ] [ over tree>> push ] }
-        { [ dup end-tag? ] [
-            dup name>> pick tree>> find-matching-tag
-            unclip
-                swap >>children
-                swap >>end-tag
-            over tree>> push
-        ] }
-        [
-            over iframe-srcdoc?>> [
-                over parser-cannot-change-mode-flag>> [
-                    [ t >>quirks-mode? ] dip
-                ] unless
-            ] [
-                "must be iframe-srcdoc here" throw
+:: body-token ( document obj -- document )
+    obj {
+        { [ dup doctype? ] [ drop ] }
+        { [ dup tag? ] [
+            dup name>> { "html" "body" } member? [ drop ] [
+                document swap insert-element
             ] if
-            ! reprocess the token
-            before-html-mode >>insertion-mode tree-insert
-        ]
-    } cond ;
-
-! https://html.spec.whatwg.org/multipage/parsing.html#the-before-html-insertion-mode
-M: before-html-mode tree-insert*
-    drop {
-        { [ dup doctype? ] [ drop ] }
-        { [ dup comment? ] [ over tree>> push ] }
-        { [ dup "\t\n\f\r\s" member? ] [ drop ] }
-        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
-            over tree>> push
-            before-head-mode >>insertion-mode
         ] }
-        ! these tags are handled in the default case
-        { [ dup { [ end-tag? ] [ name>> { "head" "body" "html" "br" } member? not ] } 1&& ] [
-            ! error end-tag, ignore
-            drop
+        { [ dup end-tag? ] [
+            dup name>> { "body" "html" } member? [
+                dup name>> "body" = [
+                    document after-body-mode >>insertion-mode drop
+                ] when
+                document swap mark-end-tag
+            ] [ document swap close-element ] if
         ] }
-        [
-            ! Create missing html tag and reprocess the token
-            <tag> "html" >>name pick tree>> push
-            before-head-mode >>insertion-mode tree-insert
-        ]
-    } cond ;
-
-M: before-head-mode tree-insert*
-    drop {
-        { [ dup "\t\n\f\r\s" member? ] [ drop ] }
-        { [ dup comment? ] [ over tree>> push ] }
-        { [ dup doctype? ] [ drop ] }
-        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
-            ! XXX: in-body-mode rules here for html tag
-            ! B
-            ! over tree>> push
-            ! before-head-mode >>insertion-mode
-            "handle html in-body-mode here" throw
-        ] }
-        { [ dup { [ tag? ] [ name>> "head" = ] } 1&& ] [
-            [ swap tree>> push ]
-            [ >>head-element-pointer drop ]
-            [ drop in-head-mode >>insertion-mode ] 2tri
-        ] }
-        ! these tags are handled in the default case
-        { [ dup { [ end-tag? ] [ name>> { "head" "body" "html" "br" } member? not ] } 1&& ] [
-            ! error end-tag, ignore
-            drop
-        ] }
-        ! ignore tag
-        { [ dup tag? ] [ drop ] }
-        [
-            ! Create missing html tag and reprocess the token
-            <tag>
-            [ "head" >>name pick tree>> push ]
-            [ >>head-element-pointer ] bi
-            in-head-mode >>insertion-mode tree-insert
-        ]
-    } cond ;
-
-M: in-head-mode tree-insert*
-    drop {
-        { [ dup "\t\n\f\r\s" member? ] [ over tree>> push ] }
-        { [ dup comment? ] [ over tree>> push ] }
-        { [ dup doctype? ] [ drop ] }
-        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
-            ! XXX: in-body-mode rules here for html tag
-            ! B
-            ! over tree>> push
-            ! before-head-mode >>insertion-mode
-            "handle html in-body-mode here" throw
-            unimplemented*
-        ] }
-        { [ dup { [ tag? ] [ name>> { "base" "basefont" "bgsound" "link" } member? ] } 1&& ] [
-            ! non-void-html-element-start-tag-with-trailing-solidus soft error if not self-closing
-            unimplemented*
-        ] }
-        { [ dup { [ tag? ] [ name>> "meta" = ] } 1&& ] [
-            unimplemented*
-        ] }
-        { [ dup { [ tag? ] [ name>> "title" = ] } 1&& ] [
-            ! https://html.spec.whatwg.org/multipage/parsing.html#generic-rcdata-element-parsing-algorithm
-            "insert title node" throw
-            unimplemented*
-        ] }
-        { [
-            dup {
-                [ { [ tag? ] [ name>> "noscript" = ] [ scripting?>> ] } 1&& ]
-                [ { [ tag? ] [ name>> { "noframes" "style" } member? ] } 1&& ]
-            } 1||
-        ] [
-            ! https://html.spec.whatwg.org/multipage/parsing.html#generic-raw-text-element-parsing-algorithm
-            unimplemented*
-        ] }
-        { [ dup { [ tag? ] [ name>> "noscript" = ] [ scripting?>> not ] } 1&& ] [
-            unimplemented*
-            over tree>> push
-            in-head-noscript-mode >>insertion-mode
-        ] }
-        { [ dup { [ tag? ] [ name>> "script" = ] } 1&& ] [
-            unimplemented*
-            text-mode >>insertion-mode
-        ] }
-        { [ dup { [ end-tag? ] [ name>> "head" = ] } 1&& ] [
-            over tree>> last end-tag<<
-            after-head-mode >>insertion-mode
-        ] }
-        { [ dup { [ end-tag? ] [ name>> { "body" "html" "br" } member? ] } 1&& ] [
-            ! non-void-html-element-start-tag-with-trailing-solidus soft error if not self-closing
-            unimplemented*
-        ] }
-        { [ dup { [ tag? ] [ name>> "template" = ] } 1&& ] [
-            unimplemented*
-            in-template-mode >>insertion-mode
-        ] }
-        { [ dup { [ end-tag? ] [ name>> "template" = ] } 1&& ] [
-            unimplemented*
-        ] }
-        ! XXX: revisit this
-        { [ dup {
-            [ { [ tag? ] [ name>> "head" = ] } 1&& ]
-            [ end-tag? ]
-            } 1|| ] [ drop "ignore here" throw ] }
-        [
-            ! end head tag should be here, pop off, reprocess
-            over tree>> pop swap >>end-tag
-            after-head-mode >>insertion-mode "omg" throw
-        ]
-    } cond ;
-
-M: in-head-noscript-mode tree-insert* drop unimplemented* ;
-
-M: after-head-mode tree-insert*
-    drop {
-        { [ dup "\t\n\f\r\s" member? ] [ over tree>> push ] }
-        { [ dup comment? ] [ over tree>> push ] }
-        { [ dup doctype? ] [ drop ] }
-        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
-            ! XXX: in-body-mode rules here for html tag
-            ! B
-            ! over tree>> push
-            ! before-head-mode >>insertion-mode
-            "handle html in-body-mode here" throw
-            unimplemented*
-        ] }
-        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
-            unimplemented*
-        ] }
-        { [ dup { [ tag? ] [ name>> "body" = ] } 1&& ] [
-            over tree>> push
-            f >>frameset-ok?
-            in-body-mode >>insertion-mode
-        ] }
-        { [ dup { [ tag? ] [ name>> "frameset" = ] } 1&& ] [
-            unimplemented*
-        ] }
-        { [ dup { [ tag? ] [
-            name>> {
-                "base" "basefont" "bgsound" "link" "meta"
-                "noframes" "script" "style" "template" "title"
-            } member? ] } 1&&
-        ] [
-            unimplemented*
-        ] }
-        { [ dup { [ end-tag? ] [ name>> "template" = ] } 1&& ] [
-            unimplemented*
-        ] }
-        ! same as default case
-        ! { [ dup { [ end-tag? ] [ name>> { "body" "html" "br" } member? not ] } 1&& ] [
-        !     unimplemented*
-        ! ] }
-        { [
-            dup {
-                [ { [ tag? ] [ name>> "head" = ] } 1&& ]
-                [ { [ end-tag? ] [ name>> { "body" "html" "br" } member? not ] } 1&& ]
-            } 1||
-        ] [
-            "omg revisit this" throw
-            unimplemented*
-        ] }
-        [
-            B
-            <tag> "body" >>name pick tree>> push
-            in-body-mode >>insertion-mode tree-insert
-        ]
-    } cond ;
-
-M: in-body-mode tree-insert*
-    drop {
-        { [ dup CHAR: \0 = ] [ drop ] }
-        { [ dup "\t\n\f\r\s" member? ] [ over tree>> push ] }
-        { [ dup comment? ] [ over tree>> push ] }
-        { [ dup doctype? ] [ drop ] }
-        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [ drop ] }
-        { [ dup {
-            [
-                {
-                    [ tag? ]
-                    [
-                        name>> {
-                            "base" "basefont" "bgsound" "link" "meta"
-                            "noframes" "script" "style" "template" "title"
-                        } member?
-                    ]
-                } 1&&
-            ] [
-                { [ end-tag? ] [ name>> "template" = ] } 1&&
-            ] } 1||
-        ] [
-            unimplemented*
-        ] }
-        ! XXX: parse error
-        { [ dup { [ tag? ] [ name>> "body" = ] } 1&& ] [ drop unimplemented* ] }
-        { [ dup { [ tag? ] [ name>> "frameset" = ] } 1&& ] [ drop unimplemented* ] }
-        ! XXX: eof
-        ! { [ ] [ ] }
-        { [ dup { [ end-tag? ] [ name>> "body" = ] } 1&& ] [
-            "body" pick tree>> find-matching-tag
-            unclip
-                swap >>children
-                swap >>end-tag
-            over tree>> push
-
-            after-body-mode >>insertion-mode
-        ] }
-        { [ dup { [ end-tag? ] [ name>> "html" = ] } 1&& ] [ drop unimplemented* ] }
-        ! { [ ] [ ] }
-        [
-            unimplemented*
-        ]
-    } cond ;
-
-M: text-mode tree-insert* drop unimplemented* ;
-M: in-table-mode tree-insert* drop unimplemented* ;
-M: in-table-text-mode tree-insert* drop unimplemented* ;
-M: in-caption-mode tree-insert* drop unimplemented* ;
-M: in-column-group-mode tree-insert* drop unimplemented* ;
-M: in-table-body-mode tree-insert* drop unimplemented* ;
-M: in-row-mode tree-insert* drop unimplemented* ;
-M: in-cell-mode tree-insert* drop unimplemented* ;
-M: in-select-mode tree-insert* drop unimplemented* ;
-M: in-select-in-table-mode tree-insert* drop unimplemented* ;
-M: in-template-mode tree-insert* drop unimplemented* ;
-M: after-body-mode tree-insert*
-    drop {
-        { [ dup "\t\n\f\r\s" member? ] [ over tree>> push ] }
-        { [ dup comment? ] [ over tree>> push ] }
-        { [ dup doctype? ] [ drop ] }
-        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [
-            unimplemented*
-        ] }
-        { [ dup { [ end-tag? ] [ name>> "html" = ] } 1&& ] [
-            ! XXX: make this a function
-            "html" pick tree>> find-matching-tag
-            unclip
-                swap >>children
-                swap >>end-tag
-            over tree>> push
-
-            after-after-body-mode >>insertion-mode
-        ] }
-        [
-            unimplemented*
-        ]
-    } cond ;
-M: in-frameset-mode tree-insert* drop unimplemented* ;
-M: after-frameset-mode tree-insert* drop unimplemented* ;
-
-M: after-after-body-mode tree-insert*
-    drop {
-        { [ dup comment? ] [ over tree>> push ] }
-        { [ dup doctype? ] [ unimplemented*  ] }
-        { [ dup "\t\n\f\r\s" member? ] [ unimplemented*  ] }
-        { [ dup { [ tag? ] [ name>> "html" = ] } 1&& ] [ unimplemented* ] }
-        ! eof
         { [ dup f = ] [ drop ] }
-        [
-            ! XXX: parse error
-            [ in-body-mode >>insertion-mode ] dip tree-insert
-        ]
-    } cond ;
+        [ document swap append-node ]
+    } cond
+    document ;
 
-M: after-after-frameset-mode tree-insert* drop unimplemented* ;
-
-: tree-insert ( document obj -- document )
-    over insertion-mode>> tree-insert* ;
+:: tree-insert ( document obj -- document )
+    document insertion-mode>> {
+        { initial-mode [
+            obj doctype? [
+                document obj >>tree-doctype before-html-mode >>insertion-mode
+            ] [
+                obj comment? [ document obj append-node document ] [
+                    obj html-space? [ document ] [
+                        document t >>quirks-mode? before-html-mode >>insertion-mode
+                        obj tree-insert
+                    ] if
+                ] if
+            ] if
+        ] }
+        { before-html-mode [
+            obj comment? [ document obj append-node document ] [
+                obj html-space? [ document ] [
+                    obj tag? [ obj name>> "html" = ] [ f ] if [
+                        document obj insert-element
+                        document before-head-mode >>insertion-mode
+                    ] [
+                        document "html" implied-element
+                        document before-head-mode >>insertion-mode obj tree-insert
+                    ] if
+                ] if
+            ] if
+        ] }
+        { before-head-mode [
+            obj html-space? [ document ] [
+                obj comment? [ document obj append-node document ] [
+                    obj tag? [ obj name>> "head" = ] [ f ] if [
+                        document obj insert-element
+                        document obj >>head-element-pointer in-head-mode >>insertion-mode
+                    ] [
+                        document "head" implied-element
+                        document dup open-elements>> last >>head-element-pointer
+                        in-head-mode >>insertion-mode obj tree-insert
+                    ] if
+                ] if
+            ] if
+        ] }
+        { in-head-mode [
+            obj {
+                { [ dup html-space? ] [ document swap append-node document ] }
+                { [ dup comment? ] [ document swap append-node document ] }
+                { [ dup doctype? ] [ drop document ] }
+                { [ dup tag? [ dup name>> {
+                    "base" "basefont" "bgsound" "link" "meta" "title"
+                    "style" "script" "noscript" "noframes" "template"
+                } member? ] [ f ] if ] [
+                    document swap insert-element document
+                ] }
+                { [ dup end-tag? [ dup name>> "head" = not ] [ f ] if ] [
+                    document swap close-element document
+                ] }
+                { [ dup end-tag? [ dup name>> "head" = ] [ f ] if ] [
+                    document swap close-element
+                    document after-head-mode >>insertion-mode
+                ] }
+                [
+                    document <end-tag> "head" >>name close-element
+                    document after-head-mode >>insertion-mode swap tree-insert
+                ]
+            } cond
+        ] }
+        { after-head-mode [
+            obj html-space? [ document obj append-node document ] [
+                obj comment? [ document obj append-node document ] [
+                    obj tag? [ obj name>> "body" = ] [ f ] if [
+                        document obj insert-element
+                        document in-body-mode >>insertion-mode
+                    ] [
+                        document "body" implied-element
+                        document in-body-mode >>insertion-mode obj tree-insert
+                    ] if
+                ] if
+            ] if
+        ] }
+        [ drop document obj body-token ]
+    } case ;
 
 MEMO: load-entities ( -- assoc )
     "vocab:html5/entities.json" utf8 file-contents json> ;
 
-MEMO: entities-suffix-array ( -- assoc )
-    load-entities keys >suffix-array ;
+MEMO: longest-entity-name ( -- n )
+    load-entities keys [ length ] map-maximum 1 - ;
 
-: lookup-entity ( string -- entity/string ? )
-    load-entities ?at ;
-
-: named-character-match? ( document -- prefix? exact? )
-    temporary-buffer>>
-    [ entities-suffix-array query f like ]
-    [ last CHAR: ; = ] bi ;
-
-ERROR: unknown-named-entity entity ;
-: take-named-character ( document -- )
-    dup
-    temporary-buffer>> >string lookup-entity [
-        "characters" of
-        SBUF" " clone-like >>temporary-buffer drop
-    ] [
-        unknown-named-entity
-    ] if ;
-
-! XXX: remove the tag>> name>> push part
-: push-tag-name ( ch document -- )
-    [ tag>> name>> push ]
-    [
-        2drop ! tag-name>> push
-    ] 2bi ;
+: push-tag-name ( ch document -- ) tag>> name>> push ;
 : push-attribute-name ( ch document -- ) attribute-name>> push ;
 : push-attribute-value ( ch document -- ) attribute-value>> push ;
 : push-comment-token ( ch document -- ) comment-token>> push ;
@@ -770,8 +551,8 @@ ERROR: invalid-return-state obj ;
 
 : current-attribute ( document -- attribute/f )
     [ attribute-name>> >string f like ]
-    [ attribute-value>> >string f like ] bi
-    2dup or [ 2array ] [ 2drop f ] if ;
+    [ attribute-value>> >string ] bi
+    over [ 2array ] [ 2drop f ] if ;
 
 : push-when ( obj/f seq -- )
     over [ push ] [ 2drop ] if ; inline
@@ -785,51 +566,34 @@ ERROR: invalid-return-state obj ;
     [ tag>> attributes>> push-when ]
     [ reset-attribute ] tri ;
 
-: emit-eof ( document -- )
-    "emit-eof" print
-    f tree-insert drop ;
-: emit-char ( char document -- ) drop "emit-char: " write 1string . ;
-: emit-string ( char document -- ) drop "emit-string: " write . ;
+: emit-eof ( document -- ) f tree-insert drop ;
+:: emit-char ( char document -- )
+    document open-elements>> ?last [
+        name>> { "html" "head" } member?
+    ] [ t ] if* [
+        document char tree-insert drop
+    ] [ document char append-node ] if ;
+: emit-string ( string document -- ) swap append-node ;
+
 : emit-tag ( document -- )
-    "emit-tag: " write
     {
         [ tag>> [ name>> >string ] [ name<< ] bi ]
         [ push-attribute ]
-        [ tag>> . ]
         [ dup tag>> tree-insert drop ]
         [ f >>tag drop ]
     } cleave ;
-: emit-end-tag ( document -- )
-    "emit-end-tag: " write
-    [ tag>> . ]
-    [ f >>tag drop ] bi ;
-: emit-comment-token ( document -- )
-    "emit-comment-token: " write
-    {
-        [ comment-token>> >string . ]
-        [ dup comment-token>> >string <comment> tree-insert drop ]
-        [ SBUF" " clone >>comment-token drop ]
-    } cleave ;
-: emit-doctype ( document -- )
-    "emit-doctype: " write dup doctype>> .
-    {
-        [ doctype>> [ >string ] change-name drop ]
-        [
-            ! XXX: handle iframe srcdoc document
-            dup { [ doctype>> name>> "html" = not ] [ parser-cannot-change-mode-flag>> not ] } 1&& [
-                t >>quirks-mode?
-            ] [
-                dup { [ iframe-srcdoc?>> not ] [ parser-cannot-change-mode-flag>> not ] } 1&& [
-                    dup doctype>> limited-quirks-mode? [ t >>limited-quirks-mode? ] when
-                ] when
-            ] if
-            drop
-        ]
-        [ dup doctype>> tree-insert drop ]
-        [ f >>doctype drop ]
-    } cleave ;
 
-: reset-temporary-buffer ( document -- ) SBUF" " clone temporary-buffer<< ;
+: emit-end-tag ( document -- ) emit-tag ;
+
+: emit-comment-token ( document -- )
+    [ dup comment-token>> >string <comment> append-node ]
+    [ SBUF" " clone >>comment-token drop ] bi ;
+
+: emit-doctype ( document -- )
+    [ doctype>> [ >string ] change-name drop ]
+    [ dup doctype>> tree-insert drop ] bi ;
+
+: reset-temporary-buffer ( document -- ) SBUF" " clone >>temporary-buffer drop ;
 : ch>new-temporary-buffer ( ch document -- ) [ 1sbuf ] dip temporary-buffer<< ;
 : string>new-temporary-buffer ( string document -- ) [ SBUF" " clone-like ] dip temporary-buffer<< ;
 : temporary-buffer-last ( document -- ch/f ) temporary-buffer>> ?last ;
@@ -837,17 +601,18 @@ ERROR: invalid-return-state obj ;
 : push-all-temporary-buffer ( string document -- ) temporary-buffer>> push-all ;
 
 : flush-temporary-buffer ( document -- )
-    "flush-temporary-buffer: " write
-    [ [ temporary-buffer>> ] keep [ emit-char ] curry each ]
+    [ dup temporary-buffer-attribute? [
+        [ temporary-buffer>> ] [ attribute-value>> ] bi push-all
+    ] [ [ temporary-buffer>> ] keep [ emit-char ] curry each ] if ]
     [ SBUF" " clone >>temporary-buffer drop ] bi ;
 
 : emit-temporary-buffer-with ( string document -- )
-    [ temporary-buffer>> push-all ]
-    [ flush-temporary-buffer ] bi ;
+    [ emit-string ] [ nip flush-temporary-buffer ] 2bi ;
 
 ! check if matches open tag
 : appropriate-end-tag-token? ( document -- ? )
-    drop f ;
+    [ tag>> name>> ] [ open-elements>> ?last ] bi
+    [ name>> sequence= ] [ drop f ] if* ;
 
 : ascii-upper-alpha? ( ch -- ? ) [ CHAR: A CHAR: Z between? ] [ f ] if* ; inline
 : ascii-lower-alpha? ( ch -- ? ) [ CHAR: a CHAR: z between? ] [ f ] if* ; inline
@@ -862,11 +627,27 @@ ERROR: invalid-return-state obj ;
 
 : (return-state) ( document n/f string ch/f -- document n'/f string )
     reach [ f ] change-return-state drop check-return-state
+    name>> "(" ")" surround "html5" lookup-word
     execute( document n/f string ch/f -- document n'/f string ) ;
 
 : return-state ( document n/f string -- document n'/f string )
     pick [ f ] change-return-state drop check-return-state
     execute( document n/f string -- document n'/f string ) ;
+
+: tag-data-state ( document n/f string -- document n'/f string )
+    pick open-elements>> ?last [ name>> ] [ "" ] if* {
+        { "title" [ rcdata-state ] }
+        { "textarea" [ rcdata-state ] }
+        { "style" [ rawtext-state ] }
+        { "xmp" [ rawtext-state ] }
+        { "iframe" [ rawtext-state ] }
+        { "noembed" [ rawtext-state ] }
+        { "noframes" [ rawtext-state ] }
+        { "script" [ script-data-state ] }
+        { "plaintext" [ plaintext-state ] }
+        [ drop data-state ]
+    } case ;
+
 
 : (data-state) ( document n/f string ch/f -- document n'/f string )
     {
@@ -960,7 +741,7 @@ ERROR: invalid-return-state obj ;
         { [ dup ascii-upper-alpha? ] [ 0x20 + reach push-tag-name tag-name-state ] }
         { [ dup "\t\n\f\s" member? ] [ drop before-attribute-name-state ] }
         { [ dup CHAR: / = ] [ drop self-closing-start-tag-state ] }
-        { [ dup CHAR: > = ] [ drop pick emit-tag data-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-tag tag-data-state ] }
         { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
         { [ dup f = ] [ eof-before-tag-name ] }
         [ reach push-tag-name tag-name-state ]
@@ -1337,7 +1118,7 @@ ERROR: invalid-return-state obj ;
         { [ dup "\t\n\f\s" member? ] [ drop after-attribute-name-state ] }
         { [ dup CHAR: / = ] [ drop self-closing-start-tag-state ] }
         { [ dup CHAR: = = ] [ drop before-attribute-value-state ] }
-        { [ dup CHAR: > = ] [ drop pick emit-tag data-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-tag tag-data-state ] }
         { [ dup f = ] [ eof-in-tag ] }
         [ [ pick push-attribute ] dip (attribute-name-state) ]
     } cond ;
@@ -1348,7 +1129,7 @@ ERROR: invalid-return-state obj ;
 
 : (before-attribute-value-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup "\t\n\f\s" member? ] [ drop before-attribute-name-state ] }
+        { [ dup "\t\n\f\s" member? ] [ drop before-attribute-value-state ] }
         { [ dup CHAR: " = ] [ drop attribute-value-double-quoted-state ] }
         { [ dup CHAR: ' = ] [ drop attribute-value-single-quoted-state ] }
         { [ dup CHAR: > = ] [ drop missing-attribute-value ] }
@@ -1401,7 +1182,7 @@ ERROR: invalid-return-state obj ;
             drop
             [ \ attribute-value-unquoted-state >>return-state ] 2dip character-reference-state
         ] }
-        { [ dup CHAR: > = ] [ drop pick emit-tag data-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-tag tag-data-state ] }
         { [ dup CHAR: \0 = ] [ drop unexpected-null-character CHAR: replacement-character reach push-attribute-value ] }
         { [ dup "\"'<=`" member? ] [
             unexpected-character-in-unquoted-attribute-value
@@ -1420,7 +1201,7 @@ ERROR: invalid-return-state obj ;
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-attribute-name-state ] }
         { [ dup CHAR: / = ] [ drop self-closing-start-tag-state ] }
-        { [ dup CHAR: > = ] [ drop pick emit-tag data-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-tag tag-data-state ] }
         { [ dup f = ] [ eof-in-tag ] }
         [ missing-whitespace-between-attributes (before-attribute-name-state) ]
     } cond ;
@@ -1431,7 +1212,7 @@ ERROR: invalid-return-state obj ;
 
 : (self-closing-start-tag-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: > = ] [ drop pick [ set-self-closing ] [ emit-tag ] bi data-state ] }
+        { [ dup CHAR: > = ] [ drop pick [ set-self-closing ] [ emit-tag ] bi tag-data-state ] }
         { [ dup f = ] [ eof-in-tag ] }
         [ unexpected-solidus-in-tag ]
     } cond ;
@@ -1980,45 +1761,46 @@ ERROR: invalid-return-state obj ;
     take-char (character-reference-state) ;
 
 
-: (named-character-reference-state) ( document n/f string ch/f -- document n'/f string )
-    reach push-temporary-buffer
-    pick named-character-match?
-    [
-        drop ! exact match, drop prefix match
-        ! XXX: check me
-        {
-            [ pick temporary-buffer-attribute? ]
-            [ pick temporary-buffer>> ?last CHAR: ; = not ]
-            [ 3dup peek-from { [ CHAR: = = ] [ ascii-alphanumeric? ] } 1|| ]
-        } 0&& [
-            unimplemented*
-            flush-temporary-buffer
-            return-state
+! Consume the longest named reference, keeping legacy semicolonless
+! references literal in attributes when followed by an alphanumeric or '='.
+:: (named-character-reference-state) ( document n string ch -- document n' string )
+    ch drop
+    n 1 - :> start
+    f :> match!
+    start :> end!
+    start 1 + :> i!
+    [ i string length <= i start - longest-entity-name <= and ] [
+        start i string subseq "&" prepend load-entities at [
+            match! i end!
+        ] when*
+        i 1 + i!
+    ] while
+    match [
+        document temporary-buffer-attribute?
+        end 1 - string nth CHAR: ; = not and
+        end string ?nth dup [
+            dup ascii-alphanumeric? swap CHAR: = = or
+        ] [ drop f ] if and [
+            document flush-temporary-buffer
+            document start string return-state
         ] [
-            pick [ take-named-character ] [ flush-temporary-buffer ] bi return-state
+            match "characters" of document string>new-temporary-buffer
+            document flush-temporary-buffer
+            document end string return-state
         ] if
     ] [
-        ! prefix match?
-        [ named-character-reference-state ]
-        [ pick flush-temporary-buffer ambiguous-ampersand-state ] if
+        document flush-temporary-buffer
+        document start string return-state
     ] if ;
 
 : named-character-reference-state ( document n/f string -- document n'/f string )
     take-char (named-character-reference-state) ;
 
-
 : (ambiguous-ampersand-state) ( document n/f string ch/f -- document n'/f string )
-    {
-        { [ dup ascii-alphanumeric? ] [
-            unimplemented*
-        ] }
-        { [ dup CHAR: ; = ] [ unknown-named-character-reference (return-state) ] }
-        [ (return-state) ]
-    } cond ;
+    (return-state) ;
 
 : ambiguous-ampersand-state ( document n/f string -- document n'/f string )
     take-char (ambiguous-ampersand-state) ;
-
 
 : (numeric-character-reference-state) ( document n/f string ch/f -- document n'/f string )
     {
@@ -2050,39 +1832,41 @@ ERROR: invalid-return-state obj ;
     take-char (decimal-character-reference-start-state) ;
 
 
+: finish-numeric-reference ( document -- )
+    dup temporary-buffer>> >string html-unescape
+    swap string>new-temporary-buffer ;
+
 : (hexadecimal-character-reference-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup ascii-digit? ] [ unimplemented* ] }
-        { [ dup ascii-upper-hex-digit? ] [ unimplemented* ] }
-        { [ dup ascii-lower-hex-digit? ] [ unimplemented* ] }
-        { [ dup CHAR: ; = ] [ drop numeric-character-reference-end-state ] }
-        [ missing-semicolon-after-character-reference ]
+        { [ dup ascii-hex-digit? ] [ reach push-temporary-buffer hexadecimal-character-reference-state ] }
+        { [ dup CHAR: ; = ] [
+            reach push-temporary-buffer
+            pick [ finish-numeric-reference ] [ flush-temporary-buffer ] bi return-state
+        ] }
+        [ [ pick [ finish-numeric-reference ] [ flush-temporary-buffer ] bi ] dip (return-state) ]
     } cond ;
 
 : hexadecimal-character-reference-state ( document n/f string -- document n'/f string )
     take-char (hexadecimal-character-reference-state) ;
 
-
 : (decimal-character-reference-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup ascii-digit? ] [ unimplemented* ] }
-        { [ dup CHAR: ; = ] [ drop numeric-character-reference-end-state ] }
-        [ missing-semicolon-after-character-reference ]
+        { [ dup ascii-digit? ] [ reach push-temporary-buffer decimal-character-reference-state ] }
+        { [ dup CHAR: ; = ] [
+            reach push-temporary-buffer
+            pick [ finish-numeric-reference ] [ flush-temporary-buffer ] bi return-state
+        ] }
+        [ [ pick [ finish-numeric-reference ] [ flush-temporary-buffer ] bi ] dip (return-state) ]
     } cond ;
 
 : decimal-character-reference-state ( document n/f string -- document n'/f string )
     take-char (decimal-character-reference-state) ;
 
-
 : (numeric-character-reference-end-state) ( document n/f string ch/f -- document n'/f string )
-    {
-        [ missing-semicolon-after-character-reference ]
-    } cond ;
+    [ pick [ finish-numeric-reference ] [ flush-temporary-buffer ] bi ] dip (return-state) ;
 
 : numeric-character-reference-end-state ( document n/f string -- document n'/f string )
-    take-char (numeric-character-reference-end-state) ;
-
-
+    pick [ finish-numeric-reference ] [ flush-temporary-buffer ] bi return-state ;
 
 : parse-html5 ( string -- document )
     [ <document> 0 ] dip data-state 2drop ;
