@@ -305,3 +305,43 @@ DEFER: node-text
 { t } [
     "<template><div>" parse-html5 parse-errors>> "eof-in-template" swap member?
 ] unit-test
+
+! Small HTML recovery rules and obsolete aliases.
+{ { { "a" "first" } { "b" "new" } } } [
+    "<html a=first><body><html a=second b=new>" html-root attributes>> >array
+] unit-test
+{ { { "a" "first" } { "b" "new" } } } [
+    "<body a=first><p>x<body a=second b=new>" body-root attributes>> >array
+] unit-test
+{ { { "a" "first" } } } [
+    "<html a=first><template><html b=new>" html-root attributes>> >array
+] unit-test
+{ { { "a" "first" } } } [
+    "<body a=first><template><body b=new>" body-root attributes>> >array
+] unit-test
+{ { "p" } } [
+    "<body><head><p>x" body-root child-tags [ name>> ] map
+] unit-test
+{ { "img" "p" } } [
+    "<image src=x><p>y" body-root child-tags [ name>> ] map
+] unit-test
+{ "image" t } [
+    "<svg><image/>" body-root child-tags first child-tags first
+    [ name>> ] [ namespace>> svg-namespace = ] bi
+] unit-test
+{ { "h3" "p" } } [
+    "<h3>x</h2><p>y" body-root child-tags [ name>> ] map
+] unit-test
+{ "y" } [
+    "<h1><div><h3><span></h1>y" body-root child-tags first child-tags first children>> last
+] unit-test
+{ { "button" "button" } } [
+    "<button><p>x<button>y" body-root child-tags [ name>> ] map
+] unit-test
+{ { "basefont" "bgsound" "meta" } } [
+    "<head><basefont><bgsound><meta>" head-root child-tags [ name>> ] map
+] unit-test
+{ t } [
+    "<head><noscript><basefont><!--x--></noscript>" head-root child-tags first
+    children>> last comment?
+] unit-test

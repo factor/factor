@@ -427,7 +427,7 @@ TUPLE: processing-instruction target data ;
 ! Tree construction. Active formatting reconstruction and frameset parsing
 ! are not yet implemented.
 CONSTANT: void-elements {
-    "area" "base" "br" "col" "embed" "hr" "img" "input" "link"
+    "area" "base" "basefont" "bgsound" "br" "col" "embed" "hr" "img" "input" "link"
     "meta" "param" "source" "track" "wbr"
 }
 
@@ -696,8 +696,38 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
     [ dup name = swap { "html" "table" "td" "th" "applet" "object" "marquee" "template" "ol" "ul" "dl" } member? or ] find nip
     name = [ document <end-tag> name >>name close-element ] when ;
 
+:: merge-element-attributes ( element token -- )
+    element attributes>> :> attributes
+    token attributes>> [
+        dup first attributes key? [ drop ] [ attributes push ] if
+    ] each ;
+
+:: merge-body-attributes ( document token -- )
+    document template-insertion-modes>> empty?
+    document open-elements>> length 1 > and [
+        document open-elements>> second :> body
+        body html-element? body name>> "body" = and [
+            body token merge-element-attributes
+            document f >>frameset-ok? drop
+        ] when
+    ] when ;
+
+:: close-heading ( document token -- )
+    heading-elements [ document swap scope-boundaries element-in-scope? ] any? [
+        document "" generate-implied-end-tags
+        document open-elements>> :> stack
+        stack [ { [ html-element? ] [ name>> heading-elements member? ] } 1&& ] find-last drop [
+            dup stack nth token >>end-tag drop stack shorten
+        ] when*
+    ] when ;
+
 :: start-body-element ( document element -- )
+    element name>> "image" = [ element "img" >>name drop ] when
     element name>> :> name
+    name "button" = document "button" scope-boundaries element-in-scope? and [
+        document "" generate-implied-end-tags
+        document <end-tag> "button" >>name close-element
+    ] when
     name "table" = document quirks-mode?>> not and [ document close-paragraph ] when
     name block-elements member? name heading-elements member? or
     name { "pre" "listing" "hr" "xmp" "plaintext" } member? or [ document close-paragraph ] when
@@ -731,29 +761,38 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
 
 :: end-body-element ( document token -- )
     token name>> :> name
-    name "br" = [ document <tag> "br" >>name insert-element ] [
-    name "p" = [
-        document "p" scope-boundaries "button" suffix element-in-scope? [
-            document "p" implied-element
-        ] unless
-        document close-paragraph
-    ] [
-        document name scope-boundaries element-in-scope? [
-            document name generate-implied-end-tags
-            document token close-element
-        ] when
-    ] if ] if ;
+    name {
+        { [ dup heading-elements member? ] [ drop document token close-heading ] }
+        { [ dup "br" = ] [ drop document <tag> "br" >>name insert-element ] }
+        { [ dup "p" = ] [
+            drop document "p" scope-boundaries "button" suffix element-in-scope? [
+                document "p" implied-element
+            ] unless
+            document close-paragraph
+        ] }
+        [
+            drop document name scope-boundaries element-in-scope? [
+                document name generate-implied-end-tags
+                document token close-element
+            ] when
+        ]
+    } cond ;
 
 :: ordinary-body-token ( document obj -- document )
     obj {
         { [ dup doctype? ] [ drop ] }
         { [ dup tag? ] [
-            dup name>> { "html" "body" } member? [ drop ] [
-                dup name>> { "head" "frame" "frameset" } member?
-                document template-insertion-modes>> empty? not and [ drop ] [
-                    document swap start-body-element
-                ] if
-            ] if
+            dup name>> {
+                { "body" [ document swap merge-body-attributes ] }
+                { "html" [ drop ] }
+                { "head" [ drop ] }
+                [
+                    { "frame" "frameset" } member?
+                    document template-insertion-modes>> empty? not and [ drop ] [
+                        document swap start-body-element
+                    ] if
+                ]
+            } case
         ] }
         { [ dup end-tag? ] [
             dup name>> { "body" "html" } member? [
@@ -1124,6 +1163,12 @@ DEFER: table-token
 
 DEFER: html-tree-insert
 :: html-tree-insert ( document obj -- document )
+    obj tag? [ obj name>> "html" = ] [ f ] if
+    document open-elements>> empty? not and [
+        document template-insertion-modes>> empty? [
+            document open-elements>> first obj merge-element-attributes
+        ] when document
+    ] [
     obj f = document template-insertion-modes>> empty? not and [
         "eof-in-template" report-parse-error
         document <end-tag> "template" >>name end-template drop
@@ -1144,7 +1189,7 @@ DEFER: html-tree-insert
                 ] if
             ] if
         ] if
-    ] if ;
+    ] if ] if ;
 
 CONSTANT: foreign-breakout-elements {
     "b" "big" "blockquote" "body" "br" "center" "code" "dd" "div" "dl" "dt"
