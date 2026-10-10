@@ -264,6 +264,7 @@ parse-errors
 skip-leading-newline?
 pending-table-characters
 template-insertion-modes
+active-formatting-elements
 quirks-mode?
 limited-quirks-mode?
 iframe-srcdoc?
@@ -347,7 +348,7 @@ TUPLE: doctype
     <doctype> t >>quirks? >>doctype drop ;
 
 ! template-contents is a vector for HTML template fragments, otherwise f.
-TUPLE: tag self-closing? name attributes children end-tag namespace template-contents ;
+TUPLE: tag self-closing? name attributes children end-tag namespace template-contents parent ;
 
 : <tag> ( -- tag )
     tag new
@@ -375,6 +376,7 @@ TUPLE: end-tag self-closing? name attributes ;
 : <document> ( -- document )
     document new
         V{ } clone >>parse-errors
+        V{ } clone >>active-formatting-elements
         V{ } clone >>template-insertion-modes
         V{ } clone >>pending-table-characters
         V{ } clone >>tree
@@ -424,7 +426,7 @@ TUPLE: processing-instruction target data ;
 : misc-node? ( obj -- ? )
     { [ comment? ] [ processing-instruction? ] } 1|| ;
 
-! Tree construction. Active formatting reconstruction is not yet implemented.
+! Tree construction.
 CONSTANT: void-elements {
     "area" "base" "basefont" "bgsound" "br" "col" "embed" "frame" "hr" "img" "input" "keygen" "link"
     "meta" "param" "source" "track" "wbr"
@@ -440,6 +442,35 @@ CONSTANT: table-text-elements { "table" "tbody" "tfoot" "thead" "tr" }
 
 : html-element? ( element -- ? ) namespace>> html-namespace = ;
 
+! Formatting list and open-stack membership use node identity.
+:: node-index ( node sequence -- index/f )
+    sequence [ node eq? ] find drop ;
+
+: node-member? ( node sequence -- ? ) node-index f = not ;
+
+:: remove-node ( node sequence -- )
+    node sequence node-index [ sequence remove-nth! drop ] when* ;
+
+: parent-children ( parent -- children )
+    dup document? [ tree>> ] [ element-children ] if ;
+
+:: set-node-parent ( node parent -- )
+    node tag? [ node parent >>parent drop ] when ;
+
+:: attach-node ( node parent -- )
+    node parent set-node-parent node parent parent-children push ;
+
+:: detach-node ( node -- )
+    node parent>> [ node swap parent-children remove-node ] when*
+    node f >>parent drop ;
+
+CONSTANT: formatting-marker-elements { "applet" "object" "marquee" "template" "td" "th" "caption" }
+
+:: clear-formatting ( document -- )
+    document active-formatting-elements>> :> entries
+    f :> done!
+    [ entries empty? not done not and ] [ entries pop f = done! ] while ;
+
 :: append-node ( document obj -- )
     obj dup integer? [ 1string ] when :> node
     document fostering-parent?>>
@@ -448,17 +479,20 @@ CONSTANT: table-text-elements { "table" "tbody" "tfoot" "thead" "tr" }
         stack [ { [ html-element? ] [ name>> "table" = ] } 1&& ] find-last drop :> table-index
         stack [ { [ html-element? ] [ name>> "template" = ] } 1&& ] find-last drop :> template-index
         template-index [ drop table-index [ drop template-index table-index > ] [ t ] if* ] [ f ] if* [
-            node template-index stack nth element-children push
+            node template-index stack nth attach-node
         ] [
             table-index [
-                table-index 0 > [
-                    table-index 1 - stack nth element-children :> children
-                    table-index stack nth children index :> position
+                table-index stack nth :> table
+                table parent>> [
+                    :> parent
+                    parent parent-children :> children
+                    table children node-index :> position
+                    node parent set-node-parent
                     node position children insert-nth!
-                ] [ node stack first element-children push ] if
-            ] [ node document current-children push ] if
+                ] [ node stack first attach-node ] if*
+            ] [ node stack ?last [ ] [ document ] if* attach-node ] if
         ] if
-    ] [ node document current-children push ] if ;
+    ] [ node document open-elements>> ?last [ ] [ document ] if* attach-node ] if ;
 
 :: insert-element ( document element -- )
     document element append-node
@@ -466,6 +500,9 @@ CONSTANT: table-text-elements { "table" "tbody" "tfoot" "thead" "tr" }
         element name>> void-elements member?
     ] [ element self-closing?>> ] if [
         element document open-elements>> push
+        element html-element? element name>> formatting-marker-elements member? and [
+            f document active-formatting-elements>> push
+        ] when
     ] unless ;
 
 :: close-element ( document token -- )
@@ -473,6 +510,7 @@ CONSTANT: table-text-elements { "table" "tbody" "tfoot" "thead" "tr" }
     stack [ { [ html-element? ] [ name>> token name>> sequence= ] } 1&& ] find-last drop [
         dup stack nth token >>end-tag drop
         stack shorten
+        token name>> formatting-marker-elements member? [ document clear-formatting ] when
     ] when* ;
 
 :: implied-element ( document name -- )
@@ -658,7 +696,7 @@ CONSTANT: foreign-attribute-adjustments H{
     ] [ f ] if* ;
 
 CONSTANT: scope-boundaries {
-    "applet" "caption" "html" "table" "td" "th" "marquee" "object" "template"
+    "applet" "caption" "html" "table" "td" "th" "marquee" "object" "select" "template"
 }
 CONSTANT: block-elements {
     "address" "article" "aside" "blockquote" "center" "details" "dialog"
@@ -694,6 +732,112 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
     document open-elements>> [ name>> ] map reverse
     [ dup name = swap { "html" "table" "td" "th" "applet" "object" "marquee" "template" "ol" "ul" "dl" } member? or ] find nip
     name = [ document <end-tag> name >>name close-element ] when ;
+
+CONSTANT: formatting-elements { "a" "b" "big" "code" "em" "font" "i" "nobr" "s" "small" "strike" "strong" "tt" "u" }
+CONSTANT: special-html-elements {
+    "address" "applet" "area" "article" "aside" "base" "basefont" "bgsound"
+    "blockquote" "body" "br" "button" "caption" "center" "col" "colgroup"
+    "dd" "details" "dialog" "dir" "div" "dl" "dt" "embed" "fieldset" "figcaption"
+    "figure" "footer" "form" "frame" "frameset" "h1" "h2" "h3" "h4" "h5" "h6"
+    "head" "header" "hgroup" "hr" "html" "iframe" "img" "input" "keygen" "li"
+    "link" "listing" "main" "marquee" "menu" "meta" "nav" "noembed" "noframes"
+    "noscript" "object" "ol" "p" "param" "plaintext" "pre" "script" "search"
+    "section" "select" "source" "style" "summary" "table" "tbody" "td" "template"
+    "textarea" "tfoot" "th" "thead" "title" "tr" "track" "ul" "wbr" "xmp"
+}
+
+: special-element? ( element -- ? )
+    {
+        [ { [ html-element? ] [ name>> special-html-elements member? ] } 1&& ]
+        [ mathml-text-integration-point? ]
+        [ { [ namespace>> mathml-namespace = ] [ name>> "annotation-xml" = ] } 1&& ]
+        [ { [ namespace>> svg-namespace = ] [ name>> { "foreignObject" "desc" "title" } member? ] } 1&& ]
+    } 1|| ;
+
+: clone-formatting-element ( element -- clone )
+    [ name>> ] [ attributes>> clone ] [ namespace>> ] tri
+    <tag> swap >>namespace swap >>attributes swap >>name ;
+
+:: formatting-index ( document name -- index/f )
+    document active-formatting-elements>> :> entries
+    entries [ dup f = [ drop t ] [ name>> name = ] if ] find-last drop
+    dup [ dup entries nth f = [ drop f ] when ] when ;
+
+:: formatting-equivalent? ( a b -- ? )
+    a name>> b name>> = a namespace>> b namespace>> = and
+    a attributes>> b attributes>> assoc= and ;
+
+:: push-formatting ( document element -- )
+    document active-formatting-elements>> :> entries
+    entries [ f = ] find-last drop [ 1 + ] [ 0 ] if* :> start
+    entries length <iota> [ start >= ] filter
+    [ entries nth element formatting-equivalent? ] filter :> matches
+    matches length 3 >= [ matches first entries remove-nth! drop ] when
+    element entries push ;
+
+:: reconstruct-formatting ( document -- )
+    document active-formatting-elements>> :> entries
+    document open-elements>> :> stack
+    entries length :> i!
+    [ i 0 > [ i 1 - entries nth dup f = [ drop f ] [ stack node-member? not ] if ] [ f ] if ] [
+        i 1 - i!
+    ] while
+    [ i entries length < ] [
+        i entries nth clone-formatting-element :> element
+        document element insert-element
+        element i entries set-nth
+        i 1 + i!
+    ] while ;
+
+:: node-in-scope? ( document target -- ? )
+    document open-elements>> reverse [
+        dup target eq? [ drop t ] [
+            dup html-element? [ name>> scope-boundaries member? ] [
+                { [ mathml-text-integration-point? ] [ html-integration-point? ]
+                  [ { [ namespace>> mathml-namespace = ] [ name>> "annotation-xml" = ] } 1&& ]
+                } 1||
+            ] if
+        ] if
+    ] find nip target eq? ;
+
+:: other-formatting-end-tag ( document token -- )
+    document open-elements>> reverse [
+        { [ { [ html-element? ] [ name>> token name>> = ] } 1&& ] [ special-element? ] } 1||
+    ] find nip [
+        dup html-element? over name>> token name>> = and [
+            drop document token name>> generate-implied-end-tags
+            document token close-element
+        ] [ drop ] if
+    ] when* ;
+
+DEFER: adoption-agency
+
+! Reconstruct only for the start tags whose HTML rules require it.
+CONSTANT: non-reconstructing-elements {
+    "address" "article" "aside" "blockquote" "center" "details" "dialog" "dir"
+    "div" "dl" "fieldset" "figcaption" "figure" "footer" "header" "hgroup"
+    "main" "menu" "nav" "ol" "p" "search" "section" "summary" "ul"
+    "h1" "h2" "h3" "h4" "h5" "h6" "pre" "listing" "form" "li" "dd" "dt"
+    "plaintext" "table" "hr" "textarea" "iframe" "noembed" "base" "basefont"
+    "bgsound" "link" "meta" "noframes" "script" "style" "title" "template"
+    "param" "source" "track"
+}
+
+:: prepare-formatting-start ( document element -- )
+    element name>> :> name
+    name "a" = [
+        document "a" formatting-index [
+            document active-formatting-elements>> nth :> previous
+            document <end-tag> "a" >>name adoption-agency
+            previous document active-formatting-elements>> remove-node
+            previous document open-elements>> remove-node
+        ] when*
+    ] when
+    name non-reconstructing-elements member? [ document reconstruct-formatting ] unless
+    name "nobr" = document "nobr" scope-boundaries element-in-scope? and [
+        document <end-tag> "nobr" >>name adoption-agency
+        document reconstruct-formatting
+    ] when ;
 
 :: merge-element-attributes ( element token -- )
     element attributes>> :> attributes
@@ -747,6 +891,111 @@ CONSTANT: frameset-blocking-elements {
         ] when
     ] when ;
 
+:: adoption-foster-node ( document node -- )
+    document open-elements>> :> stack
+    stack [ { [ html-element? ] [ name>> "table" = ] } 1&& ] find-last drop :> table-index
+    stack [ { [ html-element? ] [ name>> "template" = ] } 1&& ] find-last drop :> template-index
+    template-index [ drop table-index [ drop template-index table-index > ] [ t ] if* ] [ f ] if* [
+        node template-index stack nth attach-node
+    ] [
+        table-index [
+            stack nth :> table
+            table parent>> [
+                :> parent
+                table parent parent-children node-index :> position
+                node parent set-node-parent
+                node position parent parent-children insert-nth!
+            ] [ node stack first attach-node ] if*
+        ] [ node stack first attach-node ] if*
+    ] if ;
+
+:: adoption-insert ( document node ancestor -- )
+    node detach-node
+    ancestor html-element? ancestor name>> { "table" "tbody" "tfoot" "thead" "tr" } member? and [
+        document node adoption-foster-node
+    ] [ node ancestor attach-node ] if ;
+
+:: adoption-inner-loop ( document formatting block -- last-node bookmark )
+    document active-formatting-elements>> :> entries
+    document open-elements>> :> stack
+    formatting entries node-index :> bookmark!
+    block stack node-index :> cursor!
+    block :> last-node!
+    0 :> count!
+    f :> done!
+    [ done not ] [
+        cursor 1 - cursor!
+        cursor stack nth :> node
+        node formatting eq? [ t done! ] [
+            count 1 + count!
+            node entries node-index :> entry-index!
+            count 3 > entry-index f = not and [
+                entry-index bookmark < [ bookmark 1 - bookmark! ] when
+                node entries remove-node f entry-index!
+            ] when
+            entry-index [
+                drop node clone-formatting-element :> replacement
+                replacement entry-index entries set-nth
+                replacement cursor stack set-nth
+                last-node block eq? [ entry-index 1 + bookmark! ] when
+                last-node detach-node
+                last-node replacement attach-node
+                replacement last-node!
+            ] [ node stack remove-node ] if*
+        ] if
+    ] while last-node bookmark ;
+
+:: adoption-pass ( document token -- continue? )
+    document active-formatting-elements>> :> entries
+    document open-elements>> :> stack
+    document token name>> formatting-index [
+        entries nth :> formatting
+        formatting stack node-index [
+            :> formatting-index
+            document formatting node-in-scope? [
+                formatting-index 1 + stack [ special-element? ] find-from nip [
+                    :> block
+                    formatting-index 1 - stack nth :> ancestor
+                    document formatting block adoption-inner-loop :> bookmark :> last-node
+                    document last-node ancestor adoption-insert
+                    formatting clone-formatting-element :> replacement
+                    block children>> clone [
+                        dup tag? [ dup detach-node ] when
+                        replacement attach-node
+                    ] each
+                    block children>> delete-all
+                    replacement block attach-node
+                    formatting entries node-index :> old-index
+                    old-index bookmark < [ bookmark 1 - ] [ bookmark ] if :> new-bookmark
+                    formatting entries remove-node
+                    replacement new-bookmark entries insert-nth!
+                    formatting stack remove-node
+                    replacement block stack node-index 1 + stack insert-nth!
+                    t
+                ] [
+                    formatting-index stack shorten
+                    formatting entries remove-node f
+                ] if*
+            ] [ "formatting-element-out-of-scope" report-parse-error f ] if
+        ] [
+            formatting entries remove-node "formatting-element-not-open" report-parse-error f
+        ] if*
+    ] [ document token other-formatting-end-tag f ] if* ;
+
+:: adoption-agency ( document token -- )
+    document open-elements>> :> stack
+    document active-formatting-elements>> :> entries
+    stack ?last [
+        { [ html-element? ] [ name>> token name>> = ] [ entries node-member? not ] } 1&&
+    ] [ f ] if* [ stack pop drop ] [
+        0 :> count!
+        t :> continue?!
+        [ count 8 < continue? and ] [
+            count 1 + count!
+            document token adoption-pass continue?!
+        ] while
+    ] if ;
+
 :: start-body-element ( document element -- )
     element name>> "image" = [ element "img" >>name drop ] when
     element name>> :> name
@@ -781,14 +1030,17 @@ CONSTANT: frameset-blocking-elements {
         ] when
     ] when
     name { "rb" "rp" "rt" "rtc" } member? [ document "" generate-implied-end-tags ] when
+    document element prepare-formatting-start
     name { "svg" "math" } member? [
         document element name "svg" = [ svg-namespace ] [ mathml-namespace ] if insert-foreign-element
     ] [ document element insert-element ] if
+    name formatting-elements member? [ document element push-formatting ] when
     name { "pre" "listing" "textarea" } member? [ document t >>skip-leading-newline? drop ] when ;
 
 :: end-body-element ( document token -- )
     token name>> :> name
     name {
+        { [ dup formatting-elements member? ] [ drop document token adoption-agency ] }
         { [ dup heading-elements member? ] [ drop document token close-heading ] }
         { [ dup "br" = ] [
             drop document <tag> "br" >>name start-body-element
@@ -830,7 +1082,7 @@ CONSTANT: frameset-blocking-elements {
         ] }
         { [ dup f = ] [ drop ] }
         [
-            dup integer? [ document over update-frameset-for-character ] when
+            dup integer? [ document reconstruct-formatting document over update-frameset-for-character ] when
             document swap append-node
         ]
     } cond
@@ -866,6 +1118,7 @@ CONSTANT: table-cell-elements { "td" "th" }
     document pending-table-characters>> :> characters
     characters empty? [
         characters [ html-space? ] all? not document swap >>fostering-parent? drop
+        document fostering-parent?>> [ document reconstruct-formatting ] when
         characters [ document swap append-node ] each
         document f >>fostering-parent? drop
         characters delete-all
@@ -1406,7 +1659,16 @@ ERROR: invalid-return-state obj ;
             name>> { "html" "head" } member?
         ] [ t ] if* [
             document char tree-insert drop
-        ] [ document char append-node ] if
+        ] [
+            document open-elements>> last :> current
+            current html-element? [
+                current name>> { "title" "textarea" "style" "script" "xmp" "iframe" "noframes" "noembed" "plaintext" } member? not
+                current name>> "noscript" = document scripting?>> and not and
+            ] [ current mathml-text-integration-point? current html-integration-point? or ] if [
+                document reconstruct-formatting
+            ] when
+            document char append-node
+        ] if
         ] if
         ] if
         ] if

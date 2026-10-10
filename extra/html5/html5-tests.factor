@@ -407,3 +407,71 @@ DEFER: node-text
     "<p><noscript>text</noscript><frameset>" t parse-html5-with-scripting tree>> first
     child-tags last name>>
 ] unit-test
+
+! Formatting reconstruction and adoption agency recovery.
+DEFER: tag-shape
+: tag-shape ( tag -- shape )
+    [ name>> ] [ child-tags [ tag-shape ] map ] bi 2array ;
+: body-shapes ( string -- shapes ) body-root child-tags [ tag-shape ] map ;
+
+{ { { "b" { { "i" { } } } } { "i" { } } } } [
+    "<b><i>one</b>two</i>three" body-shapes
+] unit-test
+{ { "one" "two" } } [
+    "<b><i>one</b>two</i>three" body-root child-tags [ node-text ] map
+] unit-test
+{ { { "b" { } } { "p" { { "b" { } } } } } } [
+    "<b><p>one</b>two" body-shapes
+] unit-test
+{ "onetwo" } [
+    "<b><p>one</b>two" body-root child-tags last node-text
+] unit-test
+{ { { "p" { { "b" { } } } } { "p" { { "b" { } } } } } } [
+    "<p><b>one<p>two" body-shapes
+] unit-test
+{ { { "a" { } } { "a" { } } } } [
+    "<a href=one>one<a href=two>two" body-shapes
+] unit-test
+{ { "one" "two" } } [
+    "<a href=one>one<a href=two>two" body-root child-tags [ attributes>> first second ] map
+] unit-test
+{ { { "nobr" { } } { "nobr" { } } } } [
+    "<nobr>one<nobr>two" body-shapes
+] unit-test
+{ { { "b" { { "b" { { "b" {  } } } } } } } } [
+    "<p><b><b><b><b>one<p>two" body-root child-tags last child-tags [ tag-shape ] map
+] unit-test
+{ { { "b" { { "table" { { "tbody" { { "tr" { { "td" {  } } { "td" {  } } } } } } } } } } } } [
+    "<b><table><td>one<td>two" body-shapes
+] unit-test
+{ { "a" "a" "table" } } [
+    "<table><a>one<td>two</td>three</table>" body-root child-tags [ name>> ] map
+] unit-test
+{ { { "object" { { "b" { } } } } { "p" { } } } } [
+    "<object><b>one</object><p>two" body-shapes
+] unit-test
+{ { { "template" { } } { "p" { } } } } [
+    "<body><template><b>one</template><p>two" body-shapes
+] unit-test
+{ { "a" "table" } } [
+    "<template><a><table><a>" head-root child-tags first template-content-tags first
+    child-tags [ name>> ] map
+] unit-test
+{ { "p" "i" } } [
+    "<svg><foreignObject><p><i>one</p>two" body-root child-tags first child-tags first
+    child-tags [ name>> ] map
+] unit-test
+{ { "p" "i" } } [
+    "<math><mtext><p><i>one</p>two" body-root child-tags first child-tags first
+    child-tags [ name>> ] map
+] unit-test
+{ { { "font" { { "select" { { "option" {  } } } } } } } } [
+    "<font><select><option>one</option></font></select>" body-shapes
+] unit-test
+{ t } [
+    "<b><p>one</b>two" body-root child-tags last dup child-tags first parent>> eq?
+] unit-test
+{ t } [
+    "<template><a><table><a>" head-root child-tags first template-content-tags first
+    dup child-tags last parent>> eq?
+] unit-test
