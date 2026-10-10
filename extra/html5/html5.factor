@@ -263,6 +263,7 @@ TUPLE: document
 parse-errors
 skip-leading-newline?
 pending-table-characters
+template-insertion-modes
 quirks-mode?
 limited-quirks-mode?
 iframe-srcdoc?
@@ -345,7 +346,8 @@ TUPLE: doctype
 : new-doctype-with-quirks ( document -- )
     <doctype> t >>quirks? >>doctype drop ;
 
-TUPLE: tag self-closing? name attributes children end-tag namespace ;
+! template-contents is a vector for HTML template fragments, otherwise f.
+TUPLE: tag self-closing? name attributes children end-tag namespace template-contents ;
 
 : <tag> ( -- tag )
     tag new
@@ -373,6 +375,7 @@ TUPLE: end-tag self-closing? name attributes ;
 : <document> ( -- document )
     document new
         V{ } clone >>parse-errors
+        V{ } clone >>template-insertion-modes
         V{ } clone >>pending-table-characters
         V{ } clone >>tree
         initial-mode >>insertion-mode
@@ -421,15 +424,18 @@ TUPLE: processing-instruction target data ;
 : misc-node? ( obj -- ? )
     { [ comment? ] [ processing-instruction? ] } 1|| ;
 
-! Tree construction. Active formatting reconstruction, template contents,
-! and frameset parsing are not yet implemented.
+! Tree construction. Active formatting reconstruction and frameset parsing
+! are not yet implemented.
 CONSTANT: void-elements {
     "area" "base" "br" "col" "embed" "hr" "img" "input" "link"
     "meta" "param" "source" "track" "wbr"
 }
 
+: element-children ( element -- children )
+    dup template-contents>> [ nip ] [ children>> ] if* ;
+
 : current-children ( document -- children )
-    dup open-elements>> ?last [ nip children>> ] [ tree>> ] if* ;
+    dup open-elements>> ?last [ nip element-children ] [ tree>> ] if* ;
 
 CONSTANT: table-text-elements { "table" "tbody" "tfoot" "thead" "tr" }
 
@@ -440,14 +446,19 @@ CONSTANT: table-text-elements { "table" "tbody" "tfoot" "thead" "tr" }
     document fostering-parent?>>
     document open-elements>> ?last [ { [ html-element? ] [ name>> table-text-elements member? ] } 1&& ] [ f ] if* and [
         document open-elements>> :> stack
-        stack [ name>> "table" = ] find-last drop :> table-index
-        table-index [
-            table-index 0 > [
-                table-index 1 - stack nth children>> :> children
-                table-index stack nth children index :> position
-                node position children insert-nth!
-            ] [ node stack first children>> push ] if
-        ] [ node document current-children push ] if
+        stack [ { [ html-element? ] [ name>> "table" = ] } 1&& ] find-last drop :> table-index
+        stack [ { [ html-element? ] [ name>> "template" = ] } 1&& ] find-last drop :> template-index
+        template-index [ drop table-index [ drop template-index table-index > ] [ t ] if* ] [ f ] if* [
+            node template-index stack nth element-children push
+        ] [
+            table-index [
+                table-index 0 > [
+                    table-index 1 - stack nth element-children :> children
+                    table-index stack nth children index :> position
+                    node position children insert-nth!
+                ] [ node stack first element-children push ] if
+            ] [ node document current-children push ] if
+        ] if
     ] [ node document current-children push ] if ;
 
 :: insert-element ( document element -- )
@@ -664,7 +675,7 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
             { [ mathml-text-integration-point? ]
               [ { [ namespace>> mathml-namespace = ] [ name>> "annotation-xml" = ] } 1&& ]
               [ { [ namespace>> svg-namespace = ] [ name>> { "foreignObject" "desc" "title" } member? ] } 1&& ]
-            } 1||
+            } 1|| "td" boundaries member? and
         ] if
     ] find nip [ { [ html-element? ] [ name>> name = ] } 1&& ] [ f ] if* ;
 
@@ -738,13 +749,18 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
         { [ dup doctype? ] [ drop ] }
         { [ dup tag? ] [
             dup name>> { "html" "body" } member? [ drop ] [
-                document swap start-body-element
+                dup name>> { "head" "frame" "frameset" } member?
+                document template-insertion-modes>> empty? not and [ drop ] [
+                    document swap start-body-element
+                ] if
             ] if
         ] }
         { [ dup end-tag? ] [
             dup name>> { "body" "html" } member? [
-                document over name>> "body" = [ after-body-mode ] [ after-after-body-mode ] if >>insertion-mode drop
-                document swap mark-end-tag
+                document template-insertion-modes>> empty? [
+                    document over name>> "body" = [ after-body-mode ] [ after-after-body-mode ] if >>insertion-mode drop
+                    document swap mark-end-tag
+                ] [ drop ] if
             ] [ document swap end-body-element ] if
         ] }
         { [ dup f = ] [ drop ] }
@@ -757,15 +773,26 @@ CONSTANT: table-section-elements { "tbody" "thead" "tfoot" }
 CONSTANT: table-cell-elements { "td" "th" }
 
 : table-context ( document -- name/f )
-    open-elements>> [ html-element? ] filter [ name>> ] map reverse
-    [ table-context-elements member? ] find nip ;
+    dup open-elements>> [ html-element? ] filter [ name>> ] map reverse
+    [ dup table-context-elements member? swap "template" = or ] find nip
+    dup "template" = [
+        drop insertion-mode>> {
+            { in-table-mode [ "table" ] }
+            { in-table-body-mode [ "tbody" ] }
+            { in-row-mode [ "tr" ] }
+            { in-column-group-mode [ "colgroup" ] }
+            [ drop f ]
+        } case
+    ] [ nip ] if ;
 
 :: clear-to-table-context ( document names -- )
     document open-elements>> :> stack
-    [ stack ?last [ name>> names member? not ] [ f ] if* ] [ stack pop drop ] while ;
+    [ stack ?last [ name>> names { "template" "html" } append member? not ] [ f ] if* ] [ stack pop drop ] while ;
 
 :: close-table-element ( document name -- )
-    document <end-tag> name >>name close-element ;
+    document name { "html" "template" } element-in-scope? [
+        document <end-tag> name >>name close-element
+    ] when ;
 
 :: flush-table-characters ( document -- )
     document pending-table-characters>> :> characters
@@ -783,55 +810,66 @@ DEFER: table-token
     document t >>fostering-parent? obj ordinary-body-token
     f >>fostering-parent? ;
 
+:: template-table-start-ignored? ( document obj -- ? )
+    document table-context :> context
+    document template-insertion-modes>> empty? not
+    context { "tr" "tbody" } member? and
+    obj name>> { "caption" "col" "colgroup" "tbody" "thead" "tfoot" } member? and
+    document context { "html" "template" } element-in-scope? not and ;
+
 :: table-start-tag ( document obj -- document )
-    obj name>> {
-        { "caption" [
-            document { "table" } clear-to-table-context
-            document obj insert-element document
-        ] }
-        { "colgroup" [
-            document { "table" } clear-to-table-context
-            document obj insert-element document
-        ] }
-        { "col" [
-            document table-context "colgroup" = [
+    document obj template-table-start-ignored? [ document ] [
+        obj name>> {
+            { "caption" [
                 document { "table" } clear-to-table-context
-                document "colgroup" implied-element
-            ] unless
-            document obj insert-element document
-        ] }
-        { "tr" [
-            document table-context "tr" = [ document "tr" close-table-element ] when
-            document table-context table-section-elements member? [
-                document { "table" } clear-to-table-context
-                document "tbody" implied-element
-            ] unless
-            document table-section-elements clear-to-table-context
-            document obj insert-element document
-        ] }
-        { "table" [
-            document "table" close-table-element
-            document obj body-token
-        ] }
-        [
-            dup table-section-elements member? [
-                drop document { "table" } clear-to-table-context
                 document obj insert-element document
-            ] [
-                table-cell-elements member? [
-                    document table-context "tr" = [
-                        document <tag> "tr" >>name table-start-tag drop
-                    ] unless
-                    document { "tr" } clear-to-table-context
+            ] }
+            { "colgroup" [
+                document { "table" } clear-to-table-context
+                document obj insert-element document
+            ] }
+            { "col" [
+                document table-context "colgroup" = [
+                    document { "table" } clear-to-table-context
+                    document "colgroup" implied-element
+                ] unless
+                document obj insert-element document
+            ] }
+            { "tr" [
+                document table-context "tr" = [ document "tr" close-table-element ] when
+                document table-context table-section-elements member? [
+                    document { "table" } clear-to-table-context
+                    document "tbody" implied-element
+                ] unless
+                document table-section-elements clear-to-table-context
+                document obj insert-element document
+            ] }
+            { "table" [
+                document "table" { "html" "template" } element-in-scope? [
+                    document "table" close-table-element
+                    document obj body-token
+                ] [ document ] if
+            ] }
+            [
+                dup table-section-elements member? [
+                    drop document { "table" } clear-to-table-context
                     document obj insert-element document
                 ] [
-                    obj name>> { "script" "style" "template" } member? [
-                        document obj ordinary-body-token
-                    ] [ document obj foster-body-token ] if
+                    table-cell-elements member? [
+                        document table-context "tr" = [
+                            document <tag> "tr" >>name table-start-tag drop
+                        ] unless
+                        document { "tr" } clear-to-table-context
+                        document obj insert-element document
+                    ] [
+                        obj name>> { "script" "style" "template" } member? [
+                            document obj ordinary-body-token
+                        ] [ document obj foster-body-token ] if
+                    ] if
                 ] if
-            ] if
-        ]
-    } case ;
+            ]
+        } case
+    ] if ;
 
 :: table-end-tag ( document obj -- document )
     obj name>> :> name
@@ -878,8 +916,19 @@ DEFER: table-token
                 obj misc-node? or obj html-space? or obj f = or [
                     document obj ordinary-body-token
                 ] [
+                    obj end-tag? [ obj name>> "col" = ] [ f ] if
+                    obj tag? [ obj name>> "html" = ] [ f ] if or
+                    document open-elements>> ?last [ name>> "template" = ] [ f ] if* or [
+                        document
+                    ] [
                     document "colgroup" close-table-element
+                    document open-elements>> ?last [ name>> "template" = ] [ f ] if* [
+                        document in-table-mode >>insertion-mode drop
+                        document template-insertion-modes>> pop drop
+                        in-table-mode document template-insertion-modes>> push
+                    ] when
                     obj end-tag? [ obj name>> "colgroup" = ] [ f ] if [ document ] [ document obj body-token ] if
+                    ] if
                 ] if
             ] [
                 obj {
@@ -895,14 +944,19 @@ DEFER: table-token
     ] if ;
 
 :: body-token ( document obj -- document )
-    document table-context [ document obj table-token ] [ document obj ordinary-body-token ] if ;
+    document table-context [ document obj table-token ] [
+        document template-insertion-modes>> empty? not
+        obj tag? [ obj name>> { "caption" "col" "colgroup" "tbody" "td" "tfoot" "th" "thead" "tr" } member? ] [ f ] if and [
+            document
+        ] [ document obj ordinary-body-token ] if
+    ] if ;
 
 :: ignored-early-end-tag? ( document obj -- ? )
     obj end-tag?
     document insertion-mode>> { before-html-mode before-head-mode after-head-mode } member? and
     obj end-tag? [ obj name>> { "head" "body" "html" "br" } member? not ] [ f ] if and ;
 
-:: html-tree-insert ( document obj -- document )
+:: (html-tree-insert) ( document obj -- document )
     document obj ignored-early-end-tag? [ document ] [
         document insertion-mode>> {
             { initial-mode [
@@ -1004,6 +1058,92 @@ DEFER: table-token
             ] }
             [ drop document obj body-token ]
         } case
+    ] if ;
+
+! HTML templates have a separate fragment and a stack of insertion modes.
+: html-template? ( element -- ? )
+    { [ html-element? ] [ name>> "template" = ] } 1&& ;
+
+:: reset-template-insertion-mode ( document -- )
+    document open-elements>> [ html-element? ] filter reverse
+    [ name>> { "template" "head" "body" "html" "table" "td" "th" "tr" "tbody" "thead" "tfoot" "colgroup" "caption" } member? ] find nip
+    [ name>> ] [ "html" ] if* {
+        { "template" [ document template-insertion-modes>> last ] }
+        { "head" [ in-head-mode ] }
+        { "html" [ after-head-mode ] }
+        [ drop in-body-mode ]
+    } case document swap >>insertion-mode drop ;
+
+:: start-template ( document element -- document )
+    element V{ } clone >>template-contents drop
+    document insertion-mode>> after-head-mode = [
+        document head-element-pointer>> document open-elements>> push
+        document element insert-element
+        document open-elements>> length 2 - document open-elements>> remove-nth! drop
+    ] [ document element insert-element ] if
+    in-template-mode document template-insertion-modes>> push
+    document in-template-mode >>insertion-mode f >>frameset-ok? ;
+
+:: end-template ( document token -- document )
+    document open-elements>> [ html-template? ] find-last drop [
+        drop document "" generate-implied-end-tags
+        document token close-element
+        document template-insertion-modes>> pop drop
+        document reset-template-insertion-mode
+    ] [ "unexpected-template-end-tag" report-parse-error ] if*
+    document ;
+
+:: template-token ( document obj -- document )
+    obj tag? [
+        obj name>> { "base" "basefont" "bgsound" "link" "meta" "noframes" "script" "style" "title" } member? [
+            document obj insert-element document
+        ] [
+            obj name>> {
+                { "caption" [ in-table-mode ] }
+                { "colgroup" [ in-table-mode ] }
+                { "tbody" [ in-table-mode ] }
+                { "tfoot" [ in-table-mode ] }
+                { "thead" [ in-table-mode ] }
+                { "col" [ in-column-group-mode ] }
+                { "tr" [ in-table-body-mode ] }
+                { "td" [ in-row-mode ] }
+                { "th" [ in-row-mode ] }
+                [ drop in-body-mode ]
+            } case :> mode
+            document template-insertion-modes>> pop drop
+            mode document template-insertion-modes>> push
+            document mode >>insertion-mode obj body-token
+        ] if
+    ] [
+        obj end-tag? [
+            obj name>> { "script" "style" "title" "noframes" } member? [
+                document obj close-element
+            ] [ "unexpected-end-tag-in-template" report-parse-error ] if document
+        ] [ document obj ordinary-body-token ] if
+    ] if ;
+
+DEFER: html-tree-insert
+:: html-tree-insert ( document obj -- document )
+    obj f = document template-insertion-modes>> empty? not and [
+        "eof-in-template" report-parse-error
+        document <end-tag> "template" >>name end-template drop
+        document obj html-tree-insert
+    ] [
+        document insertion-mode>> { initial-mode before-html-mode before-head-mode } member? [
+            document obj (html-tree-insert)
+        ] [
+            obj tag? [ obj name>> "template" = ] [ f ] if [
+                document obj start-template
+            ] [
+                obj end-tag? [ obj name>> "template" = ] [ f ] if [
+                    document obj end-template
+                ] [
+                    document insertion-mode>> in-template-mode = [
+                        document obj template-token
+                    ] [ document obj (html-tree-insert) ] if
+                ] if
+            ] if
+        ] if
     ] if ;
 
 CONSTANT: foreign-breakout-elements {
@@ -1113,6 +1253,10 @@ ERROR: invalid-return-state obj ;
     document skip-leading-newline?>> char CHAR: \n = and :> skip?
     document f >>skip-leading-newline? drop
     skip? [
+        document insertion-mode>> in-column-group-mode =
+        document open-elements>> ?last [ name>> "template" = ] [ f ] if* and [
+            document char tree-insert drop
+        ] [
         document char foreign-token? [
             document char tree-insert drop
         ] [
@@ -1124,6 +1268,7 @@ ERROR: invalid-return-state obj ;
         ] [ t ] if* [
             document char tree-insert drop
         ] [ document char append-node ] if
+        ] if
         ] if
         ] if
     ] unless ] if ;

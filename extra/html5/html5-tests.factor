@@ -243,3 +243,65 @@ DEFER: node-text
     "<div><svg><foreignObject><p></div>a" body-root child-tags first child-tags first
     child-tags first child-tags first node-text
 ] unit-test
+
+! Template contents are a separate fragment, including nested templates.
+: head-root ( string -- tag ) html-root child-tags first ;
+: template-content-tags ( tag -- tags ) template-contents>> [ tag? ] filter >array ;
+
+{ t } [
+    "<body><template><p>x</template>" body-root child-tags first children>> empty?
+] unit-test
+{ "x" } [
+    "<template><p>x</template>" head-root child-tags first template-content-tags first node-text
+] unit-test
+{ { "head" "body" } } [
+    "<template><div>" html-root child-tags [ name>> ] map
+] unit-test
+{ "x" } [
+    "<template><template><span>x" head-root child-tags first
+    template-content-tags first template-content-tags first node-text
+] unit-test
+{ { "template" "p" } } [
+    "<body><template><div></template><p>x" body-root child-tags [ name>> ] map
+] unit-test
+{ { "tr" } } [
+    "<template><tr><td>x" head-root child-tags first template-content-tags [ name>> ] map
+] unit-test
+{ { "td" "td" } } [
+    "<template><td>x</td><tbody><td>y" head-root child-tags first
+    template-content-tags [ name>> ] map
+] unit-test
+{ { "col" } } [
+    "<template><col><div>x" head-root child-tags first template-content-tags [ name>> ] map
+] unit-test
+{ 1 } [
+    "<template><col>x" head-root child-tags first template-contents>> length
+] unit-test
+{ { "tr" "div" } } [
+    "<table><template><tr><div>x" body-root child-tags first child-tags first
+    template-content-tags [ name>> ] map
+] unit-test
+{ { "table" "p" } } [
+    "<table><template><tr></template></table><p>x" body-root child-tags [ name>> ] map
+] unit-test
+{ "x" } [
+    "<div><template></div>x" body-root child-tags first child-tags first
+    template-contents>> concat
+] unit-test
+{ t } [
+    "<head></head><template>x</template>" head-root child-tags first template-contents>> empty? not
+] unit-test
+{ { "script" "td" } } [
+    "<template><script>x</script><td>y" head-root child-tags first
+    template-content-tags [ name>> ] map
+] unit-test
+{ t } [
+    "<template><svg><template/>" head-root child-tags first template-content-tags first
+    child-tags first template-contents>> f =
+] unit-test
+{ t } [
+    "<template><div>" parse-html5 template-insertion-modes>> empty?
+] unit-test
+{ t } [
+    "<template><div>" parse-html5 parse-errors>> "eof-in-template" swap member?
+] unit-test
