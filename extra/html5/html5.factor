@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs combinators
-combinators.short-circuit html.entities io.encodings.utf8
-io.files json kernel locals math math.order memoize modern.slices
-sequences sequences.extras strings words ;
+combinators.short-circuit io.encodings.utf8
+io.files json kernel locals math math.order math.parser math.bitwise memoize modern.slices namespaces splitting
+sequences sequences.extras strings unicode words ;
 
 IN: html5
 
@@ -163,6 +163,16 @@ DEFER: cdata-section-bracket-state
 DEFER: (cdata-section-bracket-state)
 DEFER: cdata-section-end-state
 DEFER: (cdata-section-end-state)
+DEFER: processing-instruction-open-state
+DEFER: (processing-instruction-open-state)
+DEFER: processing-instruction-target-state
+DEFER: (processing-instruction-target-state)
+DEFER: after-processing-instruction-target-state
+DEFER: (after-processing-instruction-target-state)
+DEFER: processing-instruction-data-state
+DEFER: (processing-instruction-data-state)
+DEFER: processing-instruction-questionable-state
+DEFER: (processing-instruction-questionable-state)
 DEFER: character-reference-state
 DEFER: (character-reference-state)
 DEFER: named-character-reference-state
@@ -247,7 +257,12 @@ in-row-mode in-cell-mode in-select-mode in-select-in-table-mode in-template-mode
 after-body-mode in-frameset-mode after-frameset-mode after-after-body-mode
 after-after-frameset-mode ;
 
+SYMBOL: current-html5-document
+
 TUPLE: document
+parse-errors
+skip-leading-newline?
+pending-table-characters
 quirks-mode?
 limited-quirks-mode?
 iframe-srcdoc?
@@ -273,6 +288,7 @@ attribute-name
 attribute-value
 temporary-buffer
 comment-token
+processing-instruction-token
 open-elements
 return-state ;
 
@@ -355,6 +371,8 @@ TUPLE: end-tag self-closing? name attributes ;
 
 : <document> ( -- document )
     document new
+        V{ } clone >>parse-errors
+        V{ } clone >>pending-table-characters
         V{ } clone >>tree
         initial-mode >>insertion-mode
         <doctype> >>doctype
@@ -394,8 +412,16 @@ TUPLE: comment open payload close ;
 : push-doctype-system-identifier ( ch document -- )
     doctype>> system-identifier>> push ;
 
-! Tree construction for ordinary HTML documents. Specialized HTML5
-! recovery (formatting reconstruction and foster parenting) is not yet implemented.
+: report-parse-error ( name -- )
+    current-html5-document get parse-errors>> push ;
+
+TUPLE: processing-instruction target data ;
+
+: misc-node? ( obj -- ? )
+    { [ comment? ] [ processing-instruction? ] } 1|| ;
+
+! Tree construction. Active formatting reconstruction, template contents,
+! and foreign-content parsing are not yet implemented.
 CONSTANT: void-elements {
     "area" "base" "br" "col" "embed" "hr" "img" "input" "link"
     "meta" "param" "source" "track" "wbr"
@@ -404,8 +430,22 @@ CONSTANT: void-elements {
 : current-children ( document -- children )
     dup open-elements>> ?last [ nip children>> ] [ tree>> ] if* ;
 
+CONSTANT: table-text-elements { "table" "tbody" "tfoot" "thead" "tr" }
+
 :: append-node ( document obj -- )
-    obj dup integer? [ 1string ] when document current-children push ;
+    obj dup integer? [ 1string ] when :> node
+    document fostering-parent?>>
+    document open-elements>> ?last [ name>> table-text-elements member? ] [ f ] if* and [
+        document open-elements>> :> stack
+        stack [ name>> "table" = ] find-last drop :> table-index
+        table-index [
+            table-index 0 > [
+                table-index 1 - stack nth children>> :> children
+                table-index stack nth children index :> position
+                node position children insert-nth!
+            ] [ node stack first children>> push ] if
+        ] [ node document current-children push ] if
+    ] [ node document current-children push ] if ;
 
 :: insert-element ( document element -- )
     document element append-node
@@ -431,107 +471,355 @@ DEFER: tree-insert
     document open-elements>> [ name>> token name>> = ] find-last nip
     [ token >>end-tag drop ] when* ;
 
-:: body-token ( document obj -- document )
+CONSTANT: scope-boundaries {
+    "applet" "caption" "html" "table" "td" "th" "marquee" "object" "template"
+}
+CONSTANT: block-elements {
+    "address" "article" "aside" "blockquote" "center" "details" "dialog"
+    "dir" "div" "dl" "fieldset" "figcaption" "figure" "footer" "header"
+    "hgroup" "main" "menu" "nav" "ol" "p" "search" "section" "summary" "ul"
+}
+CONSTANT: heading-elements { "h1" "h2" "h3" "h4" "h5" "h6" }
+CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp" "rt" "rtc" }
+
+:: element-in-scope? ( document name boundaries -- ? )
+    document open-elements>> [ name>> ] map reverse
+    [ dup name = swap boundaries member? or ] find nip name = ;
+
+:: generate-implied-end-tags ( document except -- )
+    document open-elements>> :> stack
+    [ stack ?last [ name>> dup except = not swap implied-end-elements member? and ] [ f ] if* ] [
+        stack pop drop
+    ] while ;
+
+:: close-paragraph ( document -- )
+    document "p" scope-boundaries "button" suffix element-in-scope? [
+        document "p" generate-implied-end-tags
+        document <end-tag> "p" >>name close-element
+    ] when ;
+
+:: close-list-item ( document name -- )
+    document open-elements>> [ name>> ] map reverse
+    [ dup name = swap { "html" "table" "td" "th" "applet" "object" "marquee" "template" "ol" "ul" "dl" } member? or ] find nip
+    name = [ document <end-tag> name >>name close-element ] when ;
+
+:: start-body-element ( document element -- )
+    element name>> :> name
+    name "table" = document quirks-mode?>> not and [ document close-paragraph ] when
+    name block-elements member? name heading-elements member? or
+    name { "pre" "listing" "hr" "xmp" "plaintext" } member? or [ document close-paragraph ] when
+    name { "li" "dd" "dt" } member? [
+        document name close-list-item
+        name { "dd" "dt" } member? [
+            document name "dd" = [ "dt" ] [ "dd" ] if close-list-item
+        ] when
+        document close-paragraph
+    ] when
+    name heading-elements member? [
+        document open-elements>> ?last [ name>> heading-elements member? ] [ f ] if* [
+            document open-elements>> pop drop
+        ] when
+    ] when
+    name { "option" "optgroup" } member? [
+        document open-elements>> ?last [ name>> "option" = ] [ f ] if* [
+            document open-elements>> pop drop
+        ] when
+        name "optgroup" = [
+            document open-elements>> ?last [ name>> "optgroup" = ] [ f ] if* [
+                document open-elements>> pop drop
+            ] when
+        ] when
+    ] when
+    name { "rb" "rp" "rt" "rtc" } member? [ document "" generate-implied-end-tags ] when
+    document element insert-element
+    name { "pre" "listing" "textarea" } member? [ document t >>skip-leading-newline? drop ] when ;
+
+:: end-body-element ( document token -- )
+    token name>> :> name
+    name "p" = [
+        document "p" scope-boundaries "button" suffix element-in-scope? [
+            document "p" implied-element
+        ] unless
+        document close-paragraph
+    ] [
+        document name scope-boundaries element-in-scope? [
+            document name generate-implied-end-tags
+            document token close-element
+        ] when
+    ] if ;
+
+:: ordinary-body-token ( document obj -- document )
     obj {
         { [ dup doctype? ] [ drop ] }
         { [ dup tag? ] [
             dup name>> { "html" "body" } member? [ drop ] [
-                document swap insert-element
+                document swap start-body-element
             ] if
         ] }
         { [ dup end-tag? ] [
             dup name>> { "body" "html" } member? [
-                dup name>> "body" = [
-                    document after-body-mode >>insertion-mode drop
-                ] when
+                document over name>> "body" = [ after-body-mode ] [ after-after-body-mode ] if >>insertion-mode drop
                 document swap mark-end-tag
-            ] [ document swap close-element ] if
+            ] [ document swap end-body-element ] if
         ] }
         { [ dup f = ] [ drop ] }
         [ document swap append-node ]
     } cond
     document ;
 
-:: tree-insert ( document obj -- document )
-    document insertion-mode>> {
-        { initial-mode [
-            obj doctype? [
-                document obj >>tree-doctype before-html-mode >>insertion-mode
+CONSTANT: table-context-elements { "table" "caption" "colgroup" "tbody" "thead" "tfoot" "tr" "td" "th" }
+CONSTANT: table-section-elements { "tbody" "thead" "tfoot" }
+CONSTANT: table-cell-elements { "td" "th" }
+
+: table-context ( document -- name/f )
+    open-elements>> [ name>> ] map reverse
+    [ table-context-elements member? ] find nip ;
+
+:: clear-to-table-context ( document names -- )
+    document open-elements>> :> stack
+    [ stack ?last [ name>> names member? not ] [ f ] if* ] [ stack pop drop ] while ;
+
+:: close-table-element ( document name -- )
+    document <end-tag> name >>name close-element ;
+
+:: flush-table-characters ( document -- )
+    document pending-table-characters>> :> characters
+    characters empty? [
+        characters [ html-space? ] all? not document swap >>fostering-parent? drop
+        characters [ document swap append-node ] each
+        document f >>fostering-parent? drop
+        characters delete-all
+    ] unless ;
+
+DEFER: body-token
+DEFER: table-token
+
+:: foster-body-token ( document obj -- document )
+    document t >>fostering-parent? obj ordinary-body-token
+    f >>fostering-parent? ;
+
+:: table-start-tag ( document obj -- document )
+    obj name>> {
+        { "caption" [
+            document { "table" } clear-to-table-context
+            document obj insert-element document
+        ] }
+        { "colgroup" [
+            document { "table" } clear-to-table-context
+            document obj insert-element document
+        ] }
+        { "col" [
+            document table-context "colgroup" = [
+                document { "table" } clear-to-table-context
+                document "colgroup" implied-element
+            ] unless
+            document obj insert-element document
+        ] }
+        { "tr" [
+            document table-context "tr" = [ document "tr" close-table-element ] when
+            document table-context table-section-elements member? [
+                document { "table" } clear-to-table-context
+                document "tbody" implied-element
+            ] unless
+            document table-section-elements clear-to-table-context
+            document obj insert-element document
+        ] }
+        { "table" [
+            document "table" close-table-element
+            document obj body-token
+        ] }
+        [
+            dup table-section-elements member? [
+                drop document { "table" } clear-to-table-context
+                document obj insert-element document
             ] [
-                obj comment? [ document obj append-node document ] [
+                table-cell-elements member? [
+                    document table-context "tr" = [
+                        document <tag> "tr" >>name table-start-tag drop
+                    ] unless
+                    document { "tr" } clear-to-table-context
+                    document obj insert-element document
+                ] [
+                    obj name>> { "script" "style" "template" } member? [
+                        document obj ordinary-body-token
+                    ] [ document obj foster-body-token ] if
+                ] if
+            ] if
+        ]
+    } case ;
+
+:: table-end-tag ( document obj -- document )
+    obj name>> :> name
+    name "table" = [
+        document "table" close-table-element
+    ] [
+        name { "tbody" "thead" "tfoot" "tr" "colgroup" } member? [
+            document name { "html" "table" "template" } element-in-scope? [
+                document name close-table-element
+            ] when
+        ] [
+            name { "body" "caption" "col" "html" "td" "th" } member? [
+                document obj foster-body-token drop
+            ] unless
+        ] if
+    ] if document ;
+
+:: table-token ( document obj -- document )
+    document table-context :> context
+    context table-cell-elements member? [
+        obj tag? [ obj name>> { "caption" "col" "colgroup" "tbody" "td" "tfoot" "th" "thead" "tr" } member? ] [ f ] if
+        obj end-tag? [ obj name>> { "table" "tbody" "thead" "tfoot" "tr" "td" "th" } member? ] [ f ] if or [
+            obj end-tag? [
+                document obj name>> { "html" "table" "template" } element-in-scope?
+            ] [ t ] if [
+                document context generate-implied-end-tags
+                document context close-table-element
+                document obj body-token
+            ] [ document ] if
+        ] [ document obj ordinary-body-token ] if
+    ] [
+        context "caption" = [
+            obj tag? [ obj name>> table-context-elements member? ] [ f ] if
+            obj end-tag? [ obj name>> { "table" "caption" } member? ] [ f ] if or [
+                document "caption" generate-implied-end-tags
+                document "caption" close-table-element
+                obj end-tag? [ obj name>> "caption" = ] [ f ] if [
+                    document
+                ] [ document obj body-token ] if
+            ] [ document obj ordinary-body-token ] if
+        ] [
+            context "colgroup" = [
+                obj tag? [ obj name>> "col" = ] [ f ] if
+                obj misc-node? or obj html-space? or obj f = or [
+                    document obj ordinary-body-token
+                ] [
+                    document "colgroup" close-table-element
+                    obj end-tag? [ obj name>> "colgroup" = ] [ f ] if [ document ] [ document obj body-token ] if
+                ] if
+            ] [
+                obj {
+                    { [ dup tag? ] [ document swap table-start-tag ] }
+                    { [ dup end-tag? ] [ document swap table-end-tag ] }
+                    { [ dup misc-node? ] [ document swap ordinary-body-token ] }
+                    { [ dup doctype? ] [ drop document ] }
+                    { [ dup f = ] [ drop document ] }
+                    [ document swap foster-body-token ]
+                } cond
+            ] if
+        ] if
+    ] if ;
+
+:: body-token ( document obj -- document )
+    document table-context [ document obj table-token ] [ document obj ordinary-body-token ] if ;
+
+:: ignored-early-end-tag? ( document obj -- ? )
+    obj end-tag?
+    document insertion-mode>> { before-html-mode before-head-mode after-head-mode } member? and
+    obj end-tag? [ obj name>> { "head" "body" "html" "br" } member? not ] [ f ] if and ;
+
+:: tree-insert ( document obj -- document )
+    document obj ignored-early-end-tag? [ document ] [
+        document insertion-mode>> {
+            { initial-mode [
+                obj doctype? [
+                    document obj >>tree-doctype before-html-mode >>insertion-mode
+                ] [
+                    obj misc-node? [ document obj append-node document ] [
+                        obj html-space? [ document ] [
+                            document t >>quirks-mode? before-html-mode >>insertion-mode
+                            obj tree-insert
+                        ] if
+                    ] if
+                ] if
+            ] }
+            { before-html-mode [
+                obj misc-node? [ document obj append-node document ] [
                     obj html-space? [ document ] [
-                        document t >>quirks-mode? before-html-mode >>insertion-mode
-                        obj tree-insert
+                        obj tag? [ obj name>> "html" = ] [ f ] if [
+                            document obj insert-element
+                            document before-head-mode >>insertion-mode
+                        ] [
+                            document "html" implied-element
+                            document before-head-mode >>insertion-mode obj tree-insert
+                        ] if
                     ] if
                 ] if
-            ] if
-        ] }
-        { before-html-mode [
-            obj comment? [ document obj append-node document ] [
+            ] }
+            { before-head-mode [
                 obj html-space? [ document ] [
-                    obj tag? [ obj name>> "html" = ] [ f ] if [
-                        document obj insert-element
-                        document before-head-mode >>insertion-mode
-                    ] [
-                        document "html" implied-element
-                        document before-head-mode >>insertion-mode obj tree-insert
+                    obj misc-node? [ document obj append-node document ] [
+                        obj tag? [ obj name>> "head" = ] [ f ] if [
+                            document obj insert-element
+                            document obj >>head-element-pointer in-head-mode >>insertion-mode
+                        ] [
+                            document "head" implied-element
+                            document dup open-elements>> last >>head-element-pointer
+                            in-head-mode >>insertion-mode obj tree-insert
+                        ] if
                     ] if
                 ] if
-            ] if
-        ] }
-        { before-head-mode [
-            obj html-space? [ document ] [
-                obj comment? [ document obj append-node document ] [
-                    obj tag? [ obj name>> "head" = ] [ f ] if [
-                        document obj insert-element
-                        document obj >>head-element-pointer in-head-mode >>insertion-mode
-                    ] [
-                        document "head" implied-element
-                        document dup open-elements>> last >>head-element-pointer
-                        in-head-mode >>insertion-mode obj tree-insert
+            ] }
+            { in-head-mode [
+                obj {
+                    { [ dup html-space? ] [ document swap append-node document ] }
+                    { [ dup misc-node? ] [ document swap append-node document ] }
+                    { [ dup doctype? ] [ drop document ] }
+                    { [ dup tag? [ dup name>> {
+                        "base" "basefont" "bgsound" "link" "meta" "title"
+                        "style" "script" "noscript" "noframes" "template"
+                    } member? ] [ f ] if ] [
+                        document swap insert-element document
+                    ] }
+                    { [ dup end-tag? [ dup name>> { "head" "body" "html" "br" } member? not ] [ f ] if ] [
+                        document swap close-element document
+                    ] }
+                    { [ dup end-tag? [ dup name>> "head" = ] [ f ] if ] [
+                        document swap close-element
+                        document after-head-mode >>insertion-mode
+                    ] }
+                    [
+                        document <end-tag> "head" >>name close-element
+                        document after-head-mode >>insertion-mode swap tree-insert
+                    ]
+                } cond
+            ] }
+            { after-head-mode [
+                obj html-space? [ document obj append-node document ] [
+                    obj misc-node? [ document obj append-node document ] [
+                        obj tag? [ obj name>> "body" = ] [ f ] if [
+                            document obj insert-element
+                            document in-body-mode >>insertion-mode
+                        ] [
+                            document "body" implied-element
+                            document in-body-mode >>insertion-mode obj tree-insert
+                        ] if
                     ] if
                 ] if
-            ] if
-        ] }
-        { in-head-mode [
-            obj {
-                { [ dup html-space? ] [ document swap append-node document ] }
-                { [ dup comment? ] [ document swap append-node document ] }
-                { [ dup doctype? ] [ drop document ] }
-                { [ dup tag? [ dup name>> {
-                    "base" "basefont" "bgsound" "link" "meta" "title"
-                    "style" "script" "noscript" "noframes" "template"
-                } member? ] [ f ] if ] [
-                    document swap insert-element document
-                ] }
-                { [ dup end-tag? [ dup name>> "head" = not ] [ f ] if ] [
-                    document swap close-element document
-                ] }
-                { [ dup end-tag? [ dup name>> "head" = ] [ f ] if ] [
-                    document swap close-element
-                    document after-head-mode >>insertion-mode
-                ] }
-                [
-                    document <end-tag> "head" >>name close-element
-                    document after-head-mode >>insertion-mode swap tree-insert
-                ]
-            } cond
-        ] }
-        { after-head-mode [
-            obj html-space? [ document obj append-node document ] [
-                obj comment? [ document obj append-node document ] [
-                    obj tag? [ obj name>> "body" = ] [ f ] if [
-                        document obj insert-element
-                        document in-body-mode >>insertion-mode
+            ] }
+            { after-body-mode [
+                obj misc-node? [
+                    obj document open-elements>> first children>> push document
+                ] [
+                    obj end-tag? [ obj name>> "html" = ] [ f ] if [
+                        document obj mark-end-tag
+                        document after-after-body-mode >>insertion-mode
                     ] [
-                        document "body" implied-element
+                        obj html-space? obj doctype? or [ document obj body-token ] [
+                            document in-body-mode >>insertion-mode obj tree-insert
+                        ] if
+                    ] if
+                ] if
+            ] }
+            { after-after-body-mode [
+                obj misc-node? [ obj document tree>> push document ] [
+                    obj html-space? obj doctype? or [ document obj body-token ] [
                         document in-body-mode >>insertion-mode obj tree-insert
                     ] if
                 ] if
-            ] if
-        ] }
-        [ drop document obj body-token ]
-    } case ;
+            ] }
+            [ drop document obj body-token ]
+        } case
+    ] if ;
 
 MEMO: load-entities ( -- assoc )
     "vocab:html5/entities.json" utf8 file-contents json> ;
@@ -561,21 +849,36 @@ ERROR: invalid-return-state obj ;
     SBUF" " clone >>attribute-name
     SBUF" " clone >>attribute-value drop ;
 
-: push-attribute ( document -- )
-    [ current-attribute ]
-    [ tag>> attributes>> push-when ]
-    [ reset-attribute ] tri ;
+:: push-attribute ( document -- )
+    document current-attribute [
+        :> attribute
+        document tag>> attributes>> :> attributes
+        attribute first attributes key? [
+            "duplicate-attribute" report-parse-error
+        ] [ attribute attributes push ] if
+    ] when*
+    document reset-attribute ;
 
-: emit-eof ( document -- ) f tree-insert drop ;
+: emit-eof ( document -- ) dup flush-table-characters f tree-insert drop ;
 :: emit-char ( char document -- )
-    document open-elements>> ?last [
-        name>> { "html" "head" } member?
-    ] [ t ] if* [
-        document char tree-insert drop
-    ] [ document char append-node ] if ;
+    document skip-leading-newline?>> char CHAR: \n = and :> skip?
+    document f >>skip-leading-newline? drop
+    skip? [
+        document open-elements>> ?last [ name>> table-text-elements member? ] [ f ] if* [
+            char document pending-table-characters>> push
+        ] [
+        document open-elements>> ?last [
+            name>> { "html" "head" } member?
+        ] [ t ] if* [
+            document char tree-insert drop
+        ] [ document char append-node ] if
+        ] if
+    ] unless ;
 : emit-string ( string document -- ) swap append-node ;
 
 : emit-tag ( document -- )
+    dup flush-table-characters
+    f >>skip-leading-newline?
     {
         [ tag>> [ name>> >string ] [ name<< ] bi ]
         [ push-attribute ]
@@ -586,11 +889,13 @@ ERROR: invalid-return-state obj ;
 : emit-end-tag ( document -- ) emit-tag ;
 
 : emit-comment-token ( document -- )
-    [ dup comment-token>> >string <comment> append-node ]
+    dup flush-table-characters
+    f >>skip-leading-newline?
+    [ dup comment-token>> >string <comment> tree-insert drop ]
     [ SBUF" " clone >>comment-token drop ] bi ;
 
 : emit-doctype ( document -- )
-    [ doctype>> [ >string ] change-name drop ]
+    [ doctype>> [ [ >string ] [ "" ] if* ] change-name drop ]
     [ dup doctype>> tree-insert drop ] bi ;
 
 : reset-temporary-buffer ( document -- ) SBUF" " clone >>temporary-buffer drop ;
@@ -636,6 +941,7 @@ ERROR: invalid-return-state obj ;
 
 : tag-data-state ( document n/f string -- document n'/f string )
     pick open-elements>> ?last [ name>> ] [ "" ] if* {
+        { "noscript" [ pick scripting?>> [ rawtext-state ] [ data-state ] if ] }
         { "title" [ rcdata-state ] }
         { "textarea" [ rcdata-state ] }
         { "style" [ rawtext-state ] }
@@ -653,7 +959,7 @@ ERROR: invalid-return-state obj ;
     {
         { [ dup CHAR: & = ] [ drop [ \ data-state >>return-state ] 2dip character-reference-state ] }
         { [ dup CHAR: < = ] [ drop tag-open-state ] }
-        { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error data-state ] }
         { [ dup f = ] [ drop pick emit-eof ] }
         [ reach emit-char data-state ]
     } cond ;
@@ -666,7 +972,7 @@ ERROR: invalid-return-state obj ;
     {
         { [ dup CHAR: & = ] [ drop [ \ rcdata-state >>return-state ] 2dip character-reference-state ] }
         { [ dup CHAR: < = ] [ drop rcdata-less-than-sign-state ] }
-        { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach emit-char rcdata-state ] }
         { [ dup f = ] [ drop pick emit-eof ] }
         [ reach emit-char rcdata-state ]
     } cond ;
@@ -678,7 +984,7 @@ ERROR: invalid-return-state obj ;
 : (rawtext-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: < = ] [ drop rawtext-less-than-sign-state ] }
-        { [ dup CHAR: \0 = ] [ drop unexpected-null-character ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach emit-char rawtext-state ] }
         { [ dup f = ] [ drop pick emit-eof ] }
         [ reach emit-char rawtext-state ]
     } cond ;
@@ -690,7 +996,7 @@ ERROR: invalid-return-state obj ;
 : (script-data-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: < = ] [ drop script-data-less-than-sign-state ] }
-        { [ dup CHAR: \0 = ] [ drop unexpected-null-character ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach emit-char script-data-state ] }
         { [ dup f = ] [ drop pick emit-eof ] }
         [ reach emit-char script-data-state ]
     } cond ;
@@ -701,7 +1007,7 @@ ERROR: invalid-return-state obj ;
 
 : (plaintext-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: \0 = ] [ drop unexpected-null-character ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach emit-char plaintext-state ] }
         { [ dup f = ] [ drop pick emit-eof ] }
         [ reach emit-char plaintext-state ]
     } cond ;
@@ -715,9 +1021,15 @@ ERROR: invalid-return-state obj ;
         { [ dup ascii-alpha? ] [ reach new-tag (tag-name-state) ] }
         { [ dup CHAR: ! = ] [ drop markup-declaration-open-state ] }
         { [ dup CHAR: / = ] [ drop end-tag-open-state ] }
-        { [ dup CHAR: ? = ] [ unexpected-question-mark-instead-of-tag-name ] }
-        { [ dup f = ] [ eof-before-tag-name ] }
-        [ invalid-first-character-of-tag-name ]
+        { [ dup CHAR: ? = ] [ drop pick reset-temporary-buffer processing-instruction-open-state ] }
+        { [ dup f = ] [
+            drop "eof-before-tag-name" report-parse-error
+            "<" reach emit-string pick emit-eof
+        ] }
+        [
+            "invalid-first-character-of-tag-name" report-parse-error
+            [ CHAR: < reach emit-char ] dip (data-state)
+        ]
     } cond ;
 
 : tag-open-state ( document n/f string -- document n'/f string )
@@ -727,9 +1039,12 @@ ERROR: invalid-return-state obj ;
 : (end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup ascii-alpha? ] [ reach new-end-tag (tag-name-state) ] }
-        { [ dup CHAR: > = ] [ missing-end-tag-name ] }
-        { [ dup f = ] [ eof-before-tag-name ] }
-        [ invalid-first-character-of-tag-name ]
+        { [ dup CHAR: > = ] [ drop "missing-end-tag-name" report-parse-error data-state ] }
+        { [ dup f = ] [
+            drop "eof-before-tag-name" report-parse-error
+            "</" reach emit-string pick emit-eof
+        ] }
+        [ "invalid-first-character-of-tag-name" report-parse-error (bogus-comment-state) ]
     } cond ;
 
 : end-tag-open-state ( document n/f string -- document n'/f string )
@@ -742,8 +1057,10 @@ ERROR: invalid-return-state obj ;
         { [ dup "\t\n\f\s" member? ] [ drop before-attribute-name-state ] }
         { [ dup CHAR: / = ] [ drop self-closing-start-tag-state ] }
         { [ dup CHAR: > = ] [ drop pick emit-tag tag-data-state ] }
-        { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
-        { [ dup f = ] [ eof-before-tag-name ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-tag-name tag-name-state ] }
+        { [ dup f = ] [
+            drop "eof-in-tag" report-parse-error pick emit-eof
+        ] }
         [ reach push-tag-name tag-name-state ]
     } cond ;
 
@@ -764,7 +1081,7 @@ ERROR: invalid-return-state obj ;
 : (rcdata-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup ascii-alpha? ] [ reach new-end-tag (rcdata-end-tag-name-state) ] }
-        [ [ CHAR: < reach emit-char ] dip (rcdata-state) ]
+        [ [ "</" reach emit-string ] dip (rcdata-state) ]
     } cond ;
 
 : rcdata-end-tag-open-state ( document n/f string -- document n'/f string )
@@ -773,17 +1090,12 @@ ERROR: invalid-return-state obj ;
 
 : (rcdata-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup "\t\n\f\s" member? ] [
-            drop pick appropriate-end-tag-token?
-            [ before-attribute-name-state ] [ "</" reach emit-temporary-buffer-with rcdata-state ] if
-        ] }
-        { [ dup CHAR: / = ] [
-            drop pick appropriate-end-tag-token?
-            [ self-closing-start-tag-state ] [ "</" reach emit-temporary-buffer-with rcdata-state ] if
-        ] }
-        { [ dup CHAR: > = ] [
-            drop pick appropriate-end-tag-token?
-            [ pick emit-end-tag data-state ] [ "</" reach emit-temporary-buffer-with rcdata-state ] if
+        { [ dup "\t\n\f\s/>" member? [ reach appropriate-end-tag-token? ] [ f ] if ] [
+            {
+                { CHAR: > [ pick emit-end-tag data-state ] }
+                { CHAR: / [ self-closing-start-tag-state ] }
+                [ drop before-attribute-name-state ]
+            } case
         ] }
         { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi rcdata-end-tag-name-state ] }
         { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi rcdata-end-tag-name-state ] }
@@ -807,7 +1119,7 @@ ERROR: invalid-return-state obj ;
 : (rawtext-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup ascii-alpha? ] [ reach new-end-tag (rawtext-end-tag-name-state) ] }
-        [ [ CHAR: < reach emit-char ] dip (rawtext-state) ]
+        [ [ "</" reach emit-string ] dip (rawtext-state) ]
     } cond ;
 
 : rawtext-end-tag-open-state ( document n/f string -- document n'/f string )
@@ -816,17 +1128,12 @@ ERROR: invalid-return-state obj ;
 
 : (rawtext-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup "\t\n\f\s" member? ] [
-            drop pick appropriate-end-tag-token?
-            [ before-attribute-name-state ] [ "</" reach emit-temporary-buffer-with rawtext-state ] if
-        ] }
-        { [ dup CHAR: / = ] [
-            drop pick appropriate-end-tag-token?
-            [ self-closing-start-tag-state ] [ "</" reach emit-temporary-buffer-with rawtext-state ] if
-        ] }
-        { [ dup CHAR: > = ] [
-            drop pick appropriate-end-tag-token?
-            [ pick emit-end-tag data-state ] [ "</" reach emit-temporary-buffer-with rawtext-state ] if
+        { [ dup "\t\n\f\s/>" member? [ reach appropriate-end-tag-token? ] [ f ] if ] [
+            {
+                { CHAR: > [ pick emit-end-tag data-state ] }
+                { CHAR: / [ self-closing-start-tag-state ] }
+                [ drop before-attribute-name-state ]
+            } case
         ] }
         { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi rawtext-end-tag-name-state ] }
         { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi rawtext-end-tag-name-state ] }
@@ -860,20 +1167,15 @@ ERROR: invalid-return-state obj ;
 
 : (script-data-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup "\t\n\f\s" member? ] [
-            drop pick appropriate-end-tag-token?
-            [ before-attribute-name-state ] [ "</" reach emit-temporary-buffer-with script-data-state ] if
+        { [ dup "\t\n\f\s/>" member? [ reach appropriate-end-tag-token? ] [ f ] if ] [
+            {
+                { CHAR: > [ pick emit-end-tag data-state ] }
+                { CHAR: / [ self-closing-start-tag-state ] }
+                [ drop before-attribute-name-state ]
+            } case
         ] }
-        { [ dup CHAR: / = ] [
-            drop pick appropriate-end-tag-token?
-            [ self-closing-start-tag-state ] [ "</" reach emit-temporary-buffer-with script-data-state ] if
-        ] }
-        { [ dup CHAR: > = ] [
-            drop pick appropriate-end-tag-token?
-            [ pick emit-end-tag data-state ] [ "</" reach emit-temporary-buffer-with script-data-state ] if
-        ] }
-        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi rawtext-end-tag-name-state ] }
-        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi rawtext-end-tag-name-state ] }
+        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-end-tag-name-state ] }
+        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-end-tag-name-state ] }
         [ [ "</" reach emit-temporary-buffer-with ] dip (script-data-state) ]
     } cond ;
 
@@ -883,7 +1185,7 @@ ERROR: invalid-return-state obj ;
 
 : (script-data-escape-start-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: - = ] [ drop script-data-escape-start-dash-state ] }
+        { [ dup CHAR: - = ] [ reach emit-char script-data-escape-start-dash-state ] }
         [ (script-data-state) ]
     } cond ;
 
@@ -893,7 +1195,7 @@ ERROR: invalid-return-state obj ;
 
 : (script-data-escape-start-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: - = ] [ drop script-data-escaped-dash-dash-state ] }
+        { [ dup CHAR: - = ] [ reach emit-char script-data-escaped-dash-dash-state ] }
         [ (script-data-state) ]
     } cond ;
 
@@ -903,10 +1205,10 @@ ERROR: invalid-return-state obj ;
 
 : (script-data-escaped-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: - = ] [ drop script-data-escaped-dash-state ] }
+        { [ dup CHAR: - = ] [ reach emit-char script-data-escaped-dash-state ] }
         { [ dup CHAR: < = ] [ drop script-data-escaped-less-than-sign-state ] }
-        { [ dup CHAR: \0 = ] [ unexpected-null-character CHAR: replacement-character unimplemented* ] }
-        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach emit-char script-data-escaped-state ] }
+        { [ dup f = ] [ drop "eof-in-script-html-comment-like-text" report-parse-error pick emit-eof ] }
         [ reach emit-char script-data-escaped-state ]
     } cond ;
 
@@ -916,10 +1218,10 @@ ERROR: invalid-return-state obj ;
 
 : (script-data-escaped-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: - = ] [ drop script-data-escaped-dash-dash-state ] }
+        { [ dup CHAR: - = ] [ reach emit-char script-data-escaped-dash-dash-state ] }
         { [ dup CHAR: < = ] [ drop script-data-escaped-less-than-sign-state ] }
-        { [ dup CHAR: \0 = ] [ unexpected-null-character script-data-escaped-state ] }
-        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach emit-char script-data-escaped-state ] }
+        { [ dup f = ] [ drop "eof-in-script-html-comment-like-text" report-parse-error pick emit-eof ] }
         [ reach emit-char script-data-escaped-state ]
     } cond ;
 
@@ -932,8 +1234,8 @@ ERROR: invalid-return-state obj ;
         { [ dup CHAR: - = ] [ reach emit-char script-data-escaped-dash-dash-state ] }
         { [ dup CHAR: < = ] [ drop script-data-escaped-less-than-sign-state ] }
         { [ dup CHAR: > = ] [ reach emit-char script-data-state ] }
-        { [ dup CHAR: \0 = ] [ unexpected-null-character script-data-escaped-state ] }
-        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach emit-char script-data-escaped-state ] }
+        { [ dup f = ] [ drop "eof-in-script-html-comment-like-text" report-parse-error pick emit-eof ] }
         [ reach emit-char script-data-escaped-state ]
     } cond ;
 
@@ -964,17 +1266,12 @@ ERROR: invalid-return-state obj ;
 
 : (script-data-escaped-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup "\t\n\f\s" member? ] [
-            drop pick appropriate-end-tag-token?
-            [ before-attribute-name-state ] [ "</" reach emit-temporary-buffer-with script-data-escaped-state ] if
-        ] }
-        { [ dup CHAR: / = ] [
-            drop pick appropriate-end-tag-token?
-            [ self-closing-start-tag-state ] [ "</" reach emit-temporary-buffer-with script-data-escaped-state ] if
-        ] }
-        { [ dup CHAR: > = ] [
-            drop pick appropriate-end-tag-token?
-            [ pick emit-end-tag data-state ] [ "</" reach emit-temporary-buffer-with script-data-escaped-state ] if
+        { [ dup "\t\n\f\s/>" member? [ reach appropriate-end-tag-token? ] [ f ] if ] [
+            {
+                { CHAR: > [ pick emit-end-tag data-state ] }
+                { CHAR: / [ self-closing-start-tag-state ] }
+                [ drop before-attribute-name-state ]
+            } case
         ] }
         { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-escaped-end-tag-name-state ] }
         { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-escaped-end-tag-name-state ] }
@@ -992,8 +1289,8 @@ ERROR: invalid-return-state obj ;
             pick temporary-buffer>> "script" sequence=
             [ script-data-double-escaped-state ] [ script-data-escaped-state ] if
         ] }
-        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-double-escape-start-state ] }
-        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-double-escape-start-state ] } ! todo
+        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-temporary-buffer ] [ reach emit-char ] bi script-data-double-escape-start-state ] }
+        { [ dup ascii-lower-alpha? ] [ [ reach push-temporary-buffer ] [ reach emit-char ] bi script-data-double-escape-start-state ] } ! todo
         [ (script-data-escaped-state) ]
     } cond ;
 
@@ -1006,11 +1303,11 @@ ERROR: invalid-return-state obj ;
         { [ dup CHAR: - = ] [ reach emit-char script-data-double-escaped-dash-state ] }
         { [ dup CHAR: < = ] [ reach emit-char script-data-double-escaped-less-than-sign-state ] }
         { [ dup CHAR: \0 = ] [
-            unexpected-null-character
+            drop "unexpected-null-character" report-parse-error
             CHAR: replacement-character reach emit-char
             script-data-double-escaped-state
         ] }
-        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        { [ dup f = ] [ drop "eof-in-script-html-comment-like-text" report-parse-error pick emit-eof ] }
         [ reach emit-char script-data-double-escaped-state ]
     } cond ;
 
@@ -1023,11 +1320,11 @@ ERROR: invalid-return-state obj ;
         { [ dup CHAR: - = ] [ reach emit-char script-data-double-escaped-dash-dash-state ] }
         { [ dup CHAR: < = ] [ reach emit-char script-data-double-escaped-less-than-sign-state ] }
         { [ dup CHAR: \0 = ] [
-            unexpected-null-character
+            drop "unexpected-null-character" report-parse-error
             CHAR: replacement-character reach emit-char
             script-data-double-escaped-state
         ] }
-        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        { [ dup f = ] [ drop "eof-in-script-html-comment-like-text" report-parse-error pick emit-eof ] }
         [ reach emit-char script-data-double-escaped-state ]
     } cond ;
 
@@ -1041,12 +1338,12 @@ ERROR: invalid-return-state obj ;
         { [ dup CHAR: < = ] [ reach emit-char script-data-double-escaped-less-than-sign-state ] }
         { [ dup CHAR: > = ] [ reach emit-char script-data-state ] }
         { [ dup CHAR: \0 = ] [
-            unexpected-null-character
+            drop "unexpected-null-character" report-parse-error
             CHAR: replacement-character reach emit-char
             script-data-double-escaped-state
         ] }
-        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
-        [ reach emit-char script-data-escaped-state ]
+        { [ dup f = ] [ drop "eof-in-script-html-comment-like-text" report-parse-error pick emit-eof ] }
+        [ reach emit-char script-data-double-escaped-state ]
     } cond ;
 
 : script-data-double-escaped-dash-dash-state ( document n/f string -- document n'/f string )
@@ -1070,8 +1367,8 @@ ERROR: invalid-return-state obj ;
             pick temporary-buffer>> "script" sequence=
             [ script-data-escaped-state ] [ script-data-double-escaped-state ] if
         ] }
-        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-double-escape-end-state ] }
-        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-double-escape-end-state ] } ! todo
+        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-temporary-buffer ] [ reach emit-char ] bi script-data-double-escape-end-state ] }
+        { [ dup ascii-lower-alpha? ] [ [ reach push-temporary-buffer ] [ reach emit-char ] bi script-data-double-escape-end-state ] } ! todo
         [ (script-data-double-escaped-state) ]
     } cond ;
 
@@ -1084,7 +1381,10 @@ ERROR: invalid-return-state obj ;
         { [ dup "\t\n\f\s" member? ] [ drop before-attribute-name-state ] }
         { [ dup "/>" member? ] [ (after-attribute-name-state) ] }
         { [ dup f = ] [ (after-attribute-name-state) ] }
-        { [ dup CHAR: = = ] [ unexpected-equals-sign-before-attribute-name ] }
+        { [ dup CHAR: = = ] [
+            "unexpected-equals-sign-before-attribute-name" report-parse-error
+            [ pick push-attribute ] dip reach push-attribute-name attribute-name-state
+        ] }
         [ reach push-attribute (attribute-name-state) ]
     } cond ;
 
@@ -1101,9 +1401,9 @@ ERROR: invalid-return-state obj ;
             0x20 + reach push-attribute-name
             attribute-name-state
         ] }
-        { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-attribute-name attribute-name-state ] }
         { [ dup "\"'<" member? ] [
-            unexpected-character-in-attribute-name
+            "unexpected-character-in-attribute-name" report-parse-error
             reach push-attribute-name attribute-name-state
         ] }
         [ reach push-attribute-name attribute-name-state ]
@@ -1119,7 +1419,7 @@ ERROR: invalid-return-state obj ;
         { [ dup CHAR: / = ] [ drop self-closing-start-tag-state ] }
         { [ dup CHAR: = = ] [ drop before-attribute-value-state ] }
         { [ dup CHAR: > = ] [ drop pick emit-tag tag-data-state ] }
-        { [ dup f = ] [ eof-in-tag ] }
+        { [ dup f = ] [ drop "eof-in-tag" report-parse-error pick emit-eof ] }
         [ [ pick push-attribute ] dip (attribute-name-state) ]
     } cond ;
 
@@ -1132,7 +1432,7 @@ ERROR: invalid-return-state obj ;
         { [ dup "\t\n\f\s" member? ] [ drop before-attribute-value-state ] }
         { [ dup CHAR: " = ] [ drop attribute-value-double-quoted-state ] }
         { [ dup CHAR: ' = ] [ drop attribute-value-single-quoted-state ] }
-        { [ dup CHAR: > = ] [ drop missing-attribute-value ] }
+        { [ dup CHAR: > = ] [ drop "missing-attribute-value" report-parse-error pick emit-tag tag-data-state ] }
         [ (attribute-value-unquoted-state) ]
     } cond ;
 
@@ -1147,8 +1447,8 @@ ERROR: invalid-return-state obj ;
             drop
             [ \ attribute-value-double-quoted-state >>return-state ] 2dip character-reference-state
         ] }
-        { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
-        { [ dup f = ] [ eof-in-tag ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-attribute-value attribute-value-double-quoted-state ] }
+        { [ dup f = ] [ drop "eof-in-tag" report-parse-error pick emit-eof ] }
         [ reach push-attribute-value attribute-value-double-quoted-state ]
     } cond ;
 
@@ -1164,10 +1464,10 @@ ERROR: invalid-return-state obj ;
             character-reference-state
         ] }
         { [ dup CHAR: \0 = ] [
-            drop unexpected-null-character
-            CHAR: replacement-character reach push-attribute-value
+            drop "unexpected-null-character" report-parse-error
+            CHAR: replacement-character reach push-attribute-value attribute-value-single-quoted-state
         ] }
-        { [ dup f = ] [ eof-in-tag ] }
+        { [ dup f = ] [ drop "eof-in-tag" report-parse-error pick emit-eof ] }
         [ reach push-attribute-value attribute-value-single-quoted-state ]
     } cond ;
 
@@ -1183,13 +1483,13 @@ ERROR: invalid-return-state obj ;
             [ \ attribute-value-unquoted-state >>return-state ] 2dip character-reference-state
         ] }
         { [ dup CHAR: > = ] [ drop pick emit-tag tag-data-state ] }
-        { [ dup CHAR: \0 = ] [ drop unexpected-null-character CHAR: replacement-character reach push-attribute-value ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-attribute-value attribute-value-unquoted-state ] }
         { [ dup "\"'<=`" member? ] [
-            unexpected-character-in-unquoted-attribute-value
+            "unexpected-character-in-unquoted-attribute-value" report-parse-error
             reach push-attribute-value
             attribute-value-unquoted-state
         ] }
-        { [ dup f = ] [ eof-in-tag ] }
+        { [ dup f = ] [ drop "eof-in-tag" report-parse-error pick emit-eof ] }
         [ reach push-attribute-value attribute-value-unquoted-state ]
     } cond ;
 
@@ -1202,8 +1502,8 @@ ERROR: invalid-return-state obj ;
         { [ dup "\t\n\f\s" member? ] [ drop before-attribute-name-state ] }
         { [ dup CHAR: / = ] [ drop self-closing-start-tag-state ] }
         { [ dup CHAR: > = ] [ drop pick emit-tag tag-data-state ] }
-        { [ dup f = ] [ eof-in-tag ] }
-        [ missing-whitespace-between-attributes (before-attribute-name-state) ]
+        { [ dup f = ] [ drop "eof-in-tag" report-parse-error pick emit-eof ] }
+        [ "missing-whitespace-between-attributes" report-parse-error (before-attribute-name-state) ]
     } cond ;
 
 : after-attribute-value-quoted-state ( document n/f string -- document n'/f string )
@@ -1213,8 +1513,8 @@ ERROR: invalid-return-state obj ;
 : (self-closing-start-tag-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: > = ] [ drop pick [ set-self-closing ] [ emit-tag ] bi tag-data-state ] }
-        { [ dup f = ] [ eof-in-tag ] }
-        [ unexpected-solidus-in-tag ]
+        { [ dup f = ] [ drop "eof-in-tag" report-parse-error pick emit-eof ] }
+        [ "unexpected-solidus-in-tag" report-parse-error (before-attribute-name-state) ]
     } cond ;
 
 : self-closing-start-tag-state ( document n/f string -- document n'/f string )
@@ -1225,7 +1525,7 @@ ERROR: invalid-return-state obj ;
     {
         { [ dup CHAR: > = ] [ drop pick emit-comment-token data-state ] }
         { [ dup f = ] [ drop pick [ emit-comment-token ] [ emit-eof ] bi ] }
-        { [ dup CHAR: \0 = ] [ drop unexpected-null-character CHAR: replacement-character reach push-comment-token ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-comment-token bogus-comment-state ] }
         [ reach push-comment-token bogus-comment-state ]
     } cond ;
 
@@ -1233,20 +1533,28 @@ ERROR: invalid-return-state obj ;
     take-char (bogus-comment-state) ;
 
 
+:: take-markup? ( n string text -- n' string ? )
+    n text length + string length <= [
+        n string text take-from?
+    ] [ n string f ] if ;
+
 : markup-declaration-open-state ( document n/f string -- document n'/f string )
     {
-        { [ "--" take-from? ] [ comment-start-state ] }
-        { [ "DOCTYPE" take-from-insensitive? ] [ doctype-state ] }
-        { [ "[CDATA[" take-from-insensitive? ] [ unimplemented* ] }
+        { [ "--" take-markup? ] [ comment-start-state ] }
+        { [ "DOCTYPE" take-from-insensitive? ] [ pick <doctype> >>doctype drop doctype-state ] }
+        { [ "[CDATA[" take-markup? ] [
+            "cdata-in-html-content" report-parse-error
+            "[CDATA[" reach push-all-comment-token bogus-comment-state
+        ] }
         [
-            incorrectly-opened-comment ! bogus-comment-state
+            "incorrectly-opened-comment" report-parse-error bogus-comment-state
         ]
     } cond ;
 
 : (comment-start-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: - = ] [ drop comment-start-dash-state ] }
-        { [ dup CHAR: > = ] [ drop abrupt-closing-of-empty-comment pick emit-comment-token data-state ] }
+        { [ dup CHAR: > = ] [ drop "abrupt-closing-of-empty-comment" report-parse-error pick emit-comment-token data-state ] }
         [ (comment-state) ]
     } cond ;
 
@@ -1257,8 +1565,8 @@ ERROR: invalid-return-state obj ;
 : (comment-start-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: - = ] [ drop comment-end-state ] }
-        { [ dup CHAR: > = ] [ drop abrupt-closing-of-empty-comment ] }
-        { [ dup f = ] [ eof-in-comment ] }
+        { [ dup CHAR: > = ] [ drop "abrupt-closing-of-empty-comment" report-parse-error pick emit-comment-token data-state ] }
+        { [ dup f = ] [ drop "eof-in-comment" report-parse-error pick [ emit-comment-token ] [ emit-eof ] bi ] }
         [ [ CHAR: - reach push-comment-token ] dip (comment-state) ]
     } cond ;
 
@@ -1270,8 +1578,8 @@ ERROR: invalid-return-state obj ;
     {
         { [ dup CHAR: < = ] [ reach push-comment-token comment-less-than-sign-state ] }
         { [ dup CHAR: - = ] [ drop comment-end-dash-state ] }
-        { [ dup CHAR: \0 = ] [ drop unexpected-null-character ] }
-        { [ dup f = ] [ eof-in-comment ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-comment-token comment-state ] }
+        { [ dup f = ] [ drop "eof-in-comment" report-parse-error pick [ emit-comment-token ] [ emit-eof ] bi ] }
         [ reach push-comment-token comment-state ]
     } cond ;
 
@@ -1314,7 +1622,7 @@ ERROR: invalid-return-state obj ;
     {
         { [ dup CHAR: > = ] [ (comment-end-state) ] }
         { [ dup f = ] [ (comment-end-state) ] }
-        [ nested-comment (comment-end-state) ]
+        [ "nested-comment" report-parse-error (comment-end-state) ]
     } cond ;
 
 : comment-less-than-sign-bang-dash-dash-state ( document n/f string -- document n'/f string )
@@ -1324,7 +1632,7 @@ ERROR: invalid-return-state obj ;
 : (comment-end-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: - = ] [ drop comment-end-state ] }
-        { [ dup f = ] [ eof-in-comment ] }
+        { [ dup f = ] [ drop "eof-in-comment" report-parse-error pick [ emit-comment-token ] [ emit-eof ] bi ] }
         [ [ CHAR: - reach push-comment-token ] dip (comment-state) ]
     } cond ;
 
@@ -1337,7 +1645,7 @@ ERROR: invalid-return-state obj ;
         { [ dup CHAR: > = ] [ drop pick emit-comment-token data-state ] }
         { [ dup CHAR: ! = ] [ drop comment-end-bang-state ] }
         { [ dup CHAR: - = ] [ reach push-comment-token comment-end-state ] }
-        { [ dup f = ] [ drop eof-in-comment pick [ emit-comment-token ] [ emit-eof ] bi ] }
+        { [ dup f = ] [ drop "eof-in-comment" report-parse-error pick [ emit-comment-token ] [ emit-eof ] bi ] }
         [ [ "--" reach push-all-comment-token ] dip (comment-state) ]
     } cond ;
 
@@ -1347,9 +1655,9 @@ ERROR: invalid-return-state obj ;
 
 : (comment-end-bang-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: - = ] [ drop comment-end-dash-state ] }
-        { [ dup CHAR: > = ] [ drop incorrectly-closed-comment pick emit-comment-token data-state ] }
-        { [ dup f = ] [ eof-in-comment ] }
+        { [ dup CHAR: - = ] [ drop "--!" reach push-all-comment-token comment-end-dash-state ] }
+        { [ dup CHAR: > = ] [ drop "incorrectly-closed-comment" report-parse-error pick emit-comment-token data-state ] }
+        { [ dup f = ] [ drop "eof-in-comment" report-parse-error pick [ emit-comment-token ] [ emit-eof ] bi ] }
         [ [ "--!" reach push-all-comment-token ] dip (comment-state) ]
     } cond ;
 
@@ -1357,370 +1665,216 @@ ERROR: invalid-return-state obj ;
     take-char (comment-end-bang-state) ;
 
 
+: doctype-eof ( document n/f string -- document n/f string )
+    "eof-in-doctype" report-parse-error
+    pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri ;
+
 : (doctype-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-name-state ] }
-        { [ dup CHAR: > = ] [ (before-doctype-name-state) ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ new-doctype-with-quirks ] [ emit-doctype ] [ emit-eof ] tri ] }
-        [ missing-whitespace-before-doctype-name ]
+        { [ dup f = ] [ drop doctype-eof ] }
+        [ "missing-whitespace-before-doctype-name" report-parse-error (before-doctype-name-state) ]
     } cond ;
 
 : doctype-state ( document n/f string -- document n'/f string )
     take-char (doctype-state) ;
 
-
 : (before-doctype-name-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-name-state ] }
+        { [ dup CHAR: > = ] [ drop "missing-doctype-name" report-parse-error pick force-quirks pick emit-doctype data-state ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach new-doctype-from-ch doctype-name-state ] }
+        { [ dup f = ] [ drop doctype-eof ] }
         { [ dup ascii-upper-alpha? ] [ 0x20 + reach new-doctype-from-ch doctype-name-state ] }
-        { [ dup CHAR: \0 = ] [
-            drop
-            unexpected-null-character
-            CHAR: replacement-character reach new-doctype-from-ch
-            doctype-name-state
-        ] }
-        { [ dup CHAR: > = ] [
-            drop missing-doctype-name
-            pick [ new-doctype-with-quirks ] [ emit-doctype ] bi
-        ] }
-        { [ dup f = ] [
-            drop eof-in-doctype
-            pick [ new-doctype-with-quirks ] [ emit-doctype ] [ emit-eof ] tri
-        ] }
         [ reach new-doctype-from-ch doctype-name-state ]
     } cond ;
 
 : before-doctype-name-state ( document n/f string -- document n'/f string )
     take-char (before-doctype-name-state) ;
 
-
 : (doctype-name-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop after-doctype-name-state ] }
         { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-doctype-name doctype-name-state ] }
+        { [ dup f = ] [ drop doctype-eof ] }
         { [ dup ascii-upper-alpha? ] [ 0x20 + reach push-doctype-name doctype-name-state ] }
-        { [ dup CHAR: \0 = ] [
-            drop unexpected-null-character
-            CHAR: replacement-character pick push-doctype-name
-            doctype-name-state
-        ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype ] [ emit-eof ] bi ] } ! force-quirks on for doctype
         [ reach push-doctype-name doctype-name-state ]
     } cond ;
 
 : doctype-name-state ( document n/f string -- document n'/f string )
     take-char (doctype-name-state) ;
 
-
-: (after-doctype-name-state) ( document n/f string ch/f -- document n'/f string )
-    {
-        { [ dup "\t\n\f\s" member? ] [ drop after-doctype-name-state ] }
-        { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
-        { [ dup f = ] [ eof-in-doctype ] }
-        { [ [ "PUBLIC" take-from-insensitive? ] dip swap ] [ drop after-doctype-public-keyword-state ] }
-        { [ [ "SYSTEM" take-from-insensitive? ] dip swap ] [ drop after-doctype-system-keyword-state ] }
-        [ invalid-character-sequence-after-doctype-name ]
+:: (after-doctype-name-state) ( document n string ch -- document n' string )
+    ch {
+        { [ dup html-space? ] [ drop document n string after-doctype-name-state ] }
+        { [ dup CHAR: > = ] [ drop document emit-doctype document n string data-state ] }
+        { [ dup f = ] [ drop document n string doctype-eof ] }
+        [
+            drop document n 1 - string
+            {
+                { [ "PUBLIC" take-from-insensitive? ] [ after-doctype-public-keyword-state ] }
+                { [ "SYSTEM" take-from-insensitive? ] [ after-doctype-system-keyword-state ] }
+                [ "invalid-character-sequence-after-doctype-name" report-parse-error pick force-quirks bogus-doctype-state ]
+            } cond
+        ]
     } cond ;
 
 : after-doctype-name-state ( document n/f string -- document n'/f string )
     take-char (after-doctype-name-state) ;
 
-
 : (after-doctype-public-keyword-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-public-identifier-state ] }
-        { [ dup CHAR: " = ] [ missing-whitespace-after-doctype-public-keyword ] }
-        { [ dup CHAR: ' = ] [ missing-whitespace-after-doctype-public-keyword ] }
-        { [ dup CHAR: > = ] [ drop missing-doctype-public-identifier force-quirks data-state ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype ] [ emit-eof ] bi ] }
-        [
-            missing-quote-before-doctype-public-identifier
-            [ reach force-quirks ] dip
-            (bogus-doctype-state)
-        ]
+        { [ dup f = ] [ drop doctype-eof ] }
+        { [ dup CHAR: " = ] [ drop "missing-whitespace-after-doctype-public-keyword" report-parse-error pick initialize-doctype-public-identifier doctype-public-identifier-double-quoted-state ] }
+        { [ dup CHAR: ' = ] [ drop "missing-whitespace-after-doctype-public-keyword" report-parse-error pick initialize-doctype-public-identifier doctype-public-identifier-single-quoted-state ] }
+        { [ dup CHAR: > = ] [ drop "missing-doctype-public-identifier" report-parse-error pick [ force-quirks ] [ emit-doctype ] bi data-state ] }
+        [ "missing-quote-before-doctype-public-identifier" report-parse-error [ pick force-quirks ] dip (bogus-doctype-state) ]
     } cond ;
 
 : after-doctype-public-keyword-state ( document n/f string -- document n'/f string )
     take-char (after-doctype-public-keyword-state) ;
 
-
 : (before-doctype-public-identifier-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-public-identifier-state ] }
-        { [ dup CHAR: " = ] [
-            drop pick initialize-doctype-public-identifier
-            doctype-public-identifier-double-quoted-state
-        ] }
-        { [ dup CHAR: ' = ] [
-            drop pick initialize-doctype-public-identifier
-            doctype-public-identifier-single-quoted-state
-        ] }
-        { [ dup CHAR: > = ] [
-            drop missing-doctype-public-identifier
-            pick [ force-quirks ] [ emit-doctype ] bi
-            data-state
-        ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype ] [ emit-eof ] bi ] }
-        [
-            missing-quote-before-doctype-public-identifier
-            [ reach force-quirks ] dip
-            (bogus-doctype-state)
-        ]
+        { [ dup f = ] [ drop doctype-eof ] }
+        { [ dup CHAR: " = ] [ drop pick initialize-doctype-public-identifier doctype-public-identifier-double-quoted-state ] }
+        { [ dup CHAR: ' = ] [ drop pick initialize-doctype-public-identifier doctype-public-identifier-single-quoted-state ] }
+        { [ dup CHAR: > = ] [ drop "missing-doctype-public-identifier" report-parse-error pick [ force-quirks ] [ emit-doctype ] bi data-state ] }
+        [ "missing-quote-before-doctype-public-identifier" report-parse-error [ pick force-quirks ] dip (bogus-doctype-state) ]
     } cond ;
 
 : before-doctype-public-identifier-state ( document n/f string -- document n'/f string )
     take-char (before-doctype-public-identifier-state) ;
 
-
 : (doctype-public-identifier-double-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: " = ] [ drop after-doctype-public-identifier-state ] }
-        { [ dup CHAR: \0 = ] [
-            drop
-            unexpected-null-character
-            CHAR: replacement-character pick push-doctype-public-identifier
-            doctype-public-identifier-double-quoted-state
-        ] }
-        { [ dup CHAR: > = ] [
-            drop abrupt-doctype-public-identifier
-            pick [ force-quirks ] [ emit-doctype ] bi
-            data-state
-        ] }
-        { [ dup f = ] [
-            drop eof-in-doctype
-            pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri
-        ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-doctype-public-identifier doctype-public-identifier-double-quoted-state ] }
+        { [ dup CHAR: > = ] [ drop "abrupt-doctype-public-identifier" report-parse-error pick [ force-quirks ] [ emit-doctype ] bi data-state ] }
+        { [ dup f = ] [ drop doctype-eof ] }
         [ reach push-doctype-public-identifier doctype-public-identifier-double-quoted-state ]
     } cond ;
 
 : doctype-public-identifier-double-quoted-state ( document n/f string -- document n'/f string )
     take-char (doctype-public-identifier-double-quoted-state) ;
 
-
 : (doctype-public-identifier-single-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: ' = ] [ drop after-doctype-public-identifier-state ] }
-        { [ dup CHAR: \0 = ] [
-            drop
-            unexpected-null-character
-            CHAR: replacement-character pick push-doctype-public-identifier
-            doctype-public-identifier-double-quoted-state
-        ] }
-        { [ dup CHAR: > = ] [
-            drop abrupt-doctype-public-identifier
-            pick [ force-quirks ] [ emit-doctype ] bi
-            data-state
-        ] }
-        { [ dup f = ] [
-            drop eof-in-doctype
-            pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri
-        ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-doctype-public-identifier doctype-public-identifier-single-quoted-state ] }
+        { [ dup CHAR: > = ] [ drop "abrupt-doctype-public-identifier" report-parse-error pick [ force-quirks ] [ emit-doctype ] bi data-state ] }
+        { [ dup f = ] [ drop doctype-eof ] }
         [ reach push-doctype-public-identifier doctype-public-identifier-single-quoted-state ]
     } cond ;
 
 : doctype-public-identifier-single-quoted-state ( document n/f string -- document n'/f string )
     take-char (doctype-public-identifier-single-quoted-state) ;
 
-
-: (after-doctype-public-identifier-state) ( document n/f string ch/f -- document n'/f string )
-    {
-        { [ dup "\t\n\f\s" member? ] [ drop between-doctype-public-and-system-identifiers-state ] }
-        { [ dup CHAR: > = ] [
-            drop pick emit-doctype
-            data-state
-        ] }
-        { [ dup CHAR: " = ] [
-            drop missing-whitespace-between-doctype-public-and-system-identifiers
-            pick initialize-doctype-system-identifier
-            doctype-system-identifier-double-quoted-state
-        ] }
-        { [ dup CHAR: ' = ] [
-            drop missing-whitespace-between-doctype-public-and-system-identifiers
-            pick initialize-doctype-system-identifier
-            doctype-system-identifier-single-quoted-state
-        ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri ] }
-        [
-            missing-quote-before-doctype-system-identifier
-            [ reach force-quirks ] dip
-            (bogus-doctype-state)
-        ]
-    } cond ;
-
-: after-doctype-public-identifier-state ( document n/f string -- document n'/f string )
-    take-char (after-doctype-public-identifier-state) ;
-
-
-: (between-doctype-public-and-system-identifiers-state) ( document n/f string ch/f -- document n'/f string )
-    {
-        { [ dup "\t\n\f\s" member? ] [ drop between-doctype-public-and-system-identifiers-state ] }
-        { [ dup CHAR: > = ] [
-            drop pick emit-doctype
-            data-state
-        ] }
-        { [ dup CHAR: " = ] [
-            drop pick initialize-doctype-system-identifier
-            doctype-system-identifier-double-quoted-state
-        ] }
-        { [ dup CHAR: ' = ] [
-            drop pick initialize-doctype-system-identifier
-            doctype-system-identifier-single-quoted-state
-        ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri ] }
-        [
-            missing-quote-before-doctype-system-identifier
-            [ reach force-quirks ] dip
-            (bogus-doctype-state)
-        ]
-    } cond ;
-
-: between-doctype-public-and-system-identifiers-state ( document n/f string -- document n'/f string )
-    take-char (between-doctype-public-and-system-identifiers-state) ;
-
-
 : (after-doctype-system-keyword-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup "\t\n\f\s" member? ] [ drop between-doctype-public-and-system-identifiers-state ] }
-        { [ dup CHAR: " = ] [
-            drop missing-whitespace-after-doctype-system-keyword
-            pick initialize-doctype-system-identifier
-            doctype-system-identifier-double-quoted-state
-        ] }
-        { [ dup CHAR: ' = ] [
-            drop missing-whitespace-after-doctype-system-keyword
-            pick initialize-doctype-system-identifier
-            doctype-system-identifier-single-quoted-state
-        ] }
-        { [ dup CHAR: > = ] [
-            drop missing-doctype-system-identifier
-            pick [ force-quirks ] [ emit-doctype ] bi
-            data-state
-        ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri ] }
-        [
-            missing-quote-before-doctype-system-identifier
-            [ reach force-quirks ] dip
-            (bogus-doctype-state)
-        ]
+        { [ dup "\t\n\f\s" member? ] [ drop before-doctype-system-identifier-state ] }
+        { [ dup f = ] [ drop doctype-eof ] }
+        { [ dup CHAR: " = ] [ drop "missing-whitespace-after-doctype-system-keyword" report-parse-error pick initialize-doctype-system-identifier doctype-system-identifier-double-quoted-state ] }
+        { [ dup CHAR: ' = ] [ drop "missing-whitespace-after-doctype-system-keyword" report-parse-error pick initialize-doctype-system-identifier doctype-system-identifier-single-quoted-state ] }
+        { [ dup CHAR: > = ] [ drop "missing-doctype-system-identifier" report-parse-error pick [ force-quirks ] [ emit-doctype ] bi data-state ] }
+        [ "missing-quote-before-doctype-system-identifier" report-parse-error [ pick force-quirks ] dip (bogus-doctype-state) ]
     } cond ;
 
 : after-doctype-system-keyword-state ( document n/f string -- document n'/f string )
     take-char (after-doctype-system-keyword-state) ;
 
-
 : (before-doctype-system-identifier-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-system-identifier-state ] }
-        { [ dup CHAR: " = ] [
-            drop pick initialize-doctype-system-identifier
-            doctype-system-identifier-double-quoted-state
-        ] }
-        { [ dup CHAR: ' = ] [
-            drop pick initialize-doctype-system-identifier
-            doctype-system-identifier-single-quoted-state
-        ] }
-        { [ dup CHAR: > = ] [
-            drop missing-doctype-system-identifier
-            pick [ force-quirks ] [ emit-doctype ] bi
-            data-state
-        ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype ] [ emit-eof ] bi ] }
-        [
-            missing-quote-before-doctype-system-identifier
-            [ reach force-quirks ] dip
-            (bogus-doctype-state)
-        ]
+        { [ dup f = ] [ drop doctype-eof ] }
+        { [ dup CHAR: " = ] [ drop pick initialize-doctype-system-identifier doctype-system-identifier-double-quoted-state ] }
+        { [ dup CHAR: ' = ] [ drop pick initialize-doctype-system-identifier doctype-system-identifier-single-quoted-state ] }
+        { [ dup CHAR: > = ] [ drop "missing-doctype-system-identifier" report-parse-error pick [ force-quirks ] [ emit-doctype ] bi data-state ] }
+        [ "missing-quote-before-doctype-system-identifier" report-parse-error [ pick force-quirks ] dip (bogus-doctype-state) ]
     } cond ;
 
 : before-doctype-system-identifier-state ( document n/f string -- document n'/f string )
     take-char (before-doctype-system-identifier-state) ;
 
-
 : (doctype-system-identifier-double-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: " = ] [ drop after-doctype-system-identifier-state ] }
-        { [ dup CHAR: \0 = ] [
-            drop
-            unexpected-null-character
-            CHAR: replacement-character pick push-doctype-system-identifier
-            doctype-system-identifier-double-quoted-state
-        ] }
-        { [ dup CHAR: > = ] [
-            drop abrupt-doctype-system-identifier
-            pick [ force-quirks ] [ emit-doctype ] bi
-            data-state
-        ] }
-        { [ dup f = ] [
-            drop eof-in-doctype
-            pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri
-        ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-doctype-system-identifier doctype-system-identifier-double-quoted-state ] }
+        { [ dup CHAR: > = ] [ drop "abrupt-doctype-system-identifier" report-parse-error pick [ force-quirks ] [ emit-doctype ] bi data-state ] }
+        { [ dup f = ] [ drop doctype-eof ] }
         [ reach push-doctype-system-identifier doctype-system-identifier-double-quoted-state ]
     } cond ;
 
 : doctype-system-identifier-double-quoted-state ( document n/f string -- document n'/f string )
     take-char (doctype-system-identifier-double-quoted-state) ;
 
-
 : (doctype-system-identifier-single-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: ' = ] [ drop after-doctype-system-identifier-state ] }
-        { [ dup CHAR: \0 = ] [
-            drop
-            unexpected-null-character
-            CHAR: replacement-character pick push-doctype-system-identifier
-            doctype-system-identifier-double-quoted-state
-        ] }
-        { [ dup CHAR: > = ] [
-            drop abrupt-doctype-system-identifier
-            pick [ force-quirks ] [ emit-doctype ] bi
-            data-state
-        ] }
-        { [ dup f = ] [
-            drop eof-in-doctype
-            pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri
-        ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error CHAR: replacement-character reach push-doctype-system-identifier doctype-system-identifier-single-quoted-state ] }
+        { [ dup CHAR: > = ] [ drop "abrupt-doctype-system-identifier" report-parse-error pick [ force-quirks ] [ emit-doctype ] bi data-state ] }
+        { [ dup f = ] [ drop doctype-eof ] }
         [ reach push-doctype-system-identifier doctype-system-identifier-single-quoted-state ]
     } cond ;
 
 : doctype-system-identifier-single-quoted-state ( document n/f string -- document n'/f string )
     take-char (doctype-system-identifier-single-quoted-state) ;
 
+: (after-doctype-public-identifier-state) ( document n/f string ch/f -- document n'/f string )
+    {
+        { [ dup "\t\n\f\s" member? ] [ drop between-doctype-public-and-system-identifiers-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
+        { [ dup f = ] [ drop doctype-eof ] }
+        { [ dup CHAR: " = ] [ drop "missing-whitespace-between-doctype-public-and-system-identifiers" report-parse-error pick initialize-doctype-system-identifier doctype-system-identifier-double-quoted-state ] }
+        { [ dup CHAR: ' = ] [ drop "missing-whitespace-between-doctype-public-and-system-identifiers" report-parse-error pick initialize-doctype-system-identifier doctype-system-identifier-single-quoted-state ] }
+        [ "missing-quote-before-doctype-system-identifier" report-parse-error [ pick force-quirks ] dip (bogus-doctype-state) ]
+    } cond ;
+
+: after-doctype-public-identifier-state ( document n/f string -- document n'/f string )
+    take-char (after-doctype-public-identifier-state) ;
+
+: (between-doctype-public-and-system-identifiers-state) ( document n/f string ch/f -- document n'/f string )
+    {
+        { [ dup "\t\n\f\s" member? ] [ drop between-doctype-public-and-system-identifiers-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
+        { [ dup f = ] [ drop doctype-eof ] }
+        { [ dup CHAR: " = ] [ drop pick initialize-doctype-system-identifier doctype-system-identifier-double-quoted-state ] }
+        { [ dup CHAR: ' = ] [ drop pick initialize-doctype-system-identifier doctype-system-identifier-single-quoted-state ] }
+        [ "missing-quote-before-doctype-system-identifier" report-parse-error [ pick force-quirks ] dip (bogus-doctype-state) ]
+    } cond ;
+
+: between-doctype-public-and-system-identifiers-state ( document n/f string -- document n'/f string )
+    take-char (between-doctype-public-and-system-identifiers-state) ;
 
 : (after-doctype-system-identifier-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop after-doctype-system-identifier-state ] }
-        { [ dup CHAR: > = ] [
-            drop pick emit-doctype
-            data-state
-        ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri ] }
-        [
-            unexpected-character-after-doctype-system-identifier
-            [ reach force-quirks ] dip
-            (bogus-doctype-state)
-        ]
+        { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
+        { [ dup f = ] [ drop doctype-eof ] }
+        [ "unexpected-character-after-doctype-system-identifier" report-parse-error (bogus-doctype-state) ]
     } cond ;
 
 : after-doctype-system-identifier-state ( document n/f string -- document n'/f string )
     take-char (after-doctype-system-identifier-state) ;
 
-
 : (bogus-doctype-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
-        { [ dup CHAR: \0 = ] [ drop unexpected-null-character bogus-doctype-state ] }
-        { [ dup f = ] [ drop eof-in-doctype pick emit-eof ] }
+        { [ dup f = ] [ drop pick [ emit-doctype ] [ emit-eof ] bi ] }
+        { [ dup CHAR: \0 = ] [ drop "unexpected-null-character" report-parse-error bogus-doctype-state ] }
         [ drop bogus-doctype-state ]
     } cond ;
 
 : bogus-doctype-state ( document n/f string -- document n'/f string )
     take-char (bogus-doctype-state) ;
 
-
 : (cdata-section-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: ] = ] [ drop cdata-section-bracket-state ] }
-        { [ dup f = ] [ drop eof-in-cdata pick emit-eof ] }
+        { [ dup f = ] [ drop "eof-in-cdata" report-parse-error pick emit-eof ] }
         [ reach emit-char cdata-section-state ]
     } cond ;
 
@@ -1748,6 +1902,87 @@ ERROR: invalid-return-state obj ;
 : cdata-section-end-state ( document n/f string -- document n'/f string )
     take-char (cdata-section-end-state) ;
 
+
+! Processing instructions are supported by the current HTML standard.
+: temporary-buffer>comment ( document -- )
+    dup temporary-buffer>> >string "?" prepend
+    SBUF" " clone-like >>comment-token drop ;
+
+: new-processing-instruction ( document -- )
+    dup temporary-buffer>> >string
+    processing-instruction new swap >>target
+    SBUF" " clone >>data >>processing-instruction-token drop ;
+
+: push-processing-instruction-data ( ch document -- )
+    processing-instruction-token>> data>> push ;
+
+: emit-processing-instruction ( document -- )
+    dup flush-table-characters
+    dup processing-instruction-token>> [ >string ] change-data
+    tree-insert drop ;
+
+: (processing-instruction-open-state) ( document n/f string ch/f -- document n'/f string )
+    {
+        { [ dup { [ ascii-alpha? ] [ CHAR: _ = ] } 1|| ] [ (processing-instruction-target-state) ] }
+        { [ dup f = ] [ drop "eof-in-processing-instruction" report-parse-error pick emit-eof ] }
+        [
+            "invalid-first-character-of-processing-instruction-target" report-parse-error
+            [ pick temporary-buffer>comment ] dip (bogus-comment-state)
+        ]
+    } cond ;
+
+: processing-instruction-open-state ( document n/f string -- document n'/f string )
+    take-char (processing-instruction-open-state) ;
+
+: (processing-instruction-target-state) ( document n/f string ch/f -- document n'/f string )
+    {
+        { [ dup "\t\n\f\s?>" member? ] [
+            reach temporary-buffer>> >string >lower { "xml" "xml-stylesheet" } member? [
+                "disallowed-processing-instruction-target" report-parse-error
+                [ pick temporary-buffer>comment ] dip (bogus-comment-state)
+            ] [
+                [ pick new-processing-instruction ] dip (after-processing-instruction-target-state)
+            ] if
+        ] }
+        { [ dup { [ ascii-alphanumeric? ] [ "-_" member? ] } 1|| ] [ reach push-temporary-buffer processing-instruction-target-state ] }
+        { [ dup f = ] [ drop "eof-in-processing-instruction" report-parse-error pick emit-eof ] }
+        [
+            "invalid-processing-instruction-target" report-parse-error
+            [ pick temporary-buffer>comment ] dip (bogus-comment-state)
+        ]
+    } cond ;
+
+: processing-instruction-target-state ( document n/f string -- document n'/f string )
+    take-char (processing-instruction-target-state) ;
+
+: (after-processing-instruction-target-state) ( document n/f string ch/f -- document n'/f string )
+    dup html-space? [ drop after-processing-instruction-target-state ] [
+        (processing-instruction-data-state)
+    ] if ;
+
+: after-processing-instruction-target-state ( document n/f string -- document n'/f string )
+    take-char (after-processing-instruction-target-state) ;
+
+: (processing-instruction-data-state) ( document n/f string ch/f -- document n'/f string )
+    {
+        { [ dup CHAR: ? = ] [ drop processing-instruction-questionable-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-processing-instruction data-state ] }
+        { [ dup f = ] [ drop "eof-in-processing-instruction" report-parse-error pick emit-eof ] }
+        [ reach push-processing-instruction-data processing-instruction-data-state ]
+    } cond ;
+
+: processing-instruction-data-state ( document n/f string -- document n'/f string )
+    take-char (processing-instruction-data-state) ;
+
+: (processing-instruction-questionable-state) ( document n/f string ch/f -- document n'/f string )
+    {
+        { [ dup CHAR: > = ] [ drop pick emit-processing-instruction data-state ] }
+        { [ dup f = ] [ drop "eof-in-processing-instruction" report-parse-error pick emit-eof ] }
+        [ [ CHAR: ? reach push-processing-instruction-data ] dip (processing-instruction-data-state) ]
+    } cond ;
+
+: processing-instruction-questionable-state ( document n/f string -- document n'/f string )
+    take-char (processing-instruction-questionable-state) ;
 
 : (character-reference-state) ( document n/f string ch/f -- document n'/f string )
     [ CHAR: & reach ch>new-temporary-buffer ] dip
@@ -1815,7 +2050,7 @@ ERROR: invalid-return-state obj ;
 : (hexadecimal-character-reference-start-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup ascii-hex-digit? ] [ (hexadecimal-character-reference-state) ] }
-        [ absence-of-digits-in-numeric-character-reference reach flush-temporary-buffer (return-state) ]
+        [ "absence-of-digits-in-numeric-character-reference" report-parse-error reach flush-temporary-buffer (return-state) ]
     } cond ;
 
 : hexadecimal-character-reference-start-state ( document n/f string -- document n'/f string )
@@ -1825,16 +2060,45 @@ ERROR: invalid-return-state obj ;
 : (decimal-character-reference-start-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup ascii-digit? ] [ (decimal-character-reference-state) ] }
-        [ absence-of-digits-in-numeric-character-reference reach flush-temporary-buffer (return-state) ]
+        [ "absence-of-digits-in-numeric-character-reference" report-parse-error reach flush-temporary-buffer (return-state) ]
     } cond ;
 
 : decimal-character-reference-start-state ( document n/f string -- document n'/f string )
     take-char (decimal-character-reference-start-state) ;
 
 
+CONSTANT: numeric-reference-replacements H{
+    { 0x80 0x20ac } { 0x82 0x201a } { 0x83 0x192 } { 0x84 0x201e }
+    { 0x85 0x2026 } { 0x86 0x2020 } { 0x87 0x2021 } { 0x88 0x2c6 }
+    { 0x89 0x2030 } { 0x8a 0x160 } { 0x8b 0x2039 } { 0x8c 0x152 }
+    { 0x8e 0x17d } { 0x91 0x2018 } { 0x92 0x2019 } { 0x93 0x201c }
+    { 0x94 0x201d } { 0x95 0x2022 } { 0x96 0x2013 } { 0x97 0x2014 }
+    { 0x98 0x2dc } { 0x99 0x2122 } { 0x9a 0x161 } { 0x9b 0x203a }
+    { 0x9c 0x153 } { 0x9e 0x17e } { 0x9f 0x178 }
+}
+
+: noncharacter? ( n -- ? )
+    { [ 0xfdd0 0xfdef between? ] [ 0xffff bitand 0xfffe >= ] } 1|| ;
+
+: normalize-numeric-reference ( n -- ch )
+    {
+        { [ dup 0 = ] [ drop "null-character-reference" report-parse-error CHAR: replacement-character ] }
+        { [ dup 0x10ffff > ] [ drop "character-reference-outside-unicode-range" report-parse-error CHAR: replacement-character ] }
+        { [ dup 0xd800 0xdfff between? ] [ drop "surrogate-character-reference" report-parse-error CHAR: replacement-character ] }
+        [
+            dup noncharacter? [ "noncharacter-character-reference" report-parse-error ] when
+            dup { [ 0x80 0x9f between? ] [ 0x7f = ] [ 0xd = ]
+                [ 0x1 0x8 between? ] [ 0xb = ] [ 0xe 0x1f between? ]
+            } 1|| [ "control-character-reference" report-parse-error ] when
+            dup numeric-reference-replacements at [ nip ] when*
+        ]
+    } cond ;
+
 : finish-numeric-reference ( document -- )
-    dup temporary-buffer>> >string html-unescape
-    swap string>new-temporary-buffer ;
+    dup temporary-buffer>> >string
+    dup ";" tail? [ but-last ] [ "missing-semicolon-after-character-reference" report-parse-error ] if
+    2 tail dup first "xX" member? [ rest hex> ] [ dec> ] if
+    normalize-numeric-reference 1string swap string>new-temporary-buffer ;
 
 : (hexadecimal-character-reference-state) ( document n/f string ch/f -- document n'/f string )
     {
@@ -1868,6 +2132,11 @@ ERROR: invalid-return-state obj ;
 : numeric-character-reference-end-state ( document n/f string -- document n'/f string )
     pick [ finish-numeric-reference ] [ flush-temporary-buffer ] bi return-state ;
 
-: parse-html5 ( string -- document )
-    [ <document> 0 ] dip data-state 2drop ;
+:: parse-html5-with-scripting ( string scripting? -- document )
+    <document> scripting? >>scripting? :> document
+    document current-html5-document [
+        document 0 string "\r\n" "\n" replace "\r" "\n" replace data-state 2drop
+    ] with-variable ;
 
+: parse-html5 ( string -- document )
+    f parse-html5-with-scripting ;
