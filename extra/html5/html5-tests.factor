@@ -528,3 +528,104 @@ DEFER: tag-shape
     "<template><table><form><input type=hidden>" head-root child-tags first
     template-content-tags first child-tags [ name>> ] map
 ] unit-test
+
+! Late head elements, text mode restoration, and head noscript recovery.
+{ { "title" } } [
+    "<head></head><title>A &amp; B</title><p>body" head-root child-tags [ name>> ] map
+] unit-test
+{ { { "p" {  } } } } [
+    "<head></head><title>A &amp; B</title><p>body" body-shapes
+] unit-test
+{ { "style" "script" } } [
+    "<head></head><style>a>b{color:red}</style><script>x<y</script><p>body" head-root child-tags [ name>> ] map
+] unit-test
+{ { { "p" {  } } } } [
+    "<head></head><style>a>b{color:red}</style><script>x<y</script><p>body" body-shapes
+] unit-test
+{ { "base" "basefont" "bgsound" "link" "meta" } } [
+    "<head></head><base href=x><basefont><bgsound><link><meta><p>body" head-root child-tags [ name>> ] map
+] unit-test
+{ { { "p" {  } } } } [
+    "<head></head><base href=x><basefont><bgsound><link><meta><p>body" body-shapes
+] unit-test
+{ { "noframes" } } [
+    "<head></head><noframes><p>fallback</noframes><p>body" head-root child-tags [ name>> ] map
+] unit-test
+{ { { "p" {  } } } } [
+    "<head></head><noframes><p>fallback</noframes><p>body" body-shapes
+] unit-test
+{ { "style" } } [
+    "<head></head> <style>x</style>body" head-root child-tags [ name>> ] map
+] unit-test
+{ {  } } [
+    "<head></head> <style>x</style>body" body-shapes
+] unit-test
+{ { "style" "script" } } [
+    "<head></head><!--one--><style>x</style><!--two--><script>y</script>" head-root child-tags [ name>> ] map
+] unit-test
+{ {  } } [
+    "<head></head><!--one--><style>x</style><!--two--><script>y</script>" body-shapes
+] unit-test
+{ { "title" } } [
+    "<head></head><title>unfinished" head-root child-tags [ name>> ] map
+] unit-test
+{ {  } } [
+    "<head></head><title>unfinished" body-shapes
+] unit-test
+{ { "style" } } [
+    "<head></head><style>unfinished" head-root child-tags [ name>> ] map
+] unit-test
+{ {  } } [
+    "<head></head><style>unfinished" body-shapes
+] unit-test
+{ { "script" } } [
+    "<head></head><script>unfinished" head-root child-tags [ name>> ] map
+] unit-test
+{ {  } } [
+    "<head></head><script>unfinished" body-shapes
+] unit-test
+{ { "noscript" } } [
+    "<head><noscript><head class=foo><!--foo--></noscript>" head-root child-tags [ name>> ] map
+] unit-test
+{ {  } } [
+    "<head><noscript><head class=foo><!--foo--></noscript>" body-shapes
+] unit-test
+{ { "noscript" } } [
+    "<head><noscript><noscript class=foo><!--foo--></noscript>" head-root child-tags [ name>> ] map
+] unit-test
+{ {  } } [
+    "<head><noscript><noscript class=foo><!--foo--></noscript>" body-shapes
+] unit-test
+{ { "noscript" } } [
+    "<head><noscript>XXX<!--foo--></noscript></head>" head-root child-tags [ name>> ] map
+] unit-test
+{ {  } } [
+    "<head><noscript>XXX<!--foo--></noscript></head>" body-shapes
+] unit-test
+{ "A & B" } [
+    "<head></head><title>A &amp; B</title>" head-root child-tags first node-text
+] unit-test
+{ "a>b{color:red}" } [
+    "<head></head><style>a>b{color:red}</style>" head-root child-tags first node-text
+] unit-test
+{ t } [
+    "<head></head><script>x" parse-html5 open-elements>> [ name>> "script" = ] any? not
+] unit-test
+{ t } [
+    "<head></head><title>x</title><body>y" head-root dup child-tags first parent>> eq?
+] unit-test
+{ t } [
+    "<head><noscript><noscript class=foo><!--foo--></noscript>" head-root child-tags first
+    children>> first comment?
+] unit-test
+{ "XXX" } [
+    "<head><noscript>XXX<!--foo--></noscript></head>" body-root node-text
+] unit-test
+{ "<p>fallback" } [
+    "<head><noscript><p>fallback</noscript>" t parse-html5-with-scripting tree>> first
+    child-tags first child-tags first node-text
+] unit-test
+{ { "style" "meta" } } [
+    "<head><noscript><style>x</style><meta></noscript><p>body" head-root child-tags first
+    child-tags [ name>> ] map
+] unit-test

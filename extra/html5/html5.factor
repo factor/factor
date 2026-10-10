@@ -1437,16 +1437,38 @@ CONSTANT: frameset-modes { in-frameset-mode after-frameset-mode after-after-fram
           in-head-mode >>insertion-mode obj tree-insert ]
     } cond ;
 
+CONSTANT: head-elements {
+    "base" "basefont" "bgsound" "link" "meta" "noframes" "script" "style" "template" "title"
+}
+
+:: head-start-tag? ( obj -- ? )
+    obj { [ tag? ] [ name>> head-elements member? ] } 1&& ;
+
+:: start-head-element ( document element -- document )
+    document element insert-element
+    element name>> "noscript" = document scripting?>> not and [
+        document in-head-noscript-mode >>insertion-mode
+    ] [
+        element name>> { "title" "style" "script" "noframes" "noscript" } member? [
+            document dup insertion-mode>> >>original-insertion-mode text-mode >>insertion-mode
+        ] [ document ] if
+    ] if ;
+
+:: text-token ( document obj -- document )
+    obj integer? [ document obj append-node document ] [
+        obj f = [ "eof-in-text" report-parse-error ] when
+        document open-elements>> pop obj >>end-tag drop
+        document dup original-insertion-mode>> >>insertion-mode
+        obj f = [ obj tree-insert ] when
+    ] if ;
+
 :: in-head-token ( document obj -- document )
     obj {
         { [ dup html-space? ] [ document swap append-node document ] }
         { [ dup misc-node? ] [ document swap append-node document ] }
         { [ dup doctype? ] [ drop document ] }
-        { [ dup tag? [ dup name>> {
-            "base" "basefont" "bgsound" "link" "meta" "title"
-            "style" "script" "noscript" "noframes" "template"
-        } member? ] [ f ] if ] [
-            document swap insert-element document
+        { [ dup head-start-tag? over "noscript" start-tag-named? or ] [
+            document swap start-head-element
         ] }
         { [ dup end-tag? [ dup name>> { "head" "body" "html" "br" } member? not ] [ f ] if ] [
             document swap close-element document
@@ -1461,8 +1483,37 @@ CONSTANT: frameset-modes { in-frameset-mode after-frameset-mode after-after-fram
         ]
     } cond ;
 
+:: in-head-noscript-token ( document obj -- document )
+    {
+        { [ obj doctype? ] [ document ] }
+        { [ obj "html" start-tag-named? ] [ document obj ordinary-body-token ] }
+        { [ obj "noscript" end-tag-named? ] [
+            document obj close-element document in-head-mode >>insertion-mode
+        ] }
+        { [ obj html-space? obj misc-node? or
+            obj { [ tag? ] [ name>> { "basefont" "bgsound" "link" "meta" "noframes" "style" } member? ] } 1&& or ]
+          [ document obj in-head-token ] }
+        { [ obj "head" start-tag-named? obj "noscript" start-tag-named? or
+            obj end-tag? obj "br" end-tag-named? not and or ] [
+            "unexpected-token-in-head-noscript" report-parse-error document
+        ] }
+        [ "unexpected-token-in-head-noscript" report-parse-error
+          document open-elements>> pop drop
+          document in-head-mode >>insertion-mode obj tree-insert ]
+    } cond ;
+
+:: after-head-head-token ( document obj -- document )
+    "head-element-after-head" report-parse-error
+    document head-element-pointer>> :> head
+    head document open-elements>> push
+    document obj in-head-token drop
+    head document open-elements>> remove-node
+    document ;
+
 :: after-head-token ( document obj -- document )
     {
+        { [ obj doctype? ] [ document ] }
+        { [ obj head-start-tag? ] [ document obj after-head-head-token ] }
         { [ obj html-space? obj misc-node? or ] [ document obj append-node document ] }
         { [ obj "body" start-tag-named? ] [
             document obj insert-element document in-body-mode >>insertion-mode f >>frameset-ok?
@@ -1499,6 +1550,7 @@ CONSTANT: frameset-modes { in-frameset-mode after-frameset-mode after-after-fram
             { before-html-mode [ document obj before-html-token ] }
             { before-head-mode [ document obj before-head-token ] }
             { in-head-mode [ document obj in-head-token ] }
+            { in-head-noscript-mode [ document obj in-head-noscript-token ] }
             { after-head-mode [ document obj after-head-token ] }
             { after-body-mode [ document obj after-body-token ] }
             { after-after-body-mode [ document obj after-after-body-token ] }
@@ -1573,6 +1625,7 @@ CONSTANT: frameset-modes { in-frameset-mode after-frameset-mode after-after-fram
 DEFER: html-tree-insert
 :: html-tree-insert ( document obj -- document )
     {
+        { [ document insertion-mode>> text-mode = ] [ document obj text-token ] }
         { [ obj "html" start-tag-named?
             document open-elements>> empty? not and ] [
             document template-insertion-modes>> empty? [
@@ -1726,6 +1779,7 @@ ERROR: invalid-return-state obj ;
 
 :: character-needs-tree-routing? ( document char -- ? )
     {
+        [ document insertion-mode>> in-head-noscript-mode = ]
         [ document insertion-mode>> frameset-modes member?
           document "noframes" current-element-named? not and ]
         [ document insertion-mode>> in-column-group-mode =
