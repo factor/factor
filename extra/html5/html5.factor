@@ -268,7 +268,7 @@ quirks-mode?
 limited-quirks-mode?
 iframe-srcdoc?
 scripting? ! set in constructor
-frameset-ok? ! frameset-ok? but we want default to f
+frameset-ok?
 fostering-parent?
 tree
 tree-doctype
@@ -424,10 +424,9 @@ TUPLE: processing-instruction target data ;
 : misc-node? ( obj -- ? )
     { [ comment? ] [ processing-instruction? ] } 1|| ;
 
-! Tree construction. Active formatting reconstruction and frameset parsing
-! are not yet implemented.
+! Tree construction. Active formatting reconstruction is not yet implemented.
 CONSTANT: void-elements {
-    "area" "base" "basefont" "bgsound" "br" "col" "embed" "hr" "img" "input" "link"
+    "area" "base" "basefont" "bgsound" "br" "col" "embed" "frame" "hr" "img" "input" "keygen" "link"
     "meta" "param" "source" "track" "wbr"
 }
 
@@ -721,9 +720,37 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
         ] when*
     ] when ;
 
+CONSTANT: frameset-blocking-elements {
+    "pre" "listing" "li" "dd" "dt" "button" "applet" "marquee" "object"
+    "table" "area" "br" "embed" "img" "keygen" "wbr" "hr" "textarea"
+    "xmp" "iframe" "select"
+}
+
+:: update-frameset-for-element ( document element -- )
+    element name>> frameset-blocking-elements member?
+    element name>> "input" = [
+        element attributes>> "type" of [ ascii-downcase "hidden" = ] [ f ] if* not
+    ] [ f ] if or [ document f >>frameset-ok? drop ] when ;
+
+:: update-frameset-for-character ( document char -- )
+    char html-space? not [ document f >>frameset-ok? drop ] when ;
+
+:: start-body-frameset ( document element -- )
+    document open-elements>> :> stack
+    document frameset-ok?>> stack length 1 > and [
+        stack second :> body
+        body html-element? body name>> "body" = and [
+            body stack first children>> remove! drop
+            1 stack shorten
+            document element insert-element
+            document in-frameset-mode >>insertion-mode drop
+        ] when
+    ] when ;
+
 :: start-body-element ( document element -- )
     element name>> "image" = [ element "img" >>name drop ] when
     element name>> :> name
+    document element update-frameset-for-element
     name "button" = document "button" scope-boundaries element-in-scope? and [
         document "" generate-implied-end-tags
         document <end-tag> "button" >>name close-element
@@ -763,7 +790,9 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
     token name>> :> name
     name {
         { [ dup heading-elements member? ] [ drop document token close-heading ] }
-        { [ dup "br" = ] [ drop document <tag> "br" >>name insert-element ] }
+        { [ dup "br" = ] [
+            drop document <tag> "br" >>name start-body-element
+        ] }
         { [ dup "p" = ] [
             drop document "p" scope-boundaries "button" suffix element-in-scope? [
                 document "p" implied-element
@@ -786,12 +815,9 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
                 { "body" [ document swap merge-body-attributes ] }
                 { "html" [ drop ] }
                 { "head" [ drop ] }
-                [
-                    { "frame" "frameset" } member?
-                    document template-insertion-modes>> empty? not and [ drop ] [
-                        document swap start-body-element
-                    ] if
-                ]
+                { "frame" [ drop ] }
+                { "frameset" [ document swap start-body-frameset ] }
+                [ drop document swap start-body-element ]
             } case
         ] }
         { [ dup end-tag? ] [
@@ -803,7 +829,10 @@ CONSTANT: implied-end-elements { "dd" "dt" "li" "optgroup" "option" "p" "rb" "rp
             ] [ document swap end-body-element ] if
         ] }
         { [ dup f = ] [ drop ] }
-        [ document swap append-node ]
+        [
+            dup integer? [ document over update-frameset-for-character ] when
+            document swap append-node
+        ]
     } cond
     document ;
 
@@ -995,6 +1024,50 @@ DEFER: table-token
     document insertion-mode>> { before-html-mode before-head-mode after-head-mode } member? and
     obj end-tag? [ obj name>> { "head" "body" "html" "br" } member? not ] [ f ] if and ;
 
+CONSTANT: frameset-modes { in-frameset-mode after-frameset-mode after-after-frameset-mode }
+
+:: frameset-token ( document obj -- document )
+    document insertion-mode>> :> mode
+    obj {
+        { [ dup misc-node? ] [
+            mode after-after-frameset-mode = [ document tree>> push ] [ document swap append-node ] if
+        ] }
+        { [ dup html-space? ] [ document swap append-node ] }
+        { [ dup tag? ] [
+            dup name>> {
+                { "noframes" [ document swap insert-element ] }
+                { "frameset" [
+                    mode in-frameset-mode = [ document swap insert-element ] [ drop ] if
+                ] }
+                { "frame" [
+                    mode in-frameset-mode = [ document swap insert-element ] [ drop ] if
+                ] }
+                [ 2drop "unexpected-token-in-frameset" report-parse-error ]
+            } case
+        ] }
+        { [ dup end-tag? ] [
+            dup name>> {
+                { "noframes" [ document swap close-element ] }
+                { "frameset" [
+                    mode in-frameset-mode = document open-elements>> length 1 > and [
+                        document swap close-element
+                        document open-elements>> last name>> "frameset" = [
+                            document after-frameset-mode >>insertion-mode drop
+                        ] unless
+                    ] [ drop ] if
+                ] }
+                { "html" [
+                    drop mode after-frameset-mode = [
+                        document after-after-frameset-mode >>insertion-mode drop
+                    ] when
+                ] }
+                [ 2drop "unexpected-token-in-frameset" report-parse-error ]
+            } case
+        ] }
+        { [ dup f = ] [ drop ] }
+        [ drop "unexpected-token-in-frameset" report-parse-error ]
+    } cond document ;
+
 :: (html-tree-insert) ( document obj -- document )
     document obj ignored-early-end-tag? [ document ] [
         document insertion-mode>> {
@@ -1066,10 +1139,10 @@ DEFER: table-token
                     obj misc-node? [ document obj append-node document ] [
                         obj tag? [ obj name>> "body" = ] [ f ] if [
                             document obj insert-element
-                            document in-body-mode >>insertion-mode
+                            document in-body-mode >>insertion-mode f >>frameset-ok?
                         ] [
                             document "body" implied-element
-                            document in-body-mode >>insertion-mode obj tree-insert
+                            document in-body-mode >>insertion-mode t >>frameset-ok? obj tree-insert
                         ] if
                     ] if
                 ] if
@@ -1163,33 +1236,39 @@ DEFER: table-token
 
 DEFER: html-tree-insert
 :: html-tree-insert ( document obj -- document )
-    obj tag? [ obj name>> "html" = ] [ f ] if
-    document open-elements>> empty? not and [
-        document template-insertion-modes>> empty? [
-            document open-elements>> first obj merge-element-attributes
-        ] when document
-    ] [
-    obj f = document template-insertion-modes>> empty? not and [
-        "eof-in-template" report-parse-error
-        document <end-tag> "template" >>name end-template drop
-        document obj html-tree-insert
-    ] [
-        document insertion-mode>> { initial-mode before-html-mode before-head-mode } member? [
+    {
+        { [ obj tag? [ obj name>> "html" = ] [ f ] if
+            document open-elements>> empty? not and ] [
+            document template-insertion-modes>> empty? [
+                document open-elements>> first obj merge-element-attributes
+            ] when document
+        ] }
+        { [ document insertion-mode>> frameset-modes member? ] [
+            document obj frameset-token
+        ] }
+        { [ obj tag? [ obj name>> "frameset" = ] [ f ] if
+            document insertion-mode>> after-head-mode = and ] [
+            document obj insert-element document in-frameset-mode >>insertion-mode
+        ] }
+        { [ obj f = document template-insertion-modes>> empty? not and ] [
+            "eof-in-template" report-parse-error
+            document <end-tag> "template" >>name end-template drop
+            document obj html-tree-insert
+        ] }
+        { [ document insertion-mode>> { initial-mode before-html-mode before-head-mode } member? ] [
             document obj (html-tree-insert)
-        ] [
-            obj tag? [ obj name>> "template" = ] [ f ] if [
-                document obj start-template
-            ] [
-                obj end-tag? [ obj name>> "template" = ] [ f ] if [
-                    document obj end-template
-                ] [
-                    document insertion-mode>> in-template-mode = [
-                        document obj template-token
-                    ] [ document obj (html-tree-insert) ] if
-                ] if
-            ] if
-        ] if
-    ] if ] if ;
+        ] }
+        { [ obj tag? [ obj name>> "template" = ] [ f ] if ] [
+            document obj start-template
+        ] }
+        { [ obj end-tag? [ obj name>> "template" = ] [ f ] if ] [
+            document obj end-template
+        ] }
+        { [ document insertion-mode>> in-template-mode = ] [
+            document obj template-token
+        ] }
+        [ document obj (html-tree-insert) ]
+    } cond ;
 
 CONSTANT: foreign-breakout-elements {
     "b" "big" "blockquote" "body" "br" "center" "code" "dd" "div" "dl" "dt"
@@ -1240,7 +1319,10 @@ CONSTANT: foreign-breakout-elements {
             ] }
             { [ dup end-tag? ] [ document swap foreign-end-tag ] }
             { [ dup doctype? ] [ drop document ] }
-            [ document swap append-node document ]
+            [
+                dup integer? [ document over update-frameset-for-character ] when
+                document swap append-node document
+            ]
         } cond
     ] if ;
 
@@ -1292,12 +1374,24 @@ ERROR: invalid-return-state obj ;
     char CHAR: \0 = [
         document char foreign-token? [
             "unexpected-null-character" report-parse-error
-            document CHAR: replacement-character tree-insert drop
+            document CHAR: replacement-character append-node
         ] when
     ] [
     document skip-leading-newline?>> char CHAR: \n = and :> skip?
     document f >>skip-leading-newline? drop
     skip? [
+        document insertion-mode>> in-body-mode = [
+            document open-elements>> ?last [
+                { [ html-element? ]
+                  [ dup name>> { "title" "style" "script" "noframes" "noembed" } member?
+                    swap name>> "noscript" = document scripting?>> and or ]
+                } 1&&
+            ] [ f ] if* [ document char update-frameset-for-character ] unless
+        ] when
+        document insertion-mode>> frameset-modes member?
+        document open-elements>> ?last [ name>> "noframes" = ] [ f ] if* not and [
+            document char tree-insert drop
+        ] [
         document insertion-mode>> in-column-group-mode =
         document open-elements>> ?last [ name>> "template" = ] [ f ] if* and [
             document char tree-insert drop
@@ -1316,8 +1410,9 @@ ERROR: invalid-return-state obj ;
         ] if
         ] if
         ] if
+        ] if
     ] unless ] if ;
-: emit-string ( string document -- ) swap append-node ;
+: emit-string ( string document -- ) [ emit-char ] curry each ;
 
 : emit-tag ( document -- )
     dup flush-table-characters
@@ -1407,7 +1502,7 @@ ERROR: invalid-return-state obj ;
         { [ dup CHAR: \0 = ] [
             "unexpected-null-character" report-parse-error
             reach over foreign-token? [
-                drop CHAR: replacement-character reach emit-char
+                drop pick CHAR: replacement-character append-node
             ] [ drop ] if data-state
         ] }
         { [ dup f = ] [ drop pick emit-eof ] }

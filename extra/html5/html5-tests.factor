@@ -345,3 +345,65 @@ DEFER: node-text
     "<head><noscript><basefont><!--x--></noscript>" head-root child-tags first
     children>> last comment?
 ] unit-test
+
+! Frameset modes and eligibility to replace an implicit body.
+{ { "head" "frameset" } } [
+    "<frameset><frame>" html-root child-tags [ name>> ] map
+] unit-test
+{ { "frame" "frame" } } [
+    "<frameset><frame/><frame>" html-root child-tags last child-tags [ name>> ] map
+] unit-test
+{ { "frameset" "frame" } } [
+    "<frameset><frameset><frame></frameset><frame>" html-root child-tags last
+    child-tags [ name>> ] map
+] unit-test
+{ "frameset" } [
+    "<div><p> <frameset><frame>" html-root child-tags last name>>
+] unit-test
+{ { "body" "body" "body" } } [
+    { "<body><frameset>" "x<frameset>" "<div><body><frameset>" }
+    [ html-root child-tags last name>> ] map
+] unit-test
+{ { "frameset" "body" } } [
+    { "<input type=HIDDEN><frameset>" "<input><frameset>" }
+    [ html-root child-tags last name>> ] map
+] unit-test
+{ { "body" "body" "body" "body" "body" "body" "body" } } [
+    { "<button><frameset>" "<pre><frameset>" "<li><frameset>"
+      "<table><frameset>" "<img><frameset>" "<textarea></textarea><frameset>"
+      "<select></select><frameset>" }
+    [ html-root child-tags last name>> ] map
+] unit-test
+{ { "frameset" "frameset" "frameset" } } [
+    { "<param><frameset>" "<source><frameset>" "<track><frameset>" }
+    [ html-root child-tags last name>> ] map
+] unit-test
+{ "frameset" } [
+    "<svg>\0 </svg><frameset>" html-root child-tags last name>>
+] unit-test
+{ "body" } [
+    "<svg>&#0;</svg><frameset>" html-root child-tags last name>>
+] unit-test
+{ "frameset" } [
+    "<svg><![CDATA[\0]]></svg><frameset>" html-root child-tags last name>>
+] unit-test
+{ "frameset" } [
+    "<template>x</template><p><frameset>" html-root child-tags last name>>
+] unit-test
+{ "   " } [
+    "<frameset> a b <div>x</div>" html-root child-tags last node-text
+] unit-test
+{ "<p>fallback</p>" } [
+    "<frameset><noframes><p>fallback</p></noframes><frame>" html-root child-tags last
+    child-tags first node-text
+] unit-test
+{ { "frameset" "noframes" } } [
+    "<frameset></frameset><noframes>x</noframes><div>" html-root child-tags [ name>> ] map rest
+] unit-test
+{ t } [
+    "<frameset></frameset></html><!--end-->" parse-html5 tree>> last comment?
+] unit-test
+{ "frameset" } [
+    "<p><noscript>text</noscript><frameset>" t parse-html5-with-scripting tree>> first
+    child-tags last name>>
+] unit-test
