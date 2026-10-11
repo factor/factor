@@ -1,7 +1,7 @@
 USING: help.syntax help.markup ;
-IN: editors.editpadpro
+IN: editors.editpadlite
 
-ARTICLE: "editors.editpadpro" "EditPad Pro support"
-"EditPadPro text editor integration on Windows. Be sure to put EditPadPro in your system path so that it will be found. Windows only." ;
+ARTICLE: "editors.editpadlite" "EditPad Lite support"
+"EditPad Lite text editor integration on Windows. Be sure to put EditPad Lite in your system path so that it will be found. Windows only." ;
 
-ABOUT: "editors.editpadpro"
+ABOUT: "editors.editpadlite"
