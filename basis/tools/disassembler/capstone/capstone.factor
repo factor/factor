@@ -211,6 +211,9 @@ PRIVATE>
 SINGLETON: capstone-disassembler
 
 M: capstone-disassembler disassemble*
-    [ buf/len/start make-disassembly write-disassembly ] with-code-blocks ;
+    [
+        buf/len/start make-disassembly
+        dup empty? [ drop ] [ write-disassembly ] if
+    ] with-code-blocks ;
 
 capstone-disassembler disassembler-backend set-global
