@@ -59,7 +59,8 @@ PRIVATE>
         ] finally
     ] with-test-directory ; inline
 
-[
+! These integration tests require a local memcached executable.
+os windows? [ [
 
 ! An inner suite's flush must leave this suite's cache intact (#649).
 { "outer" } [
@@ -151,4 +152,4 @@ PRIVATE>
     [ x y z 3array m/getseq values sort ] with-memcached
 ] unit-test
 
-] with-test-memcached
+] with-test-memcached ] unless
