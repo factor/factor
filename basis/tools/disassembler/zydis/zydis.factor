@@ -303,7 +303,7 @@ ERROR: unsupported-zydis-version version ;
 PRIVATE>
 
 M: zydis-disassembler disassemble*
-    [ make-disassembly dup empty? [ drop ] [ write-disassembly ] if ]
+    [ make-disassembly [ write-disassembly ] unless-empty ]
     with-code-blocks ;
 
 zydis-disassembler disassembler-backend set-global
