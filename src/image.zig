@@ -224,7 +224,7 @@ pub const ImageLoader = struct {
         loader.vm = &vm;
         // The first frame spans 32 bytes, including two ordinary spill cells.
         // Metadata-based stepping with the leaf fallback would relocate them.
-        var storage = [_]Cell{0} ** (2 + 48 / @sizeOf(Cell));
+        var storage: [2 + 48 / @sizeOf(Cell)]Cell = @splat(0);
         storage[1] = layouts.tagFixnum(48);
         storage[2] = 32;
         storage[3] = 0x1000;
