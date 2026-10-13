@@ -3,7 +3,7 @@
 USING: accessors assocs calendar kernel math sequences sets
 tools.test zoneinfo ;
 
-{ t } [ "PST8PDT" find-zone-rules and >boolean ] unit-test
+{ t } [ "America/Los_Angeles" find-zone-rules and >boolean ] unit-test
 
 {
     T{ raw-zone
