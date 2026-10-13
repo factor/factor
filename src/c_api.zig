@@ -95,7 +95,7 @@ fn stdinLoop() void {
         var control_buf: [1]u8 = undefined;
         const ctrl_result = std.c.read(@intCast(control_read), &control_buf, control_buf.len);
         if (ctrl_result < 0) {
-            if (std.c._errno().* == @intFromEnum(std.posix.E.INTR)) continue;
+            if (std.c._errno().* == @backingInt(std.posix.E.INTR)) continue;
             break;
         }
         const ctrl_bytes: usize = @intCast(ctrl_result);
@@ -110,7 +110,7 @@ fn stdinLoop() void {
 
             const read_result = std.c.read(0, &buf, buf.len);
             if (read_result < 0) {
-                if (std.c._errno().* == @intFromEnum(std.posix.E.INTR)) continue;
+                if (std.c._errno().* == @backingInt(std.posix.E.INTR)) continue;
                 stdin_loop_running.store(false, .release);
                 break;
             }

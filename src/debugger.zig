@@ -208,7 +208,7 @@ fn printNestedObj(vm: *FactorVM, obj: Cell, nesting: i32) void {
     }
 
     const tag = layouts.TAG(obj);
-    switch (@as(layouts.TypeTag, @enumFromInt(@as(u4, @truncate(tag))))) {
+    switch (@as(layouts.TypeTag, @fromBackingInt(@intCast(@as(u4, @truncate(tag)))))) {
         .fixnum => {
             std.debug.print("{}", .{layouts.untagFixnum(obj)});
         },
@@ -310,7 +310,7 @@ fn printNestedObj(vm: *FactorVM, obj: Cell, nesting: i32) void {
         },
         else => {
             std.debug.print("#<{s} @ 0x{x}>", .{
-                if (tag < layouts.type_count) @tagName(@as(layouts.TypeTag, @enumFromInt(@as(u4, @truncate(tag))))) else "unknown",
+                if (tag < layouts.type_count) @tagName(@as(layouts.TypeTag, @fromBackingInt(@intCast(@as(u4, @truncate(tag)))))) else "unknown",
                 obj,
             });
         },
@@ -502,10 +502,10 @@ fn dumpObject(vm: *FactorVM, tagged_addr: Cell) void {
     std.debug.print("Object at 0x{x} (tag={}, {s}):\n", .{
         tagged_addr,
         tag,
-        if (tag < layouts.type_count) @tagName(@as(layouts.TypeTag, @enumFromInt(@as(u4, @truncate(tag))))) else "unknown",
+        if (tag < layouts.type_count) @tagName(@as(layouts.TypeTag, @fromBackingInt(@intCast(@as(u4, @truncate(tag)))))) else "unknown",
     });
 
-    switch (@as(layouts.TypeTag, @enumFromInt(@as(u4, @truncate(tag))))) {
+    switch (@as(layouts.TypeTag, @fromBackingInt(@intCast(@as(u4, @truncate(tag)))))) {
         .fixnum => {
             std.debug.print("  fixnum: {}\n", .{layouts.untagFixnum(tagged_addr)});
         },
@@ -619,7 +619,7 @@ fn dumpDataHeap(vm: *FactorVM) void {
         const obj_type = obj.getType();
         obj_count += 1;
         std.debug.print("{x:0>16} ", .{addr});
-        printObj(vm, addr | @intFromEnum(obj_type));
+        printObj(vm, addr | @backingInt(obj_type));
         std.debug.print("\n", .{});
         const size = objectSizeForDebug(obj, obj_type);
         if (size == 0) {
@@ -722,7 +722,7 @@ fn dumpTuples(vm: *FactorVM) void {
         if (obj_type == .tuple) {
             tuple_count += 1;
             std.debug.print("{x:0>16} ", .{addr});
-            printObj(vm, addr | @intFromEnum(layouts.TypeTag.tuple));
+            printObj(vm, addr | @backingInt(layouts.TypeTag.tuple));
             std.debug.print("\n", .{});
         }
         const size = objectSizeForDebug(obj, obj_type);

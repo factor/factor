@@ -165,7 +165,7 @@ pub export fn primitive_tuple(vm_asm: *VMAssemblyFields) callconv(.c) void {
     // Fill slots with f (false_object)
     @memset(tuple.data()[0..num_slots], layouts.false_object);
 
-    std.debug.assert(tuple.header == (@as(Cell, @intFromEnum(layouts.TypeTag.tuple)) << 2));
+    std.debug.assert(tuple.header == (@as(Cell, @backingInt(layouts.TypeTag.tuple)) << 2));
     std.debug.assert(tuple.layout == layout_cell);
 
     vm.replace(tagged);
@@ -209,7 +209,7 @@ pub export fn primitive_tuple_boa(vm_asm: *VMAssemblyFields) callconv(.c) void {
     // Pop slot values from stack. The layout was already popped above.
     ctx.datastack -= slot_size;
 
-    std.debug.assert(tuple.header == (@as(Cell, @intFromEnum(layouts.TypeTag.tuple)) << 2));
+    std.debug.assert(tuple.header == (@as(Cell, @backingInt(layouts.TypeTag.tuple)) << 2));
     std.debug.assert(layouts.hasTag(tuple.layout, .array));
 
     vm.push(tagged);
@@ -831,7 +831,7 @@ pub export fn primitive_word(vm_asm: *VMAssemblyFields) callconv(.c) void {
     word.hashcode_field = hashcode;
     word.name = name;
     word.vocabulary = vocab;
-    word.def = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.undefined)];
+    word.def = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.undefined)];
     word.props = layouts.false_object;
     word.pic_def = layouts.false_object;
     word.pic_tail_def = layouts.false_object;
@@ -987,7 +987,7 @@ fn testComputedHashcode(counter_offset: Cell) !Cell {
     const obj: *layouts.Object = @ptrCast(&storage);
     obj.initialize(.byte_array);
     const obj_addr = @intFromPtr(obj);
-    const tagged = obj_addr | @intFromEnum(layouts.TypeTag.byte_array);
+    const tagged = obj_addr | @backingInt(layouts.TypeTag.byte_array);
 
     // compute-identity-hashcode increments the counter before XORing it in.
     vm.object_counter = (obj_addr ^ counter_offset) -% 1;

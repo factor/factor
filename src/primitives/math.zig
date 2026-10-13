@@ -746,7 +746,7 @@ fn compareFloats(vm_asm: *VMAssemblyFields, comptime op: FloatComparison, ordere
     const y_bits: *const u64 = @ptrCast(&y.n);
     const x_bits: *const u64 = @ptrCast(&x.n);
     const result = compareFloatBits(x_bits.*, y_bits.*, op, ordered);
-    const true_obj = vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
+    const true_obj = vm_asm.special_objects[@backingInt(objects.SpecialObject.canonical_true)];
     ctx.replace(if (result) true_obj else layouts.false_object);
 }
 
@@ -786,7 +786,7 @@ pub export fn primitive_float_eq(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const ctx = vm_asm.ctx;
     const b = float_mod.untagFloat(ctx.pop());
     const a = float_mod.untagFloat(ctx.peek());
-    const true_obj = vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
+    const true_obj = vm_asm.special_objects[@backingInt(objects.SpecialObject.canonical_true)];
     ctx.replace(if (a == b) true_obj else layouts.false_object);
 }
 

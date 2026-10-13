@@ -190,8 +190,8 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
 
         const obj: *const layouts.Object = @ptrFromInt(scan);
         switch (obj.getType()) {
-            .word => words.append(vm.allocator, scan | @intFromEnum(layouts.TypeTag.word)) catch vm.memoryError(),
-            .quotation => quotations.append(vm.allocator, scan | @intFromEnum(layouts.TypeTag.quotation)) catch vm.memoryError(),
+            .word => words.append(vm.allocator, scan | @backingInt(layouts.TypeTag.word)) catch vm.memoryError(),
+            .quotation => quotations.append(vm.allocator, scan | @backingInt(layouts.TypeTag.quotation)) catch vm.memoryError(),
             else => {},
         }
 
@@ -246,8 +246,8 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
     }
 
     // Phase 4: Set OBJ_STAGE2 = canonical_true
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.stage2)] =
-        vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.stage2)] =
+        vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.canonical_true)];
 
     std.debug.print("done\n", .{});
 }
@@ -270,13 +270,13 @@ fn initSpecialObjects(vm: *vm_mod.FactorVM, image_path: []const u8, executable_p
     const stderr_ptr = getCStderr();
 
     // OBJ_CELL_SIZE = 7
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.cell_size)] = layouts.tagFixnum(@sizeOf(layouts.Cell));
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.cell_size)] = layouts.tagFixnum(@sizeOf(layouts.Cell));
 
     // OBJ_ARGS = 10 - initialized to false, will be set by passArgsToFactor
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.args)] = layouts.false_object;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.args)] = layouts.false_object;
 
     // OBJ_EMBEDDED = 15 - we're not embedded
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.embedded)] = layouts.false_object;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.embedded)] = layouts.false_object;
 
     // OBJ_STAGE2 = 67 - set to canonical_true (will be set from image)
     // Note: This is typically set from the image's canonical_true value
@@ -284,50 +284,50 @@ fn initSpecialObjects(vm: *vm_mod.FactorVM, image_path: []const u8, executable_p
 
     // OBJ_STDIN = 11 (stdin)
     const stdin_alien = vm.allotAlien(layouts.false_object, @intFromPtr(stdin_ptr));
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.stdin)] = stdin_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.stdin)] = stdin_alien;
 
     // OBJ_STDOUT = 12 (stdout)
     const stdout_alien = vm.allotAlien(layouts.false_object, @intFromPtr(stdout_ptr));
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.stdout)] = stdout_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.stdout)] = stdout_alien;
 
     // OBJ_STDERR = 66 (stderr)
     const stderr_alien = vm.allotAlien(layouts.false_object, @intFromPtr(stderr_ptr));
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.stderr)] = stderr_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.stderr)] = stderr_alien;
 
     // OBJ_CPU = 8 (CPU architecture string)
     const cpu_alien = vm.allotAlien(layouts.false_object, @intFromPtr(FACTOR_CPU_STRING.ptr));
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.cpu)] = cpu_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.cpu)] = cpu_alien;
 
     // OBJ_OS = 9 (operating system string)
     const os_alien = vm.allotAlien(layouts.false_object, @intFromPtr(FACTOR_OS_STRING.ptr));
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.os)] = os_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.os)] = os_alien;
 
     // OBJ_EXECUTABLE = 14 (runtime executable path)
     const executable_alien = nativeStringAlien(vm, executable_path);
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.executable)] = executable_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.executable)] = executable_alien;
 
     // OBJ_IMAGE = 13 (image path)
     const image_alien = nativeStringAlien(vm, image_path);
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.image)] = image_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.image)] = image_alien;
 
     // OBJ_VM_COMPILE_TIME = 75
     const compile_time_alien = vm.allotAlien(layouts.false_object, @intFromPtr(FACTOR_COMPILE_TIME.ptr));
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.vm_compile_time)] = compile_time_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.vm_compile_time)] = compile_time_alien;
 
     // OBJ_VM_COMPILER = 72
     const compiler_alien = vm.allotAlien(layouts.false_object, @intFromPtr(FACTOR_COMPILER_VERSION.ptr));
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.vm_compiler)] = compiler_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.vm_compiler)] = compiler_alien;
 
     // OBJ_VM_GIT_LABEL = 77
     const git_label_alien = vm.allotAlien(layouts.false_object, @intFromPtr(FACTOR_GIT_LABEL.ptr));
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.vm_git_label)] = git_label_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.vm_git_label)] = git_label_alien;
 
     // OBJ_VM_VERSION = 76
     const version_alien = vm.allotAlien(layouts.false_object, @intFromPtr(FACTOR_VM_VERSION.ptr));
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.vm_version)] = version_alien;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.vm_version)] = version_alien;
     if (builtin.os.tag == .windows) {
         const handler_alien = vm.allotAlien(layouts.false_object, @intFromPtr(&@import("windows_signals.zig").exception_handler));
-        vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.win_exception_handler)] = handler_alien;
+        vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.win_exception_handler)] = handler_alien;
     }
 }
 
@@ -341,7 +341,7 @@ fn passArgsToFactor(vm: *vm_mod.FactorVM, args: []const [:0]const u8) void {
     // CRITICAL: Store in special_objects BEFORE allocating aliens.
     // This makes the array a GC root so it won't become a stale pointer if GC runs.
     // We'll update the slots below, and the array is already in place as a root.
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.args)] = args_array;
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.args)] = args_array;
 
     // Create an alien for each argument string
     // NOTE: allotAlien can trigger GC, but args_array is a GC root via special_objects.
@@ -351,7 +351,7 @@ fn passArgsToFactor(vm: *vm_mod.FactorVM, args: []const [:0]const u8) void {
         // Re-fetch the array pointer AFTER the allocation. It may have moved,
         // and after its first promotion this old->young store also needs the
         // generational write barrier.
-        args_array = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.args)];
+        args_array = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.args)];
         const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(args_array));
         const data = arr.data();
         data[i] = alien;
@@ -527,7 +527,7 @@ pub fn main(init: std.process.Init) !void {
 
     // If the image is a boot image (stage2 not set), JIT compile all words
     // and quotations before running the startup quotation.
-    const stage2 = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.stage2)];
+    const stage2 = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.stage2)];
     if (stage2 == layouts.false_object or stage2 == 0) {
         prepareBootImage(vm);
     }
@@ -635,7 +635,7 @@ test "passArgsToFactor survives repeated nursery collections" {
     passArgsToFactor(vm, &args);
 
     try std.testing.expect(heap.nursery_collections >= 2);
-    const args_cell = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.args)];
+    const args_cell = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.args)];
     const args_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(args_cell));
     try std.testing.expectEqual(@as(layouts.Cell, arg_count), args_array.getCapacity());
 

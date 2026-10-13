@@ -114,7 +114,7 @@ pub export fn primitive_die(vm_asm: *VMAssemblyFields) callconv(.c) void {
 }
 
 fn dieInspectGlobal(vm: *FactorVM, name: []const u8) void {
-    const global_obj = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.global)];
+    const global_obj = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.global)];
     if (global_obj == layouts.false_object or !layouts.hasTag(global_obj, .tuple)) {
         std.debug.print("[die] OBJ_GLOBAL is not a tuple (0x{x} tag={})\n", .{ global_obj, layouts.TAG(global_obj) });
         return;

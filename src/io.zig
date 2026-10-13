@@ -38,8 +38,8 @@ pub const IOError = error{
 };
 
 // C constants for fcntl/errno
-const EINTR = @intFromEnum(std.posix.E.INTR);
-const EAGAIN = @intFromEnum(std.posix.E.AGAIN);
+const EINTR = @backingInt(std.posix.E.INTR);
+const EAGAIN = @backingInt(std.posix.E.AGAIN);
 const F_GETFD: c_int = 1;
 const F_SETFD: c_int = 2;
 const F_GETFL: c_int = 3;
@@ -121,7 +121,7 @@ pub fn safeFopen(path: [*:0]const u8, mode: [*:0]const u8) !*std.c.FILE {
 
         // Check errno
         const err = std.c._errno().*;
-        if (err == @intFromEnum(std.posix.E.INTR)) {
+        if (err == @backingInt(std.posix.E.INTR)) {
             continue; // Retry on EINTR
         }
 
@@ -134,7 +134,7 @@ pub fn safeFclose(file: *std.c.FILE) !void {
     const result = std.c.fclose(file);
     if (result != 0) {
         const err = std.c._errno().*;
-        if (err != @intFromEnum(std.posix.E.INTR)) {
+        if (err != @backingInt(std.posix.E.INTR)) {
             return error.CloseError;
         }
     }
@@ -150,7 +150,7 @@ pub fn safeFgetc(file: *std.c.FILE) !i32 {
             }
 
             const err = std.c._errno().*;
-            if (err != @intFromEnum(std.posix.E.INTR)) {
+            if (err != @backingInt(std.posix.E.INTR)) {
                 return error.ReadError;
             }
             clearerr(file);
@@ -178,7 +178,7 @@ pub fn safeFread(ptr: *anyopaque, size: usize, nitems: usize, stream: *std.c.FIL
             }
 
             const err = std.c._errno().*;
-            if (err != @intFromEnum(std.posix.E.INTR)) {
+            if (err != @backingInt(std.posix.E.INTR)) {
                 return error.ReadError;
             }
             clearerr(stream);
@@ -201,7 +201,7 @@ pub fn safeFputc(c: i32, file: *std.c.FILE) !void {
         }
 
         const err = std.c._errno().*;
-        if (err != @intFromEnum(std.posix.E.INTR)) {
+        if (err != @backingInt(std.posix.E.INTR)) {
             return error.WriteError;
         }
         clearerr(file);
@@ -222,7 +222,7 @@ pub fn safeFwrite(ptr: *const anyopaque, size: usize, nitems: usize, stream: *st
         const ret = std.c.fwrite(src + offset, size, items_remaining, stream);
         if (ret == 0) {
             const err = std.c._errno().*;
-            if (err != @intFromEnum(std.posix.E.INTR)) {
+            if (err != @backingInt(std.posix.E.INTR)) {
                 return error.WriteError;
             }
             clearerr(stream);
@@ -245,7 +245,7 @@ pub fn safeFtell(stream: *std.c.FILE) !i64 {
         }
 
         const err = std.c._errno().*;
-        if (err != @intFromEnum(std.posix.E.INTR)) {
+        if (err != @backingInt(std.posix.E.INTR)) {
             return error.SeekError;
         }
         // Retry on EINTR
@@ -260,7 +260,7 @@ pub fn safeFseek(stream: *std.c.FILE, offset: i64, whence: i32) !void {
         1 => std.c.SEEK.CUR,
         2 => std.c.SEEK.END,
         else => {
-            setErrno(@intFromEnum(std.posix.E.INVAL));
+            setErrno(@backingInt(std.posix.E.INVAL));
             return error.SeekError;
         },
     };
@@ -272,7 +272,7 @@ pub fn safeFseek(stream: *std.c.FILE, offset: i64, whence: i32) !void {
         }
 
         const err = std.c._errno().*;
-        if (err != @intFromEnum(std.posix.E.INTR)) {
+        if (err != @backingInt(std.posix.E.INTR)) {
             return error.SeekError;
         }
         // Retry on EINTR
@@ -288,7 +288,7 @@ pub fn safeFflush(stream: *std.c.FILE) !void {
         }
 
         const err = std.c._errno().*;
-        if (err != @intFromEnum(std.posix.E.INTR)) {
+        if (err != @backingInt(std.posix.E.INTR)) {
             return error.FlushError;
         }
         // Retry on EINTR
@@ -349,5 +349,5 @@ test "zero-sized stdio operations and invalid seek origin" {
     try std.testing.expectEqual(@as(usize, 0), try safeFread(&byte, 0, 1, file));
     try std.testing.expectEqual(@as(usize, 0), try safeFwrite(&byte, 0, 1, file));
     try std.testing.expectError(error.SeekError, safeFseek(file, 0, 3));
-    try std.testing.expectEqual(@as(i32, @intFromEnum(std.posix.E.INVAL)), getErrno());
+    try std.testing.expectEqual(@as(i32, @backingInt(std.posix.E.INVAL)), getErrno());
 }

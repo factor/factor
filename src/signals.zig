@@ -20,7 +20,7 @@ const Cell = layouts.Cell;
 fn sigactionInt(sig_num: anytype, act: ?*const std.posix.Sigaction, oact: ?*std.posix.Sigaction) void {
     const c_sig: c_int = switch (@typeInfo(@TypeOf(sig_num))) {
         .comptime_int, .int => @intCast(sig_num),
-        .@"enum" => @intCast(@intFromEnum(sig_num)),
+        .@"enum" => @intCast(@backingInt(sig_num)),
         else => @compileError("sigactionInt: unsupported signal type"),
     };
     const C = struct {
@@ -436,7 +436,7 @@ const SiginfoType = std.posix.siginfo_t;
 // This handles both safepoint checks and actual memory errors
 fn memorySignalHandler(sig: std.posix.SIG, siginfo: *const SiginfoType, ucontext_ptr: ?*anyopaque) callconv(.c) void {
     const vm = g_current_vm orelse {
-        fatalError("Foreign thread received signal", @intFromEnum(sig));
+        fatalError("Foreign thread received signal", @backingInt(sig));
     };
     const ucontext = ucontext_ptr orelse abort();
 
@@ -519,11 +519,11 @@ test "memory fault on a foreign thread without a VM is a fatal error" {
 // Floating point exception handler (SIGFPE)
 fn fpeSignalHandler(sig: std.posix.SIG, siginfo: *const SiginfoType, ucontext_ptr: ?*anyopaque) callconv(.c) void {
     const vm = g_current_vm orelse {
-        fatalError("Foreign thread received signal", @intFromEnum(sig));
+        fatalError("Foreign thread received signal", @backingInt(sig));
     };
     const ucontext = ucontext_ptr orelse abort();
 
-    vm.signal_number = @intFromEnum(sig);
+    vm.signal_number = @backingInt(sig);
     vm.signal_fpu_status = processFPUStatus(getFPUStatus(ucontext));
     clearFPUStatus(ucontext);
 
@@ -594,10 +594,10 @@ fn synchronousSignalHandler(sig: std.posix.SIG, _: *const SiginfoType, ucontext_
     if (vm_mod.g_fatal_erroring_p) return;
 
     const vm = g_current_vm orelse {
-        fatalError("Foreign thread received signal", @intFromEnum(sig));
+        fatalError("Foreign thread received signal", @backingInt(sig));
     };
 
-    vm.signal_number = @intFromEnum(sig);
+    vm.signal_number = @backingInt(sig);
 
     const ucontext = ucontext_ptr orelse abort();
     const sp_ptr = getStackPointer(ucontext);
@@ -615,7 +615,7 @@ fn synchronousSignalHandler(sig: std.posix.SIG, _: *const SiginfoType, ucontext_
         const mcontext: [*]u64 = @ptrCast(@alignCast(uc.uc_mcontext));
         const esr = mcontext[1]; // __es.__esr (mc[0]=__far, mc[1]=__esr|__exception)
         const ec = (esr >> 26) & 0x3f;
-        if (@intFromEnum(sig) == @intFromEnum(std.c.SIG.ILL) and ec == 0x2c) {
+        if (@backingInt(sig) == @backingInt(std.c.SIG.ILL) and ec == 0x2c) {
             vm.signal_fpu_status = processFPUStatus(@truncate(esr & 0x9f));
             clearFPUStatus(ucontext);
             dispatchSignal(vm, sp_ptr, pc_ptr, @intFromPtr(&fp_signal_handler_impl));
@@ -662,7 +662,7 @@ test "macOS ARM64 SIGILL uses ESR rather than stale FPSR flags" {
         else
             @intFromPtr(&synchronous_signal_handler_impl);
         try std.testing.expectEqual(expected_handler, getProgramCounter(&uc).*);
-        try std.testing.expectEqual(@as(c_int, @intFromEnum(std.posix.SIG.ILL)), vm.signal_number);
+        try std.testing.expectEqual(@as(c_int, @backingInt(std.posix.SIG.ILL)), vm.signal_number);
         if (case.fp_status) |status| {
             try std.testing.expectEqual(status, vm.signal_fpu_status);
             try std.testing.expectEqual(@as(u32, 0), getFPUStatus(&uc));
@@ -678,14 +678,14 @@ fn fepSignalHandler(sig: std.posix.SIG, _: *const SiginfoType, _: ?*anyopaque) c
     if (vm_mod.g_fatal_erroring_p) return;
 
     const vm = g_current_vm orelse {
-        fatalError("Foreign thread received signal", @intFromEnum(sig));
+        fatalError("Foreign thread received signal", @backingInt(sig));
     };
 
     // Best-effort: signal handler context, mprotect failure is non-recoverable
     safepoints.enqueueFep(vm) catch return;
 
     // Also enqueue the signal to the signal pipe for async processing
-    enqueueSignal(vm, @intCast(@intFromEnum(sig)));
+    enqueueSignal(vm, @intCast(@backingInt(sig)));
 }
 
 // Helper function to enqueue a signal to the signal pipe
@@ -701,7 +701,7 @@ fn enqueueSignalHandler(sig: std.posix.SIG, _: *const SiginfoType, _: ?*anyopaqu
     if (vm_mod.g_fatal_erroring_p) return;
 
     const vm = g_current_vm orelse return;
-    enqueueSignal(vm, @intCast(@intFromEnum(sig)));
+    enqueueSignal(vm, @intCast(@backingInt(sig)));
 }
 
 // Sampling profiler signal handler (SIGALRM)
@@ -781,7 +781,7 @@ pub fn dispatchSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: Cell)
 }
 
 fn leafSignalHandlerAvailable(vm: *vm_mod.FactorVM) bool {
-    const handler_word_cell = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.leaf_signal_handler_word)];
+    const handler_word_cell = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.leaf_signal_handler_word)];
     if (!layouts.hasTag(handler_word_cell, .word)) return false;
     const handler_word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(handler_word_cell));
     return handler_word.subprimitive != layouts.false_object;
@@ -802,7 +802,7 @@ fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: 
         sp.* -= if (frameless) 16 + code_blocks.CodeBlock.LEAF_FRAME_SIZE else 16;
         @as(*Cell, @ptrFromInt(sp.* + @import("contexts.zig").FRAME_RETURN_ADDRESS)).* = pc.*;
 
-        const handler_word_cell = vm.vm_asm.special_objects[@intFromEnum(word_object)];
+        const handler_word_cell = vm.vm_asm.special_objects[@backingInt(word_object)];
         if (!layouts.hasTag(handler_word_cell, .word)) {
             fatalError("Signal handler word not initialized", handler_word_cell);
         }
@@ -819,10 +819,10 @@ fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: 
 
     if (offset == 0) {
         delta = @sizeOf(Cell);
-        index = @intFromEnum(objects.SpecialObject.signal_handler_word);
+        index = @backingInt(objects.SpecialObject.signal_handler_word);
     } else if (offset == 16 - @sizeOf(Cell)) {
         delta = 16;
-        index = @intFromEnum(objects.SpecialObject.leaf_signal_handler_word);
+        index = @backingInt(objects.SpecialObject.leaf_signal_handler_word);
     } else {
         fatalError("Invalid stack alignment in signal", offset);
     }
@@ -930,7 +930,7 @@ test "ARM64 error unwind restores the saved frame before entering Factor" {
         @as(*Cell, @ptrFromInt(to)).* = 0x123;
         @as(*Cell, @ptrFromInt(to + 8)).* = 0x456;
         var word: layouts.Word align(layouts.data_alignment) = undefined;
-        vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)] = layouts.tag(layouts.Word, &word);
+        vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.unwind_native_frames_word)] = layouts.tag(layouts.Word, &word);
         var quot: layouts.Quotation align(layouts.data_alignment) = undefined;
         quot.entry_point = @intFromPtr(&Arm64UnwindProbe.entry);
         unwindNativeFrames(vm, layouts.tag(layouts.Quotation, &quot), to);
@@ -1021,7 +1021,7 @@ pub fn generalError(vm: *vm_mod.FactorVM, error_type: VMError, arg1: Cell, arg2:
     vm.gc_off = false;
 
     // Check if error handler is set and we're not in GC
-    const error_handler_quot = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.error_handler_quot)];
+    const error_handler_quot = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.error_handler_quot)];
 
     if (!vm.current_gc_p and error_handler_quot != layouts.false_object) {
         // Root arg1 and arg2 against GC - allotUninitializedArray can trigger GC
@@ -1034,14 +1034,14 @@ pub fn generalError(vm: *vm_mod.FactorVM, error_type: VMError, arg1: Cell, arg2:
 
         // Allocate error object: 4-element array with [KERNEL_ERROR, error_type, arg1, arg2]
         const error_array = vm.allotArray(4, layouts.false_object) orelse {
-            fatalError("Out of memory allocating error object", @intFromEnum(error_type));
+            fatalError("Out of memory allocating error object", @backingInt(error_type));
         };
 
         // Fill in the error array elements (use rooted values in case GC moved them)
         const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(error_array));
         const arr_data = arr.data();
         arr_data[0] = tagFixnum(KERNEL_ERROR);
-        arr_data[1] = tagFixnum(@intFromEnum(error_type));
+        arr_data[1] = tagFixnum(@backingInt(error_type));
         arr_data[2] = rooted_arg1;
         arr_data[3] = rooted_arg2;
 
@@ -1055,7 +1055,7 @@ pub fn generalError(vm: *vm_mod.FactorVM, error_type: VMError, arg1: Cell, arg2:
 
         // Re-read error handler quotation from special_objects in case GC moved it
         // (allotUninitializedArray above can trigger GC which updates special_objects)
-        const current_handler_quot = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.error_handler_quot)];
+        const current_handler_quot = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.error_handler_quot)];
 
         // Unwind to Factor's error handler
         unwindNativeFrames(vm, current_handler_quot, ctx.callstack_top);
@@ -1065,14 +1065,14 @@ pub fn generalError(vm: *vm_mod.FactorVM, error_type: VMError, arg1: Cell, arg2:
         std.debug.print("error: {}\n", .{error_type});
         std.debug.print("arg 1: 0x{x}\n", .{arg1});
         std.debug.print("arg 2: 0x{x}\n", .{arg2});
-        fatalError("Error before handler initialized or during GC", @intFromEnum(error_type));
+        fatalError("Error before handler initialized or during GC", @backingInt(error_type));
     }
 }
 
 // Call the unwind-native-frames word to unwind C stack and jump to Factor error handler
 fn unwindNativeFrames(vm: *vm_mod.FactorVM, quot: Cell, to: Cell) noreturn {
     // Get the unwind_native_frames_word from special objects
-    const unwind_word_cell = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)];
+    const unwind_word_cell = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.unwind_native_frames_word)];
 
     if (!layouts.hasTag(unwind_word_cell, .word)) {
         fatalError("unwind_native_frames_word not initialized", unwind_word_cell);
@@ -1248,7 +1248,7 @@ test "the VM's abort is not caught by an installed SIGABRT handler" {
     }
     const status = try waitForChild(pid);
     try std.testing.expect(std.posix.W.IFSIGNALED(status));
-    try std.testing.expectEqual(@as(u32, @intFromEnum(std.posix.SIG.ABRT)), @as(u32, @intFromEnum(std.posix.W.TERMSIG(status))));
+    try std.testing.expectEqual(@as(u32, @backingInt(std.posix.SIG.ABRT)), @as(u32, @backingInt(std.posix.W.TERMSIG(status))));
 }
 
 test "a fatal error raised while fatal erroring exits with status 86" {

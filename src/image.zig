@@ -698,7 +698,7 @@ pub const ImageLoader = struct {
         const untagged = layouts.UNTAG(ptr);
 
         // Data heap object types have tags 2-13 (array through dll)
-        if (type_tag >= @intFromEnum(layouts.TypeTag.array) and type_tag <= @intFromEnum(layouts.TypeTag.dll)) {
+        if (type_tag >= @backingInt(layouts.TypeTag.array) and type_tag <= @backingInt(layouts.TypeTag.dll)) {
             return layouts.RETAG(untagged +% data_offset, type_tag);
         }
 
@@ -837,7 +837,7 @@ pub const ImageLoader = struct {
                         // when Factor JIT code accesses it without checking expired
                         mapDummyMemoryIfNeeded(a.address, self.vm.allocator);
                     }
-                    a.expired = self.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
+                    a.expired = self.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.canonical_true)];
                 }
             },
             .dll => {

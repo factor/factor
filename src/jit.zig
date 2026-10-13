@@ -16,40 +16,40 @@ const FactorVM = vm_mod.FactorVM;
 // JIT template indices (stored in special_objects)
 pub const JitTemplate = enum(u32) {
     // Basic templates
-    prolog = @intFromEnum(objects.SpecialObject.jit_prolog),
-    primitive_word = @intFromEnum(objects.SpecialObject.jit_primitive_word),
-    primitive = @intFromEnum(objects.SpecialObject.jit_primitive),
-    word_jump = @intFromEnum(objects.SpecialObject.jit_word_jump),
-    word_call = @intFromEnum(objects.SpecialObject.jit_word_call),
-    if_word = @intFromEnum(objects.SpecialObject.jit_if_word),
-    jit_if = @intFromEnum(objects.SpecialObject.jit_if),
-    safepoint = @intFromEnum(objects.SpecialObject.jit_safepoint),
-    epilog = @intFromEnum(objects.SpecialObject.jit_epilog),
-    return_template = @intFromEnum(objects.SpecialObject.jit_return),
-    push_literal = @intFromEnum(objects.SpecialObject.jit_push_literal),
-    dip_word = @intFromEnum(objects.SpecialObject.jit_dip_word),
-    dip = @intFromEnum(objects.SpecialObject.jit_dip),
-    two_dip_word = @intFromEnum(objects.SpecialObject.jit_2dip_word),
-    two_dip = @intFromEnum(objects.SpecialObject.jit_2dip),
-    three_dip_word = @intFromEnum(objects.SpecialObject.jit_3dip_word),
-    three_dip = @intFromEnum(objects.SpecialObject.jit_3dip),
-    execute = @intFromEnum(objects.SpecialObject.jit_execute),
-    declare_word = @intFromEnum(objects.SpecialObject.jit_declare_word),
+    prolog = @backingInt(objects.SpecialObject.jit_prolog),
+    primitive_word = @backingInt(objects.SpecialObject.jit_primitive_word),
+    primitive = @backingInt(objects.SpecialObject.jit_primitive),
+    word_jump = @backingInt(objects.SpecialObject.jit_word_jump),
+    word_call = @backingInt(objects.SpecialObject.jit_word_call),
+    if_word = @backingInt(objects.SpecialObject.jit_if_word),
+    jit_if = @backingInt(objects.SpecialObject.jit_if),
+    safepoint = @backingInt(objects.SpecialObject.jit_safepoint),
+    epilog = @backingInt(objects.SpecialObject.jit_epilog),
+    return_template = @backingInt(objects.SpecialObject.jit_return),
+    push_literal = @backingInt(objects.SpecialObject.jit_push_literal),
+    dip_word = @backingInt(objects.SpecialObject.jit_dip_word),
+    dip = @backingInt(objects.SpecialObject.jit_dip),
+    two_dip_word = @backingInt(objects.SpecialObject.jit_2dip_word),
+    two_dip = @backingInt(objects.SpecialObject.jit_2dip),
+    three_dip_word = @backingInt(objects.SpecialObject.jit_3dip_word),
+    three_dip = @backingInt(objects.SpecialObject.jit_3dip),
+    execute = @backingInt(objects.SpecialObject.jit_execute),
+    declare_word = @backingInt(objects.SpecialObject.jit_declare_word),
 
     // PIC templates
-    pic_load = @intFromEnum(objects.SpecialObject.pic_load),
-    pic_tag = @intFromEnum(objects.SpecialObject.pic_tag),
-    pic_tuple = @intFromEnum(objects.SpecialObject.pic_tuple),
-    pic_check_tag = @intFromEnum(objects.SpecialObject.pic_check_tag),
-    pic_check_tuple = @intFromEnum(objects.SpecialObject.pic_check_tuple),
-    pic_hit = @intFromEnum(objects.SpecialObject.pic_hit),
-    pic_miss_jump = @intFromEnum(objects.SpecialObject.pic_miss_jump),
-    pic_miss_tail_jump = @intFromEnum(objects.SpecialObject.pic_miss_tail_jump),
+    pic_load = @backingInt(objects.SpecialObject.pic_load),
+    pic_tag = @backingInt(objects.SpecialObject.pic_tag),
+    pic_tuple = @backingInt(objects.SpecialObject.pic_tuple),
+    pic_check_tag = @backingInt(objects.SpecialObject.pic_check_tag),
+    pic_check_tuple = @backingInt(objects.SpecialObject.pic_check_tuple),
+    pic_hit = @backingInt(objects.SpecialObject.pic_hit),
+    pic_miss_jump = @backingInt(objects.SpecialObject.pic_miss_jump),
+    pic_miss_tail_jump = @backingInt(objects.SpecialObject.pic_miss_tail_jump),
 
     // Megamorphic templates
-    mega_lookup = @intFromEnum(objects.SpecialObject.mega_lookup),
-    mega_lookup_word = @intFromEnum(objects.SpecialObject.mega_lookup_word),
-    mega_miss_word = @intFromEnum(objects.SpecialObject.mega_miss_word),
+    mega_lookup = @backingInt(objects.SpecialObject.mega_lookup),
+    mega_lookup_word = @backingInt(objects.SpecialObject.mega_lookup_word),
+    mega_miss_word = @backingInt(objects.SpecialObject.mega_miss_word),
 };
 
 // =============================================================================
@@ -183,7 +183,7 @@ pub const LabelManager = struct {
             try patchRelativeJump(code_buffer, fwd_ref.patch_offset, target_pos);
 
             // Record fixup for code block metadata (Factor format: class, offset, target)
-            fixups.appendAssumeCapacity(layouts.tagFixnum(@as(Fixnum, @intCast(@intFromEnum(fwd_ref.relocation_class)))));
+            fixups.appendAssumeCapacity(layouts.tagFixnum(@as(Fixnum, @intCast(@backingInt(fwd_ref.relocation_class)))));
             fixups.appendAssumeCapacity(layouts.tagFixnum(@as(Fixnum, @intCast(fwd_ref.patch_offset))));
             fixups.appendAssumeCapacity(layouts.tagFixnum(@as(Fixnum, @intCast(target_pos))));
         }
@@ -416,7 +416,7 @@ pub const Jit = struct {
 
     // Get a template from special_objects by enum
     fn getTemplate(self: *const Self, template: JitTemplate) ?*const layouts.Array {
-        const template_cell = self.vm.vm_asm.special_objects[@intFromEnum(template)];
+        const template_cell = self.vm.vm_asm.special_objects[@backingInt(template)];
         return getArrayFromCell(template_cell);
     }
 
@@ -431,7 +431,7 @@ pub const Jit = struct {
 
     // Emit a template by enum (append its relocation info and machine code)
     pub fn emit(self: *Self, template: JitTemplate) !void {
-        var template_cell = self.vm.vm_asm.special_objects[@intFromEnum(template)];
+        var template_cell = self.vm.vm_asm.special_objects[@backingInt(template)];
         self.vm.data_roots.appendAssumeCapacity(&template_cell);
         defer _ = self.vm.data_roots.pop();
 
@@ -865,37 +865,37 @@ pub const QuotationJit = struct {
     fn isFastIf(self: *const Self, i: Cell, len: Cell) bool {
         if (i + 3 != len) return false;
         if (!layouts.hasTag(self.nth(i + 1), .quotation)) return false;
-        const if_word = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.jit_if_word)];
+        const if_word = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.jit_if_word)];
         return self.nth(i + 2) == if_word;
     }
 
     // Check for primitive call pattern: byte-array primitive
     fn isPrimitiveCall(self: *const Self, i: Cell, len: Cell) bool {
-        const prim_word = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.jit_primitive_word)];
+        const prim_word = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.jit_primitive_word)];
         return (i + 2) <= len and self.nth(i + 1) == prim_word;
     }
 
     // Check for dip pattern: [ quot ] dip
     fn isFastDip(self: *const Self, i: Cell, len: Cell) bool {
-        const dip_word = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.jit_dip_word)];
+        const dip_word = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.jit_dip_word)];
         return (i + 2) <= len and self.nth(i + 1) == dip_word;
     }
 
     // Check for 2dip pattern: [ quot ] 2dip
     fn isFast2Dip(self: *const Self, i: Cell, len: Cell) bool {
-        const dip2_word = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.jit_2dip_word)];
+        const dip2_word = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.jit_2dip_word)];
         return (i + 2) <= len and self.nth(i + 1) == dip2_word;
     }
 
     // Check for 3dip pattern: [ quot ] 3dip
     fn isFast3Dip(self: *const Self, i: Cell, len: Cell) bool {
-        const dip3_word = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.jit_3dip_word)];
+        const dip3_word = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.jit_3dip_word)];
         return (i + 2) <= len and self.nth(i + 1) == dip3_word;
     }
 
     // Check for declare pattern: { decl } declare
     fn isDeclare(self: *const Self, i: Cell, len: Cell) bool {
-        const declare_word = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.jit_declare_word)];
+        const declare_word = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.jit_declare_word)];
         return (i + 2) <= len and self.nth(i + 1) == declare_word;
     }
 
@@ -904,16 +904,16 @@ pub const QuotationJit = struct {
         if (i + 4 > len) return false;
         if (!layouts.hasTag(self.nth(i + 1), .fixnum)) return false;
         if (!layouts.hasTag(self.nth(i + 2), .array)) return false;
-        const mega_word = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.mega_lookup_word)];
+        const mega_word = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.mega_lookup_word)];
         return self.nth(i + 3) == mega_word;
     }
 
     // Check if word is a special subprimitive (signal handlers, unwinders)
     fn isSpecialSubprimitive(self: *const Self, obj: Cell) bool {
-        const signal_handler = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.signal_handler_word)];
-        const leaf_signal = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.leaf_signal_handler_word)];
-        const unwind = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)];
-        const pic_miss_resume = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_resume_word)];
+        const signal_handler = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.signal_handler_word)];
+        const leaf_signal = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.leaf_signal_handler_word)];
+        const unwind = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.unwind_native_frames_word)];
+        const pic_miss_resume = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.pic_miss_resume_word)];
         return obj == signal_handler or obj == leaf_signal or obj == unwind or obj == pic_miss_resume;
     }
 
@@ -1155,7 +1155,7 @@ pub const QuotationJit = struct {
         try self.push(methods);
         try self.push(layouts.tagFixnum(index));
         try self.push(cache);
-        const mega_miss = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.mega_miss_word)];
+        const mega_miss = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.mega_miss_word)];
         try self.wordCall(mega_miss);
         try self.jit.emit(.epilog);
         try self.jit.emit(.execute);
@@ -1163,9 +1163,9 @@ pub const QuotationJit = struct {
 
     // Get stack frame size for a word
     pub fn wordStackFrameSize(self: *const Self, obj: Cell) Cell {
-        const signal_handler = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.signal_handler_word)];
-        const leaf_signal = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.leaf_signal_handler_word)];
-        const unwind = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)];
+        const signal_handler = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.signal_handler_word)];
+        const leaf_signal = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.leaf_signal_handler_word)];
+        const unwind = self.jit.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.unwind_native_frames_word)];
         if (obj == signal_handler or obj == leaf_signal or obj == unwind) {
             return SIGNAL_HANDLER_STACK_FRAME_SIZE;
         }

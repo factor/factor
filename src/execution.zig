@@ -88,7 +88,7 @@ pub const Interpreter = struct {
         if (!layouts.hasTag(data[2], .array)) return false;
         if (!layouts.hasTag(data[3], .word)) return false;
 
-        const mega_lookup_word = self.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.mega_lookup_word)];
+        const mega_lookup_word = self.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.mega_lookup_word)];
         return data[3] == mega_lookup_word;
     }
 
@@ -170,7 +170,7 @@ pub const Interpreter = struct {
     }
 
     fn trueObject(self: *Self) Cell {
-        return self.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
+        return self.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.canonical_true)];
     }
 
     fn boolObject(self: *Self, cond: bool) Cell {
@@ -250,7 +250,7 @@ pub const Interpreter = struct {
             ctx.push(x);
             ctx.push(z);
         } else if (wordNameEquals(word, "die")) {
-            primitives.callPrimitive(self.vm, @intFromEnum(primitives.PrimitiveIndex.die));
+            primitives.callPrimitive(self.vm, @backingInt(primitives.PrimitiveIndex.die));
         } else if (wordNameEquals(word, "call")) {
             try self.executeQuotation(ctx.pop());
         } else if (wordNameEquals(word, "dip")) {
@@ -271,13 +271,13 @@ pub const Interpreter = struct {
             const prim_idx = ctx.pop();
             primitives.callPrimitive(self.vm, @intCast(layouts.untagFixnum(prim_idx)));
         } else if (wordNameEquals(word, "all-instances")) {
-            primitives.callPrimitive(self.vm, @intFromEnum(primitives.PrimitiveIndex.all_instances));
+            primitives.callPrimitive(self.vm, @backingInt(primitives.PrimitiveIndex.all_instances));
         } else if (wordNameEquals(word, "special-object")) {
-            primitives.callPrimitive(self.vm, @intFromEnum(primitives.PrimitiveIndex.special_object));
+            primitives.callPrimitive(self.vm, @backingInt(primitives.PrimitiveIndex.special_object));
         } else if (wordNameEquals(word, "fwrite")) {
-            primitives.callPrimitive(self.vm, @intFromEnum(primitives.PrimitiveIndex.fwrite));
+            primitives.callPrimitive(self.vm, @backingInt(primitives.PrimitiveIndex.fwrite));
         } else if (wordNameEquals(word, "fflush")) {
-            primitives.callPrimitive(self.vm, @intFromEnum(primitives.PrimitiveIndex.fflush));
+            primitives.callPrimitive(self.vm, @backingInt(primitives.PrimitiveIndex.fflush));
         } else if (wordNameEquals(word, "tag")) {
             ctx.push(layouts.tagFixnum(@intCast(layouts.TAG(ctx.pop()))));
         } else if (wordNameEquals(word, "length")) {
@@ -503,7 +503,7 @@ test "interpreter roots remaining literals and dip values across moving GC" {
     const dip_word = testWord(vm, "dip");
     const saved = vm.allotByteArray(8);
     const literal = vm.allotByteArray(8);
-    const inner = testQuotation(vm, &.{ layouts.tagFixnum(@intFromEnum(primitives.PrimitiveIndex.minor_gc)), do_primitive, literal });
+    const inner = testQuotation(vm, &.{ layouts.tagFixnum(@backingInt(primitives.PrimitiveIndex.minor_gc)), do_primitive, literal });
     const outer = testQuotation(vm, &.{ saved, inner, dip_word });
     var interp = Interpreter.init(vm);
     try interp.executeQuotation(outer);

@@ -80,17 +80,17 @@ const FactorVM = vm_mod.FactorVM;
 pub fn toBignum(vm: *FactorVM, n: Fixnum) !*layouts.Bignum {
     // Fast paths: return cached singletons from special_objects (no allocation)
     if (n == 0) {
-        const cached = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.bignum_zero)];
+        const cached = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.bignum_zero)];
         if (cached != layouts.false_object) {
             return @ptrFromInt(layouts.UNTAG(cached));
         }
     } else if (n == 1) {
-        const cached = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.bignum_pos_one)];
+        const cached = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.bignum_pos_one)];
         if (cached != layouts.false_object) {
             return @ptrFromInt(layouts.UNTAG(cached));
         }
     } else if (n == -1) {
-        const cached = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.bignum_neg_one)];
+        const cached = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.bignum_neg_one)];
         if (cached != layouts.false_object) {
             return @ptrFromInt(layouts.UNTAG(cached));
         }

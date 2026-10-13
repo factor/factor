@@ -48,15 +48,15 @@ pub const TypeTag = enum(u4) {
 };
 
 pub inline fn hasTag(x: Cell, type_tag: TypeTag) bool {
-    return TAG(x) == @intFromEnum(type_tag);
+    return TAG(x) == @backingInt(type_tag);
 }
 
 pub inline fn typeTag(x: Cell) TypeTag {
-    return @enumFromInt(x & tag_mask);
+    return @fromBackingInt(@intCast(x & tag_mask));
 }
 
 pub inline fn retag(x: Cell, type_tag: TypeTag) Cell {
-    return UNTAG(x) | @intFromEnum(type_tag);
+    return UNTAG(x) | @backingInt(type_tag);
 }
 
 pub const type_count: Cell = 14;
@@ -78,10 +78,10 @@ pub const FPTrap = struct {
 };
 
 // The 'f' (false) object - just the tag value
-pub const false_object: Cell = @intFromEnum(TypeTag.f);
+pub const false_object: Cell = @backingInt(TypeTag.f);
 
 pub fn isImmediate(obj: Cell) bool {
-    return TAG(obj) <= @intFromEnum(TypeTag.f);
+    return TAG(obj) <= @backingInt(TypeTag.f);
 }
 
 // Fixnum operations
@@ -104,7 +104,7 @@ pub fn untagFixnumFast(tagged: Cell) Cell {
 }
 
 pub fn tagFixnum(untagged: Fixnum) Cell {
-    return (@as(Cell, @bitCast(untagged << @intCast(tag_bits)))) | @intFromEnum(TypeTag.fixnum);
+    return (@as(Cell, @bitCast(untagged << @intCast(tag_bits)))) | @backingInt(TypeTag.fixnum);
 }
 
 pub fn alignCell(a: Cell, b: Cell) Cell {
@@ -133,11 +133,11 @@ pub const Object = extern struct {
     }
 
     pub fn getType(self: *const Object) TypeTag {
-        return @enumFromInt(@as(u4, @truncate((self.header >> 2) & tag_mask)));
+        return @fromBackingInt(@intCast(@as(u4, @truncate((self.header >> 2) & tag_mask))));
     }
 
     pub fn initialize(self: *Object, obj_type: TypeTag) void {
-        self.header = @as(Cell, @intFromEnum(obj_type)) << 2;
+        self.header = @as(Cell, @backingInt(obj_type)) << 2;
     }
 
     pub fn hashcode(self: *const Object) Cell {
@@ -566,7 +566,7 @@ pub fn followForwardingPointers(addr: Cell) Cell {
 // Tagged pointer utilities
 pub fn tag(comptime T: type, value: *T) Cell {
     std.debug.assert(@intFromPtr(value) % data_alignment == 0);
-    return @intFromPtr(value) | @intFromEnum(T.type_number);
+    return @intFromPtr(value) | @backingInt(T.type_number);
 }
 
 pub fn untag(comptime T: type, value: Cell) *T {
@@ -578,12 +578,12 @@ pub fn untag(comptime T: type, value: Cell) *T {
 // Specific tag functions for common types
 pub fn tagBignum(bn: *Bignum) Cell {
     std.debug.assert(@intFromPtr(bn) % data_alignment == 0);
-    return @intFromPtr(bn) | @intFromEnum(TypeTag.bignum);
+    return @intFromPtr(bn) | @backingInt(TypeTag.bignum);
 }
 
 pub fn tagFloat(boxed: *BoxedFloat) Cell {
     std.debug.assert(@intFromPtr(boxed) % data_alignment == 0);
-    return @intFromPtr(boxed) | @intFromEnum(TypeTag.float);
+    return @intFromPtr(boxed) | @backingInt(TypeTag.float);
 }
 
 // Verify struct layouts at compile time

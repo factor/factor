@@ -112,7 +112,7 @@ pub const GarbageCollector = struct {
 
         while (true) {
             if (self.current_event) |event| {
-                event.op = @intFromEnum(current_op);
+                event.op = @backingInt(current_op);
             }
 
             const success = switch (current_op) {
@@ -121,7 +121,7 @@ pub const GarbageCollector = struct {
                     const ok = self.collectAging();
                     if (ok and self.heap.isHighFragmentation()) {
                         if (self.current_event) |event| {
-                            event.op = @intFromEnum(GCOp.collect_full);
+                            event.op = @backingInt(GCOp.collect_full);
                         }
                         self.collectFull(false);
                     }
@@ -131,7 +131,7 @@ pub const GarbageCollector = struct {
                     const ok = self.collectToTenured();
                     if (ok and self.heap.isHighFragmentation()) {
                         if (self.current_event) |event| {
-                            event.op = @intFromEnum(GCOp.collect_full);
+                            event.op = @backingInt(GCOp.collect_full);
                         }
                         self.collectFull(false);
                     }
@@ -398,12 +398,12 @@ pub const GarbageCollector = struct {
 
         if (self.heap.isLowMemory()) {
             if (self.current_event) |event| {
-                event.op = @intFromEnum(GCOp.collect_growing_data_heap);
+                event.op = @backingInt(GCOp.collect_growing_data_heap);
             }
             _ = self.collectGrowingDataHeap(0) catch @panic("OOM");
         } else if (compact_p or self.heap.isHighFragmentation()) {
             if (self.current_event) |event| {
-                event.op = @intFromEnum(GCOp.collect_compact);
+                event.op = @backingInt(GCOp.collect_compact);
             }
             if (self.current_event) |event| event.resetTimer();
             compact.compactPhase(self, true);
@@ -903,16 +903,16 @@ test "gc scanCardsGeneration scans aging cards for nursery references" {
     const nursery_size = layouts.alignCell(@sizeOf(layouts.Array) + nursery_cap * @sizeOf(Cell), layouts.data_alignment);
     const nursery_addr = heap.allocateNursery(nursery_size) orelse return;
     const nursery_arr: *layouts.Array = @ptrFromInt(nursery_addr);
-    nursery_arr.header = @as(Cell, @intFromEnum(layouts.TypeTag.array)) << 2;
+    nursery_arr.header = @as(Cell, @backingInt(layouts.TypeTag.array)) << 2;
     nursery_arr.capacity = layouts.tagFixnum(@intCast(nursery_cap));
     @memset(nursery_arr.data()[0..nursery_cap], layouts.false_object);
-    const nursery_tagged = nursery_addr | @intFromEnum(layouts.TypeTag.array);
+    const nursery_tagged = nursery_addr | @backingInt(layouts.TypeTag.array);
 
     const aging_cap: Cell = 1;
     const aging_size = layouts.alignCell(@sizeOf(layouts.Array) + aging_cap * @sizeOf(Cell), layouts.data_alignment);
     const aging_addr = heap.allocateAging(aging_size) orelse return;
     const aging_arr: *layouts.Array = @ptrFromInt(aging_addr);
-    aging_arr.header = @as(Cell, @intFromEnum(layouts.TypeTag.array)) << 2;
+    aging_arr.header = @as(Cell, @backingInt(layouts.TypeTag.array)) << 2;
     aging_arr.capacity = layouts.tagFixnum(@intCast(aging_cap));
     aging_arr.data()[0] = nursery_tagged;
 
@@ -982,16 +982,16 @@ test "gc scanCards updates tenured slot spanning card" {
     const nursery_size = layouts.alignCell(@sizeOf(layouts.Array) + nursery_cap * @sizeOf(Cell), layouts.data_alignment);
     const nursery_addr = heap.allocateNursery(nursery_size) orelse return;
     const nursery_arr: *layouts.Array = @ptrFromInt(nursery_addr);
-    nursery_arr.header = @as(Cell, @intFromEnum(layouts.TypeTag.array)) << 2;
+    nursery_arr.header = @as(Cell, @backingInt(layouts.TypeTag.array)) << 2;
     nursery_arr.capacity = layouts.tagFixnum(@intCast(nursery_cap));
     @memset(nursery_arr.data()[0..nursery_cap], layouts.false_object);
-    const nursery_tagged = nursery_addr | @intFromEnum(layouts.TypeTag.array);
+    const nursery_tagged = nursery_addr | @backingInt(layouts.TypeTag.array);
 
     const tenured_cap: Cell = 31; // slot 30 starts at next card boundary when object is card-aligned
     const tenured_size = layouts.alignCell(@sizeOf(layouts.Array) + tenured_cap * @sizeOf(Cell), layouts.data_alignment);
     const tenured_addr = heap.allocateTenured(tenured_size) orelse return;
     const tenured_arr: *layouts.Array = @ptrFromInt(tenured_addr);
-    tenured_arr.header = @as(Cell, @intFromEnum(layouts.TypeTag.array)) << 2;
+    tenured_arr.header = @as(Cell, @backingInt(layouts.TypeTag.array)) << 2;
     tenured_arr.capacity = layouts.tagFixnum(@intCast(tenured_cap));
     @memset(tenured_arr.data()[0..tenured_cap], layouts.false_object);
 
@@ -1048,10 +1048,10 @@ test "gc copying destination moves nursery object" {
     const nursery_size = layouts.alignCell(@sizeOf(layouts.Array) + nursery_cap * @sizeOf(Cell), layouts.data_alignment);
     const nursery_addr = heap.allocateNursery(nursery_size) orelse return;
     const nursery_arr: *layouts.Array = @ptrFromInt(nursery_addr);
-    nursery_arr.header = @as(Cell, @intFromEnum(layouts.TypeTag.array)) << 2;
+    nursery_arr.header = @as(Cell, @backingInt(layouts.TypeTag.array)) << 2;
     nursery_arr.capacity = layouts.tagFixnum(@intCast(nursery_cap));
     @memset(nursery_arr.data()[0..nursery_cap], layouts.false_object);
-    const nursery_tagged = nursery_addr | @intFromEnum(layouts.TypeTag.array);
+    const nursery_tagged = nursery_addr | @backingInt(layouts.TypeTag.array);
 
     var destination = slot_visitor.CopyingDestination{
         .bump_here = &heap.aging.here,

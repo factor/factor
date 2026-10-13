@@ -131,7 +131,7 @@ pub const GCEvent = extern struct {
     pub fn init(op: GCOp, vm: *FactorVM) GCEvent {
         const primitives = @import("primitives.zig");
         return GCEvent{
-            .op = @intFromEnum(op),
+            .op = @backingInt(op),
             .data_heap_before = computeDataHeapRoom(vm),
             .code_heap_before = computeCodeHeapRoom(vm),
             .data_heap_after = std.mem.zeroes(DataHeapRoom),
@@ -154,7 +154,7 @@ pub const GCEvent = extern struct {
     pub fn endedPhase(self: *GCEvent, phase: GCPhase) void {
         const primitives = @import("primitives.zig");
         const now = primitives.nanoCountMonotonic();
-        self.times[@intFromEnum(phase)] += @intCast(now - self.temp_time);
+        self.times[@backingInt(phase)] += @intCast(now - self.temp_time);
     }
 
     pub fn endedGC(self: *GCEvent, vm: *FactorVM) void {
@@ -589,15 +589,15 @@ pub const FactorVM = struct {
     pub fn syncContextFromRegisters(_: *Self) void {}
 
     pub fn specialObject(self: *const Self, index: objects.SpecialObject) Cell {
-        return self.vm_asm.special_objects[@intFromEnum(index)];
+        return self.vm_asm.special_objects[@backingInt(index)];
     }
 
     pub fn setSpecialObject(self: *Self, index: objects.SpecialObject, value: Cell) void {
-        self.vm_asm.special_objects[@intFromEnum(index)] = value;
+        self.vm_asm.special_objects[@backingInt(index)] = value;
     }
 
     pub fn tagBoolean(self: *const Self, untagged: bool) Cell {
-        return if (untagged) self.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)] else layouts.false_object;
+        return if (untagged) self.vm_asm.special_objects[@backingInt(objects.SpecialObject.canonical_true)] else layouts.false_object;
     }
 
     pub fn checkTag(self: *Self, cell: Cell, expected: layouts.TypeTag) void {
@@ -611,7 +611,7 @@ pub const FactorVM = struct {
     }
 
     pub fn typeError(self: *Self, expected_type: layouts.TypeTag, actual: Cell) noreturn {
-        self.generalError(.type_error, layouts.tagFixnum(@intFromEnum(expected_type)), actual);
+        self.generalError(.type_error, layouts.tagFixnum(@backingInt(expected_type)), actual);
     }
 
     pub fn memoryError(self: *Self) noreturn {
@@ -730,7 +730,7 @@ pub const FactorVM = struct {
     }
 
     fn initCToFactorFunc(self: *Self) void {
-        const c_to_factor_word = self.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.c_to_factor_word)];
+        const c_to_factor_word = self.vm_asm.special_objects[@backingInt(objects.SpecialObject.c_to_factor_word)];
         if (c_to_factor_word == layouts.false_object) return;
 
         if (self.callbacks == null) {
@@ -962,9 +962,9 @@ pub const FactorVM = struct {
         }
 
         const obj_ptr: *layouts.Object = @ptrFromInt(addr);
-        obj_ptr.header = @as(Cell, @intFromEnum(type_tag)) << 2;
+        obj_ptr.header = @as(Cell, @backingInt(type_tag)) << 2;
 
-        return addr | @intFromEnum(type_tag);
+        return addr | @backingInt(type_tag);
     }
 
     pub fn allotObject(self: *Self, type_tag: layouts.TypeTag, size: Cell) ?Cell {
@@ -977,8 +977,8 @@ pub const FactorVM = struct {
         if (new_here <= self.vm_asm.nursery.end) {
             self.vm_asm.nursery.here = new_here;
             const obj_ptr: *layouts.Object = @ptrFromInt(addr);
-            obj_ptr.header = @as(Cell, @intFromEnum(type_tag)) << 2;
-            return addr | @intFromEnum(type_tag);
+            obj_ptr.header = @as(Cell, @backingInt(type_tag)) << 2;
+            return addr | @backingInt(type_tag);
         }
 
         return self.allotObjectSlow(type_tag, size, aligned_size);
@@ -996,8 +996,8 @@ pub const FactorVM = struct {
         if (new_here <= self.vm_asm.nursery.end) {
             self.vm_asm.nursery.here = new_here;
             const obj_ptr: *layouts.Object = @ptrFromInt(addr);
-            obj_ptr.header = @as(Cell, @intFromEnum(type_tag)) << 2;
-            return addr | @intFromEnum(type_tag);
+            obj_ptr.header = @as(Cell, @backingInt(type_tag)) << 2;
+            return addr | @backingInt(type_tag);
         }
         return null;
     }
@@ -1081,7 +1081,7 @@ pub const FactorVM = struct {
     }
 
     pub fn lazyJitCompileEntryPoint(self: *const Self) Cell {
-        const lazy_word = self.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.lazy_jit_compile_word)];
+        const lazy_word = self.vm_asm.special_objects[@backingInt(objects.SpecialObject.lazy_jit_compile_word)];
         if (lazy_word == layouts.false_object) return 0;
         std.debug.assert(layouts.hasTag(lazy_word, .word));
         const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(lazy_word));

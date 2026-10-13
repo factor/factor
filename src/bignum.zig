@@ -193,7 +193,7 @@ const vm_mod = @import("vm.zig");
 const FactorVM = vm_mod.FactorVM;
 
 fn cachedBignum(vm: *FactorVM, which: objects.SpecialObject) ?*Bignum {
-    const tagged = vm.vm_asm.special_objects[@intFromEnum(which)];
+    const tagged = vm.vm_asm.special_objects[@backingInt(which)];
     if (tagged == layouts.false_object) return null;
     return @ptrFromInt(layouts.UNTAG(tagged));
 }

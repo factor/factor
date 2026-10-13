@@ -97,7 +97,7 @@ pub const CallbackHeap = struct {
         defer jit_scope.deinit();
 
         const special_objects = &vm.vm_asm.special_objects;
-        const callback_stub = special_objects[@intFromEnum(objects.SpecialObject.callback_stub)];
+        const callback_stub = special_objects[@backingInt(objects.SpecialObject.callback_stub)];
         if (callback_stub == layouts.false_object) return null;
 
         std.debug.assert(layouts.hasTag(callback_stub, .array));
@@ -246,7 +246,7 @@ pub const CallbackHeap = struct {
 };
 
 fn storeCallbackOperand(stub: *code_blocks.CodeBlock, special_objects: *const [objects.special_object_count]Cell, index: usize, value: Cell) void {
-    const callback_stub = special_objects[@intFromEnum(objects.SpecialObject.callback_stub)];
+    const callback_stub = special_objects[@backingInt(objects.SpecialObject.callback_stub)];
     if (callback_stub == layouts.false_object) return;
 
     var stub_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(callback_stub));
@@ -359,7 +359,7 @@ test "callback heap alternates template sizes without moving live stubs" {
     };
     // add only reads this special object and code when owner is false.
     var vm: @import("vm.zig").FactorVM = undefined;
-    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.callback_stub)] = layouts.retag(@intFromPtr(&templates), .array);
+    vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.callback_stub)] = layouts.retag(@intFromPtr(&templates), .array);
     vm.code = null;
 
     var heap = try CallbackHeap.init(std.testing.allocator, 16 * 1024);

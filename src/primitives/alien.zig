@@ -47,7 +47,7 @@ pub fn initFfi() void {
 
 // Get a pinned alien's address (alien with base == f)
 fn pinnedAlienOffset(vm: *FactorVM, obj: Cell) ?[*]u8 {
-    switch (@as(layouts.TypeTag, @enumFromInt(layouts.TAG(obj)))) {
+    switch (@as(layouts.TypeTag, @fromBackingInt(@intCast(layouts.TAG(obj))))) {
         .alien => {
             const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(obj));
             if (alien.expired != layouts.false_object) {
@@ -68,7 +68,7 @@ fn pinnedAlienOffset(vm: *FactorVM, obj: Cell) ?[*]u8 {
 pub export fn primitive_alien_address(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     const obj = vm.peek();
-    switch (@as(layouts.TypeTag, @enumFromInt(layouts.TAG(obj)))) {
+    switch (@as(layouts.TypeTag, @fromBackingInt(@intCast(layouts.TAG(obj))))) {
         .alien => {
             const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(obj));
             if (alien.expired != layouts.false_object) {
@@ -317,7 +317,7 @@ pub export fn primitive_alien_float(vm_asm: *VMAssemblyFields) callconv(.c) void
     const typed_ptr: *align(1) const f32 = @ptrCast(ptr);
     const boxed = float_mod.allocBoxedFloat(vm, @floatCast(typed_ptr.*)) catch
         vm.memoryError();
-    vm.push(@intFromPtr(boxed) | @intFromEnum(layouts.TypeTag.float));
+    vm.push(@intFromPtr(boxed) | @backingInt(layouts.TypeTag.float));
 }
 
 pub export fn primitive_set_alien_float(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -337,7 +337,7 @@ pub export fn primitive_alien_double(vm_asm: *VMAssemblyFields) callconv(.c) voi
     const typed_ptr: *align(1) const f64 = @ptrCast(ptr);
     const boxed = float_mod.allocBoxedFloat(vm, typed_ptr.*) catch
         vm.memoryError();
-    vm.push(@intFromPtr(boxed) | @intFromEnum(layouts.TypeTag.float));
+    vm.push(@intFromPtr(boxed) | @backingInt(layouts.TypeTag.float));
 }
 
 pub export fn primitive_set_alien_double(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -537,7 +537,7 @@ pub export fn primitive_dll_validp(vm_asm: *VMAssemblyFields) callconv(.c) void 
     const library = vm.peek();
 
     const objects = @import("../objects.zig");
-    const canonical_true = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
+    const canonical_true = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.canonical_true)];
 
     if (library == layouts.false_object) {
         vm.replace(canonical_true);

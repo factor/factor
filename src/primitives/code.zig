@@ -242,7 +242,7 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
                         const offset_cell = labels_data[j + 1];
                         const target_cell = labels_data[j + 2];
 
-                        const rel_class: code_blocks.RelocationClass = @enumFromInt(@as(u4, @truncate(layouts.untagFixnumUnsigned(rel_class_cell))));
+                        const rel_class: code_blocks.RelocationClass = @fromBackingInt(@intCast(@as(u4, @truncate(layouts.untagFixnumUnsigned(rel_class_cell)))));
                         const offset: u24 = @truncate(layouts.untagFixnumUnsigned(offset_cell));
                         const target = layouts.untagFixnumUnsigned(target_cell);
 
@@ -340,7 +340,7 @@ fn modifyCodeHeapWithMalformedEntry(malformed: MalformedEntry) !void {
     const word_cell = vm.allotObject(.word, @sizeOf(layouts.Word)) orelse return error.OutOfMemory;
     const word: *layouts.Word = @ptrFromInt(layouts.UNTAG(word_cell));
     word.* = .{
-        .header = @as(Cell, @intFromEnum(layouts.TypeTag.word)) << 2,
+        .header = @as(Cell, @backingInt(layouts.TypeTag.word)) << 2,
         .hashcode_field = layouts.tagFixnum(0),
         .name = f,
         .vocabulary = f,
@@ -645,7 +645,7 @@ pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void
                 data[element_count] = block.owner;
                 data[element_count + 1] = block.parameters;
                 data[element_count + 2] = block.relocation;
-                data[element_count + 3] = layouts.tagFixnum(@intCast(@intFromEnum(block.blockType())));
+                data[element_count + 3] = layouts.tagFixnum(@intCast(@backingInt(block.blockType())));
                 data[element_count + 4] = layouts.tagFixnum(@intCast(block_size));
                 // Entry points are data_alignment-aligned, so library code can
                 // treat this cell as a fixnum and shift it back to an address.
@@ -853,7 +853,7 @@ pub fn objectClass(object: Cell) Cell {
         const tuple: *const layouts.Tuple = @ptrFromInt(layouts.UNTAG(object));
         return tuple.layout;
     }
-    return layouts.tagFixnum(@as(Fixnum, @intCast(@intFromEnum(tag))));
+    return layouts.tagFixnum(@as(Fixnum, @intCast(@backingInt(tag))));
 }
 
 fn methodCacheHashcode(klass: Cell, cache_arr: *const layouts.Array) Cell {
@@ -1153,7 +1153,7 @@ test "code_blocks initializes discarded snapshots before retrying" {
     const garbage_size = heap.tenured.size - 3 * vm_mod.deck_size;
     const garbage_addr = heap.allocateTenured(garbage_size) orelse return error.OutOfMemory;
     const garbage: *layouts.ByteArray = @ptrFromInt(garbage_addr);
-    garbage.header = @as(Cell, @intFromEnum(layouts.TypeTag.byte_array)) << 2;
+    garbage.header = @as(Cell, @backingInt(layouts.TypeTag.byte_array)) << 2;
     garbage.capacity = layouts.tagFixnum(@intCast(garbage_size - @sizeOf(layouts.ByteArray)));
     @memset(garbage.data()[0 .. garbage_size - @sizeOf(layouts.ByteArray)], 0x79);
 
@@ -1161,7 +1161,7 @@ test "code_blocks initializes discarded snapshots before retrying" {
     const result: *const layouts.Array = @ptrFromInt(layouts.UNTAG(vm.pop()));
     try std.testing.expectEqual(@as(Cell, 0), result.getCapacity());
     const discarded: *const layouts.Array = @ptrFromInt(heap.tenured.start);
-    try std.testing.expectEqual(@as(Cell, @intFromEnum(layouts.TypeTag.array)) << 2, discarded.header);
+    try std.testing.expectEqual(@as(Cell, @backingInt(layouts.TypeTag.array)) << 2, discarded.header);
     try std.testing.expectEqual(block_count * 6, discarded.getCapacity());
     for (discarded.data()[0..discarded.getCapacity()]) |value| {
         try std.testing.expectEqual(layouts.false_object, value);

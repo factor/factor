@@ -94,7 +94,7 @@ pub const CodeBlock = extern struct {
     }
 
     pub fn blockType(self: *const Self) CodeBlockType {
-        return @enumFromInt(@as(u2, @truncate((self.header >> 1) & 3)));
+        return @fromBackingInt(@intCast(@as(u2, @truncate((self.header >> 1) & 3))));
     }
 
     pub fn size(self: *const Self) Cell {
@@ -139,7 +139,7 @@ pub const CodeBlock = extern struct {
         std.debug.assert(total_size % 8 == 0);
         std.debug.assert(frame_size % 16 == 0);
         std.debug.assert(frame_size <= stack_frame_size_max);
-        const type_bits = @as(Cell, @intFromEnum(block_type)) << 1;
+        const type_bits = @as(Cell, @backingInt(block_type)) << 1;
         const size_bits = total_size & 0xFFFFF8;
         const frame_bits = frame_size << 20;
         self.header = type_bits | size_bits | frame_bits;
@@ -157,7 +157,7 @@ pub const CodeBlock = extern struct {
     }
 
     pub fn setType(self: *Self, block_type: CodeBlockType) void {
-        self.header = (self.header & ~@as(Cell, 0x7)) | (@as(Cell, @intFromEnum(block_type)) << 1);
+        self.header = (self.header & ~@as(Cell, 0x7)) | (@as(Cell, @backingInt(block_type)) << 1);
     }
 
     pub fn markFree(self: *Self, total_size: Cell) void {
@@ -283,11 +283,11 @@ pub const RelocationEntry = extern struct {
     value: u32,
 
     pub fn getType(self: RelocationEntry) RelocationType {
-        return @enumFromInt(@as(u4, @truncate((self.value & 0xF0000000) >> 28)));
+        return @fromBackingInt(@intCast(@as(u4, @truncate((self.value & 0xF0000000) >> 28))));
     }
 
     pub fn getClass(self: RelocationEntry) RelocationClass {
-        return @enumFromInt(@as(u4, @truncate((self.value & 0x0F000000) >> 24)));
+        return @fromBackingInt(@intCast(@as(u4, @truncate((self.value & 0x0F000000) >> 24))));
     }
 
     pub fn getOffset(self: RelocationEntry) u24 {
@@ -296,8 +296,8 @@ pub const RelocationEntry = extern struct {
 
     pub fn init(rel_type: RelocationType, rel_class: RelocationClass, offset: u24) RelocationEntry {
         return RelocationEntry{
-            .value = (@as(u32, @intFromEnum(rel_type)) << 28) |
-                (@as(u32, @intFromEnum(rel_class)) << 24) |
+            .value = (@as(u32, @backingInt(rel_type)) << 28) |
+                (@as(u32, @backingInt(rel_class)) << 24) |
                 @as(u32, offset),
         };
     }
@@ -458,7 +458,7 @@ pub const InstructionOperand = struct {
             .absolute_riscv_li => if (builtin.cpu.arch == .riscv32) @bitCast(riscv.loadLiteral32(@ptrFromInt(self.pointer - 8))) else @bitCast(riscv.loadLiteral(@ptrFromInt(self.pointer - 32))),
             ._reserved14, ._reserved15 => {
                 std.debug.print("[RELOC] FATAL: invalid relocation class {} in entry raw=0x{x} pointer=0x{x}\n", .{
-                    @intFromEnum(self.rel.getClass()), self.rel.value, self.pointer,
+                    @backingInt(self.rel.getClass()), self.rel.value, self.pointer,
                 });
                 unreachable;
             },
@@ -492,7 +492,7 @@ pub const InstructionOperand = struct {
             .absolute_riscv_li => if (builtin.cpu.arch == .riscv32) @bitCast(riscv.loadLiteral32(@ptrFromInt(self.pointer - 8))) else @bitCast(riscv.loadLiteral(@ptrFromInt(self.pointer - 32))),
             ._reserved14, ._reserved15 => {
                 std.debug.print("[RELOC] FATAL: invalid relocation class {} in entry raw=0x{x} relative_to=0x{x}\n", .{
-                    @intFromEnum(self.rel.getClass()), self.rel.value, relative_to,
+                    @backingInt(self.rel.getClass()), self.rel.value, relative_to,
                 });
                 unreachable;
             },
@@ -577,7 +577,7 @@ pub const InstructionOperand = struct {
             .absolute_riscv_li => if (builtin.cpu.arch == .riscv32) riscv.storeLiteral32(@ptrFromInt(self.pointer - 8), @bitCast(absolute_value)) else riscv.storeLiteral(@ptrFromInt(self.pointer - 32), @bitCast(absolute_value)),
             ._reserved14, ._reserved15 => {
                 std.debug.print("[RELOC] FATAL: invalid relocation class {} in storeValue, entry raw=0x{x} pointer=0x{x}\n", .{
-                    @intFromEnum(self.rel.getClass()), self.rel.value, self.pointer,
+                    @backingInt(self.rel.getClass()), self.rel.value, self.pointer,
                 });
                 unreachable;
             },
@@ -974,7 +974,7 @@ pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, select
                                 S.count += 1;
                                 if (S.count <= 5) {
                                     std.debug.print("[updateWordRefs STUCK] #{} block=0x{x} block_owner=0x{x} dest_owner=0x{x} tag={}\n", .{
-                                        S.count, @intFromPtr(block), block.owner, owner, @intFromEnum(layouts.typeTag(owner)),
+                                        S.count, @intFromPtr(block), block.owner, owner, @backingInt(layouts.typeTag(owner)),
                                     });
                                 }
                             }

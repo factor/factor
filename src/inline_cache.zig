@@ -71,7 +71,7 @@ pub const InlineCacheJit = struct {
         try self.base_jit.push(cache_entries.*);
 
         const vm = self.base_jit.vm;
-        const resume_word = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_resume_word)];
+        const resume_word = vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.pic_miss_resume_word)];
         if (resume_word == layouts.false_object)
             @panic("Boot image lacks inline-cache-miss-resume");
         const jump_template: jit.JitTemplate = if (tail_call) .pic_miss_tail_jump else .pic_miss_jump;

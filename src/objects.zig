@@ -145,15 +145,15 @@ pub const SpecialObject = enum(Cell) {
 // save-image-and-exit discards special objects that are filled in on startup
 // anyway, to reduce image size
 pub fn isSaveSpecial(i: Cell) bool {
-    return (i >= @intFromEnum(SpecialObject.startup_quot) and
-        i <= @intFromEnum(SpecialObject.leaf_signal_handler_word)) or
-        (i >= @intFromEnum(SpecialObject.redefinition_counter) and
-            i <= @intFromEnum(SpecialObject.undefined)) or
-        i == @intFromEnum(SpecialObject.stage2) or
-        (i >= @intFromEnum(SpecialObject.canonical_true) and
-            i <= @intFromEnum(SpecialObject.bignum_neg_one)) or
-        (i >= @intFromEnum(SpecialObject.pic_miss_resume_word) and
-            i <= @intFromEnum(SpecialObject.pic_miss_tail_jump));
+    return (i >= @backingInt(SpecialObject.startup_quot) and
+        i <= @backingInt(SpecialObject.leaf_signal_handler_word)) or
+        (i >= @backingInt(SpecialObject.redefinition_counter) and
+            i <= @backingInt(SpecialObject.undefined)) or
+        i == @backingInt(SpecialObject.stage2) or
+        (i >= @backingInt(SpecialObject.canonical_true) and
+            i <= @backingInt(SpecialObject.bignum_neg_one)) or
+        (i >= @backingInt(SpecialObject.pic_miss_resume_word) and
+            i <= @backingInt(SpecialObject.pic_miss_tail_jump));
 }
 
 pub const context_object_count: Cell = 4;
