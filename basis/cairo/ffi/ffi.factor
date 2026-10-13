@@ -9,7 +9,7 @@ IN: cairo.ffi
 ! Adapted from cairo.h, version 1.8.10
 
 C-LIBRARY: cairo {
-    { windows "cairo-2.dll" }
+    { windows "libcairo-2.dll" }
     { macos "libcairo.dylib" }
     { linux "libcairo.so.2" }
     { unix "libcairo.so" }

@@ -6,7 +6,7 @@ IN: freetype
 
 << "freetype" {
     { [ os macos? ] [ "libfreetype.6.dylib" cdecl add-library ] }
-    { [ os windows? ] [ "freetype6.dll" cdecl add-library ] }
+    { [ os windows? ] [ "libfreetype-6.dll" cdecl add-library ] }
     [ drop ]
 } cond >>
 

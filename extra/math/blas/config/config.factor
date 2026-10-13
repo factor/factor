@@ -26,7 +26,8 @@ ou will need to install a third-party BLAS library and configure Factor. See `\"
                 } cond nip
             ]
         }
-        { [ os windows? cpu x86.32? and ] [ f2c-abi        ] }
+        ! The shipped OpenBLAS Windows builds use GCC's Fortran return ABI.
+        { [ os windows? cpu x86.32? and ] [ gfortran-abi   ] }
         { [ os windows? cpu x86.64? and ] [ gfortran-abi   ] }
         ! { [ os freebsd?                 ] [ gfortran-abi   ] }
         { [ os linux?                   ] [ gfortran-abi   ] }

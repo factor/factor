@@ -12,7 +12,7 @@ USE: glib.ffi
 LIBRARY: gobject
 
 C-LIBRARY: gobject {
-    { windows "gobject-2.0-0.dll" }
+    { windows "libgobject-2.0-0.dll" }
     { macos "libgobject-2.0.dylib" }
     { linux "libgobject-2.0.so.0" }
     { unix "libgobject-2.0.so" }

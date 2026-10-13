@@ -9,7 +9,7 @@ SPECIALIZED-ARRAY: uint
 IN: openal
 
 << "openal" {
-        { [ os windows? ]  [ "OpenAL32.dll" ] }
+        { [ os windows? ]  [ "libopenal-1.dll" ] }
         { [ os macos? ] [
             "/System/Library/Frameworks/OpenAL.framework/OpenAL"
         ] }
