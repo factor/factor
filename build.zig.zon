@@ -1,6 +1,6 @@
 .{
     .name = .factor,
-    .version = "0.102.0",
+    .version = "0.103.0",
     .dependencies = .{
         .translate_c = .{
             .url = "git+https://codeberg.org/ziglang/translate-c#875969d3493e245e01bf5d7860f792d8f3eb9ef5",

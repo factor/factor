@@ -144,7 +144,7 @@ const FACTOR_OS_STRING = switch (builtin.os.tag) {
     .windows => "windows",
     else => @compileError("unsupported OS"),
 };
-const FACTOR_VM_VERSION = "0.102";
+const FACTOR_VM_VERSION = "0.103";
 const FACTOR_COMPILE_TIME = build_options.compile_time;
 const FACTOR_COMPILER_VERSION = std.fmt.comptimePrint("Zig {f} {s}", .{
     builtin.zig_version,
