@@ -42,10 +42,13 @@ math.functions sets grouping random.private math.statistics ;
 { t }
 [ 500000 [ 1 exponential-random ] replicate [ mean ] [ std ] bi .2 ~ ] unit-test
 
-{ t t }
+! The std of pareto with alpha 3 has infinite variance, so test
+! the mean and log x, which is exponential with rate alpha.
+{ t t t }
 [
-    500000 [ 1 3 pareto-random ] replicate [ mean ] [ std ] bi
-    [ 1.5 .5 ~ ] [ 3 sqrt 2 / .5 ~ ] bi*
+    500000 [ 1 3 pareto-random ] replicate
+    [ mean 1.5 .5 ~ ]
+    [ [ log ] map [ mean ] [ std ] bi [ 1/3 .02 ~ ] bi@ ] bi
 ] unit-test
 
 { t t }
