@@ -7,7 +7,7 @@ IN: rocksdb.ffi
 ! https://github.com/facebook/rocksdb/blob/master/include/rocksdb/c.h
 ! v6.14.5
 
-C-LIBRARY: rockdb {
+C-LIBRARY: rocksdb {
     { windows "librocksdb.dll" }
     { macos "librocksdb.dylib" }
     { unix "librocksdb.so" }
