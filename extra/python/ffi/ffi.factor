@@ -1,14 +1,15 @@
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.libraries.finder alien.syntax classes.struct combinators system ;
+alien.libraries.finder alien.syntax classes.struct combinators
+kernel system ;
 IN: python.ffi
 
-<< "python" os windows? [ {
+<< "python" os windows? {
     "python315.dll" "python314.dll" "python313.dll" "python312.dll"
     "python311.dll" "python310.dll" "python39.dll" "python38.dll" "python37.dll"
-} ] [ {
+} {
     "python3.15" "python3.14" "python3.13" "python3.12" "python3.11"
     "python3.10" "python3.9" "python3.8" "python3.7"
-} ] if find-library-from-list cdecl add-library >>
+} ? find-library-from-list cdecl add-library >>
 
 ! Functions that return borrowed references needs to be called like this:
 ! Py_Func dup Py_IncRef &Py_DecRef
