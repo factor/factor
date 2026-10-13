@@ -29,11 +29,11 @@ FUNCTION: size_t ZSTD_decompress ( void* dst, size_t dstCapacity,
 
 FUNCTION: ulonglong ZSTD_getFrameContentSize ( void *src, size_t srcSize )
 
-FUNCTION: size_t ZSTD_findFrameContentSize ( void *src, size_t srcSize )
+FUNCTION: size_t ZSTD_findFrameCompressedSize ( void *src, size_t srcSize )
 
 ! Helper functions
 
-FUNCTION: size_t ZSTD_compressBounds ( size_t srcSize )
+FUNCTION: size_t ZSTD_compressBound ( size_t srcSize )
 
 FUNCTION: uint ZSTD_isError ( size_t code )
 
@@ -59,7 +59,7 @@ FUNCTION: ZSTD_DCtx* ZSTD_createDCtx ( )
 FUNCTION: size_t ZSTD_freeDCtx ( ZSTD_DCtx* dctx )
 DESTRUCTOR: ZSTD_freeDCtx
 
-FUNCTION: size_t ZSTD_decompressCCtx ( ZSTD_DCtx* dctx, void* dst, size_t dstCapacity, void* src, size_t srcSize )
+FUNCTION: size_t ZSTD_decompressDCtx ( ZSTD_DCtx* dctx, void* dst, size_t dstCapacity, void* src, size_t srcSize )
 FUNCTION: size_t ZSTD_decompressStream_simpleArgs ( ZSTD_DCtx* dctx, void* dst, size_t dstCapacity, size_t* dstPos, void* src, size_t srcSize, size_t* srcPos )
 
 ! Streaming
