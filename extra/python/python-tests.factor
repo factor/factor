@@ -4,7 +4,7 @@ python.ffi python.objects sequences strings tools.test ;
 IN: python
 
 : py-test ( result quot -- )
-    '[ python-dll-loaded? [ _ [ _ with-destructors ] unit-test ] when ] call ; inline
+    '[ python-dll-loaded? [ _ [ py-initialize _ with-destructors ] unit-test ] when ] call ; inline
 
 ! None testing
 { t } [

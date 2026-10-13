@@ -1,6 +1,6 @@
 USING: alien alien.libraries arrays assocs byte-arrays
 hashtables init kernel math math.parser namespaces python.errors
-python.ffi python.objects sequences strings vectors ;
+python.ffi python.lifecycle python.objects sequences strings vectors ;
 
 IN: python
 
@@ -8,14 +8,14 @@ ERROR: python-error type message traceback ;
 
 ! Initialization and finalization
 : py-initialize ( -- )
-    Py_IsInitialized [ Py_Initialize ] unless ;
+    ensure-python ;
 
 : py-finalize ( -- )
-    Py_IsInitialized [ Py_Finalize ] when ;
+    finalize-python ;
 
 ! Importing
 : py-import ( modulename -- module )
-    PyImport_ImportModule check-new-ref ;
+    ensure-python PyImport_ImportModule check-new-ref ;
 
 : py-import-from ( modulename objname -- obj )
     [ py-import ] [ getattr ] bi* ;
@@ -54,19 +54,19 @@ ERROR: python-error type message traceback ;
 GENERIC: >py ( obj -- py-obj )
 
 M: byte-array >py
-    dup length PyBytes_FromStringAndSize check-new-ref ;
+    ensure-python dup length PyBytes_FromStringAndSize check-new-ref ;
 
 M: string >py
-    PyUnicode_FromString check-new-ref ;
+    ensure-python PyUnicode_FromString check-new-ref ;
 
 M: math:fixnum >py
-    PyLong_FromLong check-new-ref ;
+    ensure-python PyLong_FromLong check-new-ref ;
 
 M: math:bignum >py
-    number>string f 10 PyLong_FromString check-new-ref ;
+    ensure-python number>string f 10 PyLong_FromString check-new-ref ;
 
 M: math:float >py
-    PyFloat_FromDouble check-new-ref ;
+    ensure-python PyFloat_FromDouble check-new-ref ;
 
 M: array >py
     [ >py ] map array>py-tuple ;
@@ -114,6 +114,3 @@ ERROR: missing-type type ;
 
 : python-dll-loaded? ( -- ? )
     "Py_IsInitialized" "python" dlsym? ;
-
-STARTUP-HOOK: [ python-dll-loaded? [ py-initialize ] when ]
-SHUTDOWN-HOOK: [ python-dll-loaded? [ py-finalize ] when ]

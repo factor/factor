@@ -1,6 +1,6 @@
 USING: accessors alien.data alien.libraries classes.struct
 io.encodings.ascii io.encodings.utf8 kernel libc literals
-python.errors python.ffi ;
+python.errors python.ffi python.lifecycle ;
 IN: python.objects
 
 ! The None object
@@ -8,7 +8,7 @@ IN: python.objects
     "_Py_NoneStruct" "python" address-of ;
 
 : <none> ( -- none )
-    (none) check-borrowed-ref ;
+    ensure-python (none) check-borrowed-ref ;
 
 ! Objects
 : getattr ( obj str -- value )
@@ -25,7 +25,7 @@ IN: python.objects
 
 ! Tuples
 : <py-tuple> ( length -- tuple )
-    PyTuple_New check-new-ref ;
+    ensure-python PyTuple_New check-new-ref ;
 
 : py-tuple-set-item ( obj pos val -- )
     dup unsteal-ref PyTuple_SetItem check-zero ;
@@ -41,7 +41,7 @@ IN: python.objects
 
 ! Dicts
 : <py-dict> ( -- dict )
-    PyDict_New check-new-ref ;
+    ensure-python PyDict_New check-new-ref ;
 
 : py-dict-set-item ( obj key val -- )
     PyDict_SetItem check-zero ;
@@ -57,7 +57,7 @@ IN: python.objects
 
 ! Lists
 : <py-list> ( length -- list )
-    PyList_New check-new-ref ;
+    ensure-python PyList_New check-new-ref ;
 
 : py-list-size ( list -- len )
     PyList_Size ;
@@ -77,7 +77,7 @@ IN: python.objects
     flags{ METH_VARARGS METH_KEYWORDS } >>ml_flags ;
 
 : <py-cfunction> ( alien -- cfunction )
-    "cfunction" f <PyMethodDef> f f
+    ensure-python "cfunction" f <PyMethodDef> f f
     ! It's not clear from the docs whether &Py_DecRef is right for
     ! PyCFunction_NewEx, but I'm betting on it.
     PyCFunction_NewEx check-new-ref ;

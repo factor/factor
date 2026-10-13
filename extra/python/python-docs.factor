@@ -2,7 +2,7 @@ USING: alien destructors help.markup help.syntax quotations ;
 IN: python
 
 HELP: py-initialize
-{ $description "Initializes the python binding. This word must be called before any other words in the api can be used" } ;
+{ $description "Initializes the Python interpreter if necessary. High-level imports, object constructors and conversions initialize it automatically on first use. Call this word before using raw words from python.ffi." } ;
 
 HELP: py-finalize
 { $description "Finalizes the python binding. After this word is called the api must not be used anymore." } ;

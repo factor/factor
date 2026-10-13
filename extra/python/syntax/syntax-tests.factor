@@ -8,10 +8,10 @@ QUALIFIED-WITH: sequences s
 IN: python.syntax.tests
 
 : py-test ( result quot -- )
-    '[ python-dll-loaded? [ _ [ _ with-destructors ] unit-test ] when ] call ; inline
+    '[ python-dll-loaded? [ _ [ py-initialize _ with-destructors ] unit-test ] when ] call ; inline
 
 : long-py-test ( result quot -- )
-    '[ python-dll-loaded? [ _ [ _ with-destructors ] long-unit-test ] when ] call ; inline
+    '[ python-dll-loaded? [ _ [ py-initialize _ with-destructors ] long-unit-test ] when ] call ; inline
 
 { t } [ getpid py> integer? ] py-test
 
