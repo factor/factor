@@ -31,7 +31,9 @@ void factor_vm::primitive_compute_identity_hashcode() {
   object_counter++;
   if (object_counter == 0)
     object_counter++;
-  obj->set_hashcode((cell)obj ^ object_counter);
+  // Keep only the bits the header can hold; 0 means "not computed yet".
+  cell hashcode = ((cell)obj ^ object_counter) & (~(cell)0 >> 6);
+  obj->set_hashcode(hashcode == 0 ? 1 : hashcode);
 }
 
 void factor_vm::primitive_set_slot() {

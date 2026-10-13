@@ -243,7 +243,9 @@ pub export fn primitive_compute_identity_hashcode(vm_asm: *VMAssemblyFields) cal
 
         vm.object_counter += 1;
         if (vm.object_counter == 0) vm.object_counter += 1; // Avoid 0
-        obj_ptr.setHashcode(obj_addr ^ vm.object_counter);
+        // Keep only the bits the header can hold; 0 means "not computed yet".
+        const hashcode = (obj_addr ^ vm.object_counter) & (~@as(Cell, 0) >> 6);
+        obj_ptr.setHashcode(if (hashcode == 0) 1 else hashcode);
     }
 }
 
@@ -972,4 +974,40 @@ test "become visits the current context exactly once" {
 
 test "become substitutes recorded profiler roots" {
     try testBecomeRoots(true);
+}
+
+fn testComputedHashcode(counter_offset: Cell) !Cell {
+    const allocator = std.testing.allocator;
+    const vm = try FactorVM.init(allocator);
+    defer vm.deinit();
+    vm.vm_asm.ctx = try vm.newContext();
+
+    // A header-only object at a data-aligned address stands in for a heap object.
+    var storage: [4]Cell align(layouts.data_alignment) = .{ 0, 0, 0, 0 };
+    const obj: *layouts.Object = @ptrCast(&storage);
+    obj.initialize(.byte_array);
+    const obj_addr = @intFromPtr(obj);
+    const tagged = obj_addr | @intFromEnum(layouts.TypeTag.byte_array);
+
+    // compute-identity-hashcode increments the counter before XORing it in.
+    vm.object_counter = (obj_addr ^ counter_offset) -% 1;
+    vm.push(tagged);
+    primitive_compute_identity_hashcode(&vm.vm_asm);
+    try std.testing.expectEqual(layouts.TypeTag.byte_array, obj.getType());
+
+    vm.push(tagged);
+    primitive_identity_hashcode(&vm.vm_asm);
+    return layouts.untagFixnumUnsigned(vm.pop());
+}
+
+test "computed identity hashcode is never zero" {
+    // addr ^ counter == 0: identity-hashcode treats 0 as "not computed yet".
+    try std.testing.expect(try testComputedHashcode(0) != 0);
+}
+
+test "computed identity hashcode is never truncated to zero" {
+    // Only bits shifted out of the header survive; on 32-bit this is reachable
+    // because the header keeps just 26 hashcode bits.
+    const lost_bit = @as(Cell, 1) << (@bitSizeOf(Cell) - 6);
+    try std.testing.expect(try testComputedHashcode(lost_bit) != 0);
 }
