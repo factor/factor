@@ -37,6 +37,7 @@ HELP: bytes>hex-string
 HELP: hex-string>bytes
 { $values { "hex-string" sequence } { "bytes" byte-array } }
 { $description "Converts a sequence of hex numbers in the range [00,ff] to a sequence of bytes (integers in the range [0,255])." }
+{ $errors "Throws an error if the input has odd length or contains a non-hexadecimal character." }
 { $examples
     { $example "USING: hex-strings prettyprint ;" "\"cafebabe\" hex-string>bytes ." "B{ 202 254 186 190 }" }
 } ;
