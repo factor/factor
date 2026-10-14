@@ -101,7 +101,10 @@ M: hash-set in?
     key@ 2nip ;
 
 M: hash-set clear-set
-    [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi ;
+    ! count includes tombstones; zero means every slot is already empty.
+    dup count>> zero? [ drop ] [
+        [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi
+    ] if ;
 
 M: hash-set delete
     (delete) drop ;
