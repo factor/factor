@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io.directories io.pathnames kernel
-make mason.common mason.config mason.platform namespaces
-sequences system words ;
+USING: accessors combinators continuations io.directories io.files
+io.files.links io.pathnames kernel make mason.common mason.config
+mason.platform namespaces sequences system words ;
 IN: mason.release.archive
 
 : base-name ( -- string )
@@ -27,16 +27,25 @@ IN: mason.release.archive
         "hdiutil" "create"
         "-srcfolder" dmg-root
         "-fs" "HFS+"
+        "-format" "UDZO"
         "-volname" volume-name
         archive-name
     } short-running-process ;
 
-! Make the .dmg
-: make-macos-archive ( archive-name -- )
+! Keep the complete distribution together when dragged into Applications.
+: prepare-dmg-root ( -- )
     "dmg-root" make-directory
     "factor" "dmg-root" copy-tree-into
-    "factor" "dmg-root" make-disk-image
-    "dmg-root" delete-tree ;
+    "/Applications" "dmg-root/Applications" make-link
+    "resource:extra/mason/release/archive/dmg_layout.DS_Store"
+    "dmg-root/.DS_Store" copy-file ;
+
+! The saved Finder layout avoids requiring a desktop session on Mason.
+: make-macos-archive ( archive-name -- )
+    [
+        prepare-dmg-root
+        "Factor" "dmg-root" make-disk-image
+    ] [ "dmg-root" delete-tree ] finally ;
 
 :: make-unix-archive ( archive-name -- )
     { "tar" "-cvz" "--no-xattrs" "-f" archive-name "factor" } short-running-process ;
