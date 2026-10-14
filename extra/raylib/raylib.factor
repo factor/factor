@@ -1428,15 +1428,17 @@ FUNCTION-ALIAS: get-ray-collision-mesh RayCollision GetRayCollisionMesh ( Ray ra
 FUNCTION-ALIAS: get-ray-collision-triangle RayCollision GetRayCollisionTriangle ( Ray ray, Vector3 p1, Vector3 p2, Vector3 p3 )       ! Get collision info between ray and triangle
 FUNCTION-ALIAS: get-ray-collision-quad RayCollision GetRayCollisionQuad ( Ray ray, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4 )   ! Get collision info between ray and quad
 
-: get-ray-collision-model ( ray model -- ray-collision )
-    [ RayCollision <struct> ] 2dip dup meshCount>> [
-        swap dup
-        [ _meshes>> <displaced-alien> ] [ transform>> ] bi*
-        get-ray-collision-mesh dup hit>> [
-            over hit>> [ 2dup [ distance>> ] bi@ < ] [ t ] if
-            [ nip ] [ drop ] if
-        ] [ drop ] if
-    ] 2with each-integer ;
+:: get-ray-collision-model ( ray model -- ray-collision )
+    RayCollision <struct> :> nearest!
+    model meshes>> [| mesh |
+        ray mesh model transform>> get-ray-collision-mesh :> collision
+        collision hit>> [
+            nearest hit>>
+            [ collision distance>> nearest distance>> < ] [ t ] if
+            [ collision nearest! ] when
+        ] when
+    ] each
+    nearest ;
 
 <PRIVATE
 : Vector3Add ( v1 v2 -- v3 )

@@ -69,7 +69,7 @@ TUPLE: hit-state name color nearest-hit ;
     [ PURPLE >>color "Triangle" >>name ] when ] keep ;
 
 : handle-mesh-hit ( hit-state ray model bbox -- hit-state ? )
-    pick swap get-ray-collision-box
+    pick swap get-ray-collision-box hit>>
     [
       get-ray-collision-model
       over nearest-hit>> swap update-hit?

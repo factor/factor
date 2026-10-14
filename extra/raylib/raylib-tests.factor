@@ -13,6 +13,7 @@ IN: raylib.tests
 
 "raylib" library-dll dll-valid? [
     "resource:extra/raylib/native/varargs.factor" run-test-file
+    "resource:extra/raylib/native/mesh-collision.factor" run-test-file
 ] [
     "Raylib native formatting tests unavailable: shared library not installed." print
 ] if
