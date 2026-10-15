@@ -1,0 +1,4 @@
+ARCHITECTURE_FLAG += -m64 -mcpu=v9 -mstack-bias
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-sparc.o $(BUILD_DIR)/cpu-sparc-trampoline.o $(BUILD_DIR)/sparc-stackghost.o
+PLAF_MASTER_HEADERS += vm/cpu-sparc.hpp vm/sparc.hpp
+CXXFLAGS += -ffixed-g2 -ffixed-g3 -ffixed-g4 -ffixed-g5

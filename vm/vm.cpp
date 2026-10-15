@@ -35,6 +35,21 @@ factor_vm::factor_vm(THREADHANDLE thread)
       sampler_thread(NULL)
 #endif
 {
+#ifdef FACTOR_NETBSD_RAS
+  (void)atomic::ras::initialize();
+#endif
+#ifdef FACTOR_OPENBSD_HPPA_MASKED_RMW
+  (void)atomic::openbsd_hppa::initialize();
+#endif
+#ifdef FACTOR_SPARC
+  for (auto& slot : sparc_signal_slots) {
+    slot.active = false;
+#if defined(__OpenBSD__)
+    slot.region = nullptr;
+    slot.saved.snapshot = nullptr;
+#endif
+  }
+#endif
   primitive_reset_dispatch_stats();
 }
 
@@ -57,6 +72,12 @@ factor_vm::~factor_vm() {
   if (code)
     delete code;
   delete gc_events;
+#if defined(FACTOR_SPARC) && defined(__OpenBSD__)
+  for (auto& slot : sparc_signal_slots) {
+    delete slot.region;
+    delete[] slot.saved.snapshot;
+  }
+#endif
   if (signal_callstack_seg) {
     delete signal_callstack_seg;
     signal_callstack_seg = NULL;

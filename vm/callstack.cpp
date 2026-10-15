@@ -37,7 +37,18 @@ cell factor_vm::capture_callstack(context* stack_ctx) {
 
   callstack* stack = allot_callstack(size);
   memcpy((void*)stack->top(), (void *)top, size);
-#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
+#if defined(FACTOR_SPARC)
+  cell dst = stack->top();
+  while (top < bottom) {
+    cell next = sparc_frame_predecessor(top);
+    *(cell*)(dst + SPARC_FRAME_LINK) = next - top;
+#if defined(__OpenBSD__)
+    *(cell*)(dst + FRAME_RETURN_ADDRESS) = sparc_frame_return_address(top) - 8;
+#endif
+    dst += next - top;
+    top = next;
+  }
+#elif defined(FACTOR_LINKED_FRAMES)
   // Convert absolute frame pointers to relative offsets. This allows
   // moving the callstack through memory. They will be converted back
   // in set-callstack.
@@ -90,14 +101,22 @@ void factor_vm::primitive_callstack_to_array() {
 void factor_vm::primitive_innermost_stack_frame_executing() {
   callstack* stack = untag_check<callstack>(ctx->peek());
   cell frame = stack->top();
+#ifdef FACTOR_SPARC
+  cell addr = sparc_frame_return_address(frame);
+#else
   cell addr = *(cell*)(frame + FRAME_RETURN_ADDRESS);
+#endif
   ctx->replace(code->code_block_for_address(addr)->owner_quot());
 }
 
 void factor_vm::primitive_innermost_stack_frame_scan() {
   callstack* stack = untag_check<callstack>(ctx->peek());
   cell frame = stack->top();
+#ifdef FACTOR_SPARC
+  cell addr = sparc_frame_return_address(frame);
+#else
   cell addr = *(cell*)(frame + FRAME_RETURN_ADDRESS);
+#endif
   ctx->replace(code->code_block_for_address(addr)->scan(this, addr));
 }
 
@@ -112,10 +131,18 @@ void factor_vm::primitive_set_innermost_stack_frame_quotation() {
   jit_compile_quotation(quot.value(), true);
 
   cell inner = stack->top() + FRAME_RETURN_ADDRESS;
+#ifdef FACTOR_SPARC
+  cell addr = *(cell*)inner + 8;
+#else
   cell addr = *(cell*)inner;
+#endif
   code_block* block = code->code_block_for_address(addr);
   cell offset = block->offset(addr);
+#ifdef FACTOR_SPARC
+  *(cell*)inner = quot->entry_point + offset - 8;
+#else
   *(cell*)inner = quot->entry_point + offset;
+#endif
 }
 
 // Allocates memory (allot_alien)

@@ -1,0 +1,3 @@
+include vm/Config.netbsd
+include vm/Config.sparc.64
+PLAF_MASTER_HEADERS += vm/os-netbsd-sparc.hpp vm/sparc-netbsd-signal.h

@@ -1,0 +1,8 @@
+include vm/Config.linux
+include vm/Config.sparc.32
+# GNU Linux multilib supplies the SPARC32PLUS ABI. V9 CAS supports the VM's
+# signal-safe counters; this target does not certify pure V8/Sun4m userspace.
+ARCHITECTURE_FLAG := -m32 -mcpu=v9
+PLAF_MASTER_HEADERS += vm/os-linux-sparc.hpp vm/os-linux-sparc-context.hpp
+
+PLAF_DLL_OBJS += $(BUILD_DIR)/sparc-linux-sigreturn.o
