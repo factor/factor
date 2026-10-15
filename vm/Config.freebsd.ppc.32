@@ -1,0 +1,4 @@
+include vm/Config.freebsd
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-ppc.linux.o $(BUILD_DIR)/cpu-ppc.o
+PLAF_MASTER_HEADERS += vm/os-freebsd-ppc.hpp vm/cpu-ppc.hpp vm/powerpc.hpp
+ARCHITECTURE_FLAG := -m32

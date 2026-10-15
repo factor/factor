@@ -1,6 +1,9 @@
 #include <ucontext.h>
+#include <asm/ptrace.h>
 
 namespace factor {
+
+#define UAP_LINK_REGISTER(ucontext) (((ucontext_t*)ucontext)->uc_mcontext.uc_regs->gregs[PT_LNK])
 
 #define UAP_STACK_POINTER(ucontext) \
   ((ucontext_t*)ucontext)->uc_mcontext.uc_regs->gregs[1]

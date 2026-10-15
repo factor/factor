@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Erik Charlebois
 ! See https://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
-system cpu.ppc.assembler compiler.units compiler.constants math
+system cpu.ppc.assembler cpu.ppc.relocation compiler.units compiler.constants compiler.codegen.relocation math
 math.private ranges layouts words vocabs slots.private
 locals locals.backend generic.single.private sequences
 threads.private strings.private ;
@@ -11,6 +11,7 @@ IN: bootstrap.assembler.ppc
 : jit-call ( string -- )
     dup
     0 swap jit-load-dlsym
+    12 0 MR
     0 MTLR
     jit-load-dlsym-toc
     BLRL ;
@@ -28,7 +29,7 @@ IN: bootstrap.assembler.ppc
     BCTR ;
 
 : stack-frame ( -- n )
-    reserved-size factor-area-size + 16 align ;
+    reserved-size param-size + factor-area-size + 16 align ;
 
 : save-at ( m -- n ) reserved-size + param-size + ;
 
@@ -133,6 +134,16 @@ IN: bootstrap.assembler.ppc
     ds-reg ctx-reg context-datastack-offset jit-load-cell
     rs-reg ctx-reg context-retainstack-offset jit-load-cell ;
 
+! DIVW/DIVD do not raise on a zero divisor. Enter the shared VM error
+! path before changing the data stack, just as the other non-trapping CPUs do.
+: jit-check-divisor ( -- )
+    0 3 0 jit-compare-cell-imm
+    [ 0 swap BNE ] [
+        jit-save-context
+        3 vm-reg MR
+        "divide_by_zero" jit-call
+    ] jit-conditional* ;
+
 [
     0 MFLR
     0 1 lr-save jit-save-cell
@@ -152,27 +163,39 @@ IN: bootstrap.assembler.ppc
     jit-save-context
     3 vm-reg MR
     4 jit-load-dlsym-arg
+    12 4 MR
     4 MTLR
     jit-load-dlsym-toc-arg ! Restore the TOC/GOT
     BLRL
     jit-restore-context
 ] JIT-PRIMITIVE jit-define
 
+! Cross-block calls must span the whole code heap, not only a 32MiB branch window.
+: jit-word-call ( type -- )
+    12 swap jit-load-word-entry 12 MTCTR BCTRL ;
+
+: jit-word-jump ( type -- )
+    12 swap jit-load-word-entry 12 MTCTR BCTR ;
+
 [
-    0 BL rc-relative-ppc-3-pc rt-entry-point-pic jit-rel
+    rt-entry-point-pic jit-word-call
 ] JIT-WORD-CALL jit-define
 
 [
-    6 jit-load-here-arg
-    0 B rc-relative-ppc-3-pc rt-entry-point-pic-tail jit-rel
+    0 MFLR
+    20 31 4 BCL
+    6 MFLR
+    0 MTLR
+    6 6 cell-size 4 = [ 28 ] [ 40 ] if ADDI
+    rt-entry-point-pic-tail jit-word-jump
 ] JIT-WORD-JUMP jit-define
 
 [
     3 ds-reg 0 jit-load-cell
     ds-reg dup cell-size SUBI
     0 3 \ f type-number jit-compare-cell-imm
-    [ 0 swap BEQ ] [ 0 B rc-relative-ppc-3-pc rt-entry-point jit-rel ] jit-conditional*
-    0 B rc-relative-ppc-3-pc rt-entry-point jit-rel
+    [ 0 swap BEQ ] [ rt-entry-point jit-word-jump ] jit-conditional*
+    rt-entry-point jit-word-jump
 ] JIT-IF jit-define
 
 : jit->r ( -- )
@@ -223,19 +246,19 @@ IN: bootstrap.assembler.ppc
 
 [
     jit->r
-    0 BL rc-relative-ppc-3-pc rt-entry-point jit-rel
+    rt-entry-point jit-word-call
     jit-r>
 ] JIT-DIP jit-define
 
 [
     jit-2>r
-    0 BL rc-relative-ppc-3-pc rt-entry-point jit-rel
+    rt-entry-point jit-word-call
     jit-2r>
 ] JIT-2DIP jit-define
 
 [
     jit-3>r
-    0 BL rc-relative-ppc-3-pc rt-entry-point jit-rel
+    rt-entry-point jit-word-call
     jit-3r>
 ] JIT-3DIP jit-define
 
@@ -246,6 +269,7 @@ IN: bootstrap.assembler.ppc
 ] JIT-EPILOG jit-define
 
 [ BLR ] JIT-RETURN jit-define
+[ jit-safe-point ] JIT-SAFEPOINT jit-define
 
 ! ! ! Polymorphic inline caches
 
@@ -279,7 +303,7 @@ IN: bootstrap.assembler.ppc
 ] PIC-CHECK-TUPLE jit-define
 
 [
-    [ 0 swap BNE ] [ 0 B rc-relative-ppc-3-pc rt-entry-point jit-rel ] jit-conditional*
+    [ 0 swap BNE ] [ rt-entry-point jit-word-jump ] jit-conditional*
 ] PIC-HIT jit-define
 
 ! Inline cache miss entry points
@@ -309,11 +333,11 @@ IN: bootstrap.assembler.ppc
 
 [
     6 MFLR
-    0 B rc-relative-ppc-3-pc rt-entry-point jit-rel
+    rt-entry-point jit-word-jump
 ] PIC-MISS-JUMP jit-define
 
 [
-    0 B rc-relative-ppc-3-pc rt-entry-point jit-rel
+    rt-entry-point jit-word-jump
 ] PIC-MISS-TAIL-JUMP jit-define
 
 ! ! ! Megamorphic caches
@@ -396,8 +420,7 @@ IN: bootstrap.assembler.ppc
 
 ! Comparisons
 : jit-compare ( insn -- )
-    t jit-literal
-    3 jit-load-literal-arg
+    3 t jit-load-known-literal
     4 ds-reg 0 jit-load-cell
     5 ds-reg cell-size neg jit-load-cell-update
     0 5 4 jit-compare-cell
@@ -430,7 +453,9 @@ IN: bootstrap.assembler.ppc
 
 ! Contexts
 :: jit-switch-context ( reg -- )
-    7 0 LI
+    ! GC walks parked contexts too; give this frame a real code owner.
+    ! Offset zero has no spill roots, since switching publishes DS and RS.
+    7 jit-load-this-arg
     7 1 lr-save jit-save-cell
 
     ! Make the new context the current one
@@ -499,6 +524,57 @@ IN: bootstrap.assembler.ppc
     jit-jump-quot ;
 
 ! # All ppc subprimitives
+! The native signal handler may collect or unwind, so publish the full
+! linked frame and preserve both integer and floating-point machine state.
+: jit-signal-handler ( -- )
+    ! Keep the largest native linkage/parameter area (ELFv1:112 bytes)
+    ! separate from saved registers; a C callee may write every home slot.
+    1 1 -672 jit-save-cell-update
+    32 <iota> [ dup 1 = [ drop ] [
+        dup 8 * 112 + [ 1 ] dip jit-save-cell
+    ] if ] each
+    32 <iota> [ dup 8 * 368 + [ 1 ] dip STFD ] each
+    0 MFLR 0 1 624 jit-save-cell
+    0 MFCR 0 1 632 jit-save-cell
+    0 MFXER 0 1 640 jit-save-cell
+    0 MFCTR 0 1 648 jit-save-cell
+    0 MFFS 0 1 656 STFD
+    jit-save-context
+    12 vm-reg vm-signal-handler-addr-offset jit-load-cell
+    function-descriptors? [
+        2 12 cell-size jit-load-cell 12 12 0 jit-load-cell
+    ] when
+    12 MTCTR BCTRL
+    0 1 656 LFD 255 0 0 0 MTFSF
+    0 1 624 jit-load-cell 0 MTLR
+    0 1 640 jit-load-cell 0 MTXER
+    0 1 632 jit-load-cell 255 0 MTCRF
+    32 <iota> [ dup 8 * 368 + [ 1 ] dip LFD ] each
+    32 <iota> [ dup 0 = over 1 = or [ drop ] [
+        dup 8 * 112 + [ 1 ] dip jit-load-cell
+    ] if ] each
+    ! CTR is the reserved transfer register for this safepoint continuation.
+    0 1 672 lr-save + jit-load-cell 0 MTCTR
+    0 1 112 jit-load-cell
+    1 1 0 jit-load-cell 1 1 0 jit-load-cell BCTR ;
+
+! The FPSCR occupies the low 32 bits of the saved double representation.
+: fpscr-offset ( -- n ) ppc-little-endian get [ 16 ] [ 20 ] if ;
+: fpscr-high-offset ( -- n ) ppc-little-endian get [ 20 ] [ 16 ] if ;
+: jit-get-fpu-state ( -- )
+    1 1 -32 jit-save-cell-update
+    0 MFFS 0 1 16 STFD
+    3 1 fpscr-offset LWZ
+    4 0x0007f8ff jit-load-constant 4 3 4 AND
+    4 1 fpscr-offset STW 0 1 16 LFD 255 0 0 0 MTFSF
+    1 1 32 ADDI ;
+: jit-set-fpu-state ( -- )
+    1 1 -32 jit-save-cell-update
+    4 0x0007f8ff jit-load-constant 4 3 4 AND
+    4 1 fpscr-offset STW 5 0 LI 5 1 fpscr-high-offset STW
+    0 1 16 LFD 255 0 0 0 MTFSF
+    1 1 32 ADDI ;
+
 {
     ! ## Contexts
     { (set-context) [ jit-set-context ] }
@@ -512,17 +588,19 @@ IN: bootstrap.assembler.ppc
     ] }
 
     ! ## Entry points
+    { signal-handler [ jit-signal-handler ] }
+    { leaf-signal-handler [ jit-signal-handler ] }
+    { fpu-state [ jit-get-fpu-state ] }
+    { set-fpu-state [ jit-set-fpu-state ] }
     { c-to-factor [
-        frame-reg 3 MR
-
+        4 3 MR
         3 vm-reg MR
         "begin_callback" jit-call
 
         jit-load-context
         jit-restore-context
 
-        ! Call quotation
-        3 frame-reg MR
+        ! begin_callback returns the quotation updated by GC.
         jit-call-quot
 
         jit-save-context
@@ -541,6 +619,10 @@ IN: bootstrap.assembler.ppc
         ! Load ds and rs registers
         jit-load-context
         jit-restore-context
+
+        ! A handled exception must permit the next independent fault.
+        0 0 LI
+        0 vm-reg vm-fault-flag-offset jit-save-cell
 
         ! We have changed the stack; load return address again
         0 1 lr-save jit-load-cell
@@ -618,6 +700,7 @@ IN: bootstrap.assembler.ppc
     ! ### Div/mod
     { fixnum-mod [
         3 ds-reg 0 jit-load-cell
+        jit-check-divisor
         ds-reg ds-reg cell-size SUBI
         4 ds-reg 0 jit-load-cell
         5 4 3 jit-divide
@@ -627,6 +710,7 @@ IN: bootstrap.assembler.ppc
     ] }
     { fixnum/i-fast [
         3 ds-reg 0 jit-load-cell
+        jit-check-divisor
         ds-reg ds-reg cell-size SUBI
         4 ds-reg 0 jit-load-cell
         5 4 3 jit-divide
@@ -635,6 +719,7 @@ IN: bootstrap.assembler.ppc
     ] }
     { fixnum/mod-fast [
         3 ds-reg 0 jit-load-cell
+        jit-check-divisor
         4 ds-reg cell-size neg jit-load-cell
         5 4 3 jit-divide
         6 5 3 jit-multiply-low
@@ -715,7 +800,20 @@ IN: bootstrap.assembler.ppc
         1 1 -16 cell-size * jit-save-cell-update
         "factor_memcpy" jit-call
         1 1 0 jit-load-cell
-        ! Return with new callstack
+        ! Captured backchains contain relative frame sizes. Rebase them
+        ! after copying the payload, before restoring the innermost caller.
+        4 1 MR
+        jit-load-context
+        6 ctx-reg context-callstack-bottom-offset jit-load-cell
+        0 cell-size 8 = 1 0 ? 4 6 CMPL
+        0 24 BGE
+        5 4 0 jit-load-cell
+        5 4 5 ADD
+        5 4 0 jit-save-cell
+        4 5 MR
+        -24 B
+        ! capture_callstack already omits the primitive and its caller.
+        ! Resume from the restored top frame's saved LR without popping it.
         0 1 lr-save jit-load-cell
         0 MTLR
         BLR
@@ -757,6 +855,7 @@ IN: bootstrap.assembler.ppc
     { drop [ ds-reg dup cell-size SUBI ] }
     { 2drop [ ds-reg dup 2 cell-size * SUBI ] }
     { 3drop [ ds-reg dup 3 cell-size * SUBI ] }
+    { 4drop [ ds-reg dup 4 cell-size * SUBI ] }
 
     ! ### Dups
     { dup [
@@ -778,6 +877,17 @@ IN: bootstrap.assembler.ppc
         3 ds-reg 0 jit-save-cell
         4 ds-reg cell-size neg jit-save-cell
         5 ds-reg cell-size neg 2 * jit-save-cell
+    ] }
+    { 4dup [
+        3 ds-reg 0 jit-load-cell
+        4 ds-reg cell-size neg jit-load-cell
+        5 ds-reg cell-size neg 2 * jit-load-cell
+        6 ds-reg cell-size neg 3 * jit-load-cell
+        ds-reg dup cell-size 4 * ADDI
+        3 ds-reg 0 jit-save-cell
+        4 ds-reg cell-size neg jit-save-cell
+        5 ds-reg cell-size neg 2 * jit-save-cell
+        6 ds-reg cell-size neg 3 * jit-save-cell
     ] }
     { dupd [
         3 ds-reg 0 jit-load-cell

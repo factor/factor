@@ -1,12 +1,17 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: parser system kernel sequences math ranges
-cpu.ppc.assembler combinators compiler.constants
+cpu.ppc.assembler cpu.ppc.relocation combinators compiler.constants compiler.codegen.relocation
 bootstrap.image.private layouts namespaces ;
 IN: bootstrap.assembler.ppc
 
 8 \ cell set
 big-endian on
+ppc-little-endian off
+
+<< "resource:basis/bootstrap/assembler/ppc-relocations.factor" parse-file suffix! >> call
+
+: function-descriptors? ( -- ? ) t ;
 
 : reserved-size ( -- n ) 48 ;
 : lr-save ( -- n ) 16 ;
@@ -27,6 +32,15 @@ CONSTANT: frame-reg 31
         [ 0xffff bitand ORI ]
     } 3cleave ;
 
+: jit-load-constant ( dst value -- ) LOAD64 ;
+
+: jit-load-known-literal ( dst val -- )
+    [ 0 LOAD64 ] dip rc-absolute-ppc-2/2 rel-literal ;
+
+: jit-safe-point ( -- )
+    12 0 LOAD64 rc-absolute-ppc-2/2 rel-safepoint
+    0 12 0 STW ;
+
 : jit-trap-null ( src -- ) drop ;
 : jit-load-vm ( dst -- )
     0 LOAD64 0 rc-absolute-ppc-2/2/2/2 jit-vm ;
@@ -36,6 +50,8 @@ CONSTANT: frame-reg 31
     [ 2 0 LOAD64 ] dip rc-absolute-ppc-2/2/2/2 jit-dlsym-toc ;
 : jit-load-vm-arg ( dst -- )
     0 LOAD64 rc-absolute-ppc-2/2/2/2 rt-vm jit-rel ;
+: jit-load-word-entry ( dst type -- )
+    [ 0 LOAD64 ] dip rc-absolute-ppc-2/2/2/2 swap jit-rel ;
 : jit-load-entry-point-arg ( dst -- )
     0 LOAD64 rc-absolute-ppc-2/2/2/2 rt-entry-point jit-rel ;
 : jit-load-this-arg ( dst -- )
@@ -45,7 +61,7 @@ CONSTANT: frame-reg 31
 : jit-load-dlsym-arg ( dst -- )
     0 LOAD64 rc-absolute-ppc-2/2/2/2 rt-dlsym jit-rel ;
 : jit-load-dlsym-toc-arg ( -- )
-    2 0 LOAD64 rc-absolute-ppc-2/2/2/2 rt-dlsym-toc jit-rel ;
+    2 0 LOAD64 rc-absolute-ppc-2/2/2/2 rt-dlsym jit-rel ;
 : jit-load-here-arg ( dst -- )
     0 LOAD64 rc-absolute-ppc-2/2/2/2 rt-here jit-rel ;
 : jit-load-megamorphic-cache-arg ( dst -- )

@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors system kernel layouts combinators
 compiler.cfg.builder.alien.boxing sequences arrays math
-alien.c-types cpu.architecture cpu.ppc alien.complex ;
+alien.c-types cpu.architecture cpu.ppc alien.complex cpu.ppc.64.varargs ;
 IN: cpu.ppc.64.linux
 
 M: linux lr-save 2 cells ;

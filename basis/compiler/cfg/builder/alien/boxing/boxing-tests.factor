@@ -13,7 +13,7 @@ STRUCT: some-struct
 ! Stack-only aggregate chunks carry the same marker on these ABIs.
 : stack-struct-chunks? ( -- ? )
     cpu { x86.32 m68k.32 m88k.32 vax.32 } member?
-    cpu ppc.32? os linux? and or ;
+    cpu ppc.32? os { linux netbsd } member? and or ;
 
 ! flatten-c-type
 {
