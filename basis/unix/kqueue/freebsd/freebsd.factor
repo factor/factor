@@ -2,7 +2,7 @@ USING: alien.c-types alien.syntax classes.struct unix.types unix.time ;
 IN: unix.kqueue
 
 STRUCT: kevent
-    { ident  __uint64_t }
+    { ident  uintptr_t }
     { filter short }
     { flags  ushort }
     { fflags uint }

@@ -1,7 +1,7 @@
-USING: alien.syntax alien.c-types ;
+USING: alien.syntax alien.c-types kernel system ;
 IN: unix.types
 
-TYPEDEF: long clockid_t
+TYPEDEF: int clockid_t
 
 TYPEDEF: ushort   __uint16_t
 TYPEDEF: uint     __uint32_t
@@ -21,11 +21,13 @@ TYPEDEF: __int32_t  blksize_t
 TYPEDEF: __uint32_t fflags_t
 TYPEDEF: int        pid_t
 TYPEDEF: long       time_t
+! ARM and PowerPC 32-bit FreeBSD use a 64-bit time_t, unlike i386.
+<< cpu arm.32? cpu ppc.32? or [ \ longlong \ time_t typedef ] when >>
 TYPEDEF: __uint64_t fsblkcnt_t
 TYPEDEF: __uint64_t fsfilcnt_t
 
 TYPEDEF: void* posix_spawn_file_actions_t
 TYPEDEF: void* posix_spawnattr_t
-TYPEDEF: uint sigset_t
+TYPEDEF: uint[4] sigset_t
 
 TYPEDEF: long suseconds_t
