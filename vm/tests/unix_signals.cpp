@@ -1,6 +1,11 @@
 #include "../master.hpp"
 #include <setjmp.h>
 #include <sys/wait.h>
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#include <sys/sysctl.h>
+#endif
+
+static const char* executable_path;
 
 using namespace factor;
 
@@ -12,6 +17,13 @@ void fep_signal_handler(int, siginfo_t*, void*);
 void sample_signal_handler(int, siginfo_t*, void*);
 VM_C_API void factor_begin_ignore_console_signals();
 VM_C_API void factor_end_ignore_console_signals();
+#if defined(FACTOR_LOONGARCH64)
+extern "C" {
+extern int control_read, control_write, stdin_read, size_read;
+extern bool stdin_thread_initialized_p;
+extern pthread_mutex_t stdin_mutex;
+}
+#endif
 }
 
 static void check(bool condition, const char* message) {
@@ -111,9 +123,28 @@ static void test_timer(fixnum rate, long seconds, long microseconds) {
   bool armed = timer.it_value.tv_sec != 0 || timer.it_value.tv_usec != 0 ||
                alarm_pending_soon();
   vm.end_sampling_profiler_timer();
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__) || defined(__NetBSD__)
+  // BSD interval timers round short requests to the kernel clock resolution.
+  struct clockinfo clocks;
+  size_t clock_size = sizeof(clocks);
+#if defined(__FreeBSD__) || defined(__DragonFly__)
+  check(sysctlbyname("kern.clockrate", &clocks, &clock_size, NULL, 0) == 0,
+        "clockrate query failed");
+#else
+  int clock_mib[] = {CTL_KERN, KERN_CLOCKRATE};
+  check(sysctl(clock_mib, 2, &clocks, &clock_size, NULL, 0) == 0,
+        "clockrate query failed");
+#endif
+  check(clocks.tick > 0, "invalid kernel clock resolution");
+  const long requested = seconds * 1000000L + microseconds;
+  const long observed = timer.it_interval.tv_sec * 1000000L + timer.it_interval.tv_usec;
+  check(observed >= requested && observed <= std::max(requested, (long)clocks.tick),
+        "incorrect rounded profiler timer interval");
+#else
   check(timer.it_interval.tv_sec == seconds &&
             timer.it_interval.tv_usec == microseconds,
         "incorrect profiler timer interval");
+#endif
   check(armed, "profiler timer was not armed");
   check(getitimer(ITIMER_REAL, &timer) == 0, "getitimer failed");
   check(timer.it_value.tv_sec == 0 && timer.it_value.tv_usec == 0,
@@ -194,10 +225,31 @@ static void fault_on_foreign_thread() {
   pthread_join(thread, NULL);
 }
 
+static int foreign_diagnostic_pipe[2];
+
+static void fault_with_diagnostic_pipe() {
+  close(foreign_diagnostic_pipe[0]);
+  check(dup2(foreign_diagnostic_pipe[1], STDERR_FILENO) == STDERR_FILENO,
+        "dup2 failed");
+  close(foreign_diagnostic_pipe[1]);
+  fault_on_foreign_thread();
+}
+
 static void test_foreign_fault_without_vm() {
-  int status = status_within(10, fault_on_foreign_thread);
+  check(pipe(foreign_diagnostic_pipe) == 0, "pipe failed");
+  int status = status_within(10, fault_with_diagnostic_pipe);
+  close(foreign_diagnostic_pipe[1]);
+  char diagnostic[256] = {};
+  ssize_t count = read(foreign_diagnostic_pipe[0], diagnostic, sizeof(diagnostic) - 1);
+  close(foreign_diagnostic_pipe[0]);
   check(WIFEXITED(status) && WEXITSTATUS(status) == 1,
         "foreign thread fault did not end in fatal_error");
+  check(count > 0 && strstr(diagnostic, "fatal_error: Foreign thread received signal:") &&
+            strstr(diagnostic, "; pc=0x"),
+        "foreign thread fault lost its signal/PC diagnostic");
+  check(strstr(diagnostic, "Native backtrace") == NULL,
+        "foreign thread fault attempted native unwinding in a signal handler");
+  std::cerr << diagnostic;
 }
 
 static void fatal_error_while_fatal_erroring() {
@@ -244,7 +296,7 @@ static void test_waiting_shell_signals() {
   pid_t pid = fork();
   check(pid >= 0, "fork failed");
   if (pid == 0) {
-    execl("/bin/sh", "sh", "-c", "kill -INT $$; exit 17", (char*)NULL);
+    execl(executable_path, executable_path, "--raise-sigint", (char*)NULL);
     _exit(99);
   }
   int status;
@@ -328,7 +380,73 @@ static bool run_test(const char* name, void (*test)()) {
   return passed;
 }
 
-int main() {
+#if defined(FACTOR_LOONGARCH64)
+static void test_console_idle_shutdown() {
+  // Bound a hung join independently of the suite's external deadline.
+  alarm(10);
+  open_console();
+  close_console();
+  check(!stdin_thread_initialized_p, "idle console worker did not stop");
+  close_console();
+  alarm(0);
+}
+
+static void ignore_console_interrupt(int, siginfo_t*, void*) {}
+
+static void test_console_input() {
+  alarm(10);
+  int input[2];
+  check(pipe(input) == 0, "stdin pipe failed");
+  check(dup2(input[0], STDIN_FILENO) == STDIN_FILENO, "stdin dup2 failed");
+  close(input[0]);
+  int flags = fcntl(STDIN_FILENO, F_GETFL);
+  check(flags >= 0 && !(flags & O_NONBLOCK), "stdin was not blocking");
+  open_console();
+  check(write(input[1], "data", 4) == 4, "stdin data write failed");
+  char request = 'X';
+  check(write(control_write, &request, 1) == 1, "stdin request failed");
+  ssize_t size = -1;
+  check(read(size_read, &size, sizeof(size)) == sizeof(size) && size == 4,
+        "stdin worker reported wrong size");
+  char bytes[4];
+  check(read(stdin_read, bytes, sizeof(bytes)) == sizeof(bytes) &&
+            memcmp(bytes, "data", 4) == 0,
+        "stdin worker lost input");
+  close_console();
+  check(fcntl(STDIN_FILENO, F_GETFL) == flags, "stdin flags changed");
+  close(input[1]);
+  alarm(0);
+}
+
+static void test_console_reader_shutdown(bool debugger_locked) {
+  alarm(10);
+  int input[2];
+  check(pipe(input) == 0, "stdin pipe failed");
+  check(dup2(input[0], STDIN_FILENO) == STDIN_FILENO, "stdin dup2 failed");
+  close(input[0]);
+  install_handler(SIGUSR2, ignore_console_interrupt);
+  open_console();
+  if (debugger_locked)
+    lock_console();
+  char request = 'X';
+  check(write(control_write, &request, 1) == 1, "stdin request failed");
+  // Let the worker consume the request and wait for stdin or the debugger.
+  usleep(50000);
+  close_console();
+  check(!stdin_thread_initialized_p, "busy console worker did not stop");
+  if (debugger_locked)
+    check(pthread_mutex_unlock(&stdin_mutex) == 0, "debugger mutex cleanup failed");
+  close(input[1]);
+  alarm(0);
+}
+#endif
+
+int main(int argc, char** argv) {
+  executable_path = argv[0];
+  if (argc == 2 && strcmp(argv[1], "--raise-sigint") == 0) {
+    raise(SIGINT);
+    return 17;
+  }
   bool passed = true;
   passed &= run_test("signal pipe errno", test_signal_pipe_errno);
   passed &= run_test("signal pipe fd zero", test_signal_pipe_fd_zero);
@@ -342,5 +460,11 @@ int main() {
   passed &= run_test("fault on a foreign thread without a VM", test_foreign_fault_without_vm);
   passed &= run_test("fatal error while fatal erroring", test_fatal_error_reentry);
   passed &= run_test("signal stack with a small callstack", test_small_callstack_signal_stack);
+#if defined(FACTOR_LOONGARCH64)
+  passed &= run_test("idle console shutdown", test_console_idle_shutdown);
+  passed &= run_test("console input preserves blocking stdin", test_console_input);
+  passed &= run_test("stdin reader shutdown", []() { test_console_reader_shutdown(false); });
+  passed &= run_test("debugger console shutdown", []() { test_console_reader_shutdown(true); });
+#endif
   return passed ? 0 : 1;
 }

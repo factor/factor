@@ -1,10 +1,15 @@
 #include <fenv.h>
 #include <stdio.h>
+#include "../mips-soft-float.hpp"
 double ffi_fp_divide(double a, double b);
 #ifndef ABI_CONTROL
 double ffi_fp_divide(double a, double b) {
+#if defined(FACTOR_NETBSD_N64_HARDWARE_OPERATIONS)
+    return factor_mips_divide(a, b);
+#else
     volatile double x=a, y=b;
     return x/y;
+#endif
 }
 #else
 int main(void) {
