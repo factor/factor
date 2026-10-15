@@ -1,4 +1,5 @@
 #include "master.hpp"
+#include "os-unix-signals.hpp"
 #if defined(FACTOR_LOONGARCH64)
 #include <poll.h>
 #endif
@@ -98,27 +99,9 @@ segment::segment(cell size_, bool executable_p, cell low_guard_size_) {
   int pagesize = getpagesize();
   low_guard_size = std::max((cell)pagesize, align_page(low_guard_size_));
 
-#if defined(__APPLE__) && defined(FACTOR_ARM64)
-  int prot = PROT_READ | PROT_WRITE;
-  int flags = MAP_ANON | MAP_PRIVATE | MAP_JIT;
-#else
-  int prot;
-  if (executable_p)
-    prot = PROT_READ | PROT_WRITE | PROT_EXEC;
-  else
-    prot = PROT_READ | PROT_WRITE;
-  int flags = MAP_ANON | MAP_PRIVATE;
-#if defined(__NetBSD__)
-  if (executable_p) prot |= PROT_MPROTECT(PROT_EXEC);
-#endif
-#endif
-
-#if defined(__OpenBSD__)
-  // OpenBSD requires syscall stacks in MAP_STACK memory.
-  if (!executable_p) flags |= MAP_STACK;
-#endif
+  const auto mapping = os::map_segment(executable_p);
   cell alloc_size = low_guard_size + pagesize + size;
-  char* array = (char*)mmap(NULL, alloc_size, prot, flags, -1, 0);
+  char* array = (char*)mmap(NULL, alloc_size, mapping.protection, mapping.flags, -1, 0);
 
   if (array == (char*)-1)
     fatal_error("Out of memory in mmap", alloc_size);
@@ -126,12 +109,10 @@ segment::segment(cell size_, bool executable_p, cell low_guard_size_) {
   start = (cell)(array + low_guard_size);
   end = start + size;
 
-#if defined(__APPLE__) && defined(FACTOR_ARM64)
-  if (executable_p) {
-    if (mprotect((char*)start, size, prot | PROT_EXEC) == -1)
+  if (executable_p && mapping.separate_execute) {
+    if (mprotect((char*)start, size, mapping.protection | PROT_EXEC) == -1)
       fatal_error("mprotect executable page failed", 0);
   }
-#endif
 
   set_border_locked(true);
 }
@@ -177,21 +158,12 @@ void factor_vm::end_sampling_profiler_timer() {
 }
 
 // Signal delivery must not change the interrupted code's syscall result.
-struct signal_handler_scope {
-#if defined(__NetBSD__) && defined(FACTOR_ALPHA)
-  netbsd_alpha_signal_fpu_scope alpha_fpu;
-#endif
+struct signal_handler_scope : platform::signal_fpu_scope {
   int saved_errno;
   explicit signal_handler_scope(void* uap)
-#if defined(__NetBSD__) && defined(FACTOR_ALPHA)
-      : alpha_fpu(uap), saved_errno(errno) {}
-#else
-      : saved_errno(errno) { (void)uap; }
-#endif
+      : platform::signal_fpu_scope(uap), saved_errno(errno) {}
   ~signal_handler_scope() {
-#if defined(__NetBSD__) && defined(FACTOR_ALPHA)
-    alpha_fpu.restore();
-#endif
+    restore();
     errno = saved_errno;
   }
 };
@@ -231,80 +203,7 @@ static char* append_signal_hex(char* destination, cell value) {
 }
 
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {
-#if defined(FACTOR_HPPA)
-  cell hppa_sp = UAP_STACK_POINTER(uap);
-  cell hppa_pc = UAP_PROGRAM_COUNTER(uap) & ~cell(3);
-  dispatch_signal_handler(&hppa_sp, &hppa_pc, (cell)FUNCTION_CODE_POINTER(handler));
-  UAP_STACK_POINTER(uap) = hppa_sp;
-  UAP_PROGRAM_COUNTER(uap) = hppa_pc | 3;
-  UAP_NEXT_PROGRAM_COUNTER(uap) = (hppa_pc + 4) | 3;
-  if (signal_resumable) signal_handler_addr = (cell)handler;
-  else UAP_GLOBAL_POINTER(uap) = FUNCTION_TOC_POINTER(handler);
-#elif defined(FACTOR_PPC)
-  dispatch_ppc_signal((cell*)&UAP_STACK_POINTER(uap),
-                      (cell*)&UAP_PROGRAM_COUNTER(uap),
-                      (cell)UAP_LINK_REGISTER(uap),
-                      (cell)FUNCTION_CODE_POINTER(handler));
-#ifdef FACTOR_PPC_TOC
-  if (signal_resumable) signal_handler_addr = (cell)handler;
-#endif
-  if (!signal_resumable) {
-#if defined(UAP_GLOBAL_ENTRY_REGISTER)
-    UAP_GLOBAL_ENTRY_REGISTER(uap) = (cell)FUNCTION_CODE_POINTER(handler);
-#endif
-#if defined(UAP_TOC_REGISTER)
-    UAP_TOC_REGISTER(uap) = (cell)FUNCTION_TOC_POINTER(handler);
-#endif
-  }
-#elif defined(FACTOR_SPARC)
-  dispatch_sparc_signal(uap, (cell)FUNCTION_CODE_POINTER(handler));
-#elif defined(FACTOR_M88K)
-  struct reg* regs = m88k_signal_registers(uap);
-  cell sp = regs->r[31];
-  cell pc = regs->sxip & XIP_ADDR;
-  dispatch_signal_handler(&sp, &pc, (cell)FUNCTION_CODE_POINTER(handler));
-  regs->r[31] = sp;
-  // OpenBSD sigreturn resumes the next/future instruction pipeline slots.
-  regs->snip = pc | NIP_V;
-  regs->sfip = (pc + 4) | FIP_V;
-  // The redirected handler replaces the interrupted memory operation.
-  // OpenBSD restores the saved data pipeline on sigreturn; leaving DMT0
-  // valid can replay the failed access before the new instruction pointer.
-  regs->dmt0 = 0;
-#else
-  dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
-                          (cell*)&UAP_PROGRAM_COUNTER(uap),
-                          (cell)FUNCTION_CODE_POINTER(handler));
-#if defined(__linux__) && defined(FACTOR_ARM32)
-  arm32_signal_set_entry(uap, UAP_PROGRAM_COUNTER(uap));
-#endif
-#if defined(__NetBSD__) && defined(FACTOR_VAX)
-  if (!signal_resumable) {
-    // A native VAX entry starts with a CALLS mask, not an instruction.
-    UAP_NATIVE_HANDLER_REGISTER(uap) = (cell)handler;
-    UAP_PROGRAM_COUNTER(uap) = (cell)vax_non_resumable_signal_entry;
-  }
-#endif
-#ifdef FACTOR_PPC_TOC
-  if (signal_resumable)
-    signal_handler_addr = (cell)handler;
-#endif
-#ifdef FACTOR_PPC64
-  // Native global entries derive their TOC from r12 (ELFv2) or require the
-  // descriptor's TOC in r2 (ELFv1). Kernel signal return must install it.
-  if (!signal_resumable) {
-    UAP_GLOBAL_ENTRY_REGISTER(uap) = (cell)FUNCTION_CODE_POINTER(handler);
-#ifdef FACTOR_PPC_TOC
-    UAP_TOC_REGISTER(uap) = (cell)FUNCTION_TOC_POINTER(handler);
-#endif
-  }
-#endif
-#ifdef UAP_NATIVE_ENTRY
-  // Native PIC entry derives gp from t9 (MIPS) or pv (Alpha). A PC-only
-  // redirection retains the interrupted callee's entry register.
-  if (!signal_resumable) UAP_NATIVE_ENTRY(uap, UAP_PROGRAM_COUNTER(uap));
-#endif
-#endif
+  platform::dispatch_signal(*this, uap, handler);
 }
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
@@ -405,14 +304,7 @@ void fpe_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   if (!vm)
     fatal_signal_without_vm(signal, (cell)UAP_PROGRAM_COUNTER(uap));
   vm->signal_number = signal;
-#if defined(FACTOR_LOONGARCH64) || \
-    (defined(__linux__) && (defined(FACTOR_HPPA) || defined(FACTOR_SPARC)))
-  vm->signal_fpu_status = signal_fpu_status(uap_fpu_status(uap), siginfo->si_code);
-#elif defined(__NetBSD__) && defined(FACTOR_MIPS)
-  vm->signal_fpu_status = signal_fpu_status(uap_fpu_status(uap), siginfo->si_trap);
-#else
-  vm->signal_fpu_status = fpu_status(uap_fpu_status(uap));
-#endif
+  vm->signal_fpu_status = platform::signal_fpu_status(uap, siginfo);
 #if defined(FACTOR_VAX)
   vm->signal_fpu_status |= vax_fpe_flags(siginfo->si_code);
 #endif

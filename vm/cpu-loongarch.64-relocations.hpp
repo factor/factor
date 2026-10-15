@@ -2,7 +2,7 @@
 #pragma once
 #include "loongarch.hpp"
 
-namespace factor { namespace cpu {
+namespace factor::cpu {
 inline fixnum load_native_operand(relocation_class klass, cell pointer,
                                   cell relative_to) {
   if (klass == RC_NATIVE_1)
@@ -17,4 +17,4 @@ inline void store_native_operand(relocation_class klass, cell pointer,
   else
     loongarch_store_pair((uint32_t*)(pointer - 8), int64_t(absolute) - int64_t(pointer - 8));
 }
-}}
+}

@@ -62,6 +62,7 @@
       #endif
     #elif defined(__NetBSD__)
       #define FACTOR_OS_STRING "netbsd"
+      #include "os-netbsd.hpp"
       #if defined(FACTOR_ALPHA)
         #include "os-netbsd-alpha.hpp"
       #elif defined(FACTOR_HPPA)
@@ -78,8 +79,12 @@
         #include "os-netbsd-sparc.hpp"
       #elif defined(FACTOR_PPC32)
         #include "os-netbsd-ppc.32.hpp"
-      #elif defined(FACTOR_X86) || defined(FACTOR_AMD64) || defined(FACTOR_ARM32) || defined(FACTOR_ARM64)
-        #include "os-netbsd.hpp"
+      #elif defined(FACTOR_ARM32)
+        #include "os-netbsd-arm.32.hpp"
+      #elif defined(FACTOR_ARM64)
+        #include "os-netbsd-arm.64.hpp"
+      #elif defined(FACTOR_X86) || defined(FACTOR_AMD64)
+        #include "os-netbsd-x86.hpp"
       #else
         #error "Unsupported NetBSD flavor"
       #endif

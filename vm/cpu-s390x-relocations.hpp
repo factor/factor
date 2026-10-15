@@ -2,7 +2,7 @@
 #pragma once
 #include "s390x.hpp"
 
-namespace factor { namespace cpu {
+namespace factor::cpu {
 inline fixnum load_native_operand(relocation_class klass, cell pointer,
                                   cell relative_to) {
   if (klass == RC_NATIVE_1)
@@ -23,4 +23,4 @@ inline void store_native_operand(relocation_class klass, cell pointer,
     s390x_store_branch((unsigned char*)(pointer - 6), displacement);
   }
 }
-}}
+}

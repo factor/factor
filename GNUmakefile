@@ -140,8 +140,6 @@ ifdef CONFIG
 		$(BUILD_DIR)/aging_collector.o \
 		$(BUILD_DIR)/alien.o \
 		$(BUILD_DIR)/arrays.o \
-		$(BUILD_DIR)/atomic-netbsd-sparc.o \
-		$(BUILD_DIR)/atomic-netbsd-hppa.o \
 		$(BUILD_DIR)/bignum.o \
 		$(BUILD_DIR)/byte_arrays.o \
 		$(BUILD_DIR)/callbacks.o \
@@ -183,69 +181,7 @@ ifdef CONFIG
 		$(BUILD_DIR)/words.o \
 		$(BUILD_DIR)/zstd.o
 
-	MASTER_HEADERS := $(PLAF_MASTER_HEADERS) \
-		$(wildcard vm/*.hpp) \
-		vm/assert.hpp \
-		vm/debug.hpp \
-		vm/layouts.hpp \
-		vm/vm_float.hpp \
-		vm/ieee_binary64.hpp \
-		vm/ieee_float.hpp \
-		vm/ieee_float.h \
-		vm/software_fp_state.hpp \
-		vm/ieee_decimal.hpp \
-		vm/ieee_integer.hpp \
-		vm/platform.hpp \
-		vm/cpu-stack-pointer-signals.hpp \
-		vm/primitives.hpp \
-		vm/segments.hpp \
-		vm/gc_info.hpp \
-		vm/contexts.hpp \
-		vm/run.hpp \
-		vm/objects.hpp \
-		vm/sampling_profiler.hpp \
-		vm/errors.hpp \
-		vm/bignumint.hpp \
-		vm/bignum.hpp \
-		vm/booleans.hpp \
-		vm/instruction_operands.hpp \
-		vm/code_blocks.hpp \
-		vm/bump_allocator.hpp \
-		vm/bitwise_hacks.hpp \
-		vm/mark_bits.hpp \
-		vm/free_list.hpp \
-		vm/fixup.hpp \
-		vm/write_barrier.hpp \
-		vm/object_start_map.hpp \
-		vm/aging_space.hpp \
-		vm/tenured_space.hpp \
-		vm/data_heap.hpp \
-		vm/code_heap.hpp \
-		vm/gc.hpp \
-		vm/float_bits.hpp \
-		vm/io.hpp \
-		vm/image.hpp \
-		vm/callbacks.hpp \
-		vm/dispatch.hpp \
-		vm/vm.hpp \
-		vm/allot.hpp \
-		vm/tagged.hpp \
-		vm/data_roots.hpp \
-		vm/code_roots.hpp \
-		vm/generic_arrays.hpp \
-		vm/callstack.hpp \
-		vm/slot_visitor.hpp \
-		vm/to_tenured_collector.hpp \
-		vm/arrays.hpp \
-		vm/math.hpp \
-		vm/byte_arrays.hpp \
-		vm/jit.hpp \
-		vm/quotations.hpp \
-		vm/inline_cache.hpp \
-		vm/mvm.hpp \
-		vm/factor.hpp \
-		vm/utilities.hpp \
-		vm/zstd.hpp
+	MASTER_HEADERS := $(PLAF_MASTER_HEADERS) $(wildcard vm/*.hpp vm/*.h)
 
 	EXE_OBJS := $(PLAF_EXE_OBJS)
 
@@ -465,7 +401,7 @@ $(BUILD_DIR)/ieee_float.o: CXXFLAGS += -fno-exceptions -fno-rtti
 $(BUILD_DIR)/ieee_float.o: vm/ieee_float.cpp vm/ieee_float.h vm/ieee_float.hpp | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-$(BUILD_DIR)/%.o: vm/%.cpp $(PCH_DEPENDENCY) | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: vm/%.cpp vm/master.hpp $(MASTER_HEADERS) $(PCH_DEPENDENCY) | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
 
 $(BUILD_DIR)/%.o: vm/%.mm $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)

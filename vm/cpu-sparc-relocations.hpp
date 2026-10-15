@@ -2,7 +2,7 @@
 #pragma once
 #include "sparc.hpp"
 
-namespace factor { namespace cpu {
+namespace factor::cpu {
 inline fixnum load_native_operand(relocation_class klass, cell pointer,
                                   cell relative_to) {
   if (klass == RC_NATIVE_1)
@@ -28,4 +28,4 @@ inline void store_native_operand(relocation_class klass, cell pointer,
     sparc_store_displacement((void*)(pointer - 4), displacement, bits);
   }
 }
-}}
+}

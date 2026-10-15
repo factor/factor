@@ -1,3 +1,5 @@
+#pragma once
+#include "os-unix-memory.hpp"
 namespace factor {
 
 #define VM_C_API extern "C" __attribute__((visibility("default")))
@@ -19,4 +21,15 @@ const char* default_image_path();
 
 #define ZSTD_LIB "libzstd.dylib"
 
+}
+
+namespace factor::os {
+inline segment_mapping map_segment(bool executable) {
+#if defined(FACTOR_ARM64)
+  (void)executable;
+  return {PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE | MAP_JIT, true};
+#else
+  return default_segment_mapping(executable);
+#endif
+}
 }

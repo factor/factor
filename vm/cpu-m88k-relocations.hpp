@@ -2,7 +2,7 @@
 #pragma once
 #include "m88k.hpp"
 
-namespace factor { namespace cpu {
+namespace factor::cpu {
 inline fixnum load_native_operand(relocation_class klass, cell pointer,
                                   cell relative_to) {
   if (klass == RC_NATIVE_0)
@@ -19,4 +19,4 @@ inline void store_native_operand(relocation_class klass, cell pointer,
   else
     m88k_store_branch((uint32_t*)(pointer - 4), int32_t(absolute - pointer + 4));
 }
-}}
+}

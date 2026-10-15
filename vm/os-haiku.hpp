@@ -1,3 +1,5 @@
+#pragma once
+#include "os-unix-memory.hpp"
 #include <image.h>
 
 namespace factor {
@@ -8,4 +10,10 @@ namespace factor {
 
 // Haiku exposes __sighandler_t, rather than the BSD sig_t alias.
 typedef __sighandler_t sig_t;
+}
+
+namespace factor::os {
+inline segment_mapping map_segment(bool executable) {
+  return default_segment_mapping(executable);
+}
 }

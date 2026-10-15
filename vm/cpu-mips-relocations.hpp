@@ -2,7 +2,7 @@
 #pragma once
 #include "mips.hpp"
 
-namespace factor { namespace cpu {
+namespace factor::cpu {
 inline fixnum load_native_operand(relocation_class klass, cell pointer,
                                   cell relative_to) {
   (void)relative_to;
@@ -42,4 +42,4 @@ inline void store_native_operand(relocation_class klass, cell pointer,
     memcpy((void*)(pointer - 8), words, sizeof(words));
   }
 }
-}}
+}

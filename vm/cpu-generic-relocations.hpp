@@ -1,7 +1,7 @@
 // CPU interpretation of RC_NATIVE_0 and RC_NATIVE_1.
 #pragma once
 
-namespace factor { namespace cpu {
+namespace factor::cpu {
 inline fixnum load_native_operand(relocation_class klass, cell pointer,
                                   cell relative_to) {
   (void)pointer; (void)relative_to;
@@ -14,4 +14,4 @@ inline void store_native_operand(relocation_class klass, cell pointer,
   (void)pointer; (void)absolute;
   critical_error("Native relocation class is unsupported on this CPU", klass);
 }
-}}
+}

@@ -2,7 +2,7 @@
 #pragma once
 #include "powerpc.hpp"
 
-namespace factor { namespace cpu {
+namespace factor::cpu {
 inline fixnum load_native_operand(relocation_class klass, cell pointer,
                                   cell relative_to) {
   return klass == RC_NATIVE_0 ? ppc_load_absolute(pointer)
@@ -14,4 +14,4 @@ inline void store_native_operand(relocation_class klass, cell pointer,
   if (klass == RC_NATIVE_0) ppc_store_absolute(pointer, absolute);
   else ppc_store_relative(pointer, absolute);
 }
-}}
+}
