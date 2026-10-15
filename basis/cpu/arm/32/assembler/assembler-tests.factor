@@ -1,9 +1,9 @@
 IN: cpu.arm32.assembler.tests
 USING: cpu.arm.32.assembler math tools.test namespaces make
-sequences kernel quotations ;
+sequences kernel quotations literals ;
 FROM: cpu.arm.32.assembler => B ;
 
-: test-opcode ( expect quot -- ) [ { } make first ] curry unit-test ;
+: test-opcode ( expect quot -- ) [ f emit-bytecode? [ { } make first ] with-variable ] curry unit-test ;
 
 { 0xea000000 } [ 0 B ] test-opcode
 { 0xeb000000 } [ 0 BL ] test-opcode
@@ -44,3 +44,44 @@ FROM: cpu.arm.32.assembler => B ;
 { 0xe1b310d4 } [ R1 R3 R4 <!+> LDRSB ] test-opcode
 { 0xe0c317bb } [ R1 R3 123 <+!> STRH ] test-opcode
 { 0xe08310b4 } [ R1 R3 R4 <+!> STRH ] test-opcode
+
+{ 0xe30a0bcd } [ R0 0xabcd MOVW ] test-opcode
+{ 0xe34f4fff } [ R4 0xffff MOVT ] test-opcode
+{ 0xe12fff3c } [ [ have-BLX? on IP BLX ] with-scope ] test-opcode
+{ B{ 205 11 10 227 } } [
+    [ emit-bytecode? on [ R0 0xabcd MOVW ] B{ } make ] with-scope
+] unit-test
+
+{ B{ 4 192 159 229 60 255 47 225 0 0 0 234 0 0 0 0 } } [
+    [ emit-bytecode? on have-BLX? on
+      [ f call-address 2drop ] B{ } make ] with-scope
+] unit-test
+{ B{ 0 0 159 229 0 0 0 234 0 0 0 0 } } [
+    [ emit-bytecode? on
+      [ f R0 load-address 2drop ] B{ } make ] with-scope
+] unit-test
+
+{ 0xe92d4010 } [ ${ R4 LR } PUSH ] test-opcode
+{ 0xe8bd8010 } [ ${ R4 PC } POP ] test-opcode
+{ 0xed2d0b20 } [ VPUSH-D0-D15 ] test-opcode
+{ 0xecbd0b20 } [ VPOP-D0-D15 ] test-opcode
+{ 0xeef10a10 } [ R0 VMRS ] test-opcode
+{ 0xeee10a10 } [ R0 VMSR ] test-opcode
+
+{ 0xeafffff8 } [ -8 B ] test-opcode
+
+{ 0xe16f2f13 } [ R2 R3 CLZ ] test-opcode
+
+{ 0xe1a03211 } [ R3 R1 R2 <LSL> MOV ] test-opcode
+{ 0xe0c32190 } [ R2 R3 R0 R1 SMULL ] test-opcode
+
+{ 0xe5101003 } [ R1 R0 -3 <+> LDR ] test-opcode
+
+{ 0x31a00001 } [ LO R0 R1 MOV ] test-opcode
+{ 0x41a00001 } [ MI R0 R1 MOV ] test-opcode
+
+{ 0xe10fc000 } [ R12 MRS-APSR ] test-opcode
+{ 0xe12cf00c } [ R12 MSR-APSR ] test-opcode
+
+{ 0xe2401002 } [ R1 R0 -2 ADD ] test-opcode
+{ 0xe2801002 } [ R1 R0 -2 SUB ] test-opcode

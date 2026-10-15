@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators kernel make math math.bitwise
+USING: accessors arrays combinators compiler.constants endian kernel locals make math math.bitwise
 namespaces sequences words words.symbol parser ;
 IN: cpu.arm.32.assembler
 
@@ -51,6 +51,10 @@ PREDICATE: register-class < word register >boolean ;
 PRIVATE>
 
 ! Condition codes
+! Preserve the historical opcode-vector interface for assembler clients.
+! Bootstrap and compiler code select byte emission in their namespace.
+SYMBOL: emit-bytecode?
+
 SYMBOL: cond-code
 
 : >CC ( n -- )
@@ -64,7 +68,8 @@ SYMBOL: cond-code
 : NE ( -- ) 0b0001 >CC ;
 : CS ( -- ) 0b0010 >CC ;
 : CC ( -- ) 0b0011 >CC ;
-: LO ( -- ) 0b0100 >CC ;
+: LO ( -- ) CC ;
+: MI ( -- ) 0b0100 >CC ;
 : PL ( -- ) 0b0101 >CC ;
 : VS ( -- ) 0b0110 >CC ;
 : VC ( -- ) 0b0111 >CC ;
@@ -79,14 +84,18 @@ SYMBOL: cond-code
 
 <PRIVATE
 
-: (insn) ( n -- ) CC> 28 shift bitor , ;
+: (insn) ( n -- )
+    CC> 28 shift bitor
+    emit-bytecode? get [ 4 >le % ] [ , ] if ;
 
 : insn ( bitspec -- ) bitfield (insn) ; inline
 
 ! Branching instructions
 GENERIC#: (B) 1 ( target l -- )
 
-M: integer (B) { 24 { 1 25 } { 0 26 } { 1 27 } 0 } insn ;
+M: integer (B)
+    [ 0x00ffffff bitand ] dip
+    { 24 { 1 25 } { 0 26 } { 1 27 } 0 } insn ;
 
 PRIVATE>
 
@@ -119,8 +128,8 @@ M: register-class shift-imm/reg ( Rs Rm shift -- n )
         { 1 4 }
         { 0 7 }
         5
-        { register 8 }
         { register 0 }
+        { register 8 }
     } bitfield ;
 
 PRIVATE>
@@ -166,9 +175,13 @@ PRIVATE>
 
 : AND ( Rd Rn shifter-op -- ) 0b0000 addr1 ;
 : EOR ( Rd Rn shifter-op -- ) 0b0001 addr1 ;
-: SUB ( Rd Rn shifter-op -- ) 0b0010 addr1 ;
+: SUB ( Rd Rn shifter-op -- )
+    dup integer? [ dup 0 < ] [ f ] if
+    [ neg 0b0100 ] [ 0b0010 ] if addr1 ;
 : RSB ( Rd Rn shifter-op -- ) 0b0011 addr1 ;
-: ADD ( Rd Rn shifter-op -- ) 0b0100 addr1 ;
+: ADD ( Rd Rn shifter-op -- )
+    dup integer? [ dup 0 < ] [ f ] if
+    [ neg 0b0010 ] [ 0b0100 ] if addr1 ;
 : ADC ( Rd Rn shifter-op -- ) 0b0101 addr1 ;
 : SBC ( Rd Rn shifter-op -- ) 0b0110 addr1 ;
 : RSC ( Rd Rn shifter-op -- ) 0b0111 addr1 ;
@@ -207,8 +220,8 @@ PRIVATE>
 : (S/UMLAL)  ( RdLo RdHi Rm Rs s a -- )
     {
         { 1 23 }
-        22
         21
+        22
         { register 8 }
         { register 0 }
         { register 16 }
@@ -233,7 +246,7 @@ PRIVATE>
         { 1 24 }
         { 1 22 }
         { 1 21 }
-        { 0b111 16 }
+        { 0b1111 16 }
         { 0b1111 8 }
         { 1 4 }
         { register 0 }
@@ -271,7 +284,9 @@ M: object addressing-mode-2 shifter-op { { 1 25 } 0 } bitfield ;
 PRIVATE>
 
 ! Offset
-: <+> ( base -- addressing ) 1 1 0 <addressing> ;
+: <+> ( base -- addressing )
+    dup integer? [ dup 0 < ] [ f ] if
+    [ neg 1 0 0 <addressing> ] [ 1 1 0 <addressing> ] if ;
 : <-> ( base -- addressing ) 1 0 0 <addressing> ;
 
 ! Pre-indexed
@@ -365,3 +380,40 @@ PRIVATE>
 ! Semaphore instructions
 
 ! Exception-generating instructions
+
+! ARMv7 halfword immediates permit materializing any cell without a pool.
+<PRIVATE
+:: mov-halfword ( Rd imm opcode -- )
+    imm 0xffff bitand dup 0xfff bitand swap -12 shift 16 shift bitor
+    Rd register 12 shift bitor opcode bitor (insn) ;
+PRIVATE>
+: MOVW ( Rd imm -- ) 0x03000000 mov-halfword ;
+: MOVT ( Rd imm -- ) 0x03400000 mov-halfword ;
+
+! These helpers emit complete byte sequences when emit-bytecode? is enabled.
+! Inline pointers use absolute-cell relocation and preserve native Thumb bits.
+: emit-cell ( value -- ) 4 >le % ;
+:: LI ( Rd value -- )
+    Rd value MOVW Rd value -16 shift MOVT ;
+: load-address ( Rd -- class )
+    PC 0 <+> LDR 0 B 0 emit-cell rc-absolute-cell ;
+: call-address ( -- class )
+    IP PC 4 <+> LDR IP 1 (BX) 0 B 0 emit-cell rc-absolute-cell ;
+: jump-address ( -- class )
+    IP PC 4 <+> LDR IP 0 (BX) 0 B 0 emit-cell rc-absolute-cell ;
+
+<PRIVATE
+: register-mask ( regs -- mask )
+    [ register 2^ ] map 0 [ bitor ] reduce ;
+PRIVATE>
+: PUSH ( regs -- ) register-mask 0x092d0000 bitor (insn) ;
+: POP ( regs -- ) register-mask 0x08bd0000 bitor (insn) ;
+! The ARMv7 hardfloat baseline has sixteen double VFP registers.
+: VPUSH-D0-D15 ( -- ) 0x0d2d0b20 (insn) ;
+: VPOP-D0-D15 ( -- ) 0x0cbd0b20 (insn) ;
+: VMRS ( Rd -- ) register 12 shift 0x0ef10a10 bitor (insn) ;
+: VMSR ( Rm -- ) register 12 shift 0x0ee10a10 bitor (insn) ;
+
+! Preserve application condition and DSP flags across the JIT signal bridge.
+: MRS-APSR ( Rd -- ) register 12 shift 0x010f0000 bitor (insn) ;
+: MSR-APSR ( Rm -- ) register 0x012cf000 bitor (insn) ;
