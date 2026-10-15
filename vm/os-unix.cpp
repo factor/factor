@@ -178,9 +178,22 @@ void factor_vm::end_sampling_profiler_timer() {
 
 // Signal delivery must not change the interrupted code's syscall result.
 struct signal_handler_scope {
+#if defined(__NetBSD__) && defined(FACTOR_ALPHA)
+  netbsd_alpha_signal_fpu_scope alpha_fpu;
+#endif
   int saved_errno;
-  signal_handler_scope() : saved_errno(errno) {}
-  ~signal_handler_scope() { errno = saved_errno; }
+  explicit signal_handler_scope(void* uap)
+#if defined(__NetBSD__) && defined(FACTOR_ALPHA)
+      : alpha_fpu(uap), saved_errno(errno) {}
+#else
+      : saved_errno(errno) { (void)uap; }
+#endif
+  ~signal_handler_scope() {
+#if defined(__NetBSD__) && defined(FACTOR_ALPHA)
+    alpha_fpu.restore();
+#endif
+    errno = saved_errno;
+  }
 };
 
 static char* append_signal_hex(char* destination, cell value) {
@@ -295,7 +308,7 @@ void factor_vm::dispatch_signal(void* uap, void(handler)()) {
 }
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
-  signal_handler_scope scope;
+  signal_handler_scope scope(uap);
   cell fault_addr = (cell)siginfo->si_addr;
   cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
   factor_vm* vm = current_vm_p();
@@ -306,7 +319,7 @@ void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void synchronous_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
-  signal_handler_scope scope;
+  signal_handler_scope scope(uap);
   (void) siginfo;
   if (factor_vm::fatal_erroring_p)
     return;
@@ -338,7 +351,7 @@ static void enqueue_signal(factor_vm* vm, int signal) {
 }
 
 void enqueue_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
-  signal_handler_scope scope;
+  signal_handler_scope scope(uap);
   (void) siginfo;
   (void) uap;
   if (factor_vm::fatal_erroring_p)
@@ -350,7 +363,7 @@ void enqueue_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void fep_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
-  signal_handler_scope scope;
+  signal_handler_scope scope(uap);
   (void) siginfo;
   (void) uap;
   if (factor_vm::fatal_erroring_p)
@@ -365,7 +378,7 @@ void fep_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
-  signal_handler_scope scope;
+  signal_handler_scope scope(uap);
   (void) siginfo;
   factor_vm* vm = current_vm_p();
   factor_vm* owner = atomic::load(&sampling_profiler_vm);
@@ -378,13 +391,16 @@ void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void ignore_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+#if defined(__NetBSD__) && defined(FACTOR_ALPHA)
+  signal_handler_scope scope(uap);
+#endif
   (void) signal;
   (void) siginfo;
   (void) uap;
 }
 
 void fpe_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
-  signal_handler_scope scope;
+  signal_handler_scope scope(uap);
   factor_vm* vm = current_vm_p();
   if (!vm)
     fatal_signal_without_vm(signal, (cell)UAP_PROGRAM_COUNTER(uap));

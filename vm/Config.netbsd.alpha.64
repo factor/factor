@@ -1,0 +1,6 @@
+include vm/Config.netbsd
+include vm/Config.alpha.64
+PLAF_MASTER_HEADERS += vm/os-netbsd-alpha.hpp
+
+# NetBSD Alpha GCC cannot map its fixed PCH arena; compile headers normally.
+NO_PCH = 1

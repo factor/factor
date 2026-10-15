@@ -95,7 +95,8 @@ inline static float bits_float(uint32_t y) {
 // NaN encodings are data here. Hardware precision conversions quiet signaling
 // NaNs, so move their sign and payload without floating-point arithmetic.
 inline static uint64_t widen_float_bits(uint32_t bits) {
-#if defined(FACTOR_INTEGER_ONLY)
+#if defined(FACTOR_INTEGER_ONLY) || (defined(FACTOR_ALPHA) && defined(__OpenBSD__))
+  // Raw binary32 widening is exact data conversion, independent of FP modes.
   return widen_ieee_bits(bits);
 #elif defined(__vax__)
   return ieee_binary64::from_float_bits(bits).bits();
@@ -121,6 +122,13 @@ inline static uint32_t narrow_float_bits(uint64_t bits) {
     return (uint32_t)((bits >> 32) & 0x80000000U) | 0x7f800000U |
            (narrowed == 0 ? 1 : narrowed);
   }
+#if defined(FACTOR_ALPHA) && defined(__OpenBSD__)
+  // Only exact binary32 values bypass native conversion. This is not a
+  // rounding-mode substitute: every inexact value keeps the hardware path.
+  uint32_t exact = narrow_ieee_bits(bits);
+  if (widen_ieee_bits(exact) == bits)
+    return exact;
+#endif
   return float_bits((float)bits_double(bits));
 #endif
 }

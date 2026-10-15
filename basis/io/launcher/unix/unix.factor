@@ -274,7 +274,8 @@ M: unix (process-notifications?)
     os linux? os haiku? or os macos? cpu arm.64? and or
     ! NetBSD spawns in the kernel without copying the Factor heap.
     ! Its spawn API has no setsid flag, so session creation still uses fork.
-    os netbsd? process group>> +new-session+ eq? not and or ;
+    os netbsd? cpu alpha.64? not and
+    process group>> +new-session+ eq? not and or ;
 
 M: unix (run-process)
     dup use-posix-spawn?
