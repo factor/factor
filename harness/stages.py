@@ -47,7 +47,7 @@ def passed(stage, exit_code, log):
     if any(marker in log for marker in failures):
         return False
     if stage == 'core':
-        return b'QEMU_CORE_FAILURES 0' in log
+        return bool(re.search(rb'^QEMU_CORE_FAILURES 0\s*$', log, re.M))
     if stage == 'reopen':
         return b'FACTOR_REOPEN_OK' in log
     if stage in ('compiler', 'io', 'ui'):

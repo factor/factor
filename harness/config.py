@@ -50,6 +50,7 @@ def load(name, assets, site=None, path=PROFILES):
 
     profile = expand(profile)
     profile['id'] = name
+    profile['assets'] = str(Path(assets).resolve())
     validate(profile)
     return profile
 

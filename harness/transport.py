@@ -30,8 +30,11 @@ class Transport:
         # is a guest setup concern, never guessed by parsing arbitrary boot text.
         token = uuid.uuid4().hex
         marker = ('\nFACTOR_EXIT_' + token + ' ').encode()
-        with socket.socket(socket.AF_UNIX) as connection, Path(log).open('ab') as output:
-            connection.connect(self.config['socket'])
+        connection = (socket.create_connection((self.config['host'], self.config['port']))
+                      if 'host' in self.config else socket.socket(socket.AF_UNIX))
+        with connection, Path(log).open('ab') as output:
+            if 'socket' in self.config:
+                connection.connect(self.config['socket'])
             connection.settimeout(1)
             if stdin is not None:
                 # Spool through a private guest file; fixed-size lines fit old UARTs.
@@ -74,10 +77,12 @@ def vnc_actions(server, actions):
     """Optional first-boot input, separate from readiness and test execution."""
     from vncdotool import api
     with api.connect(server) as client:
+        client.factory.force_caps = True
         for action in actions:
             if 'key' in action:
                 client.keyPress(action['key'])
             elif 'text' in action:
-                client.typeText(action['text'])
+                for character in action['text']:
+                    client.keyPress('enter' if character == '\n' else character)
             else:
                 raise ValueError('VNC action needs key or text')

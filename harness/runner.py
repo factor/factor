@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import fcntl
 import hashlib
 import json
+import re
 from pathlib import Path
 import shlex
 import subprocess
@@ -116,25 +117,31 @@ def execute(profile, output, seed, *, resume=False, stages=STAGES, repo=ROOT):
             with guest:
                 directory = state['directory']
                 quote = shlex.quote
-                if not state.get('prepared'):
-                    with (output / 'source.tar.gz').open('rb') as stream:
-                        attempt(output, 'prepare', 'set -eu; mkdir ' + quote(directory) +
-                                '; cd ' + quote(directory) + '; tar xzf -', transport, binding, stream)
-                    with seed.open('rb') as stream:
-                        attempt(output, 'seed', 'cat > ' + quote(directory + '/boot.image'), transport, binding, stream)
-                    state['prepared'] = True
+                setup = state.setdefault('setup', {})
+                for name, command, input_path in [
+                        ('prepare', 'set -eu; mkdir ' + quote(directory) +
+                         '; cd ' + quote(directory) + '; tar xzf -', output / 'source.tar.gz'),
+                        ('seed', 'cat > ' + quote(directory + '/boot.image'), seed)]:
+                    if name in setup and reusable(output, setup[name], binding):
+                        continue
+                    with input_path.open('rb') as stream:
+                        setup[name] = attempt(output, name, command, transport, binding, stream)
                     write_json(output / 'run.json', state)
+                if state.get('artifacts'):
+                    check_artifacts(profile, directory, output, transport, binding, state)
                 for name, command in commands(profile, directory).items():
                     if name not in stages:
                         continue
                     if name in state['stages'] and reusable(output, state['stages'][name], binding):
                         continue
                     state['stages'][name] = attempt(output, name, command, transport, binding)
+                    if name == 'bootstrap':
+                        check_artifacts(profile, directory, output, transport, binding, state)
                     write_json(output / 'run.json', state)
+                if state.get('artifacts'):
+                    check_artifacts(profile, directory, output, transport, binding, state)
             complete = all(name in state['stages'] for name in STAGES)
-            closed = guest.closed is None or (not guest.closed['forced'] and not guest.closed['error']
-                       and guest.closed['shutdown_exit'] in (0, 255)
-                       and guest.closed['emulator_exit'] == profile.get('guest', {}).get('success_exit', 0))
+            closed = closure_passed(guest.closed, profile.get('guest', {}))
             state['status'] = 'pass' if complete and closed else 'partial' if closed else 'fail'
         except BaseException as error:
             state.update(status='interrupted' if isinstance(error, KeyboardInterrupt) else 'fail', error=str(error))
@@ -143,3 +150,34 @@ def execute(profile, output, seed, *, resume=False, stages=STAGES, repo=ROOT):
             state.update(ended_at=now(), closure=guest.closed)
             write_json(output / 'run.json', state)
     return state
+
+
+def closure_passed(closure, config):
+    if closure is None:
+        return not config
+    return (not closure['forced'] and not closure['error']
+            and closure['shutdown_exit'] in (0, 255)
+            and closure['emulator_exit'] == config.get('success_exit', 0)
+            and closure_passed(closure.get('outer'), config.get('outer', {}).get('guest', {})))
+
+
+def check_artifacts(profile, directory, output, transport, binding, state):
+    names = ['factor', 'factor.image', 'boot.image', 'libfactor-ffi-test.so']
+    command = ('set -eu; cd ' + shlex.quote(directory) +
+               '; if command -v sha256sum >/dev/null; then sha256sum ' +
+               shlex.join(names) + '; else sha256 ' + shlex.join(names) + '; fi')
+    record = attempt(output, 'artifacts', command, transport, binding)
+    receipt = json.loads((output / record['receipt']).read_text())
+    hashes = {}
+    for line in (output / receipt['log']).read_text().splitlines():
+        match = re.fullmatch(r'([0-9a-f]{64})  ?(.+)', line)
+        bsd = re.fullmatch(r'SHA256 \((.+)\) = ([0-9a-f]{64})', line)
+        if match:
+            hashes[match[2]] = match[1]
+        elif bsd:
+            hashes[bsd[1]] = bsd[2]
+    if set(hashes) != set(names):
+        raise ValueError('incomplete runtime artifact hashes')
+    if state.get('artifacts', hashes) != hashes:
+        raise ValueError('runtime artifacts changed since bootstrap')
+    state['artifacts'] = hashes

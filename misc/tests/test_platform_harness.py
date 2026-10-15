@@ -1,8 +1,5 @@
 """Shared runner contracts, without stock guest images or privileged services."""
-from contextlib import contextmanager
-import io
 import json
-import os
 from pathlib import Path
 import socket
 import subprocess
@@ -101,6 +98,64 @@ class HarnessTests(unittest.TestCase):
         (self.root / 'build-2.log').write_text('changed')
         with self.assertRaisesRegex(ValueError, 'changed evidence'):
             runner.reusable(self.root, record, binding)
+
+    def test_all_profiles_render_without_external_assets_or_jobs(self):
+        names = config.profiles()
+        self.assertEqual(len(names), 47)
+        for name in names:
+            profile = config.load(name, self.root)
+            rendered = runner.plan(profile)
+            self.assertEqual(set(rendered['stages']), set(stages.STAGES))
+            self.assertIsNone(rendered['elapsed_timeout'])
+
+    def test_nested_closure_requires_both_layers(self):
+        good = dict(forced=False, error=None, shutdown_exit=0, emulator_exit=0)
+        self.assertTrue(runner.closure_passed(good, {}))
+        bad = dict(good, forced=True)
+        inner = dict(good, emulator_exit=1, outer=bad)
+        config = {'success_exit': 1, 'outer': {'guest': {}}}
+        self.assertFalse(runner.closure_passed(inner, config))
+        self.assertFalse(runner.closure_passed(None, {'argv': ['qemu']}))
+
+    def test_real_source_snapshot_stage_resume_and_artifact_binding(self):
+        repo = self.root / 'repo'
+        repo.mkdir()
+        subprocess.run(['git', 'init', '-q', str(repo)], check=True)
+        (repo / 'source.txt').write_text('original')
+        subprocess.run(['git', 'add', '.'], cwd=repo, check=True)
+        subprocess.run(['git', '-c', 'user.name=Harness test', '-c',
+                        'user.email=harness@example.invalid', 'commit', '-qm', 'fixture'], cwd=repo, check=True)
+        seed = self.root / 'boot.image'
+        seed.write_bytes(b'fixture seed')
+        profile = {'id': 'fixture', 'assets': str(self.root), 'transport': {'kind': 'local'}}
+
+        def fixture_commands(profile, directory):
+            import shlex
+            prefix = 'cd ' + shlex.quote(directory) + '; '
+            commands = {name: prefix + 'true' for name in stages.STAGES}
+            commands['build'] = prefix + 'touch factor libfactor-ffi-test.so'
+            commands['bootstrap'] = prefix + 'echo fixture > factor.image'
+            commands['reopen'] = 'echo FACTOR_REOPEN_OK'
+            commands['core'] = 'echo QEMU_CORE_FAILURES 0'
+            for name in ('compiler', 'io', 'ui'):
+                commands[name] = "echo 'Unit Test: fixture'"
+            return commands
+
+        output = self.root / 'run'
+        with patch.object(runner, 'commands', side_effect=fixture_commands):
+            state = runner.execute(profile, output, seed, stages=('build',), repo=repo)
+            self.assertEqual(state['status'], 'partial')
+            original = (output / 'build-1.json').read_bytes()
+            state = runner.execute(profile, output, seed, resume=True, repo=repo)
+            self.assertEqual(state['status'], 'pass')
+            self.assertEqual(original, (output / 'build-1.json').read_bytes())
+            (Path(state['directory']) / 'factor.image').write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError, 'artifacts changed'):
+                runner.execute(profile, output, seed, resume=True, repo=repo)
+            self.assertEqual(json.loads((output / 'run.json').read_text())['status'], 'fail')
+            (repo / 'source.txt').write_text('dirty')
+            with self.assertRaisesRegex(ValueError, 'commit tracked changes'):
+                runner.source_identity(repo)
 
 
 if __name__ == '__main__':

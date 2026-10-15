@@ -456,7 +456,7 @@ $(BUILD_DIR)/gc-tests$(EXE_EXTENSION): vm/tests/gc.cpp vm/tests/jit_templates.hp
 
 # Run with the same CONFIG and build flags used for the VM.
 test-vm: $(BUILD_DIR)/gc-tests$(EXE_EXTENSION)
-	./$(BUILD_DIR)/gc-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/gc-tests$(EXE_EXTENSION)
 
 $(BUILD_DIR)/diagnostics-tests$(EXE_EXTENSION): vm/tests/diagnostics.cpp $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(DLL_OBJS) $(LIBS)
@@ -472,7 +472,7 @@ $(BUILD_DIR)/riscv-tests$(EXE_EXTENSION): vm/tests/riscv.cpp vm/riscv.hpp | $(BU
 
 .PHONY: test-riscv
 test-riscv: $(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
-	./$(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
 
 test-vm: test-riscv
 
@@ -482,7 +482,7 @@ $(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION): vm/tests/unix_signals.cpp $(DLL
 
 .PHONY: test-unix-signals
 test-unix-signals: $(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION)
-	./$(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION)
 
 test-vm: test-unix-signals
 endif
@@ -503,7 +503,7 @@ $(BUILD_DIR)/ieee-bits-tests$(EXE_EXTENSION): vm/tests/ieee_bits.cpp vm/ieee_bit
 
 .PHONY: test-ieee-bits
 test-ieee-bits: $(BUILD_DIR)/ieee-bits-tests$(EXE_EXTENSION)
-	./$(BUILD_DIR)/ieee-bits-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/ieee-bits-tests$(EXE_EXTENSION)
 
 .PHONY: test-ieee-float
 test-ieee-float:

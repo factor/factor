@@ -321,7 +321,12 @@ def main():
     parser.add_argument('--foundation', action='store_true', help='show ABI-specific VM bring-up without promoting it to compiler/io acceptance')
     parser.add_argument('--commands', action='store_true', help='show commands recorded in guest/stage evidence')
     parser.add_argument('--run', nargs=argparse.REMAINDER, metavar='COMMAND', help='run the selected OS runner; requires --os and --arch')
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from harness import cli
+    cli.arguments(parser)
     args = parser.parse_args()
+    if args.profiles or args.profile:
+        return cli.main(args, parser)
     if args.run is not None:
         if not args.os or not args.arch or not args.run:
             parser.error('--run requires --os, --arch, and a runner action')

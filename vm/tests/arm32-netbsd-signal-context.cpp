@@ -9,7 +9,7 @@ enum {
   FP_TRAP_OVERFLOW = 4, FP_TRAP_UNDERFLOW = 8, FP_TRAP_INEXACT = 16
 };
 #define FACTOR_ARM32
-#include "../os-netbsd.hpp"
+#include "../os-netbsd-arm.32.hpp"
 static volatile sig_atomic_t observed = 0;
 static void handler(int, siginfo_t*, void* context) {
   auto uc = (ucontext_t*)context;

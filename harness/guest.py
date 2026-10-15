@@ -7,7 +7,7 @@ import subprocess
 import time
 
 from . import process
-from .transport import vnc_actions
+from .transport import Transport, vnc_actions
 
 
 class Guest(AbstractContextManager):
@@ -19,6 +19,7 @@ class Guest(AbstractContextManager):
         self.log = None
         self.forced = False
         self.closed = None
+        self.outer = None
 
     def activity(self):
         return process.activity(self.child.pid) if self.child else None
@@ -27,6 +28,14 @@ class Guest(AbstractContextManager):
         if not self.config:
             return self
         try:
+            if 'outer' in self.config:
+                outer = self.config['outer']
+                outer_directory = self.directory / 'outer'
+                outer_directory.mkdir(exist_ok=True)
+                outer_transport = Transport(outer['transport'], self.transport.cwd, self.transport.stall_seconds)
+                self.outer = Guest(outer['guest'], outer_directory, outer_transport)
+                outer_transport.progress = self.outer.activity
+                self.outer.__enter__()
             prior_path = self.directory / 'guest-command.json'
             if prior_path.exists():
                 prior = json.loads(prior_path.read_text())
@@ -41,14 +50,15 @@ class Guest(AbstractContextManager):
                     subprocess.run(['qemu-img', 'create', '-q', '-f', 'qcow2', '-F',
                                     drive['format'], '-b', str(backing), str(overlay)], check=True)
                 argv += ['-drive', f'file={overlay},format=qcow2,' + drive['options']]
-            if self.config.get('qmp', True):
-                self.qmp_path = self.directory / 'qmp.sock'
-                argv += ['-qmp', f'unix:{self.qmp_path},server=on,wait=off']
-            if self.transport.config['kind'] == 'serial':
-                argv += ['-serial', 'unix:' + self.transport.config['socket'] + ',server=on,wait=off']
-            else:
-                argv += ['-serial', 'file:' + str(self.directory / 'console.log')]
-            argv += self.config.get('display_args', ['-display', 'none'])
+            if self.config.get('kind', 'qemu') == 'qemu':
+                if self.config.get('qmp', True):
+                    self.qmp_path = self.directory / 'qmp.sock'
+                    argv += ['-qmp', f'unix:{self.qmp_path},server=on,wait=off']
+                if self.transport.config['kind'] == 'serial':
+                    argv += ['-serial', 'unix:' + self.transport.config['socket'] + ',server=on,wait=off']
+                else:
+                    argv += ['-serial', 'file:' + str(self.directory / 'console.log')]
+                argv += self.config.get('display_args', ['-display', 'none'])
             self.log = (self.directory / 'emulator.log').open('ab')
             self.child = subprocess.Popen(argv, stdout=self.log, stderr=subprocess.STDOUT,
                                           start_new_session=True)
@@ -69,8 +79,11 @@ class Guest(AbstractContextManager):
         while True:
             if self.child.poll() is not None:
                 raise RuntimeError(f'emulator exited before readiness: {self.child.returncode}')
-            ready = self.transport.run(self.config.get('ready_command', 'true'),
-                                       self.directory / 'readiness.log')
+            try:
+                ready = self.transport.run(self.config.get('ready_command', 'true'),
+                                           self.directory / 'readiness.log')
+            except (ConnectionError, FileNotFoundError):
+                ready = 255
             if ready == 0:
                 return
             console = self.directory / 'console.log'
@@ -103,6 +116,8 @@ class Guest(AbstractContextManager):
         if self.child is None:
             if self.log:
                 self.log.close()
+            if self.outer:
+                self.outer.__exit__(*exception)
             return
         shutdown_exit = None
         error = None
@@ -131,8 +146,14 @@ class Guest(AbstractContextManager):
             self.forced = self.child.poll() is None
             process.stop(self.child)
             self.log.close()
+            if self.outer:
+                try:
+                    self.outer.__exit__(*exception)
+                except BaseException as failure:
+                    error = str(failure)
             self.closed = {'emulator_exit': self.child.returncode,
-                           'shutdown_exit': shutdown_exit, 'forced': self.forced, 'error': error}
+                           'shutdown_exit': shutdown_exit, 'forced': self.forced, 'error': error,
+                           'outer': self.outer.closed if self.outer else None}
             process.write_json(self.directory / 'closure.json', self.closed)
         if error and not exception[0]:
             raise RuntimeError(error)
