@@ -1,0 +1,2 @@
+include vm/Config.haiku
+include vm/Config.x86.64

@@ -2,7 +2,7 @@ USING: alien.c-types alien.syntax classes.struct kernel
 unix.time unix.types ;
 IN: unix.stat
 
-! Ubuntu 7.10 64-bit
+! Linux x86-64 uses this layout with both glibc and musl.
 
 STRUCT: stat
     { st_dev dev_t }
@@ -21,10 +21,6 @@ STRUCT: stat
     { st_ctimespec timespec }
     { __unused0 long[3] } ;
 
-FUNCTION: int __xstat64  ( int ver, c-string pathname, stat* buf )
-FUNCTION: int __lxstat64 ( int ver, c-string pathname, stat* buf )
-FUNCTION: int __fxstat64 ( int ver, int fd, stat* buf )
-
-:  stat-func ( pathname buf -- int ) [ 1 ] 2dip __xstat64 ;
-: lstat ( pathname buf -- int ) [ 1 ] 2dip __lxstat64 ;
-: fstat ( fd buf -- int ) [ 1 ] 2dip __fxstat64 ;
+FUNCTION-ALIAS: stat-func int stat ( c-string pathname, stat* buf )
+FUNCTION: int lstat ( c-string pathname, stat* buf )
+FUNCTION: int fstat ( int fd, stat* buf )

@@ -61,11 +61,15 @@ M: x86.32 vm-stack-space 16 ;
 : save-vm-ptr ( n -- )
     stack@ 0 MOV 0 rc-absolute-cell rel-vm ;
 
+! NetBSD ELF uses the same memory aggregate return ABI as Linux.
+: pcc-struct-return? ( -- ? )
+    os { linux netbsd } member? ;
+
 M: x86.32 return-struct-in-registers?
     lookup-c-type
     [ return-in-registers?>> ]
     [ heap-size { 1 2 4 8 } member? ] bi
-    os linux? not
+    pcc-struct-return? not
     and or ;
 
 ! On x86, parameters are usually never passed in registers,
@@ -222,7 +226,7 @@ M: x86.32 long-long-on-stack? t ;
 M: x86.32 flatten-struct-type
     call-next-method [ first t f 3array ] map ;
 
-M: x86.32 struct-return-on-stack? os linux? not ;
+M: x86.32 struct-return-on-stack? pcc-struct-return? not ;
 
 M: x86.32 return-struct-pointer? os windows? ;
 
