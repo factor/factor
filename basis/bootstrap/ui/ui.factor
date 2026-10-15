@@ -1,18 +1,14 @@
-USING: alien namespaces system combinators kernel sequences
-vocabs ;
+USING: alien bootstrap.ui.platform kernel namespaces sequences system vocabs ;
 IN: bootstrap.ui
 
 "bootstrap.math" require
 "bootstrap.compiler" require
 "bootstrap.threads" require
 
-! Use GTK3 on 32-bit x86 and RISC-V Linux.
+! GTK4 has a restricted architecture set; use GTK3 on the other Linux CPUs.
+! Other Unix systems use their established GTK3 or GTK2 backend.
 "ui-backend" get [
     "ui.backend." prepend
 ] [
-    {
-        { [ os macos? ] [ "ui.backend.cocoa" ] }
-        { [ os windows? ] [ "ui.backend.windows" ] }
-        { [ os unix? ] [ os linux? cpu x86.32? cpu riscv.32? or and "ui.backend.gtk3" "ui.backend.gtk4" ? ] }
-    } cond
+    os cpu default-ui-backend
 ] if* require

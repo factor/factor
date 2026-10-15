@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.private classes
-classes.tuple.private compiler.units cpu.architecture generic hashtables
+classes.tuple.private compiler.units cpu.architecture generic grouping growable hashtables
 hashtables.private io kernel libc math math.parser memory
 namespaces namespaces.private quotations quotations.private
 sbufs sequences sequences.private splitting system vectors
@@ -30,6 +30,22 @@ gc
     [ [ subwords ] map ] keep suffix concat
     [ word-optimized? ] reject compile ;
 
+! Preserve each vocabulary's subword-then-word expansion before batching.
+: bootstrap-vocab-words ( vocab -- words )
+    vocab-words [ [ subwords ] map ] keep suffix concat ;
+
+: compile-bootstrap-vocab-batch ( vocabs -- )
+    [ [ bootstrap-vocab-words ] map concat
+      [ word-optimized? ] reject compile ]
+    [ [ drop "." write ] each flush ] bi ;
+
+! Freeze the original subword/word queue before publishing any code.
+! Publishing each warm-up word lets later words use compiled helpers.
+: compile-bootstrap-warmup ( words -- )
+    [ [ subwords ] map ] keep suffix concat
+    [ word-optimized? ] reject
+    [ 1array compile ] each ;
+
 "debug-compiler" get [
 
     nl
@@ -42,7 +58,7 @@ gc
     ! which are also quick to compile are replaced by
     ! compiled definitions as soon as possible.
     {
-        not ?
+        not ? integer?
 
         2over
 
@@ -53,7 +69,7 @@ gc
         curried? composed? quotation-like? callable?
         quotation?
 
-        curry compose uncurry
+        curry compose uncurry uncompose
 
         array-nth set-array-nth
 
@@ -62,38 +78,43 @@ gc
         (get-namestack)
 
         layout-of
-    } compile-unoptimized
+    } compile-bootstrap-warmup
 
     "." write flush
 
+    ! These fixed-effect leaves remain hot during compiler bootstrap.
+    M\ array length M\ growable length 2array compile-bootstrap-warmup
+    M\ array nth-unsafe M\ growable nth-unsafe M\ array length>>
+    3array compile-bootstrap-warmup
+
     ! Compiler passes use these methods heavily. Compile them before the
     ! larger arithmetic and sequence batches.
-    M\ hashtable at* M\ hashtable set-at 2array compile-unoptimized
+    M\ hashtable at* M\ hashtable set-at 2array compile-bootstrap-warmup
 
     ! Hash-table growth and mutation remain separate calls in compiler code.
-    M\ hashtable delete-at \ grow-hash \ maybe-set-at 3array compile-unoptimized
+    M\ hashtable delete-at \ grow-hash \ maybe-set-at 3array compile-bootstrap-warmup
 
     {
         bitand bitor bitxor bitnot
-    } compile-unoptimized
+    } compile-bootstrap-warmup
 
     "." write flush
 
     {
         + * 2/ < <= > >= shift
-    } compile-unoptimized
+    } compile-bootstrap-warmup
 
     "." write flush
 
     {
         new-sequence nth push pop last flip
-    } compile-unoptimized
+    } compile-bootstrap-warmup
 
     "." write flush
 
     {
         hashcode* = equal? assoc-stack assoc-stack-from get set
-    } compile-unoptimized
+    } compile-bootstrap-warmup
 
     "." write flush
 
@@ -101,36 +122,37 @@ gc
         member-eq? split harvest sift cut cut-slice subseq-start subseq-index
         index clone set-at reverse push-all class-of number>string string>number
         like clone-like
-    } compile-unoptimized
+    } compile-bootstrap-warmup
 
     "." write flush
 
     {
         read-lines prefix suffix unclip new-assoc assoc-union!
         word-prop set-word-prop 1array 2array 3array ?nth
-    } compile-unoptimized
+    } compile-bootstrap-warmup
 
     "." write flush
 
     os windows? [
         "GetLastError" "windows.kernel32" lookup-word
         "FormatMessageW" "windows.kernel32" lookup-word
-        2array compile-unoptimized
+        2array compile-bootstrap-warmup
     ] when
 
     os unix? [
         "(dlerror)" "alien.libraries.unix" lookup-word
-        1array compile-unoptimized
+        1array compile-bootstrap-warmup
     ] when
 
     {
         malloc calloc free memcpy
-    } compile-unoptimized
+    } compile-bootstrap-warmup
 
     "." write flush
 
     ! Compile profiled helpers before the compiler passes that use them.
     ! Look up already-loaded words without changing vocabulary load order.
+    nl "Optimizing bootstrap helpers..." print flush
     {
         { "compile" "compiler.units" }
         { "backend" "compiler" }
@@ -169,15 +191,21 @@ gc
         { "<hash-array>" "hash-sets.private" }
         { "compress-path" "compiler.utilities" }
         { "meta-d" "stack-checker.state" }
+        ! These run while compiling the compiler passes themselves.
+        { "finalize" "compiler.tree.finalization" }
+        { "finalize*" "compiler.tree.finalization" }
+        { "cached-expansion" "compiler.tree.finalization" }
     } [ first2 lookup-word ] map compile-unoptimized
 
     ! Optimize the compiler passes before using them for the full sweep.
     { "compiler.tree" "compiler.cfg" } [
+        dup "Optimizing " write write "..." print flush
         loaded-vocab-names swap [ head? ] curry filter
         [ vocab-words compile-unoptimized ] each
     ] each
 
-    loaded-vocab-names [ vocab-words compile-unoptimized "." write flush ] each
+    "Optimizing loaded vocabularies..." print flush
+    loaded-vocab-names 4 group [ compile-bootstrap-vocab-batch ] each
 
     " done" print flush
 

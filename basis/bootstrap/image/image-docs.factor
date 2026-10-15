@@ -51,6 +51,8 @@ ARTICLE: "bootstrap.image" "Bootstrapping new images"
 { $code "./factor -i=boot.x86.32.image" }
 "This stage loads additional code, compiles all words, and creates a final " { $snippet "factor.image" } "."
 $nl
+"Architecture-specific context templates must use the same outer-frame position when starting a fresh context and restarting a reset context. On SuperH, entry reserves the 16-byte outer frame by setting the stack pointer 16 bytes above the context's callstack bottom before entering the quotation. Changes to these templates require a new bootstrap image."
+$nl
 "The bootstrap process can be customized with command-line switches."
 { $see-also "runtime-cli-args" "bootstrap-cli-args" } ;
 

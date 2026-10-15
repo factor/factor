@@ -32,7 +32,9 @@ CONSTANT: image-names
         "windows-x86.32" "unix-x86.32"
         "windows-x86.64" "unix-x86.64"
         "windows-arm.64" "unix-arm.64"
-        "unix-riscv.32" "unix-riscv.64"
+        "unix-riscv.32" "unix-riscv.64" "unix-loongarch.64"
+        "unix-sparc.32" "unix-sparc.64"
+        "linux-s390x" "unix-alpha.64"
     }
 
 <PRIVATE
@@ -116,7 +118,11 @@ SYMBOL: special-objects
 : jit-conditional* ( test-quot false-quot -- )
     [ '[ 4 + @ ] ] dip jit-conditional ; inline
 
+SYMBOL: big-endian
+
 : make-jit ( quot -- parameters literals code )
+    big-endian get endian:big-endian little-endian ?
+    relocation-byte-order [
     [
         0 extra-offset set
         init-relocation
@@ -124,10 +130,17 @@ SYMBOL: special-objects
         parameter-table get >array
         literal-table get >array
         relocation-table get >byte-array
-    ] B{ } make 2array ;
+    ] B{ } make 2array
+    ] with-variable ;
 
 : make-jit-no-params ( quot -- code )
     make-jit 2nip ;
+
+! Preserve fixed parameters after the prefix supplied dynamically by the VM.
+:: make-jit-with-parameters ( quot dynamic-count -- template )
+    quot make-jit :> ( parameters literals template )
+    literals empty? t assert=
+    template parameters dynamic-count tail >array suffix ;
 
 : jit-define ( quot n -- )
     [ make-jit-no-params ] dip special-objects get set-at ;
@@ -151,8 +164,7 @@ SYMBOL: special-objects
 
 SYMBOL: bootstrapping-image
 
-! Image output format
-SYMBOL: big-endian
+! Image output format (big-endian is declared above make-jit)
 
 SYMBOL: architecture
 
