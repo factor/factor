@@ -255,8 +255,8 @@ SYMBOL: escaped-copy
 [ va-list-outside-callback-scope? ] must-fail-with
 
 { t t f } [
-    va_list native-va-list-type? cpu arm.64? cpu riscv? or cpu mips? or cpu s390x? or cpu loongarch.64? or =
-    va_list lookup-c-type native-va-list-type? cpu arm.64? cpu riscv? or cpu mips? or cpu s390x? or cpu loongarch.64? or =
+    va_list native-va-list-type? cpu arm.64? cpu riscv? or cpu mips? or cpu s390x? or cpu loongarch.64? or cpu hppa? or =
+    va_list lookup-c-type native-va-list-type? cpu arm.64? cpu riscv? or cpu mips? or cpu s390x? or cpu loongarch.64? or cpu hppa? or =
     int native-va-list-type?
 ] unit-test
 

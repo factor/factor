@@ -1,0 +1,46 @@
+#include "hppa-cache.hpp"
+#include <ucontext.h>
+#include <signal.h>
+namespace factor {
+inline static void flush_icache(cell start, cell length) {
+  hppa_flush_icache(start, length);
+}
+// Factor frames are independent of the upward native r30 stack.
+#define UAP_STACK_POINTER(raw) (((ucontext_t*)(raw))->uc_mcontext.sc_gr[18])
+#define UAP_NEXT_PROGRAM_COUNTER(raw) (((ucontext_t*)(raw))->uc_mcontext.sc_iaoq[1])
+#define UAP_GLOBAL_POINTER(raw) (((ucontext_t*)(raw))->uc_mcontext.sc_gr[19])
+#define UAP_PROGRAM_COUNTER(raw) (((ucontext_t*)(raw))->uc_mcontext.sc_iaoq[0])
+inline static unsigned int uap_fpu_status(void* raw) {
+  return unsigned(((ucontext_t*)raw)->uc_mcontext.sc_fr[0] >> 32);
+}
+inline static void uap_clear_fpu_status(void* raw) {
+  ((ucontext_t*)raw)->uc_mcontext.sc_fr[0] &= ~UINT64_C(0xf800000000000000);
+}
+inline static unsigned int fpu_status(unsigned int status) {
+  unsigned bits = status >> 27;
+  unsigned result = 0;
+  if (bits & 16) result |= FP_TRAP_INVALID_OPERATION;
+  if (bits & 8) result |= FP_TRAP_ZERO_DIVIDE;
+  if (bits & 4) result |= FP_TRAP_OVERFLOW;
+  if (bits & 2) result |= FP_TRAP_UNDERFLOW;
+  if (bits & 1) result |= FP_TRAP_INEXACT;
+  return result;
+}
+inline static unsigned int signal_fpu_status(unsigned int status, int code) {
+  unsigned int traps = fpu_status(status);
+  // Enabled exceptions need not set sticky FR0 flags in the Linux context.
+  switch (code) {
+    case FPE_FLTINV: return traps | FP_TRAP_INVALID_OPERATION;
+    case FPE_FLTDIV: return traps | FP_TRAP_ZERO_DIVIDE;
+    case FPE_FLTOVF: return traps | FP_TRAP_OVERFLOW;
+    case FPE_FLTUND: return traps | FP_TRAP_UNDERFLOW;
+    case FPE_FLTRES: return traps | FP_TRAP_INEXACT;
+    default: return traps;
+  }
+}
+// $$dyncall accepts raw code addresses as well as tagged plabels.
+#define CODE_TO_FUNCTION_POINTER(code) (void)0
+#define CODE_TO_FUNCTION_POINTER_CALLBACK(vm, code) (void)0
+#define FUNCTION_CODE_POINTER(ptr) hppa_function_field((uintptr_t)(ptr), 0)
+#define FUNCTION_TOC_POINTER(ptr) hppa_function_field((uintptr_t)(ptr), 1)
+}
