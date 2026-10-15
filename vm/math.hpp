@@ -20,37 +20,106 @@ inline cell factor_vm::from_unsigned_cell(cell x) {
 }
 
 // Allocates memory
-inline cell factor_vm::allot_float(double n) {
+inline cell factor_vm::allot_float(vm_float n) {
   boxed_float* flo = allot<boxed_float>(sizeof(boxed_float));
+#if defined(FACTOR_INVERSE_NAN_ENCODING)
+  uint64_t bits = inverse_canonical_double_bits(double_bits(n));
+  memcpy(&flo->n, &bits, sizeof(bits));
+#else
   flo->n = n;
+#endif
   return tag(flo);
 }
 
 inline cell factor_vm::allot_float_bits(uint64_t bits) {
   boxed_float* flo = allot<boxed_float>(sizeof(boxed_float));
-  memcpy(&flo->n, &bits, sizeof(bits));
+  memcpy(static_cast<void*>(&flo->n), &bits, sizeof(bits));
   return tag(flo);
 }
+
+#if defined(FACTOR_INTEGER_ONLY)
+inline cell factor_vm::allot_float(float n) {
+  (void)n;
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+  return false_object;
+}
+inline cell factor_vm::allot_float(double n) {
+  (void)n;
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+  return false_object;
+}
+#elif defined(FACTOR_INVERSE_NAN_ENCODING)
+inline cell factor_vm::allot_float(float n) {
+  return allot_float_bits(widen_float_bits(inverse_canonical_float_bits(float_bits(n))));
+}
+#elif defined(__vax__)
+// Foreign values retain the native F/D ABI. No native floating arithmetic is
+// needed to box them, including dirty zero and reserved-operand encodings.
+inline cell factor_vm::allot_float(float n) {
+  uint32_t bits = 0;
+  if (vax_f_to_ieee(&n, bits) == vax_float_conversion::reserved_operand)
+    general_error(ERROR_FFI, false_object, false_object);
+  return allot_float(vm_float::from_float_bits(bits));
+}
+
+inline cell factor_vm::allot_float(double n) {
+  uint64_t bits = 0;
+#if defined(__GFLOAT__)
+#error "The VAX VM uses NetBSD's default D-floating foreign ABI"
+#endif
+  if (vax_d_to_ieee(&n, bits) == vax_float_conversion::reserved_operand)
+    general_error(ERROR_FFI, false_object, false_object);
+  return allot_float_bits(bits);
+}
+#endif
 
 // Allocates memory
 inline bignum* factor_vm::float_to_bignum(cell tagged) {
   return double_to_bignum(untag_float(tagged));
 }
 
-inline double factor_vm::untag_float(cell tagged) {
+inline vm_float factor_vm::untag_float(cell tagged) {
+#if defined(FACTOR_INVERSE_NAN_ENCODING)
+  uint64_t bits;
+  memcpy(&bits, &untag<boxed_float>(tagged)->n, sizeof(bits));
+  return bits_double(inverse_native_double_bits(bits));
+#else
   return untag<boxed_float>(tagged)->n;
+#endif
 }
 
-inline double factor_vm::untag_float_check(cell tagged) {
+inline vm_float factor_vm::untag_float_check(cell tagged) {
+#if defined(FACTOR_INVERSE_NAN_ENCODING)
+  uint64_t bits;
+  memcpy(&bits, &untag_check<boxed_float>(tagged)->n, sizeof(bits));
+  return bits_double(inverse_native_double_bits(bits));
+#else
   return untag_check<boxed_float>(tagged)->n;
+#endif
 }
 
 inline fixnum factor_vm::float_to_fixnum(cell tagged) {
+#if defined(FACTOR_INTEGER_ONLY)
+  (void)tagged;
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+  return 0;
+#else
+#if defined(__vax__)
+  return (fixnum)vm_float_to_signed(untag_float(tagged));
+#else
   return (fixnum)untag_float(tagged);
+#endif
+#endif
 }
 
-inline double factor_vm::fixnum_to_float(cell tagged) {
-  return (double)untag_fixnum(tagged);
+inline vm_float factor_vm::fixnum_to_float(cell tagged) {
+#if defined(FACTOR_INTEGER_ONLY)
+  (void)tagged;
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+  return vm_float{0};
+#else
+  return vm_float_from_signed(untag_fixnum(tagged));
+#endif
 }
 
 inline cell factor_vm::unbox_array_size() {

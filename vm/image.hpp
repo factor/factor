@@ -1,5 +1,10 @@
 namespace factor {
 
+// Images are native snapshots for one target CPU, cell width and byte order.
+// Header cells, object cells, doubles and relocation entries use that target's
+// native representation; byte arrays and machine code retain their bytes.
+// The width-dependent, asymmetric magic rejects a reversed-endian header.
+// Reserved header fields are compression metadata, not an endian marker.
 static const cell image_magic = 0x0f0e0d0c;
 // Integer arithmetic now normalizes results; old compiled code is incompatible.
 static const cell image_version = 5;

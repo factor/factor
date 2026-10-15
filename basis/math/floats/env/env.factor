@@ -52,16 +52,24 @@ M: object fp-traps-supported? t ;
 M: riscv.64 fp-traps-supported? f ;
 M: riscv.32 fp-traps-supported? f ;
 
+HOOK: rounding-mode-supported? cpu ( mode -- ? )
+M: object rounding-mode-supported? drop t ;
+
 HOOK: denormal-flush-supported? cpu ( -- ? )
 M: object denormal-flush-supported? t ;
 M: riscv.64 denormal-flush-supported? f ;
 M: riscv.32 denormal-flush-supported? f ;
+M: loongarch.64 denormal-flush-supported? f ;
 
 <PRIVATE
 
 HOOK: (fp-env-registers) cpu ( -- registers )
 
-: fp-env-register ( -- register ) (fp-env-registers) first ;
+: require-fp-env ( -- )
+    "floating-point environment" require-floating-point ; inline
+
+: fp-env-register ( -- register )
+    require-fp-env (fp-env-registers) first ;
 
 : mask> ( bits assoc -- symbols )
     [ mask zero? ] with reject-values keys ;
@@ -88,7 +96,7 @@ GENERIC: (get-denormal-mode) ( fp-env -- mode )
 GENERIC#: (set-denormal-mode) 1 ( fp-env mode -- fp-env )
 
 : change-fp-env-registers ( quot -- )
-    (fp-env-registers) swap [ (set-fp-env-register) ] compose each ; inline
+    require-fp-env (fp-env-registers) swap [ (set-fp-env-register) ] compose each ; inline
 
 : set-fp-traps ( exceptions -- ) [ (set-fp-traps) ] curry change-fp-env-registers ;
 : set-rounding-mode ( mode -- ) [ (set-rounding-mode) ] curry change-fp-env-registers ;
@@ -124,7 +132,7 @@ CONSTANT: vm-error-exception-flag>bit
 PRIVATE>
 
 : fp-exception-flags ( -- exceptions )
-    (fp-env-registers) [ (get-exception-flags) ] [ union ] map-reduce >array ; inline
+    require-fp-env (fp-env-registers) [ (get-exception-flags) ] [ union ] map-reduce >array ; inline
 : set-fp-exception-flags ( exceptions -- )
     [ (set-exception-flags) ] curry change-fp-env-registers ; inline
 : clear-fp-exception-flags ( -- ) { } set-fp-exception-flags ; inline
@@ -152,7 +160,7 @@ PRIVATE>
     quot [ orig set-rounding-mode ] finally ; inline
 
 : fp-traps ( -- exceptions )
-    (fp-env-registers) [ (get-fp-traps) ] [ union ] map-reduce >array ; inline
+    require-fp-env (fp-env-registers) [ (get-fp-traps) ] [ union ] map-reduce >array ; inline
 
 :: with-fp-traps ( exceptions quot -- )
     clear-fp-exception-flags
@@ -163,11 +171,22 @@ PRIVATE>
 : without-fp-traps ( quot -- )
     { } swap with-fp-traps ; inline
 
+floating-point-supported? [
 {
+    { [ cpu alpha.64? ] [ "math.floats.env.alpha" require ] }
     { [ cpu x86? ] [ "math.floats.env.x86" require ] }
+    { [ cpu m68k.32? ] [ "math.floats.env.m68k" require ] }
+    { [ cpu sh4? ] [ "math.floats.env.sh4" require ] }
+    { [ cpu hppa? ] [ "math.floats.env.hppa" require ] }
+    { [ cpu mips? ] [ "math.floats.env.mips" require ] }
     { [ cpu ppc? ] [ "math.floats.env.ppc" require ] }
+    { [ cpu sparc? ] [ "math.floats.env.sparc" require ] }
+    { [ cpu s390x? ] [ "math.floats.env.s390x" require ] }
+    { [ cpu arm.32? ] [ "math.floats.env.arm.32" require ] }
     { [ cpu arm.64? ] [ "math.floats.env.arm.64" require ] }
     { [ cpu riscv.32? ] [ "math.floats.env.riscv.32" require ] }
     { [ cpu riscv.64? ] [ "math.floats.env.riscv.64" require ] }
+    { [ cpu loongarch.64? ] [ "math.floats.env.loongarch.64" require ] }
     [ "CPU architecture unsupported by math.floats.env" throw ]
 } cond
+] when

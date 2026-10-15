@@ -48,7 +48,10 @@ M: float fp-nan-payload
     double>bits 52 2^ 1 - bitand ; inline
 
 M: float fp-nan?
-    dup float= not ;
+    floating-point-supported? [ dup float= not ] [
+        ! Opaque IEEE payload classification is a storage operation.
+        double>bits 0x7fffffffffffffff bitand 0x7ff0000000000000 >
+    ] if ;
 
 M: float fp-qnan?
     dup fp-nan? [ fp-nan-payload 51 bit? ] [ drop f ] if ; inline

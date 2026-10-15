@@ -255,14 +255,14 @@ IN: math.integers.tests
 
 : ratio>float ( a b -- f ) [ >bignum ] bi@ /f ;
 
-{ 5. } [ 5 1 ratio>float ] unit-test
-{ 4. } [ 4 1 ratio>float ] unit-test
-{ 2. } [ 2 1 ratio>float ] unit-test
-{ .5 } [ 1 2 ratio>float ] unit-test
-{ .75 } [ 3 4 ratio>float ] unit-test
-{ 1. } [ 2000 2^ 2000 2^ 1 + ratio>float ] unit-test
-{ -1. } [ 2000 2^ neg 2000 2^ 1 + ratio>float ] unit-test
-{ 0.4 } [ 6 15 ratio>float ] unit-test
+{ 5. } [ 5 1 ratio>float ] floating-point-unit-test
+{ 4. } [ 4 1 ratio>float ] floating-point-unit-test
+{ 2. } [ 2 1 ratio>float ] floating-point-unit-test
+{ .5 } [ 1 2 ratio>float ] floating-point-unit-test
+{ .75 } [ 3 4 ratio>float ] floating-point-unit-test
+{ 1. } [ 2000 2^ 2000 2^ 1 + ratio>float ] floating-point-unit-test
+{ -1. } [ 2000 2^ neg 2000 2^ 1 + ratio>float ] floating-point-unit-test
+{ 0.4 } [ 6 15 ratio>float ] floating-point-unit-test
 
 { 0x3fe553522d230931 }
 [ 61967020039 92984792073 ratio>float double>bits ] unit-test
@@ -279,40 +279,40 @@ IN: math.integers.tests
         random-integer
         [ >float / ] [ /f ] 2bi 0.1 ~
     ] all-integers?
-] unit-test
+] floating-point-unit-test
 
 ! Ensure that /f is accurate for fixnums > 2^53 on 64-bit platforms
-{ 0x1.758bec11492f9p-54 } [ 1 12345678901234567 /f ] unit-test
-{ -0x1.758bec11492f9p-54 } [ 1 -12345678901234567 /f ] unit-test
+{ 0x1.758bec11492f9p-54 } [ 1 12345678901234567 /f ] floating-point-unit-test
+{ -0x1.758bec11492f9p-54 } [ 1 -12345678901234567 /f ] floating-point-unit-test
 
 ! Ensure that /f rounds to nearest and not to zero
-{ 0x1.0p55 } [ 0x7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
-{ 0x1.0p55 } [ -0x7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
-{ -0x1.0p55 } [ -0x7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
-{ -0x1.0p55 } [ 0x7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
+{ 0x1.0p55 } [ 0x7f,ffff,ffff,ffff >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0p55 } [ -0x7f,ffff,ffff,ffff >bignum -1 /f ] floating-point-unit-test
+{ -0x1.0p55 } [ -0x7f,ffff,ffff,ffff >bignum 1 /f ] floating-point-unit-test
+{ -0x1.0p55 } [ 0x7f,ffff,ffff,ffff >bignum -1 /f ] floating-point-unit-test
 
-{ 0x1.0000,0000,0000,0p56 } [ 0x100,0000,0000,0007 >bignum 1 /f ] unit-test
-{ 0x1.0000,0000,0000,0p56 } [ -0x100,0000,0000,0007 >bignum -1 /f ] unit-test
-{ 0x1.0000,0000,0000,0p120 } [ 0x100,0000,0000,0007,FFFF,FFFF,FFFF,FFFF >bignum 1 /f ] unit-test
-{ 0x1.0000,0000,0000,0p120 } [ -0x100,0000,0000,0007,FFFF,FFFF,FFFF,FFFF >bignum -1 /f ] unit-test
-{ 0x1.0000,0000,0000,0p56 } [ 0x100,0000,0000,0008 >bignum 1 /f ] unit-test
-{ 0x1.0000,0000,0000,0p56 } [ -0x100,0000,0000,0008 >bignum -1 /f ] unit-test
-{ 0x1.0000,0000,0000,1p56 } [ 0x100,0000,0000,0009 >bignum 1 /f ] unit-test
-{ 0x1.0000,0000,0000,1p56 } [ -0x100,0000,0000,0009 >bignum -1 /f ] unit-test
-{ 0x1.0000,0000,0000,1p120 } [ 0x100,0000,0000,0008,0000,0000,0000,0001 >bignum 1 /f ] unit-test
-{ 0x1.0000,0000,0000,1p120 } [ -0x100,0000,0000,0008,0000,0000,0000,0001 >bignum -1 /f ] unit-test
+{ 0x1.0000,0000,0000,0p56 } [ 0x100,0000,0000,0007 >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,0p56 } [ -0x100,0000,0000,0007 >bignum -1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,0p120 } [ 0x100,0000,0000,0007,FFFF,FFFF,FFFF,FFFF >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,0p120 } [ -0x100,0000,0000,0007,FFFF,FFFF,FFFF,FFFF >bignum -1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,0p56 } [ 0x100,0000,0000,0008 >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,0p56 } [ -0x100,0000,0000,0008 >bignum -1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,1p56 } [ 0x100,0000,0000,0009 >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,1p56 } [ -0x100,0000,0000,0009 >bignum -1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,1p120 } [ 0x100,0000,0000,0008,0000,0000,0000,0001 >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,1p120 } [ -0x100,0000,0000,0008,0000,0000,0000,0001 >bignum -1 /f ] floating-point-unit-test
 
 ! Ensure that /f rounds to even on tie
-{ 0x1.0000,0000,0000,1p56 } [ 0x100,0000,0000,0017 >bignum 1 /f ] unit-test
-{ 0x1.0000,0000,0000,1p56 } [ -0x100,0000,0000,0017 >bignum -1 /f ] unit-test
-{ 0x1.0000,0000,0000,1p120 } [ 0x100,0000,0000,0017,FFFF,FFFF,FFFF,FFFF >bignum 1 /f ] unit-test
-{ 0x1.0000,0000,0000,1p120 } [ -0x100,0000,0000,0017,FFFF,FFFF,FFFF,FFFF >bignum -1 /f ] unit-test
-{ 0x1.0000,0000,0000,2p56 } [ 0x100,0000,0000,0018 >bignum 1 /f ] unit-test
-{ 0x1.0000,0000,0000,2p56 } [ -0x100,0000,0000,0018 >bignum -1 /f ] unit-test
-{ 0x1.0000,0000,0000,2p56 } [ 0x100,0000,0000,0019 >bignum 1 /f ] unit-test
-{ 0x1.0000,0000,0000,2p56 } [ -0x100,0000,0000,0019 >bignum -1 /f ] unit-test
-{ 0x1.0000,0000,0000,2p120 } [ 0x100,0000,0000,0018,0000,0000,0000,0001 >bignum 1 /f ] unit-test
-{ 0x1.0000,0000,0000,2p120 } [ -0x100,0000,0000,0018,0000,0000,0000,0001 >bignum -1 /f ] unit-test
+{ 0x1.0000,0000,0000,1p56 } [ 0x100,0000,0000,0017 >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,1p56 } [ -0x100,0000,0000,0017 >bignum -1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,1p120 } [ 0x100,0000,0000,0017,FFFF,FFFF,FFFF,FFFF >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,1p120 } [ -0x100,0000,0000,0017,FFFF,FFFF,FFFF,FFFF >bignum -1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,2p56 } [ 0x100,0000,0000,0018 >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,2p56 } [ -0x100,0000,0000,0018 >bignum -1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,2p56 } [ 0x100,0000,0000,0019 >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,2p56 } [ -0x100,0000,0000,0019 >bignum -1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,2p120 } [ 0x100,0000,0000,0018,0000,0000,0000,0001 >bignum 1 /f ] floating-point-unit-test
+{ 0x1.0000,0000,0000,2p120 } [ -0x100,0000,0000,0018,0000,0000,0000,0001 >bignum -1 /f ] floating-point-unit-test
 
 { 17 } [ 17 >bignum 5 max ] unit-test
 { 5 } [ 17 >bignum 5 min ] unit-test
@@ -321,28 +321,28 @@ IN: math.integers.tests
 { 12 } [ 3 50600563326827654588123836679729326762389162441035529589225339506857584891998836722990095925359281123796769466079202977847452184346448369216753349985184627480379356069141590341116726935523304085309941919618186267140501870856173174654525838912289889085202514128089692388083353653807625633046581877161501565826926935273373696 /f double>bits ] unit-test
 { 123 } [ 123 202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494784 /f double>bits ] unit-test
 { 1234 } [ 617 101201126653655309176247673359458653524778324882071059178450679013715169783997673445980191850718562247593538932158405955694904368692896738433506699970369254960758712138283180682233453871046608170619883839236372534281003741712346349309051677824579778170405028256179384776166707307615251266093163754323003131653853870546747392 /f double>bits ] unit-test
-{ 1/0. } [ 2048 2^ 1 /f ] unit-test
-{ -1/0. } [ 2048 2^ -1 /f ] unit-test
-{ -1/0. } [ 2048 2^ neg 1 /f ] unit-test
-{ 1/0. } [ 2048 2^ neg -1 /f ] unit-test
+{ 1/0. } [ 2048 2^ 1 /f ] floating-point-unit-test
+{ -1/0. } [ 2048 2^ -1 /f ] floating-point-unit-test
+{ -1/0. } [ 2048 2^ neg 1 /f ] floating-point-unit-test
+{ 1/0. } [ 2048 2^ neg -1 /f ] floating-point-unit-test
 
 ! bignum/f had a bug for results in ]0x1.0p-1022,0x0.4p-1022]
 ! these are the first subnormals...
-{ 0x0.cp-1022 } [ 12 1026 2^ /f ] unit-test
-{ 0x0.8p-1022 } [ 8 1026 2^ /f ] unit-test
-{ 0x0.6p-1022 } [ 6 1026 2^ /f ] unit-test
-{ 0x0.4p-1022 } [ 4 1026 2^ /f ] unit-test
+{ 0x0.cp-1022 } [ 12 1026 2^ /f ] floating-point-unit-test
+{ 0x0.8p-1022 } [ 8 1026 2^ /f ] floating-point-unit-test
+{ 0x0.6p-1022 } [ 6 1026 2^ /f ] floating-point-unit-test
+{ 0x0.4p-1022 } [ 4 1026 2^ /f ] floating-point-unit-test
 
 ! bignum/f didn't round subnormals
 ! biggest subnormal to smallest normal rounding
-{ 0x1.0p-1022 } [ 0xfffffffffffffffffffffffff 1122 2^ /f ] unit-test
+{ 0x1.0p-1022 } [ 0xfffffffffffffffffffffffff 1122 2^ /f ] floating-point-unit-test
 ! almost half less than smallest subnormal to smallest subnormal rounding
-{ 0x1.0p-1074 } [ 0x8000000000000000000000001 1122 52 + 2^ /f ] unit-test
+{ 0x1.0p-1074 } [ 0x8000000000000000000000001 1122 52 + 2^ /f ] floating-point-unit-test
 ! half less than smallest subnormal to 0
-{ 0.0 } [ 0x8000000000000000000000000 1122 52 + 2^ /f ] unit-test
+{ 0.0 } [ 0x8000000000000000000000000 1122 52 + 2^ /f ] floating-point-unit-test
 
 ! rounding triggering special case in post-scale
-{ 1.0 } [ 300 2^ 1 - 300 2^ /f ] unit-test
+{ 1.0 } [ 300 2^ 1 - 300 2^ /f ] floating-point-unit-test
 
 ! #799: bignum shift counts must not wrap or reverse direction.
 { 0 } [ 12 200 2^ 1 - neg shift ] unit-test

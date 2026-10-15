@@ -58,9 +58,9 @@ unit-test
 { 7 } [ -13 10 rem ] unit-test
 { 0 } [ 37 37 rem ] unit-test
 
-{ -1 } [ -12.55 sgn ] unit-test
+{ -1 } [ -12.55 sgn ] floating-point-unit-test
 { 1 } [ 100000000000000000000000000000000 sgn ] unit-test
-{ 0 } [ 0.0 sgn ] unit-test
+{ 0 } [ 0.0 sgn ] floating-point-unit-test
 
 { 1/2 } [ 1/2 1 mod ] unit-test
 { 1/3 } [ 10/3 3 mod ] unit-test
@@ -84,8 +84,8 @@ unit-test
 { -1/2 } [ 1/2 1 - ] unit-test
 { 3/2 } [ 1/2 1 + ] unit-test
 
-{ 1.0 } [ 0.5 1/2 + ] unit-test
-{ 1.0 } [ 1/2 0.5 + ] unit-test
+{ 1.0 } [ 0.5 1/2 + ] floating-point-unit-test
+{ 1.0 } [ 1/2 0.5 + ] floating-point-unit-test
 
 { 1/134217728 } [ -1 -134217728 >fixnum / ] unit-test
 { 134217728 } [ -134217728 >fixnum -1 / ] unit-test

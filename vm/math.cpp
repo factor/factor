@@ -1,9 +1,26 @@
 #include "master.hpp"
+#include "mips-soft-float.hpp"
 #include <sstream>
 #include <iomanip>
 #include <stdexcept>
 
+#if defined(FACTOR_M68K) && !defined(FACTOR_INTEGER_ONLY)
+#include "m68k-float.hpp"
+#endif
+
 namespace factor {
+
+#if defined(FACTOR_M68K) && !defined(FACTOR_INTEGER_ONLY)
+// Optimizing code calls these without entering the VM or allocating. Compute
+// the hardware operation first so FPSR and enabled traps retain native behavior.
+VM_C_API double m68k_float_multiply(double x, double y) {
+  return m68k_float::correct_underflow(x * y, x, y, false);
+}
+
+VM_C_API double m68k_float_divide(double x, double y) {
+  return m68k_float::correct_underflow(x / y, x, y, true);
+}
+#endif
 
 void factor_vm::primitive_bignum_to_fixnum() {
   ctx->replace(tag_fixnum(bignum_to_fixnum(untag<bignum>(ctx->peek()))));
@@ -14,7 +31,11 @@ void factor_vm::primitive_bignum_to_fixnum_strict() {
 }
 
 void factor_vm::primitive_float_to_fixnum() {
+#if defined(FACTOR_INTEGER_ONLY)
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+#else
   ctx->replace(tag_fixnum(float_to_fixnum(ctx->peek())));
+#endif
 }
 
 // does not allocate, even though from_signed_cell can allocate
@@ -95,7 +116,11 @@ void factor_vm::primitive_fixnum_to_bignum() {
 
 // Allocates memory
 void factor_vm::primitive_float_to_bignum() {
+#if defined(FACTOR_INTEGER_ONLY)
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+#else
   ctx->replace(tag<bignum>(float_to_bignum(ctx->peek())));
+#endif
 }
 
 #define POP_BIGNUMS(x, y)                \
@@ -212,17 +237,24 @@ void factor_vm::primitive_bignum_log2() {
 
 // Allocates memory
 void factor_vm::primitive_fixnum_to_float() {
+#if defined(FACTOR_INTEGER_ONLY)
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+#else
   ctx->replace(allot_float(fixnum_to_float(ctx->peek())));
+#endif
 }
 
 // Allocates memory
 void factor_vm::primitive_format_float() {
+#if defined(FACTOR_INTEGER_ONLY)
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+#else
   char* locale = alien_offset(ctx->pop());
   char* format = alien_offset(ctx->pop());
   fixnum precision = untag_fixnum(ctx->pop());
   fixnum width = untag_fixnum(ctx->pop());
   char* fill = alien_offset(ctx->pop());
-  double value = untag_float_check(ctx->peek());
+  vm_float value = untag_float_check(ctx->peek());
   std::ostringstream localized_stream;
   try {
     localized_stream.imbue(std::locale(locale));
@@ -254,44 +286,85 @@ void factor_vm::primitive_format_float() {
   byte_array* array = allot_byte_array(size);
   memcpy(array->data<char>(), cstr, size);
   ctx->replace(tag<byte_array>(array));
+#endif
 }
 
 #define POP_FLOATS(x, y)              \
-  double y = untag_float(ctx->pop()); \
-  double x = untag_float(ctx->peek());
-
-void factor_vm::primitive_float_eq() {
-  POP_FLOATS(x, y);
-  ctx->replace(tag_boolean(x == y));
-}
+  vm_float y = untag_float(ctx->pop()); \
+  vm_float x = untag_float(ctx->peek());
 
 // Allocates memory
 void factor_vm::primitive_float_add() {
+#if defined(FACTOR_INTEGER_ONLY)
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+#else
   POP_FLOATS(x, y);
+#if defined(FACTOR_NETBSD_N64_HARDWARE_OPERATIONS)
+  ctx->replace(allot_float(factor_mips_add(x, y)));
+#else
   ctx->replace(allot_float(x + y));
+#endif
+#endif
 }
 
 // Allocates memory
 void factor_vm::primitive_float_subtract() {
+#if defined(FACTOR_INTEGER_ONLY)
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+#else
   POP_FLOATS(x, y);
+#if defined(FACTOR_NETBSD_N64_HARDWARE_OPERATIONS)
+  ctx->replace(allot_float(factor_mips_subtract(x, y)));
+#else
   ctx->replace(allot_float(x - y));
+#endif
+#endif
 }
 
 // Allocates memory
 void factor_vm::primitive_float_multiply() {
+#if defined(FACTOR_INTEGER_ONLY)
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+#else
   POP_FLOATS(x, y);
-  ctx->replace(allot_float(x * y));
+#if defined(FACTOR_NETBSD_N64_HARDWARE_OPERATIONS)
+  vm_float result = factor_mips_multiply(x, y);
+#else
+  vm_float result = x * y;
+#endif
+#if defined(FACTOR_M68K)
+  result = m68k_float::correct_underflow(result, x, y, false);
+#endif
+  ctx->replace(allot_float(result));
+#endif
 }
 
 // Allocates memory
 void factor_vm::primitive_float_divfloat() {
+#if defined(FACTOR_INTEGER_ONLY)
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+#else
   POP_FLOATS(x, y);
-  ctx->replace(allot_float(x / y));
+#if defined(FACTOR_NETBSD_N64_HARDWARE_OPERATIONS)
+  vm_float result = factor_mips_divide(x, y);
+#else
+  vm_float result = x / y;
+#endif
+#if defined(FACTOR_M68K)
+  result = m68k_float::correct_underflow(result, x, y, true);
+#endif
+  ctx->replace(allot_float(result));
+#endif
 }
 
-enum class float_comparison { less, lesseq, greater, greatereq };
+enum class float_comparison { equal, less, lesseq, greater, greatereq };
 
 static bool compare_float(factor_vm* vm, float_comparison op, bool ordered) {
+#if defined(FACTOR_INTEGER_ONLY)
+  (void)op; (void)ordered;
+  vm->general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+  return false;
+#else
   uint64_t y_bits, x_bits;
   memcpy(&y_bits, &untag<boxed_float>(vm->ctx->pop())->n, sizeof(y_bits));
   memcpy(&x_bits, &untag<boxed_float>(vm->ctx->peek())->n, sizeof(x_bits));
@@ -304,20 +377,43 @@ static bool compare_float(factor_vm* vm, float_comparison op, bool ordered) {
         (y_nan && !(y_bits & 0x0008000000000000ULL))) {
       // Volatile arithmetic raises invalid using the platform's FP control
       // state. A quiet comparison must only do this for signaling NaNs.
-      volatile double snan = bits_double(0x7ff0000000000001ULL);
-      volatile double result = snan + snan;
+#if defined(FACTOR_NETBSD_N64_HARDWARE_OPERATIONS)
+      factor_mips_raise_invalid();
+#elif defined(__vax__)
+      software_fp_raise_flags(fp::invalid);
+#else
+      // Invalid division does not depend on the architecture's NaN encoding.
+      volatile double zero = 0.0;
+      volatile double result = zero / zero;
       (void)result;
+#endif
     }
     return false;
   }
-  double x = bits_double(x_bits), y = bits_double(y_bits);
+  vm_float x = vm_float_from_bits(x_bits), y = vm_float_from_bits(y_bits);
+#if defined(FACTOR_NETBSD_N64_HARDWARE_OPERATIONS)
   switch (op) {
+    case float_comparison::equal: return factor_mips_equal(x, y);
+    case float_comparison::less: return factor_mips_less(x, y);
+    case float_comparison::lesseq: return factor_mips_lesseq(x, y);
+    case float_comparison::greater: return factor_mips_less(y, x);
+    case float_comparison::greatereq: return factor_mips_lesseq(y, x);
+  }
+#else
+  switch (op) {
+    case float_comparison::equal: return x == y;
     case float_comparison::less: return x < y;
     case float_comparison::lesseq: return x <= y;
     case float_comparison::greater: return x > y;
     case float_comparison::greatereq: return x >= y;
   }
+#endif
   return false;
+#endif
+}
+
+void factor_vm::primitive_float_eq() {
+  ctx->replace(tag_boolean(compare_float(this, float_comparison::equal, false)));
 }
 
 #define FLOAT_COMPARISON(name, op, ordered) \
@@ -451,11 +547,46 @@ VM_C_API cell from_unsigned_4(uint32_t n, factor_vm* parent) {
 
 // Cannot allocate
 float factor_vm::to_float(cell value) {
+#if defined(FACTOR_INTEGER_ONLY)
+  (void)value;
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+  return 0;
+#elif defined(FACTOR_INVERSE_NAN_ENCODING)
+  uint64_t bits;
+  memcpy(&bits, &untag_check<boxed_float>(value)->n, sizeof(bits));
+  return bits_float(inverse_native_float_bits(narrow_float_bits(bits)));
+#else
+#if defined(__vax__)
+  vm_float x = untag_float_check(value);
+  float native = 0.0f;
+  vax_float_conversion status = ieee_to_vax_f(x.float_bits(), &native);
+  if (status != vax_float_conversion::exact && status != vax_float_conversion::rounded)
+    general_error(ERROR_FFI, false_object, false_object);
+  return native;
+#else
   return (float)untag_float_check(value);
+#endif
+#endif
 }
 
 // Cannot allocate
-double factor_vm::to_double(cell value) { return untag_float_check(value); }
+double factor_vm::to_double(cell value) {
+#if defined(FACTOR_INTEGER_ONLY)
+  (void)value;
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+  return 0;
+#else
+#if defined(__vax__)
+  double native = 0.0;
+  vax_float_conversion status = ieee_to_vax_d(untag_float_check(value).bits(), &native);
+  if (status != vax_float_conversion::exact && status != vax_float_conversion::rounded)
+    general_error(ERROR_FFI, false_object, false_object);
+  return native;
+#else
+  return untag_float_check(value);
+#endif
+#endif
+}
 
 // The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
 // overflow, they call these functions.
@@ -491,4 +622,11 @@ VM_C_API void overflow_fixnum_multiply(fixnum x, fixnum y, factor_vm* parent) {
   parent->overflow_fixnum_multiply(x, y);
 }
 
+void factor_vm::primitive_floating_point_supported() {
+#if defined(FACTOR_INTEGER_ONLY)
+  ctx->push(false_object);
+#else
+  ctx->push(tag_boolean(true));
+#endif
+}
 }

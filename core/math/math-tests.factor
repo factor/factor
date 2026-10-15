@@ -1,4 +1,4 @@
-USING: kernel layouts make math math.private tools.test ;
+USING: compiler.test.literal-metadata kernel layouts make math math.private tools.test ;
 IN: math.tests
 
 { } [ 5 [ ] times ] unit-test
@@ -26,46 +26,46 @@ IN: math.tests
 { f } [ 0 <fp-nan> fp-nan? ] unit-test
 { t } [ 0 <fp-nan> fp-infinity? ] unit-test
 
-{ t } [  0.0 neg -0.0 fp-bitwise= ] unit-test
-{ t } [ -0.0 neg  0.0 fp-bitwise= ] unit-test
+{ t } [  0.0 neg -0.0 fp-bitwise= ] floating-point-unit-test
+{ t } [ -0.0 neg  0.0 fp-bitwise= ] floating-point-unit-test
 
-{ 0.0 } [ -0.0 next-float ] unit-test
-{ t } [ 1.0 dup next-float < ] unit-test
-{ t } [ -1.0 dup next-float < ] unit-test
+{ 0.0 } [ -0.0 next-float ] literal-metadata-unit-test
+{ t } [ 1.0 dup next-float < ] floating-point-unit-test
+{ t } [ -1.0 dup next-float < ] floating-point-unit-test
 
-{ -0.0 } [ 0.0 prev-float ] unit-test
-{ t } [ 1.0 dup prev-float > ] unit-test
-{ t } [ -1.0 dup prev-float > ] unit-test
+{ -0.0 } [ 0.0 prev-float ] literal-metadata-unit-test
+{ t } [ 1.0 dup prev-float > ] floating-point-unit-test
+{ t } [ -1.0 dup prev-float > ] floating-point-unit-test
 
-{ f } [ 0/0.  0/0. = ] unit-test
-{ f } [ 0/0.  1.0  = ] unit-test
-{ f } [ 0/0.  1/0. = ] unit-test
-{ f } [ 0/0. -1/0. = ] unit-test
+{ f } [ 0/0.  0/0. = ] floating-point-unit-test
+{ f } [ 0/0.  1.0  = ] floating-point-unit-test
+{ f } [ 0/0.  1/0. = ] floating-point-unit-test
+{ f } [ 0/0. -1/0. = ] floating-point-unit-test
 
-{ f } [  0/0. 0/0. = ] unit-test
-{ f } [  1.0  0/0. = ] unit-test
-{ f } [ -1/0. 0/0. = ] unit-test
-{ f } [  1/0. 0/0. = ] unit-test
+{ f } [  0/0. 0/0. = ] floating-point-unit-test
+{ f } [  1.0  0/0. = ] floating-point-unit-test
+{ f } [ -1/0. 0/0. = ] floating-point-unit-test
+{ f } [  1/0. 0/0. = ] floating-point-unit-test
 
-{ f } [ 0/0.  0/0. < ] unit-test
-{ f } [ 0/0.  1.0  < ] unit-test
-{ f } [ 0/0.  1/0. < ] unit-test
-{ f } [ 0/0. -1/0. < ] unit-test
+{ f } [ 0/0.  0/0. < ] floating-point-unit-test
+{ f } [ 0/0.  1.0  < ] floating-point-unit-test
+{ f } [ 0/0.  1/0. < ] floating-point-unit-test
+{ f } [ 0/0. -1/0. < ] floating-point-unit-test
 
-{ f } [ 0/0.  0/0. <= ] unit-test
-{ f } [ 0/0.  1.0  <= ] unit-test
-{ f } [ 0/0.  1/0. <= ] unit-test
-{ f } [ 0/0. -1/0. <= ] unit-test
+{ f } [ 0/0.  0/0. <= ] floating-point-unit-test
+{ f } [ 0/0.  1.0  <= ] floating-point-unit-test
+{ f } [ 0/0.  1/0. <= ] floating-point-unit-test
+{ f } [ 0/0. -1/0. <= ] floating-point-unit-test
 
-{ f } [  0/0. 0/0. > ] unit-test
-{ f } [  1.0  0/0. > ] unit-test
-{ f } [ -1/0. 0/0. > ] unit-test
-{ f } [  1/0. 0/0. > ] unit-test
+{ f } [  0/0. 0/0. > ] floating-point-unit-test
+{ f } [  1.0  0/0. > ] floating-point-unit-test
+{ f } [ -1/0. 0/0. > ] floating-point-unit-test
+{ f } [  1/0. 0/0. > ] floating-point-unit-test
 
-{ f } [  0/0. 0/0. >= ] unit-test
-{ f } [  1.0  0/0. >= ] unit-test
-{ f } [ -1/0. 0/0. >= ] unit-test
-{ f } [  1/0. 0/0. >= ] unit-test
+{ f } [  0/0. 0/0. >= ] floating-point-unit-test
+{ f } [  1.0  0/0. >= ] floating-point-unit-test
+{ f } [ -1/0. 0/0. >= ] floating-point-unit-test
+{ f } [  1/0. 0/0. >= ] floating-point-unit-test
 
 { f } [ 0 neg? ] unit-test
 { f } [ 1/2 neg? ] unit-test

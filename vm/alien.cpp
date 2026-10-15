@@ -93,16 +93,108 @@ template <typename T> static void write_unaligned(void* pointer, T value) {
   memcpy(pointer, &value, sizeof(value));
 }
 
+// Integer-only memory access copies representations without native FP values.
+// VAX MOVF/MOVD fault on reserved operands and normalize dirty zeros. Read
+// foreign encodings as integers so the explicit F/D bridge controls both.
+template <typename T, typename Boxer>
+static cell read_alien_value(factor_vm* parent, const void* pointer,
+                             Boxer boxer) {
+  (void)parent;
+  (void)boxer;
+#if defined(FACTOR_INTEGER_ONLY)
+  if constexpr (std::is_same<T, float>::value) {
+    uint32_t bits = read_unaligned<uint32_t>(pointer);
+#if defined(__vax__)
+    uint32_t ieee = 0;
+    if (vax_f_to_ieee(&bits, ieee) == vax_float_conversion::reserved_operand)
+      parent->general_error(ERROR_FFI, false_object, false_object);
+    bits = ieee;
+#endif
+    return parent->allot_float_bits(widen_ieee_bits(bits));
+  } else if constexpr (std::is_same<T, double>::value) {
+    uint64_t bits = read_unaligned<uint64_t>(pointer);
+#if defined(__vax__)
+    uint64_t ieee = 0;
+    if (vax_d_to_ieee(&bits, ieee) == vax_float_conversion::reserved_operand)
+      parent->general_error(ERROR_FFI, false_object, false_object);
+    bits = ieee;
+#endif
+    return parent->allot_float_bits(bits);
+  } else
+#elif defined(__vax__)
+  if constexpr (std::is_same<T, float>::value) {
+    uint32_t native = read_unaligned<uint32_t>(pointer), bits = 0;
+    if (vax_f_to_ieee(&native, bits) == vax_float_conversion::reserved_operand)
+      parent->general_error(ERROR_FFI, false_object, false_object);
+    return parent->allot_float(vm_float::from_float_bits(bits));
+  } else if constexpr (std::is_same<T, double>::value) {
+    uint64_t native = read_unaligned<uint64_t>(pointer), bits = 0;
+    if (vax_d_to_ieee(&native, bits) == vax_float_conversion::reserved_operand)
+      parent->general_error(ERROR_FFI, false_object, false_object);
+    return parent->allot_float_bits(bits);
+  } else
+#endif
+    return boxer(read_unaligned<T>(pointer));
+}
+
+template <typename T, typename Unboxer>
+static void write_alien_value(factor_vm* parent, void* pointer, cell value,
+                              Unboxer unboxer) {
+  (void)parent;
+  (void)unboxer;
+#if defined(FACTOR_INTEGER_ONLY)
+  if constexpr (std::is_same<T, float>::value) {
+    uint32_t bits = narrow_ieee_bits(vm_float_bits(parent->untag_float_check(value)));
+#if defined(__vax__)
+    uint32_t native = 0;
+    auto status = ieee_to_vax_f(bits, &native);
+    if (status != vax_float_conversion::exact && status != vax_float_conversion::rounded)
+      parent->general_error(ERROR_FFI, false_object, false_object);
+    bits = native;
+#endif
+    write_unaligned(pointer, bits);
+  } else if constexpr (std::is_same<T, double>::value) {
+    uint64_t bits = vm_float_bits(parent->untag_float_check(value));
+#if defined(__vax__)
+    uint64_t native = 0;
+    auto status = ieee_to_vax_d(bits, &native);
+    if (status != vax_float_conversion::exact && status != vax_float_conversion::rounded)
+      parent->general_error(ERROR_FFI, false_object, false_object);
+    bits = native;
+#endif
+    write_unaligned(pointer, bits);
+  } else
+#elif defined(__vax__)
+  if constexpr (std::is_same<T, float>::value) {
+    uint32_t native = 0;
+    vax_float_conversion status =
+        ieee_to_vax_f(parent->untag_float_check(value).float_bits(), &native);
+    if (status != vax_float_conversion::exact && status != vax_float_conversion::rounded)
+      parent->general_error(ERROR_FFI, false_object, false_object);
+    write_unaligned(pointer, native);
+  } else if constexpr (std::is_same<T, double>::value) {
+    uint64_t native = 0;
+    vax_float_conversion status =
+        ieee_to_vax_d(parent->untag_float_check(value).bits(), &native);
+    if (status != vax_float_conversion::exact && status != vax_float_conversion::rounded)
+      parent->general_error(ERROR_FFI, false_object, false_object);
+    write_unaligned(pointer, native);
+  } else
+#endif
+    write_unaligned(pointer, (T)unboxer(value));
+}
+
 // define words to read/write values at an alien address
 #define DEFINE_ALIEN_ACCESSOR(name, type, from, to)                     \
   VM_C_API void primitive_alien_##name(factor_vm * parent) {            \
-    type value = read_unaligned<type>(parent->alien_pointer());         \
-    parent->ctx->push(parent->from(value));                             \
+    void* pointer = parent->alien_pointer();                           \
+    parent->ctx->push(read_alien_value<type>(parent, pointer,            \
+        [parent](type value) { return parent->from(value); }));          \
   }                                                                     \
   VM_C_API void primitive_set_alien_##name(factor_vm * parent) {        \
     void* pointer = parent->alien_pointer();                            \
-    type value = (type)parent->to(parent->ctx->pop());                  \
-    write_unaligned(pointer, value);                                    \
+    write_alien_value<type>(parent, pointer, parent->ctx->pop(),         \
+        [parent](cell value) { return parent->to(value); });            \
   }
 
 EACH_ALIEN_PRIMITIVE(DEFINE_ALIEN_ACCESSOR)

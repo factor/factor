@@ -7,6 +7,14 @@ BUILTIN: fixnum ;
 BUILTIN: bignum ;
 BUILTIN: float ;
 
+! Runtime VM capability; never fold the host producer's value into an image.
+PRIMITIVE: floating-point-supported? ( -- ? )
+
+ERROR: floating-point-unsupported operation ;
+
+: require-floating-point ( operation -- )
+    floating-point-supported? [ drop ] [ floating-point-unsupported ] if ;
+
 PRIMITIVE: bits>double ( n -- x )
 PRIMITIVE: bits>float ( n -- x )
 PRIMITIVE: double>bits ( x -- n )

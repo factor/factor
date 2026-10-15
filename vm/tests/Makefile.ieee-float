@@ -1,0 +1,25 @@
+# Standalone Factor-owned software IEEE checks.
+CXX ?= c++
+CC ?= cc
+BUILD_DIR ?= build-ieee-float
+CXXFLAGS ?= -O2
+CFLAGS ?= -O2
+RUNNER ?=
+ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../..
+TESTS := ieee_float ieee_float_exact ieee_float_nan ieee_binary64 ieee_decimal ieee_integer ieee_bits software_fp_state
+TESTS += $(foreach name,vax_float vax_g_float,$(if $(wildcard $(ROOT)/vm/tests/$(name).cpp),$(name)))
+PROGRAMS := $(addprefix $(BUILD_DIR)/,$(TESTS))
+HEADERS := $(wildcard $(ROOT)/vm/ieee*.hpp) $(ROOT)/vm/software_fp_state.hpp $(wildcard $(ROOT)/vm/vax_float.hpp)
+.PHONY: check
+check: $(PROGRAMS) $(BUILD_DIR)/ieee_float_c
+	@set -e; for test in $(PROGRAMS) $(BUILD_DIR)/ieee_float_c; do $(RUNNER) $$test; done
+$(BUILD_DIR):
+	mkdir -p $@
+$(BUILD_DIR)/%: $(ROOT)/vm/tests/%.cpp $(HEADERS) | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -std=c++17 -pthread -o $@ $<
+$(BUILD_DIR)/ieee_float.o: $(ROOT)/vm/ieee_float.cpp $(ROOT)/vm/ieee_float.h $(ROOT)/vm/ieee_float.hpp | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -std=c++17 -fno-exceptions -fno-rtti -c -o $@ $<
+$(BUILD_DIR)/ieee_float_c.o: $(ROOT)/vm/tests/ieee_float_c.c $(ROOT)/vm/ieee_float.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -std=c11 -c -o $@ $<
+$(BUILD_DIR)/ieee_float_c: $(BUILD_DIR)/ieee_float_c.o $(BUILD_DIR)/ieee_float.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
