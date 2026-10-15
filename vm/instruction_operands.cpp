@@ -82,7 +82,7 @@ fixnum instruction_operand::load_value(cell relative_to) {
       return relative_to - 4 + riscv_branch_displacement(load_unaligned<uint32_t>(pointer - 4));
     case RC_NATIVE_0:
     case RC_NATIVE_1:
-      return load_native_operand(rel.klass(), pointer, relative_to);
+      return cpu::load_native_operand(rel.klass(), pointer, relative_to);
     case RC_ABSOLUTE_RISCV_I:
 #if defined(FACTOR_LOONGARCH64)
       return loongarch_signed(load_unaligned<uint32_t>(pointer - 4) >> 10, 12);
@@ -185,7 +185,7 @@ void instruction_operand::store_value(fixnum absolute_value) {
       break;
     case RC_NATIVE_0:
     case RC_NATIVE_1:
-      store_native_operand(rel.klass(), pointer, absolute_value);
+      cpu::store_native_operand(rel.klass(), pointer, absolute_value);
       break;
     case RC_ABSOLUTE_RISCV_I:
       FACTOR_ASSERT(absolute_value >= -2048 && absolute_value <= 2047);
