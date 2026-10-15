@@ -1,0 +1,41 @@
+.text
+.p2align 1
+.global s390x_test_native_call
+.type s390x_test_native_call,@function
+s390x_test_native_call:
+  stmg %r6,%r15,48(%r15)
+  lgr %r0,%r15
+  aghi %r15,-176
+  stg %r0,0(%r15)
+  lay %r12,160(%r15)
+  stg %r0,0(%r12)
+  lgr %r8,%r2
+  lgr %r1,%r3
+  lgr %r2,%r4
+  lgr %r3,%r5
+  brasl %r14,trampoline
+  aghi %r15,176
+  lmg %r6,%r15,48(%r15)
+  br %r14
+.size s390x_test_native_call,.-s390x_test_native_call
+.global s390x_test_generated_invoke
+.type s390x_test_generated_invoke,@function
+s390x_test_generated_invoke:
+  stmg %r6,%r15,48(%r15)
+  lgr %r0,%r15
+  aghi %r15,-176
+  stg %r0,0(%r15)
+  lay %r12,160(%r15)
+  stg %r0,0(%r12)
+  lgr %r8,%r2
+  lgr %r1,%r3
+  lgr %r2,%r4
+  lgr %r3,%r5
+  larl %r11,trampoline
+  larl %r10,trampoline2
+  basr %r14,%r1
+  aghi %r15,176
+  lmg %r6,%r15,48(%r15)
+  br %r14
+.size s390x_test_generated_invoke,.-s390x_test_generated_invoke
+.section .note.GNU-stack,"",@progbits
