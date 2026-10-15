@@ -1,5 +1,6 @@
 #include "master.hpp"
 #include "native_relocations.hpp"
+#include "riscv.hpp"
 
 namespace factor {
 

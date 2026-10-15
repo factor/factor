@@ -184,6 +184,7 @@ ifdef CONFIG
 		$(BUILD_DIR)/zstd.o
 
 	MASTER_HEADERS := $(PLAF_MASTER_HEADERS) \
+		$(wildcard vm/*.hpp) \
 		vm/assert.hpp \
 		vm/debug.hpp \
 		vm/layouts.hpp \
