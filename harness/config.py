@@ -62,12 +62,29 @@ def validate(profile):
         raise ValueError('transport must be local, ssh, or serial')
     if not (ROOT / 'vm' / ('Config.' + profile['build']['config'])).is_file():
         raise ValueError('missing VM build configuration')
-    if profile.get('stall_seconds', 0) < 0:
+    if not isinstance(profile.get('stall_seconds', 0), (int, float)) or profile.get('stall_seconds', 0) < 0:
         raise ValueError('stall_seconds must be nonnegative; zero disables it')
     for section in ('build', 'execution'):
         for key, value in profile.get(section, {}).get('env', {}).items():
             if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', key) or not isinstance(value, str):
                 raise ValueError(f'invalid {section} environment entry: {key}')
+    validate_guest(profile.get('guest'))
     for arg in profile.get('heap', []):
         if not re.fullmatch(r'-(young|aging|tenured)=\d+', arg):
             raise ValueError(f'invalid heap argument: {arg}')
+
+
+def validate_guest(guest):
+    if not guest:
+        return
+    if guest.get('kind', 'qemu') not in ('qemu', 'command'):
+        raise ValueError('guest kind must be qemu or command')
+    if not isinstance(guest.get('argv'), list) or not guest['argv'] or not all(isinstance(arg, str) for arg in guest['argv']):
+        raise ValueError('guest argv must be a nonempty list of strings')
+    for drive in guest.get('drives', []) + guest.get('scratch_drives', []):
+        options = drive.get('options', '')
+        if any(part.split('=')[0] in ('file', 'format') or part.startswith('file.') for part in options.split(',')):
+            raise ValueError('drive options cannot override the private file or format')
+        if 'file' in drive and drive.get('format') not in ('raw', 'qcow2'):
+            raise ValueError('backing drive format must be raw or qcow2')
+    validate_guest(guest.get('outer', {}).get('guest'))

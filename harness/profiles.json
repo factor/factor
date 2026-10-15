@@ -58,7 +58,11 @@
           "-netdev",
           "user,id=n,hostfwd=tcp:127.0.0.1:34100-:22",
           "-device",
-          "e1000,netdev=n"
+          "e1000,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
         ],
         "drives": [
           {
@@ -73,7 +77,8 @@
           }
         ],
         "shutdown": "sync; /sbin/shutdown -p now"
-      }
+      },
+      "work_root": "/root"
     },
     "freebsd-arm-32": {
       "build": {
@@ -138,7 +143,8 @@
           }
         ],
         "shutdown": "sync; /sbin/shutdown -p now"
-      }
+      },
+      "work_root": "/root"
     },
     "freebsd-arm-64": {
       "build": {
@@ -203,7 +209,8 @@
           }
         ],
         "shutdown": "sync; /sbin/shutdown -p now"
-      }
+      },
+      "work_root": "/root"
     },
     "freebsd-ppc-32": {
       "build": {
@@ -273,8 +280,36 @@
             "options": "if=ide"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
-      }
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "console_char_delay": 0.12,
+        "console_steps": [
+          {
+            "expect": "boot immediately",
+            "send": " \r"
+          },
+          {
+            "expect": "OK",
+            "send": "set hint.ata.0.mode=PIO4\r"
+          },
+          {
+            "expect": "OK",
+            "send": "set hint.ata.1.mode=PIO4\r"
+          },
+          {
+            "expect": "OK",
+            "send": "set vfs.root.mountfrom=ufs:/dev/ada0s3\r"
+          },
+          {
+            "expect": "OK",
+            "send": "boot\r"
+          },
+          {
+            "expect": "Starting sshd.",
+            "send": ""
+          }
+        ]
+      },
+      "work_root": "/root"
     },
     "freebsd-ppc-64-be": {
       "build": {
@@ -339,8 +374,29 @@
             "options": "if=virtio"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
-      }
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "uname -a; sysctl hw.physmem; c++ --version; /root/owned-stock-gnu-make-freebsd-ppc-64-be-4631a09187-v7-v1/install/bin/make --version; df -k /root",
+        "console_char_delay": 0.12,
+        "console_steps": [
+          {
+            "expect": "boot immediately",
+            "send": " \r"
+          },
+          {
+            "expect": "OK",
+            "send": "set vfs.root.mountfrom=ufs:/dev/vtbd0s2a\r"
+          },
+          {
+            "expect": "OK",
+            "send": "boot\r"
+          },
+          {
+            "expect": "Starting sshd.",
+            "send": ""
+          }
+        ]
+      },
+      "work_root": "/root"
     },
     "freebsd-ppc-64-le": {
       "build": {
@@ -405,12 +461,70 @@
             "options": "if=virtio"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
-      }
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "uname -a; sysctl hw.physmem; c++ --version; /root/owned-stock-gnu-make-freebsd-ppc-64-le-4631a09187-v7-v1/install/bin/make --version; df -k /root",
+        "console_char_delay": 0.12,
+        "console_steps": [
+          {
+            "expect": "boot immediately",
+            "send": " \r"
+          },
+          {
+            "expect": "OK",
+            "send": "set vfs.root.mountfrom=ufs:/dev/vtbd0p2\r"
+          },
+          {
+            "expect": "OK",
+            "send": "boot -s\r"
+          },
+          {
+            "expect": "Enter full pathname",
+            "send": "\r"
+          },
+          {
+            "expect": "# ",
+            "send": "/sbin/fsck -y /dev/vtbd0p2\r"
+          },
+          {
+            "expect": "# ",
+            "send": "/sbin/reboot\r"
+          },
+          {
+            "expect": "boot immediately",
+            "send": " \r"
+          },
+          {
+            "expect": "OK",
+            "send": "set vfs.root.mountfrom=ufs:/dev/vtbd0p2\r"
+          },
+          {
+            "expect": "OK",
+            "send": "boot\r"
+          },
+          {
+            "expect": "Starting sshd.",
+            "send": ""
+          },
+          {
+            "expect": "login:",
+            "send": "root\r"
+          },
+          {
+            "expect": "# ",
+            "send": "ifconfig vtnet0 inet 10.0.2.15 netmask 255.255.255.0; route add default 10.0.2.2; echo OWNED_USERNET_READY\r"
+          },
+          {
+            "expect": "OWNED_USERNET_READY",
+            "send": "exit\r"
+          }
+        ]
+      },
+      "work_root": "/root"
     },
     "freebsd-riscv-64": {
       "build": {
-        "config": "freebsd.riscv.64"
+        "config": "freebsd.riscv.64",
+        "make": "/mnt/fp-rv-source51-space-v1/gnu-make-source51/install/bin/make"
       },
       "seed": "unix-riscv.64",
       "transport": {
@@ -470,8 +584,15 @@
             "options": "if=none,id=root"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
-      }
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "8G",
+            "options": "if=none,id=owned_scratch"
+          }
+        ]
+      },
+      "work_root": "/mnt/fp-rv-source51-space-v1"
     },
     "freebsd-x86-32": {
       "build": {
@@ -520,7 +641,11 @@
           "-netdev",
           "user,id=n,hostfwd=tcp:127.0.0.1:34107-:22",
           "-device",
-          "virtio-net-pci,netdev=n"
+          "virtio-net-pci,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
         ],
         "drives": [
           {
@@ -530,7 +655,8 @@
           }
         ],
         "shutdown": "sync; /sbin/shutdown -p now"
-      }
+      },
+      "work_root": "/root"
     },
     "freebsd-x86-64": {
       "build": {
@@ -579,7 +705,11 @@
           "-netdev",
           "user,id=n,hostfwd=tcp:127.0.0.1:34108-:22",
           "-device",
-          "virtio-net-pci,netdev=n"
+          "virtio-net-pci,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
         ],
         "drives": [
           {
@@ -589,7 +719,8 @@
           }
         ],
         "shutdown": "sync; /sbin/shutdown -p now"
-      }
+      },
+      "work_root": "/root"
     },
     "linux-alpha-64": {
       "build": {
@@ -694,7 +825,8 @@
             "options": "if=none,id=disk0"
           }
         ]
-      }
+      },
+      "work_root": "/home"
     },
     "linux-arm-64": {
       "build": {
@@ -990,7 +1122,8 @@
             "options": "if=ide"
           }
         ]
-      }
+      },
+      "work_root": "/home"
     },
     "linux-ppc-64-be": {
       "build": {
@@ -1154,8 +1287,10 @@
             "format": "raw",
             "options": "if=none,id=seed"
           }
-        ]
-      }
+        ],
+        "shutdown": "sync; sudo -n /sbin/poweroff"
+      },
+      "work_root": "/home/factor"
     },
     "linux-s390x-64": {
       "build": {
@@ -1346,8 +1481,10 @@
             "format": "raw",
             "options": "if=virtio"
           }
-        ]
-      }
+        ],
+        "shutdown": "sync; sudo -n /sbin/poweroff"
+      },
+      "work_root": "/home/factor"
     },
     "linux-x86-64": {
       "build": {
@@ -1424,7 +1561,11 @@
           "-netdev",
           "user,id=n,hostfwd=tcp:127.0.0.1:34113-:22",
           "-device",
-          "virtio-net-pci,netdev=n"
+          "virtio-net-pci,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
         ],
         "drives": [
           {
@@ -1432,13 +1573,25 @@
             "format": "qcow2",
             "options": "if=virtio"
           }
+        ],
+        "setup": "ip link set lo up; ip addr show lo; ping -c 1 127.0.0.1; test ! -e /tmp/fp51m-v1; mkdir -m 700 /tmp/fp51m-v1; test \"$(cd /tmp/fp51m-v1 && pwd -P)\" = /tmp/fp51m-v1; test \"$(stat -c %u:%a /tmp/fp51m-v1)\" = 0:700",
+        "console_steps": [
+          {
+            "expect": "login:",
+            "send": "root\r"
+          },
+          {
+            "expect": "localhost:~#",
+            "send": "set -eu; modprobe ext4; mkdir -p /work; mount -t ext4 /dev/vda /work; mount --bind /work/alpine-usr /usr; ip link set lo up; ip link set eth0 up; udhcpc -i eth0 -q; mkdir -p /root/.ssh /etc/ssh; chmod 700 /root/.ssh; printf '%s\\n' 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID9UaKA05Op4GotVj+PrytDqtXlwR39K4b7MDPaI0W4Z sheeple@agent1' > /root/.ssh/authorized_keys; chmod 600 /root/.ssh/authorized_keys; ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''; /usr/sbin/sshd -f /dev/null -o PermitRootLogin=prohibit-password -o PasswordAuthentication=no; echo OWNED_ALPINE_MUSL_SSH_READY\r"
+          }
         ]
       },
       "heap": [
         "-young=16",
         "-aging=16",
         "-tenured=128"
-      ]
+      ],
+      "work_root": "/work"
     },
     "netbsd-alpha-64": {
       "build": {
@@ -1524,7 +1677,26 @@
           }
         ],
         "shutdown": "sync; /sbin/shutdown -h now",
-        "halt_marker": "halted."
+        "halt_marker": "halted.",
+        "setup": "if test ! -x /usr/alpha-build/alpha-tools/bin/gmake; then mount -t ffs /dev/wd1c /usr/alpha-build; fi; if ! mount | grep -q \"^/dev/wd2c on /usr/alpha-final \"; then mount -t ffs /dev/wd2c /usr/alpha-final; fi; df -k /usr/alpha-final; test -x /usr/alpha-build/alpha-tools/bin/gmake",
+        "console_steps": [
+          {
+            "expect": "root device:",
+            "send": "wd0c\n"
+          },
+          {
+            "expect": "dump device",
+            "send": "none\n"
+          },
+          {
+            "expect": "file system",
+            "send": "\n"
+          },
+          {
+            "expect": "init path",
+            "send": "\n"
+          }
+        ]
       },
       "io_prefix": [
         "/usr/bin/nice",
@@ -1533,7 +1705,8 @@
       ],
       "commands": {
         "build": "gmake CONFIG=vm/Config.netbsd.alpha.64 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
-      }
+      },
+      "work_root": "/usr/alpha-final"
     },
     "netbsd-arm-32": {
       "build": {
@@ -1593,11 +1766,26 @@
             "options": "if=virtio"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "2G",
+            "options": "if=virtio"
+          }
+        ],
+        "setup": "PATH=/usr/sbin:/sbin:/usr/bin:/bin:$PATH; export PATH; dmesg | tail -80; test \"$(disklabel ld5 | awk '/total sectors:/ {print $3}')\" = 4194304; test \"$(dd if=/dev/rld5c bs=4096 count=1 2>/dev/null | tr -d '\\000' | wc -c)\" -eq 0; newfs -I -O 2 /dev/rld5c; mkdir /fp-owned-work; mount -t ffs /dev/ld5c /fp-owned-work; df -k /fp-owned-work",
+        "console_steps": [
+          {
+            "expect": "Option 1 will be chosen",
+            "send": "\r"
+          }
+        ],
+        "resume_setup": "/sbin/mount -t ffs /dev/ld5c /fp-owned-work"
       },
       "commands": {
         "build": "gmake CONFIG=vm/Config.netbsd.arm.32 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
-      }
+      },
+      "work_root": "/fp-owned-work"
     },
     "netbsd-arm-64": {
       "build": {
@@ -1669,7 +1857,8 @@
       },
       "commands": {
         "build": "gmake CONFIG=vm/Config.netbsd.arm.64 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
-      }
+      },
+      "work_root": "/root"
     },
     "netbsd-hppa-32": {
       "build": {
@@ -1725,7 +1914,15 @@
             "options": "if=scsi"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "1024M",
+            "options": "if=scsi"
+          }
+        ],
+        "setup": "PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH; export PATH; set -eu; test -e /dev/sd1b || (cd /dev; ./MAKEDEV sd1); cat > /root/owned-scratch-swap.disklabel <<'OWNED_LABEL'\ntype: SCSI\ndisk: QEMU HARDDISK\nlabel: owned-swap\nflags:\nbytes/sector: 512\nsectors/track: 63\ntracks/cylinder: 16\nsectors/cylinder: 1008\ncylinders: 2080\ntotal sectors: 2097152\nrpm: 5400\ninterleave: 1\ntrackskew: 0\ncylinderskew: 0\nheadswitch: 0\ntrack-to-track seek: 0\n3 partitions:\n b: 2097152 0 swap 0 0 0\n c: 2097152 0 unused 0 0 0\nOWNED_LABEL\ndisklabel -R -r sd1 /root/owned-scratch-swap.disklabel; disklabel sd1; swapctl -a /dev/sd1b; swapctl -lk; sysctl hw.physmem hw.usermem; vmstat\n",
+        "resume_setup": "/sbin/swapctl -a /dev/sd1b"
       },
       "heap": [
         "-young=16",
@@ -1734,7 +1931,8 @@
       ],
       "commands": {
         "build": "/root/owned-stock-netbsd-hppa-32-source51-v1/install/bin/make CONFIG=vm/Config.netbsd.hppa.32 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
-      }
+      },
+      "work_root": "/root"
     },
     "netbsd-ppc-32": {
       "build": {
@@ -1801,7 +1999,34 @@
             "options": "if=ide"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "1G",
+            "options": "if=ide,index=1"
+          }
+        ],
+        "setup": "set -eu; PATH=/usr/sbin:/sbin:/usr/bin:/bin:/usr/pkg/bin; export PATH; test -e /dev/rwd1c || (cd /dev && ./MAKEDEV wd1); test \"$(disklabel wd1 | awk '/total sectors:/ {print $3}')\" = 2097152; test \"$(dd if=/dev/rwd1c bs=4096 count=1 2>/dev/null | tr -d '\\000' | wc -c)\" -eq 0; cat > /root/owned-v7-scratch.disklabel <<'OWNED_SWAP'\ntype: IDE\ndisk: owned-swap\nlabel: owned-v7-swap\nflags:\nbytes/sector: 512\nsectors/track: 64\ntracks/cylinder: 16\nsectors/cylinder: 1024\ncylinders: 2048\ntotal sectors: 2097152\nrpm: 5400\ninterleave: 1\ntrackskew: 0\ncylinderskew: 0\nheadswitch: 0\ntrack-to-track seek: 0\ndrivedata: 0\n3 partitions:\n b: 2096128 1024 swap\n c: 2097152 0 unused 0 0\nOWNED_SWAP\ndisklabel -R -r wd1 /root/owned-v7-scratch.disklabel; swapctl -a /dev/wd1b; swapctl -lk; test \"$(swapctl -l | awk '$1==\"/dev/wd1b\" {print $2}')\" -ge 2096128; sysctl hw.physmem; vmstat; df -k /root",
+        "console_char_delay": 0.5,
+        "console_steps": [
+          {
+            "expect": "root device:",
+            "send": "wd0a\r"
+          },
+          {
+            "expect": "dump device",
+            "send": "\r"
+          },
+          {
+            "expect": "file system",
+            "send": "\r"
+          },
+          {
+            "expect": "init path",
+            "send": "\r"
+          }
+        ],
+        "resume_setup": "/sbin/swapctl -a /dev/wd1b"
       },
       "heap": [
         "-young=4",
@@ -1810,7 +2035,8 @@
       ],
       "commands": {
         "build": "/usr/pkg/bin/gmake CONFIG=vm/Config.netbsd.ppc.32 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
-      }
+      },
+      "work_root": "/root"
     },
     "netbsd-riscv-64": {
       "build": {
@@ -1888,7 +2114,8 @@
       },
       "commands": {
         "build": "/usr/local/bin/gmake CONFIG=vm/Config.netbsd.riscv.64 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
-      }
+      },
+      "work_root": "/root"
     },
     "netbsd-sparc-32": {
       "build": {
@@ -1960,11 +2187,20 @@
             "options": "if=scsi"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "1G",
+            "options": "if=scsi"
+          }
+        ],
+        "setup": "uname -a; /sbin/sysctl hw.physmem hw.model hw.machine; test \"$(/sbin/sysctl -n hw.physmem)\" -ge 900000000; test ! -e /tmp/owned-fp-sparc32-native-controls-50-4631a09187; mkdir /tmp/owned-fp-sparc32-native-controls-50-4631a09187; printf %s 'type: SCSI\ndisk: owned-swap\nlabel: owned-fp-scratch\nflags:\nbytes/sector: 512\nsectors/track: 64\ntracks/cylinder: 16\nsectors/cylinder: 1024\ncylinders: 2048\ntotal sectors: 2097152\nrpm: 5400\ninterleave: 1\ntrackskew: 0\ncylinderskew: 0\nheadswitch: 0\ntrack-to-track seek: 0\ndrivedata: 0\n3 partitions:\n b: 2096128 1024 swap\n c: 2097152 0 unused 0 0\n' > /tmp/owned-fp-sparc32-native-controls-50-4631a09187/scratch.disklabel; test -b /dev/sd1b || (cd /dev && ./MAKEDEV sd1); /sbin/disklabel -R sd1 /tmp/owned-fp-sparc32-native-controls-50-4631a09187/scratch.disklabel; /sbin/disklabel sd1; /sbin/swapctl -a /dev/sd1b; /sbin/swapctl -l; /sbin/swapctl -s; test \"$(/sbin/swapctl -l | awk '$1==\"/dev/sd1b\" {print $2}')\" -ge 2096128",
+        "resume_setup": "/sbin/swapctl -a /dev/sd1b"
       },
       "commands": {
         "build": "/root/owned-tools-20261008/install/bin/make CONFIG=vm/Config.netbsd.sparc.32 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
-      }
+      },
+      "work_root": "/root"
     },
     "netbsd-sparc-64": {
       "build": {
@@ -2028,11 +2264,20 @@
             "options": "if=ide"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "2G",
+            "options": "if=ide,index=1"
+          }
+        ],
+        "setup": "PATH=/usr/sbin:/sbin:/usr/bin:/bin:$PATH; export PATH; set -eu; test -e /dev/rwd1c || (cd /dev; ./MAKEDEV wd1); test \"$(disklabel wd1 | awk '/total sectors:/ {print $3}')\" = 4194304; test \"$(dd if=/dev/rwd1c bs=4096 count=1 2>/dev/null | tr -d '\\000' | wc -c)\" -eq 0; newfs -I -O 2 /dev/rwd1c; mkdir /fp-owned-work; mount -t ffs /dev/wd1c /fp-owned-work; df -k /fp-owned-work",
+        "resume_setup": "/sbin/mount -t ffs /dev/wd1c /fp-owned-work"
       },
       "commands": {
         "build": "gmake CONFIG=vm/Config.netbsd.sparc.64 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
-      }
+      },
+      "work_root": "/fp-owned-work"
     },
     "netbsd-x86-32": {
       "build": {
@@ -2094,7 +2339,8 @@
       },
       "commands": {
         "build": "gmake CONFIG=vm/Config.netbsd.x86.32 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
-      }
+      },
+      "work_root": "/root"
     },
     "netbsd-x86-64": {
       "build": {
@@ -2151,7 +2397,11 @@
           "-netdev",
           "user,id=n,hostfwd=tcp:127.0.0.1:34123-:22",
           "-device",
-          "e1000,netdev=n"
+          "e1000,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
         ],
         "drives": [
           {
@@ -2164,7 +2414,8 @@
       },
       "commands": {
         "build": "/usr/pkg/bin/gmake CONFIG=vm/Config.netbsd.x86.64 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
-      }
+      },
+      "work_root": "/root"
     },
     "openbsd-alpha-64": {
       "build": {
@@ -2174,7 +2425,21 @@
       "transport": {
         "kind": "serial",
         "host": "127.0.0.1",
-        "port": 34528
+        "port": 34528,
+        "login": [
+          {
+            "expect": "P00>>>",
+            "send": "boot dka0"
+          },
+          {
+            "expect": "login:",
+            "send": "root"
+          },
+          {
+            "expect": "#",
+            "send": "stty -echo"
+          }
+        ]
       },
       "execution": {
         "env": {}
@@ -2236,15 +2501,18 @@
                 "format": "qcow2",
                 "options": "if=virtio"
               }
-            ]
+            ],
+            "shutdown": "sync; sudo -n /sbin/poweroff"
           }
-        }
+        },
+        "halt_marker": "halted"
       },
       "heap": [
         "-young=16",
         "-aging=16",
         "-tenured=64"
-      ]
+      ],
+      "work_root": "/mnt"
     },
     "openbsd-arm-32": {
       "build": {
@@ -2305,8 +2573,10 @@
             "options": "if=virtio"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
-      }
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "df -k /home; mount; mount -u -o wxallowed /home; mount; df -k /home"
+      },
+      "work_root": "/home"
     },
     "openbsd-arm-64": {
       "build": {
@@ -2370,8 +2640,10 @@
             "options": "if=virtio"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
-      }
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "df -k /home; mount; mount -u -o wxallowed /home; mount; df -k /home"
+      },
+      "work_root": "/home"
     },
     "openbsd-riscv-64": {
       "build": {
@@ -2433,8 +2705,10 @@
             "options": "if=none,id=root"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
-      }
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "df -k /home; mount; mount -u -o wxallowed /home; mount; df -k /home"
+      },
+      "work_root": "/home"
     },
     "openbsd-x86-32": {
       "build": {
@@ -2496,8 +2770,11 @@
             "options": "if=virtio"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
-      }
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "df -k /usr/local; mount; mount -u -o wxallowed /usr/local; mount; df -k /usr/local",
+        "console_char_delay": 0.12
+      },
+      "work_root": "/usr/local"
     },
     "openbsd-x86-64": {
       "build": {
@@ -2546,7 +2823,11 @@
           "-netdev",
           "user,id=n,hostfwd=tcp:127.0.0.1:34129-:22",
           "-device",
-          "virtio-net-pci,netdev=n"
+          "virtio-net-pci,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
         ],
         "drives": [
           {
@@ -2555,8 +2836,10 @@
             "options": "if=virtio"
           }
         ],
-        "shutdown": "sync; /sbin/shutdown -p now"
-      }
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "df -k /home; mount; mount -u -o wxallowed /home; mount; df -k /home"
+      },
+      "work_root": "/home"
     },
     "haiku-x86-64": {
       "build": {
@@ -2606,7 +2889,8 @@
           }
         ],
         "shutdown": "sync; shutdown -q"
-      }
+      },
+      "work_root": "/boot/home"
     }
   }
 }

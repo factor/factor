@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import socket
 import subprocess
+import sys
 import time
 
 from . import process
@@ -20,9 +21,11 @@ class Guest(AbstractContextManager):
         self.forced = False
         self.closed = None
         self.outer = None
+        self.ready = False
 
     def activity(self):
-        return process.activity(self.child.pid) if self.child else None
+        return (process.activity(self.child.pid) if self.child else None,
+                self.outer.activity() if self.outer else None)
 
     def __enter__(self):
         if not self.config:
@@ -50,12 +53,21 @@ class Guest(AbstractContextManager):
                     subprocess.run(['qemu-img', 'create', '-q', '-f', 'qcow2', '-F',
                                     drive['format'], '-b', str(backing), str(overlay)], check=True)
                 argv += ['-drive', f'file={overlay},format=qcow2,' + drive['options']]
+            for index, drive in enumerate(self.config.get('scratch_drives', [])):
+                disk = self.directory / f'scratch-{index}.qcow2'
+                if not disk.exists():
+                    subprocess.run(['qemu-img', 'create', '-q', '-f', 'qcow2', str(disk), drive['size']], check=True)
+                argv += ['-drive', f'file={disk},format=qcow2,' + drive['options']]
             if self.config.get('kind', 'qemu') == 'qemu':
                 if self.config.get('qmp', True):
                     self.qmp_path = self.directory / 'qmp.sock'
                     argv += ['-qmp', f'unix:{self.qmp_path},server=on,wait=off']
                 if self.transport.config['kind'] == 'serial':
                     argv += ['-serial', 'unix:' + self.transport.config['socket'] + ',server=on,wait=off']
+                elif self.config.get('console_steps'):
+                    self.console_path = self.directory / 'console.sock'
+                    argv += ['-chardev', f'socket,id=console,path={self.console_path},server=on,wait=off,logfile={self.directory / "console.log"}',
+                             '-serial', 'chardev:console']
                 else:
                     argv += ['-serial', 'file:' + str(self.directory / 'console.log')]
                 argv += self.config.get('display_args', ['-display', 'none'])
@@ -67,19 +79,62 @@ class Guest(AbstractContextManager):
                                {'argv': argv, 'pid': self.child.pid, 'birth': birth})
             if self.config.get('vnc_actions'):
                 vnc_actions(self.config['vnc_server'], self.config['vnc_actions'])
+            self.boot_console()
             self.wait_ready()
+            self.ready = True
+            setup_record = self.directory / 'setup.json'
+            command = self.config.get('setup')
+            if setup_record.exists():
+                command = self.config.get('resume_setup', command)
+            if command:
+                code = self.transport.run('set -eu; ' + command, self.directory / 'setup.log')
+                if code:
+                    raise RuntimeError(f'guest setup failed: {code}')
+                process.write_json(setup_record, {'command': command, 'exit_code': code})
             return self
         except BaseException:
-            self.__exit__(None, None, None)
+            self.__exit__(*sys.exc_info())
             raise
+
+    def boot_console(self):
+        cursor = 0
+        previous = None
+        last_progress = time.monotonic()
+        for step in self.config.get('console_steps', []):
+            while True:
+                if self.child.poll() is not None:
+                    raise RuntimeError('emulator exited during console setup')
+                path = self.directory / 'console.log'
+                raw = path.read_bytes() if path.exists() else b''
+                found = raw.find(step['expect'].encode(), cursor)
+                if found >= 0:
+                    cursor = found + len(step['expect'].encode())
+                    break
+                sample = (len(raw), self.activity())
+                if sample != previous:
+                    previous = sample
+                    last_progress = time.monotonic()
+                elif self.transport.stall_seconds and time.monotonic() - last_progress >= self.transport.stall_seconds:
+                    raise RuntimeError('boot console stopped making progress')
+                time.sleep(.1)
+            if step['send']:
+                with socket.socket(socket.AF_UNIX) as connection:
+                    connection.connect(str(self.console_path))
+                    for character in step['send']:
+                        connection.sendall(character.encode())
+                        time.sleep(self.config.get('console_char_delay', 0))
 
     def wait_ready(self):
         previous = None
         last_progress = time.monotonic()
+        logged_in = not self.transport.config.get('login')
         while True:
             if self.child.poll() is not None:
                 raise RuntimeError(f'emulator exited before readiness: {self.child.returncode}')
             try:
+                if not logged_in:
+                    self.transport.login(self.transport.config['login'], self.directory / 'login.log')
+                    logged_in = True
                 ready = self.transport.run(self.config.get('ready_command', 'true'),
                                            self.directory / 'readiness.log')
             except (ConnectionError, FileNotFoundError):
@@ -113,6 +168,8 @@ class Guest(AbstractContextManager):
             return reply['return']
 
     def __exit__(self, *exception):
+        if self.closed is not None:
+            return
         if self.child is None:
             if self.log:
                 self.log.close()
@@ -123,8 +180,19 @@ class Guest(AbstractContextManager):
         error = None
         try:
             if self.child.poll() is None:
-                shutdown_exit = self.transport.run(self.config.get('shutdown', 'sync; poweroff'),
-                                                   self.directory / 'shutdown.log')
+                if not self.ready:
+                    raise RuntimeError('guest failed before readiness; cleaning up the owned emulator')
+                try:
+                    shutdown_exit = self.transport.run(self.config.get('shutdown', 'sync; poweroff'),
+                                                       self.directory / 'shutdown.log')
+                except RuntimeError:
+                    marker = self.config.get('halt_marker')
+                    raw = (self.directory / 'shutdown.log').read_bytes()
+                    if not marker or marker.encode() not in raw:
+                        raise
+                    shutdown_exit = 0
+                if shutdown_exit not in (0, 255):
+                    raise RuntimeError(f'native shutdown command failed: {shutdown_exit}')
                 # SSH commonly disconnects during poweroff. The owned emulator
                 # exit, rather than the SSH result alone, establishes closure.
                 previous = None
@@ -144,7 +212,7 @@ class Guest(AbstractContextManager):
             error = str(failure)
         finally:
             self.forced = self.child.poll() is None
-            process.stop(self.child)
+            self.forced = process.stop(self.child) or self.forced
             self.log.close()
             if self.outer:
                 try:

@@ -25,52 +25,86 @@ class Transport:
         return process.run(argv, log, cwd=self.cwd, stdin=stdin,
                            stall_seconds=self.stall_seconds, progress=self.progress)
 
+    def connect(self):
+        if 'host' in self.config:
+            return socket.create_connection((self.config['host'], self.config['port']), timeout=1)
+        connection = socket.socket(socket.AF_UNIX)
+        connection.connect(self.config['socket'])
+        return connection
+
+    def send(self, connection, data):
+        # sendall() loses the partial count on timeout. Retain the offset so
+        # slow UARTs can apply backpressure without corrupting an upload.
+        connection.settimeout(1)
+        pending = memoryview(data)
+        previous = None
+        last_progress = time.monotonic()
+        while pending:
+            try:
+                count = connection.send(pending)
+                if not count:
+                    raise RuntimeError('serial console disconnected during upload')
+                pending = pending[count:]
+                last_progress = time.monotonic()
+            except socket.timeout:
+                sample = self.progress() if self.progress else None
+                if sample != previous:
+                    previous = sample
+                    last_progress = time.monotonic()
+                elif self.stall_seconds and time.monotonic() - last_progress >= self.stall_seconds:
+                    raise RuntimeError('serial upload stopped making progress')
+
+    def receive_until(self, connection, marker, output):
+        connection.settimeout(1)
+        buffer = b''
+        previous = None
+        last_progress = time.monotonic()
+        while True:
+            try:
+                data = connection.recv(65536)
+                if not data:
+                    raise RuntimeError('serial console disconnected before the expected marker')
+                output.write(data)
+                output.flush()
+                buffer = (buffer + data)[-65536:]
+                last_progress = time.monotonic()
+                if marker in buffer:
+                    return buffer
+            except socket.timeout:
+                sample = self.progress() if self.progress else None
+                if sample != previous:
+                    previous = sample
+                    last_progress = time.monotonic()
+                elif self.stall_seconds and time.monotonic() - last_progress >= self.stall_seconds:
+                    raise RuntimeError('serial console stopped making progress')
+
+    def login(self, steps, log):
+        with self.connect() as connection, Path(log).open('ab') as output:
+            for step in steps:
+                self.receive_until(connection, step['expect'].encode(), output)
+                text = Path(step['send_file']).read_text().strip() if 'send_file' in step else step['send']
+                self.send(connection, text.encode() + b'\n')
+
     def serial(self, command, log, stdin):
-        # A connected console must already be at a shell prompt. Login/bootstrap
-        # is a guest setup concern, never guessed by parsing arbitrary boot text.
         token = uuid.uuid4().hex
         marker = ('\nFACTOR_EXIT_' + token + ' ').encode()
-        connection = (socket.create_connection((self.config['host'], self.config['port']))
-                      if 'host' in self.config else socket.socket(socket.AF_UNIX))
-        with connection, Path(log).open('ab') as output:
-            if 'socket' in self.config:
-                connection.connect(self.config['socket'])
-            connection.settimeout(1)
+        with self.connect() as connection, Path(log).open('ab') as output:
             if stdin is not None:
-                # Spool through a private guest file; fixed-size lines fit old UARTs.
+                # Fixed-size base64 lines fit old UARTs; the guest spool is private.
                 temporary = '/tmp/factor-input-' + token
-                connection.sendall(('stty -echo; cat > ' + temporary + ".b64 <<'FACTOR_EOF'\n").encode())
+                self.send(connection, ('stty -echo; cat > ' + temporary + ".b64 <<'FACTOR_EOF'\n").encode())
                 while chunk := stdin.read(384):
-                    connection.sendall(base64.b64encode(chunk) + b'\n')
-                connection.sendall(b'FACTOR_EOF\n')
+                    self.send(connection, base64.b64encode(chunk) + b'\n')
+                self.send(connection, b'FACTOR_EOF\n')
                 command = (f'base64 -d {temporary}.b64 > {temporary}; ' +
                            f'sh -c {shlex.quote(command)} < {temporary}; ' +
                            f'code=$?; rm -f {temporary} {temporary}.b64; exit "$code"')
             wrapped = 'sh -c ' + shlex.quote(command)
-            connection.sendall((f'{wrapped}; printf "\\nFACTOR_EXIT_{token} %s\\n" "$?"\n').encode())
-            buffer = b''
-            previous = None
-            last_progress = time.monotonic()
-            while True:
-                try:
-                    data = connection.recv(65536)
-                    if not data:
-                        raise RuntimeError('serial console disconnected before exit status')
-                    output.write(data)
-                    output.flush()
-                    buffer = (buffer + data)[-65536:]
-                    last_progress = time.monotonic()
-                    if marker in buffer:
-                        suffix = buffer.split(marker, 1)[1]
-                        if b'\n' in suffix:
-                            return int(suffix.splitlines()[0].strip())
-                except socket.timeout:
-                    sample = self.progress() if self.progress else None
-                    if sample != previous:
-                        previous = sample
-                        last_progress = time.monotonic()
-                    elif self.stall_seconds and time.monotonic() - last_progress >= self.stall_seconds:
-                        raise RuntimeError('serial console stopped making progress')
+            self.send(connection, (f'stty -echo; {wrapped}; printf "\\nFACTOR_EXIT_{token} %s\\n" "$?"\n').encode())
+            suffix = self.receive_until(connection, marker, output).split(marker, 1)[1]
+            if b'\n' not in suffix:
+                suffix += self.receive_until(connection, b'\n', output)
+            return int(suffix.splitlines()[0].strip())
 
 
 def vnc_actions(server, actions):

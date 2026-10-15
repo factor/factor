@@ -19,6 +19,11 @@ def write_json(path, value):
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(temporary, path)
+        directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
@@ -47,19 +52,21 @@ def activity(pid):
 
 
 def stop(process):
-    """Signal only the process group created by this still-owned child."""
-    if process.poll() is not None:
-        return
+    """Reap the owned child and remove descendants in its private process group."""
+    running = process.poll() is None
     try:
-        os.killpg(process.pid, signal.SIGTERM)
+        os.killpg(process.pid, signal.SIGTERM if running else signal.SIGKILL)
     except ProcessLookupError:
         process.wait()
-        return
+        return False
+    if not running:
+        return True  # The command exited while leaving background children.
     try:
         process.wait(timeout=10)
     except subprocess.TimeoutExpired:
         os.killpg(process.pid, signal.SIGKILL)
         process.wait()
+    return False
 
 
 def run(argv, log, *, cwd=None, env=None, stdin=None, stall_seconds=0,
@@ -79,6 +86,8 @@ def run(argv, log, *, cwd=None, env=None, stdin=None, stall_seconds=0,
                 elif stall_seconds and time.monotonic() - last_progress >= stall_seconds:
                     raise RuntimeError(f'no CPU, IO, or output progress for {stall_seconds}s')
                 time.sleep(poll_seconds)
-            return child.returncode
         finally:
-            stop(child)
+            leftovers = stop(child)
+        if leftovers:
+            output.write(b'\nHARNESS_CLEANUP_BACKGROUND_GROUP\n')
+        return child.returncode
