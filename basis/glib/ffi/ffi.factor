@@ -11,6 +11,7 @@ LIBRARY: glib
 C-LIBRARY: glib {
     { windows "libglib-2.0-0.dll" }
     { macos "libglib-2.0.dylib" }
+    { haiku "libglib-2.0.so.0" }
     { linux "libglib-2.0.so.0" }
     { unix "libglib-2.0.so" }
 }

@@ -11,6 +11,7 @@ IN: cairo.ffi
 C-LIBRARY: cairo {
     { windows "libcairo-2.dll" }
     { macos "libcairo.dylib" }
+    { haiku "libcairo.so.2" }
     { linux "libcairo.so.2" }
     { unix "libcairo.so" }
 }

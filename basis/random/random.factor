@@ -645,6 +645,7 @@ M: bernoulli-distribution random*
 
 {
     { [ os windows? ] [ "random.windows" require ] }
+    { [ os haiku? ] [ "random.haiku" require ] }
     { [ os unix? ] [ "random.unix" require ] }
 } cond
 

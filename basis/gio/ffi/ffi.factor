@@ -11,6 +11,7 @@ LIBRARY: gio
 C-LIBRARY: gio {
     { windows "libgio-2.0-0.dll" }
     { macos "libgio-2.0.dylib" }
+    { haiku "libgio-2.0.so.0" }
     { linux "libgio-2.0.so.0" }
     { unix "libgio-2.0.so" }
 }
