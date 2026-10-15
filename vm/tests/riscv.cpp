@@ -8,13 +8,29 @@
 #include <random>
 #if defined(__riscv)
 #include <sys/mman.h>
+#if defined(__linux__)
 #include <sys/cachectl.h>
+#elif defined(__OpenBSD__)
+#include <machine/sysarch.h>
+#endif
 #endif
 #define FACTOR_ASSERT(condition) assert(condition)
 #include "../riscv.hpp"
 using namespace factor;
 
 #if defined(__riscv)
+static void clear_test_icache(void* start, void* end) {
+#if defined(__linux__)
+  assert(__riscv_flush_icache(start, end, 0) == 0);
+#elif defined(__OpenBSD__)
+  struct riscv_sync_icache_args args = {
+    (uint64_t)(uintptr_t)start, (size_t)((uintptr_t)end - (uintptr_t)start) };
+  assert(sysarch(RISCV_SYNC_ICACHE, &args) == 0);
+#else
+  (void)start; (void)end;
+  __asm__ __volatile__("fence.i" ::: "memory");
+#endif
+}
 static void test_executable_relocations() {
   uint32_t* code = (uint32_t*)mmap(NULL, 4096, PROT_READ | PROT_WRITE | PROT_EXEC,
                                  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -26,7 +42,7 @@ static void test_executable_relocations() {
   for (uint32_t value : {uint32_t(0), uint32_t(2048), uint32_t(0x7ffff800),
                         uint32_t(0x80000000), UINT32_MAX}) {
     riscv_store_li32(code, value);
-    assert(__riscv_flush_icache(code, code + 3, 0) == 0);
+    clear_test_icache(code, code + 3);
     assert(((uint32_t (*)())code)() == value);
   }
 #else
@@ -36,7 +52,7 @@ static void test_executable_relocations() {
   for (uint64_t value : {uint64_t(0), uint64_t(2048), uint64_t(INT64_MAX),
                         uint64_t(INT64_MIN), UINT64_MAX}) {
     riscv_store_li(code, value);
-    assert(__riscv_flush_icache(code, code + 9, 0) == 0);
+    clear_test_icache(code, code + 9);
     assert(((uint64_t (*)())code)() == value);
   }
 #endif
@@ -54,7 +70,7 @@ static void test_executable_relocations() {
 #else
     riscv_store_pair(code + 4, (int64_t(destination) - 4) * 4);
 #endif
-    assert(__riscv_flush_icache(code, code + 6, 0) == 0);
+    clear_test_icache(code, code + 6);
     assert(((uintptr_t (*)())(code + 4))() == destination / 2 + 1);
   }
   code[6] = 0x00300513;
@@ -64,7 +80,7 @@ static void test_executable_relocations() {
 #else
   riscv_store_pair(code + 4, 8);
 #endif
-  assert(__riscv_flush_icache(code, code + 8, 0) == 0);
+  clear_test_icache(code, code + 8);
   assert(((uintptr_t (*)())(code + 4))() == 3);
   assert(munmap(code, 4096) == 0);
 }

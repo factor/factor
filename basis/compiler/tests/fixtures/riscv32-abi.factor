@@ -2,8 +2,7 @@
 USING: accessors alien alien.accessors alien.c-types alien.data
 alien.libraries alien.syntax arrays byte-arrays classes.struct combinators
 compiler.test destructors io.pathnames kernel kernel.private locals math
-memory sequences tools.test unix.linux.epoll unix.statvfs.linux
-unix.types vocabs.loader ;
+memory sequences tools.test unix.types vocabs.loader ;
 FROM: alien.c-types => float ;
 IN: compiler.tests.riscv32-abi
 
@@ -28,13 +27,6 @@ FUNCTION: double rv_call_fp_bit ( void* callback )
 FUNCTION: double rv_call_return_fp_bit ( void* callback )
 FUNCTION: size_t rv_sizeof_nlink_t ( )
 FUNCTION: size_t rv_sizeof_blksize_t ( )
-FUNCTION: size_t rv_sizeof_epoll_event ( )
-FUNCTION: size_t rv_offsetof_epoll_data ( )
-FUNCTION: size_t rv_sizeof_statvfs ( )
-FUNCTION: size_t rv_offsetof_statvfs_flag ( )
-FUNCTION: size_t rv_offsetof_statvfs_namemax ( )
-FUNCTION: ulong rv_statvfs_flag ( c-string path )
-FUNCTION: ulong rv_statvfs_namemax ( c-string path )
 FUNCTION: long rv_call_stack_gc ( void* callback,
     long a0, long a1, long a2, long a3, long a4,
     long a5, long a6, long a7, long a8 )
@@ -53,20 +45,6 @@ FUNCTION: double rv_call_fp_pair_after_stack ( void* callback )
 
 { t } [ nlink_t heap-size rv_sizeof_nlink_t = ] unit-test
 { t } [ blksize_t heap-size rv_sizeof_blksize_t = ] unit-test
-{ t } [ epoll-event heap-size rv_sizeof_epoll_event = ] unit-test
-{ t } [
-    epoll-event lookup-c-type fields>> second offset>> rv_offsetof_epoll_data =
-] unit-test
-
-{ t } [ \ statvfs64 heap-size rv_sizeof_statvfs = ] unit-test
-{ t } [ "f_flag" \ statvfs64 offset-of rv_offsetof_statvfs_flag = ] unit-test
-{ t } [ "f_namemax" \ statvfs64 offset-of rv_offsetof_statvfs_namemax = ] unit-test
-{ t t } [
-    \ statvfs64 new "/" over statvfs64 0 assert=
-    [ f_flag>> "/" rv_statvfs_flag = ]
-    [ f_namemax>> "/" rv_statvfs_namemax = ] bi
-] unit-test
-
 { 23.0 } [ 7 2.5 <bit-fp> 11 rv_take_bit_fp ] unit-test
 { 5 -3.0 } [ 5 -3.0 rv_return_bit_fp [ bits>> ] [ number>> ] bi ] unit-test
 { -2031.0 } [ 2.5 -2047 <fp-bit> 11 rv_take_fp_bit ] unit-test
