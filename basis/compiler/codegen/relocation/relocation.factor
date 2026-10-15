@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.strings
-compiler.constants kernel make math math.bitwise namespaces
+compiler.constants endian kernel make math math.bitwise namespaces
 sequences ;
 IN: compiler.codegen.relocation
 
@@ -30,12 +30,15 @@ SYMBOL: literal-table
 
 SYMBOL: relocation-table
 
+! Relocation entries follow the target's native uint32_t representation.
+! Bootstrap image generation binds this independently of the host VM.
+SYMBOL: relocation-byte-order
+
 : push-uint ( value vector -- )
-    ! If we ever revive PowerPC support again, this needs to be
-    ! changed to reverse the byte order when bootstrapping from
-    ! x86 to PowerPC or vice versa
-    [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying>> ] tri
-    swap set-alien-unsigned-4 ;
+    [
+        relocation-byte-order get compute-native-endianness or
+        big-endian = [ 4 >be ] [ 4 >le ] if
+    ] dip push-all ;
 
 : add-relocation-at ( class type offset -- )
     { 0 28 24 } bitfield relocation-table get push-uint ;

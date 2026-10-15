@@ -105,6 +105,8 @@ SYMBOL: branch-effect
     tri ;
 
 : copy-inference ( -- )
+    V{ } clone enclosing-retain-stacks set
+    V{ } clone (meta-r) set
     (meta-d) [ clone ] change
     literals [ clone ] change
     input-count [ ] change

@@ -5,6 +5,7 @@ combinators combinators.short-circuit compiler.cfg.comparisons
 compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.intrinsics compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.simd.backend compiler.cfg.stacks
+compiler.tree.propagation.info
 cpu.architecture kernel layouts locals math math.order math.vectors
 math.vectors.simd.intrinsics math.vectors.simd.intrinsics.private
 sequences specialized-arrays strings ;
@@ -47,16 +48,16 @@ CONSTANT: rep>bit-mask {
     signed-rep rep>bit-mask at underlying>> ;
 
 CONSTANT: rep>neg-zero {
-    { float-4-rep float-array{ -0.0 -0.0 -0.0 -0.0 } }
-    { double-2-rep double-array{ -0.0 -0.0 } }
+    { float-4-rep uint-array{ 0x80000000 0x80000000 0x80000000 0x80000000 } }
+    { double-2-rep ulonglong-array{ 0x8000000000000000 0x8000000000000000 } }
 }
 
 : ^load-neg-zero-vector ( rep -- dst )
     rep>neg-zero at underlying>> ^^load-literal ;
 
 CONSTANT: rep>add-sub {
-    { float-4-rep float-array{ -1.0 1.0 -1.0 1.0 } }
-    { double-2-rep double-array{ -1.0 1.0 } }
+    { float-4-rep uint-array{ 0xbf800000 0x3f800000 0xbf800000 0x3f800000 } }
+    { double-2-rep ulonglong-array{ 0xbff0000000000000 0x3ff0000000000000 } }
     { char-16-rep char-array{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 } }
     { short-8-rep short-array{ -1 0 -1 0 -1 0 -1 0 } }
     { int-4-rep int-array{ -1 0 -1 0 } }
@@ -67,8 +68,8 @@ CONSTANT: rep>add-sub {
     signed-rep rep>add-sub at underlying>> ^^load-literal ;
 
 CONSTANT: rep>half {
-    { float-4-rep float-array{  0.5 0.5 0.5 0.5 } }
-    { double-2-rep double-array{ 0.5 0.5 } }
+    { float-4-rep uint-array{ 0x3f000000 0x3f000000 0x3f000000 0x3f000000 } }
+    { double-2-rep ulonglong-array{ 0x3fe0000000000000 0x3fe0000000000000 } }
 }
 
 : ^load-half-vector ( rep -- dst )
@@ -740,6 +741,28 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         [| src op rep | src op rep ^^unary-vector-function rep ^^vector>scalar ]
     } [ string? ] emit-vl-vector-op ;
 
+! Consult the executing VM for every intrinsic trial, including trials using
+! properties loaded from a normal producer's image. Unknown representations
+! use the original fallback; integer vector lowering remains available.
+:: simd-intrinsic-allowed? ( node word -- ? )
+    floating-point-supported? [ t ] [
+        word { (simd-v>float) (simd-vsqrt) (simd-vfma) } member? [ f ] [
+            node node-input-infos dup empty? [ drop f ] [
+                last dup literal?>> [
+                    literal>> dup representation?
+                    [ floating-simd-rep? not ] [ drop f ] if
+                ] [ drop f ] if
+            ] if
+        ] if
+    ] if ;
+
+:: guard-simd-intrinsic ( word quot -- quot' )
+    [ dup word simd-intrinsic-allowed?
+      [ quot call( block node -- block' ) ] [ bad-simd-intrinsic ] if ] ;
+
+: enable-safe-simd-intrinsics ( alist -- )
+    [ first2 2dup guard-simd-intrinsic nip 2array ] map enable-intrinsics ;
+
 : enable-simd ( -- )
     {
         { (simd-reduce) [ emit-simd-reduce ] }
@@ -807,8 +830,8 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { (simd-select)             [ emit-simd-select              ] }
         { alien-vector              [ emit-alien-vector             ] }
         { set-alien-vector          [ emit-set-alien-vector         ] }
-        { (simd-positive)           [ drop                          ] }
         { (simd-vgetmask)           [ emit-simd-vgetmask            ] }
-    } enable-intrinsics ;
+    } enable-safe-simd-intrinsics ;
 
 enable-simd
+{ { (simd-positive) [ drop ] } } enable-intrinsics

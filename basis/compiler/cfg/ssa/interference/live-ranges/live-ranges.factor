@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg compiler.cfg.def-use
+USING: compiler.utilities accessors assocs compiler.cfg compiler.cfg.def-use
 compiler.cfg.dominance compiler.cfg.instructions
 compiler.cfg.liveness compiler.cfg.rpo kernel math namespaces
 sequences ;
@@ -68,9 +68,9 @@ PRIVATE>
 ERROR: bad-kill-index vreg bb ;
 
 : kill-index ( vreg bb -- n )
-    2dup live-out? [ 2drop 1/0. ] [
+    2dup live-out? [ 2drop compiler-position-infinity ] [
         2dup kill-indices get at at* [ 2nip ] [
             drop 2dup live-in?
-            [ bad-kill-index ] [ 2drop -1/0. ] if
+            [ bad-kill-index ] [ 2drop compiler-position-negative-infinity ] if
         ] if
     ] if ;

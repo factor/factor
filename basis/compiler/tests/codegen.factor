@@ -123,7 +123,7 @@ unit-test
 
 { t } [
     10000000 [ drop try-breaking-dispatch-2 ] all-integers?
-] unit-test
+] floating-point-unit-test
 
 ! Regression
 : (broken) ( x -- y ) ;
@@ -131,7 +131,7 @@ unit-test
 { 2.0 { 2.0 0.0 } } [
     2.0 1.0
     [ float/f 0.0 [ drop (broken) ] 2keep 2array ] compile-call
-] unit-test
+] floating-point-unit-test
 
 ! Regression
 : hellish-bug-1 ( a b -- ) 2drop ;
@@ -168,11 +168,11 @@ TUPLE: my-tuple ;
 { 5 } [ "hi" foox ] unit-test
 
 ! Making sure we don't needlessly unbox/rebox
-{ t 3.0 } [ 1.0 dup [ dup 2.0 float+ [ eq? ] dip ] compile-call ] unit-test
+{ t 3.0 } [ 1.0 dup [ dup 2.0 float+ [ eq? ] dip ] compile-call ] floating-point-unit-test
 
-{ t 3.0 } [ 1.0 dup [ dup 2.0 float+ ] compile-call [ eq? ] dip ] unit-test
+{ t 3.0 } [ 1.0 dup [ dup 2.0 float+ ] compile-call [ eq? ] dip ] floating-point-unit-test
 
-{ t } [ 1.0 dup [ [ 2.0 float+ ] keep ] compile-call nip eq? ] unit-test
+{ t } [ 1.0 dup [ [ 2.0 float+ ] keep ] compile-call nip eq? ] floating-point-unit-test
 
 { 1 B{ 1 2 3 4 } } [
     B{ 1 2 3 4 } [
@@ -267,7 +267,7 @@ TUPLE: id obj ;
         if
     ] if ;
 
-{ 4.0 } [ 2.0 blah ] unit-test
+{ 4.0 } [ 2.0 blah ] floating-point-unit-test
 
 { 4 } [ 2 [ dup fixnum* ] compile-call ] unit-test
 { 7 } [ 2 [ dup fixnum* 3 fixnum+fast ] compile-call ] unit-test
@@ -407,14 +407,15 @@ cell 4 = [
 ! XXX: investigate this mac vs linux/win difference
 : 1.4fcos>string ( -- str )
     os macos? cpu x86? and
+    os { netbsd openbsd } member? cpu x86.32? and or
     "0.169967142900241" "0.16996714290024104" ? ;
 
-${ 1 1.4fcos>string } [ 1.4 [ 1 swap fcos ] compile-call number>string ] unit-test
-${ 1 1.4fcos>string } [ 1.4 1 [ swap fcos ] compile-call number>string ] unit-test
-${ 1.4fcos>string "0.9854497299884601" } [ 1.4 [ [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
-${ 1 1.4fcos>string "0.9854497299884601" } [ 1.4 1 [ swap >float [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
+${ 1 1.4fcos>string } [ 1.4 [ 1 swap fcos ] compile-call number>string ] floating-point-unit-test
+${ 1 1.4fcos>string } [ 1.4 1 [ swap fcos ] compile-call number>string ] floating-point-unit-test
+${ 1.4fcos>string "0.9854497299884601" } [ 1.4 [ [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] floating-point-unit-test
+${ 1 1.4fcos>string "0.9854497299884601" } [ 1.4 1 [ swap >float [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] floating-point-unit-test
 
-{ 6.0 } [ 1.0 [ >float 3.0 + [ B{ 0 0 0 0 } 0 set-alien-float ] [ 2.0 + ] bi ] compile-call ] unit-test
+{ 6.0 } [ 1.0 [ >float 3.0 + [ B{ 0 0 0 0 } 0 set-alien-float ] [ 2.0 + ] bi ] compile-call ] floating-point-unit-test
 
 ! Bug in linearization
 { 283686952174081 } [
@@ -454,11 +455,11 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 { t } [
     [ 1.0 100 [ fsin ] times 1.0 float+ ] compile-call
     1.168852488727981 1.e-9 ~
-] unit-test
+] floating-point-unit-test
 
 { 65537.0 } [
     [ 2.0 4 [ 2.0 fpow ] times 1.0 float+ ] compile-call
-] unit-test
+] floating-point-unit-test
 
 ! ##box-displaced-alien is a def-is-use instruction
 { ALIEN: 3e9 } [

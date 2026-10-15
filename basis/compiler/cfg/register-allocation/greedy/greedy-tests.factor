@@ -125,7 +125,7 @@ IN: compiler.cfg.register-allocation.greedy.tests
     greedy-allocator register-allocator [
         { 0.0 1.0 2.0 3.0 } [ [ 1.0 + ] map ] compile-call
     ] with-variable
-] unit-test
+] floating-point-unit-test
 
 ! More simultaneous float values than either ARM64 or x86-64 can hold.
 :: pressure-kernel ( x -- value )
@@ -183,7 +183,7 @@ IN: compiler.cfg.register-allocation.greedy.tests
     greedy-allocator register-allocator [
         2.5 \ pressure-kernel def>> compile-call
     ] with-variable
-] unit-test
+] floating-point-unit-test
 
 ! Eviction reuses cached costs; a split mutates its input and must discard
 ! that cache entry before computing child priorities from shortened ranges.
@@ -522,7 +522,7 @@ IN: compiler.cfg.register-allocation.greedy.tests
             2.5 \ pressure-kernel def>> compile-call
         ] with-variable
     ] with-variable
-] unit-test
+] floating-point-unit-test
 
 ! Actual eviction transfers cascade ownership and requeues the displaced
 ! interval; this checks the state transition rather than only the predicate.

@@ -1,6 +1,6 @@
 USING: accessors alien alien.accessors alien.c-types alien.data arrays
 assocs byte-arrays classes classes.algebra classes.struct
-classes.tuple.private combinators.short-circuit compiler.test
+classes.tuple.private combinators.short-circuit compiler.test compiler.test.literal-metadata
 compiler.tree compiler.tree.builder compiler.tree.debugger
 compiler.tree.optimizer compiler.tree.propagation.info effects fry
 generic.single hashtables kernel kernel.private layouts literals
@@ -125,10 +125,13 @@ IN: compiler.tree.propagation.tests
 ] unit-test
 
 ! The value interval should be limited for these.
-{ t t } [
+{ t } [
     [ fixnum>bignum ] final-info first interval>> fixnum-interval =
-    [ fixnum>float ] final-info first interval>> fixnum-interval =
 ] unit-test
+
+float floating-point-supported? [ fixnum-interval ] [ full-interval ] if
+<class/interval-info> 1array
+[ [ fixnum>float ] final-info first ] literal-metadata-unit-test
 
 { V{ } } [ [ ] final-classes ] unit-test
 
@@ -198,7 +201,10 @@ IN: compiler.tree.propagation.tests
 
 { fixnum } [ [ { integer } declare 123 >bignum bitand ] final-math-class ] unit-test
 
-{ float } [ [ { float float } declare mod ] final-math-class ] unit-test
+! An unsupported foreign path leaves an unreachable subtree result placeholder.
+floating-point-supported? [ float <class-info> ] [ f <literal-info> ] if
+1vector 1array
+[ [ { float float } declare mod ] final-info ] literal-metadata-unit-test
 
 { V{ integer float } } [ [ { float float } declare [ /i ] keep ] final-classes ] unit-test
 
@@ -291,21 +297,31 @@ IN: compiler.tree.propagation.tests
 
 { t } [ [ { bignum } declare absq ] final-info first interval>> [0,inf] interval-subset? ] unit-test
 
-{ t } [ [ { float } declare abs ] final-info first interval>> [0,inf] = ] unit-test
+float floating-point-supported? [ [0,inf] ] [ full-interval ] if
+<class/interval-info> 1array
+[ [ { float } declare abs ] final-info first ] literal-metadata-unit-test
 
-{ t } [ [ { float } declare absq ] final-info first interval>> [0,inf] = ] unit-test
+float floating-point-supported? [ [0,inf] ] [ full-interval ] if
+<class/interval-info> 1array
+[ [ { float } declare absq ] final-info first ] literal-metadata-unit-test
 
-{ t } [ [ { complex } declare abs ] final-info first interval>> [0,inf] = ] unit-test
+float floating-point-supported? [ [0,inf] ] [ full-interval ] if
+<class/interval-info> 1array
+[ [ { complex } declare abs ] final-info first ] literal-metadata-unit-test
 
 { t } [ [ { complex } declare absq ] final-info first interval>> [0,inf] = ] unit-test
 
-{ t } [ [ { float float } declare rect> C{ 0.0 0.0 } + absq ] final-info first interval>> [0,inf] = ] unit-test
+float floating-point-supported? [ [0,inf] ] [ full-interval ] if
+<class/interval-info> 1array
+[ [ { float float } declare rect> C{ 0.0 0.0 } + absq ] final-info first ] literal-metadata-unit-test
 
 { V{ float } } [ [ { float float } declare rect> C{ 0.0 0.0 } + absq ] final-classes ] unit-test
 
 { t } [ [ [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
 
-{ t } [ [ { double-array double-array } declare [ - absq ] [ + ] 2map-reduce ] final-info first interval>> [0,inf] = ] unit-test
+float floating-point-supported? [ [0,inf] ] [ full-interval ] if
+<class/interval-info> 1array
+[ [ { double-array double-array } declare [ - absq ] [ + ] 2map-reduce ] final-info first ] literal-metadata-unit-test
 
 { V{ string } } [
     [ dup string? not [ "Oops" throw ] [ ] if ] final-classes
@@ -383,37 +399,42 @@ IN: compiler.tree.propagation.tests
     [ [ 0.0 ] [ -0.0 ] if ] final-literals
 ] unit-test
 
-{ V{ 1.5 } } [
-    [ /f 1.5 1.5 clamp ] final-literals
-] unit-test
+floating-point-supported? [ 1.5 <literal-info> ] [ float <class-info> ] if
+1vector 1array [
+    [ /f 1.5 1.5 clamp ] final-info
+] literal-metadata-unit-test
 
-{ V{ 1.5 } } [
+floating-point-supported? [ 1.5 <literal-info> ] [ float <class-info> ] if
+1vector 1array [
     [
         /f
         dup 1.5 <= [ dup 1.5 >= [ ] [ drop 1.5 ] if ] [ drop 1.5 ] if
-    ] final-literals
-] unit-test
+    ] final-info
+] literal-metadata-unit-test
 
-{ V{ 1.5 } } [
+floating-point-supported? [ 1.5 <literal-info> ] [ float <class-info> ] if
+1vector 1array [
     [
         /f
         dup 1.5 u<= [ dup 1.5 u>= [ ] [ drop 1.5 ] if ] [ drop 1.5 ] if
-    ] final-literals
-] unit-test
+    ] final-info
+] literal-metadata-unit-test
 
-{ V{ 1.5 } } [
+floating-point-supported? [ 1.5 <literal-info> ] [ float <class-info> ] if
+1vector 1array [
     [
         /f
         dup 1.5 <= [ dup 10 >= [ ] [ drop 1.5 ] if ] [ drop 1.5 ] if
-    ] final-literals
-] unit-test
+    ] final-info
+] literal-metadata-unit-test
 
-{ V{ 1.5 } } [
+floating-point-supported? [ 1.5 <literal-info> ] [ float <class-info> ] if
+1vector 1array [
     [
         /f
         dup 1.5 u<= [ dup 10 u>= [ ] [ drop 1.5 ] if ] [ drop 1.5 ] if
-    ] final-literals
-] unit-test
+    ] final-info
+] literal-metadata-unit-test
 
 { V{ f } } [
     [
@@ -629,9 +650,10 @@ TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
 { V{ number } } [ [ [ "Oops" throw ] [ 2 + ] if ] final-classes ] unit-test
 { V{ number } } [ [ [ 2 + ] [ "Oops" throw ] if ] final-classes ] unit-test
 
-{ V{ POSTPONE: f } } [
-    [ dup 1.0 <= [ drop f ] [ 0 number= ] if ] final-classes
-] unit-test
+floating-point-supported? [ f <literal-info> ] [ object <class-info> ] if
+1vector 1array [
+    [ dup 1.0 <= [ drop f ] [ 0 number= ] if ] final-info
+] literal-metadata-unit-test
 
 ! Don't fold this
 TUPLE: mutable-tuple-test { x sequence } ;
@@ -894,7 +916,9 @@ MIXIN: empty-mixin
 
 { V{ float } } [ [ fsqrt ] final-classes ] unit-test
 
-{ V{ t } } [ [ { fixnum } declare 10 mod >float -20 > ] final-literals ] unit-test
+floating-point-supported? [ t <literal-info> ] [ object <class-info> ] if
+1vector 1array
+[ [ { fixnum } declare 10 mod >float -20 > ] final-info ] literal-metadata-unit-test
 
 { T{ interval f { 0 t } { 127 t } } } [
     [ { integer } declare 127 bitand ] final-info first interval>>
@@ -1173,7 +1197,13 @@ M: f derp drop t ;
 : shift-test0 ( x -- y )
     4.3 shift ;
 
-[ 1 shift-test0 ] [ no-method? ] must-fail-with
+[ 1 shift-test0 ] [
+    floating-point-supported? [ no-method? ] [
+        dup array?
+        [ 2 head ${ KERNEL-ERROR ERROR-FLOAT-UNSUPPORTED } = ]
+        [ drop f ] if
+    ] if
+] must-fail-with
 
 ! Test for the #1370 bug
 STRUCT: bar { s bar* } ;

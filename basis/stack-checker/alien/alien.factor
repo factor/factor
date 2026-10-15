@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.c-types.varargs alien.libraries
+USING: accessors alien alien.c-types alien.c-types.capabilities alien.c-types.varargs alien.libraries
 alien.private arrays assocs combinators cpu.architecture effects generalizations kernel locals math math.order
 namespaces quotations sequences sequences.generalizations stack-checker.backend
 stack-checker.dependencies stack-checker.state
@@ -24,6 +24,13 @@ TUPLE: alien-assembly-params < alien-node-params
 
 TUPLE: alien-callback-params < alien-node-params
     xt ;
+
+: floating-point-signature-supported? ( params -- ? )
+    [ parameters>> ] [ return>> ] bi prefix floating-point-types-supported? ;
+
+: infer-unsupported-floating-point-signature ( params -- )
+    '[ _ floating-point-foreign-call-unsupported ] infer-quot-here ;
+
 
 : param-prep-quot ( params -- quot )
     parameters>> [ lookup-c-type c-type-unboxer-quot ] map deep-spread>quot ;
@@ -73,7 +80,7 @@ ERROR: invalid-varargs-count count parameters ;
 
 :: prepare-varargs ( params -- params )
     params varargs?>> :> count
-    count t eq? os macos? cpu arm.64? and cpu riscv? or and
+    count t eq? os macos? cpu arm.64? and cpu riscv? cpu loongarch.64? or or and
     [ missing-varargs-count ] when
     count integer? [
         count 0 params parameters>> length between? [
@@ -91,18 +98,22 @@ ERROR: invalid-varargs-count count parameters ;
     pop-return prepare-varargs
     ! Set ABI
     dup library>> library-abi >>abi
+    dup floating-point-signature-supported? [
     ! Quotation which coerces parameters to required types
     dup param-prep-quot infer-quot-here
     ! Consume inputs and outputs and add node to IR
     dup dup inputs/outputs #alien-invoke,
     ! Quotation which coerces return value to required type
-    infer-return ;
+    infer-return
+    ] [ infer-unsupported-floating-point-signature ] if ;
 
 : (infer-alien-indirect) ( params -- )
     pop-abi pop-params pop-return prepare-varargs
+    dup floating-point-signature-supported? [
     dup param-prep-quot '[ _ [ >c-ptr ] bi* ] infer-quot-here
     dup dup inputs/outputs #alien-indirect,
-    infer-return ;
+    infer-return
+    ] [ infer-unsupported-floating-point-signature ] if ;
 
 : infer-alien-indirect ( -- )
     alien-indirect-params new (infer-alien-indirect) ;
@@ -117,12 +128,14 @@ ERROR: invalid-varargs-count count parameters ;
     pop-abi
     pop-params
     pop-return
+    dup floating-point-signature-supported? [
     ! Quotation which coerces parameters to required types
     dup param-prep-quot infer-quot-here
     ! Consume inputs and outputs and add node to IR
     dup dup inputs/outputs #alien-assembly,
     ! Quotation which coerces return value to required type
-    infer-return ;
+    infer-return
+    ] [ infer-unsupported-floating-point-signature ] if ;
 
 ERROR: variadic-callback-runtime-required ;
 ERROR: variadic-callback-architecture-unsupported ;
@@ -208,11 +221,13 @@ M: callable wrap-callback-quot
     pop-literal :> quot
     alien-callback-params new varargs? >>varargs?
     pop-abi pop-params pop-return :> params
-    varargs? cpu arm.64? cpu riscv? or not and
+    params floating-point-signature-supported? [
+    varargs? cpu arm.64? cpu riscv? cpu loongarch.64? or or cpu mips? or cpu s390x? or not and
     [ variadic-callback-architecture-unsupported ] when
     params callback-bottom
     params dup dup quot wrap-callback-quot infer-callback-quot
-    #alien-callback, ;
+    #alien-callback,
+    ] [ params infer-unsupported-floating-point-signature ] if ;
 
 : infer-alien-callback ( -- ) f (infer-alien-callback) ;
 

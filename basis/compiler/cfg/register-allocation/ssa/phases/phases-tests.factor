@@ -7,8 +7,8 @@ compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.ssa.livene
 compiler.cfg.register-allocation.ssa.phases
 compiler.cfg.register-allocation.validation compiler.cfg.register-allocation.verifier
 compiler.cfg.registers
-compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
-kernel layouts locals make math namespaces sequences sequences.generalizations tools.test ;
+compiler.cfg.ssa.destruction.leaders compiler.cfg.rpo compiler.cfg.utilities cpu.architecture
+kernel layouts locals make math namespaces sequences sequences.generalizations tools.test vectors ;
 QUALIFIED: compiler.cfg.linear-scan.allocation
 IN: compiler.cfg.register-allocation.ssa.phases.tests
 
@@ -129,8 +129,28 @@ IN: compiler.cfg.register-allocation.ssa.phases.tests
     2 live-intervals get at 10 live-intervals get at intervals-intersect?
 ] with-scope ] unit-test
 
+! This mechanics kernel deliberately rejects spills. Keep its loop count
+! as an untagged fixnum so pointer-base tracking does not add a fifth live
+! value on CPUs with four integer registers. The shared validation cycle
+! retains its pointer bitcast and companion-base coverage.
+: <phase-cycle-cfg> ( -- graph )
+    0 f <validation-cycle>
+    dup [
+        [
+            [
+                dup ##tagged>integer?
+                [
+                    250 >>dst
+                    T{ ##sar-imm { dst 1 } { src1 250 } } clone
+                    tag-bits get >>src2 2array
+                ]
+                [ dup ##sub-imm? [ 1 >>src2 ] when 1array ] if
+            ] map concat >vector
+        ] change-instructions drop
+    ] each-basic-block ;
+
 { t } [ [ [let
-    0 f <validation-cycle> :> graph
+    <phase-cycle-cfg> :> graph
     graph 6 2 validation-register-bank :> bank
     linear-scan-allocator bank [ phase-mechanics-kernel ] constrained-allocator boa
     graph swap compile-validation-cfg :> word

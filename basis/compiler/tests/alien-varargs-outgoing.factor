@@ -20,28 +20,28 @@ FUNCTION: varout-hfa varout_return ( int tag, ... varout-hfa h )
 FUNCTION: double varout_control ( )
 FUNCTION: double varout_split_control ( )
 FUNCTION: int varout_split_caller_supported ( )
-{ 570.0 } [ varout_control ] unit-test
+{ 570.0 } [ varout_control ] floating-point-unit-test
 varout_split_caller_supported 0 > [
-    { 317.0 } [ varout_split_control ] unit-test
+    { 317.0 } [ varout_split_control ] floating-point-unit-test
 ] [
     "Clang Windows ARM64 C caller cannot split a variadic composite at X7; Factor-to-C split test remains required." print
 ] if
-{ 285.0 } [ 1 2 3 4 5 6 7 8 9 varout_mixed ] unit-test
-{ 285.0 } [ 1 2 varout-small-hfa boa 3 4 5 varout-pair boa 6 7 8 varout-hfa boa 9 varout_hfas ] unit-test
+{ 285.0 } [ 1 2 3 4 5 6 7 8 9 varout_mixed ] floating-point-unit-test
+{ 285.0 } [ 1 2 varout-small-hfa boa 3 4 5 varout-pair boa 6 7 8 varout-hfa boa 9 varout_hfas ] floating-point-unit-test
 cpu riscv? [
-    { 48.0 } [ varout_indirect_alignment_control ] unit-test
-    { 48.0 } [ 1 4 5 varout-pair boa 6 varout_indirect_alignment ] unit-test
+    { 48.0 } [ varout_indirect_alignment_control ] floating-point-unit-test
+    { 48.0 } [ 1 4 5 varout-pair boa 6 varout_indirect_alignment ] floating-point-unit-test
 ] when
 ! This is the ARM64 X7/stack boundary regression. The original x86 image
 ! independently fails this signature (317 -> 365); retain its C-only control
 ! above without broadening this ARM64 change into an x86 ABI repair.
 cpu arm.64? [
-    { 317.0 } [ 1 2 3 4 5 6 7 4 5 varout-pair boa 10 varout_split ] unit-test
+    { 317.0 } [ 1 2 3 4 5 6 7 4 5 varout-pair boa 10 varout_split ] floating-point-unit-test
 ] when
-{ 16.0 27.0 38.0 } [ 10 6 7 8 varout-hfa boa varout_return [ x>> ] [ y>> ] [ z>> ] tri ] unit-test
+{ 16.0 27.0 38.0 } [ 10 6 7 8 varout-hfa boa varout_return [ x>> ] [ y>> ] [ z>> ] tri ] floating-point-unit-test
 : indirect-varout-mixed ( first second tag i d l e j f ptr -- result )
     double { float double int int double longlong double int double } cdecl 3 alien-indirect-varargs ;
-{ 285.0 } [ 1 2 3 4 5 6 7 8 9 "varout_mixed" "varargs-outgoing" library-dll dlsym indirect-varout-mixed ] unit-test
+{ 285.0 } [ 1 2 3 4 5 6 7 8 9 "varout_mixed" "varargs-outgoing" library-dll dlsym indirect-varout-mixed ] floating-point-unit-test
 
 FUNCTION: int varout_alignment_supported ( )
 varout_alignment_supported 0 > [

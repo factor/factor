@@ -35,7 +35,11 @@ ERROR: impossible-register-pressure demanded capacity ;
 ! values when measured loop pressure leaves them no room.
 :: entry-priority ( value all-resident distances -- priority )
     value all-resident in? 0 1 ?
-    value distances at 1/0. or value 3array ;
+    value distances at [ ] [
+        floating-point-supported? [ 1/0. ] [
+            distances values 0 [ max ] reduce 1 +
+        ] if
+    ] if* value 3array ;
 
 :: select-entry-residents ( candidates all-resident distances capacity -- residents )
     candidates members [ all-resident distances entry-priority ] sort-by

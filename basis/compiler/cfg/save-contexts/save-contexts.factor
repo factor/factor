@@ -10,6 +10,8 @@ UNION: context-modifier ##phi ##inc ##callback-inputs ;
     [ context-modifier? not ] find drop ;
 
 UNION: needs-save-context-insn
+    ##mapped-callback-inputs
+    native-helper-insn
     ##alien-invoke
     ##alien-indirect
     ##box-long-long

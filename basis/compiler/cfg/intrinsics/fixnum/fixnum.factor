@@ -33,8 +33,8 @@ IN: compiler.cfg.intrinsics.fixnum
 
 : emit-fixnum-shift-fast ( block #call -- block' )
     node-input-infos second interval>> {
-        { [ dup 0 [a,inf] interval-subset? ] [ drop emit-fixnum-left-shift ] }
-        { [ dup 0 [-inf,b] interval-subset? ] [ drop emit-fixnum-right-shift ] }
+        { [ dup interval-nonnegative? ] [ drop emit-fixnum-left-shift ] }
+        { [ dup interval-nonpositive? ] [ drop emit-fixnum-right-shift ] }
         [ drop emit-fixnum-shift-general ]
     } cond ;
 

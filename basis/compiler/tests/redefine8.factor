@@ -27,4 +27,4 @@ IN: compiler.tests.redefine8
 
 { 2.0 } [
     1.0 "my-generic" "compiler.tests.redefine8" lookup-word execute
-] unit-test
+] floating-point-unit-test

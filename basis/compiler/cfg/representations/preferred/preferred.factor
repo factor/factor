@@ -96,3 +96,5 @@ M: ##callback-outputs uses-vreg-reps
     [ each-def-rep ] [ each-use-rep ] [ each-temp-rep ] 2tri ; inline
 
 M: ##mul-wide-vector defs-vreg-reps rep>> widen-vector-rep 1array ;
+
+M: ##native-helper uses-vreg-reps src-rep>> 1array ;

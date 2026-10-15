@@ -12,16 +12,20 @@ FUNCTION: double ffi_fp_divide ( double a, double b )
 { t } [
     [ clear-fp-exception-flags 1.0 0.0 ffi_fp_divide drop
       +fp-zero-divide+ fp-exception-flags member? ] without-fp-traps fp-status-case
-] unit-test
-{ 2.0 } [ 4.0 2.0 ffi_fp_divide fp-status-case ] unit-test
+] floating-point-unit-test
+{ 2.0 } [ 4.0 2.0 ffi_fp_divide fp-status-case ] floating-point-unit-test
 
-fp-traps-supported? [
-    { +fp-zero-divide+ } [ +fp-zero-divide+ fp-traps member? ] with-fp-traps
-] [ f ] if [
+floating-point-supported? [
+    fp-traps-supported? [
+        { +fp-zero-divide+ } [ +fp-zero-divide+ fp-traps member? ] with-fp-traps
+    ] [ f ] if
+] [ t ] if [
     [ { +fp-zero-divide+ } [ 1.0 0.0 ffi_fp_divide drop ] with-fp-traps ]
-    [ +fp-zero-divide+ vm-error-exception-flag? ] must-fail-with
-    { 2.0 } [ 4.0 2.0 ffi_fp_divide fp-status-case ] unit-test
-    "FFI-COVERAGE native-fp-trap executed=1" print
+    [ +fp-zero-divide+ vm-error-exception-flag? ] floating-point-must-fail-with
+    { 2.0 } [ 4.0 2.0 ffi_fp_divide fp-status-case ] floating-point-unit-test
+    floating-point-supported?
+    [ "FFI-COVERAGE native-fp-trap executed=1" ]
+    [ "FFI-COVERAGE native-fp-trap executed=0" ] if print
 ] [ "FFI-SKIP native-fp-trap reason=effective-trap-mask-unavailable" print ] if
 
 "FFI-COVERAGE fp-status executed=" write "fp-status-cases" get .

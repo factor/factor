@@ -13,12 +13,12 @@ IN: compiler.cfg.linear-scan.allocation
 : inactive-positions ( new assoc -- )
     [ [ inactive-intervals-for ] keep ] dip
     '[
-        [ _ intersect-intervals 1/0. or ] [ reg>> ] bi
+        [ _ intersect-intervals allocation-infinity or ] [ reg>> ] bi
         _ add-use-position
     ] each ;
 
 : free-positions ( registers reg-class -- avail-registers )
-    of [ 1/0. 2array ] map ;
+    of [ allocation-infinity 2array ] map ;
 
 : register-status ( new registers -- free-pos )
     over interval-reg-class free-positions [

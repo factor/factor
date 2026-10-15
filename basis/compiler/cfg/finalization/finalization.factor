@@ -4,12 +4,13 @@ USING: compiler.cfg.build-stack-frame compiler.cfg.gc-checks
 compiler.cfg.register-allocation compiler.cfg.representations
 compiler.cfg.save-contexts
 compiler.cfg.stacks.clearing compiler.cfg.utilities
-compiler.cfg.write-barrier ;
+compiler.cfg.write-barrier cpu.architecture ;
 IN: compiler.cfg.finalization
 
 : finalize-cfg ( cfg -- )
     {
         select-representations
+        lower-native-helpers
         insert-gc-checks
         eliminate-write-barriers
         clear-uninitialized

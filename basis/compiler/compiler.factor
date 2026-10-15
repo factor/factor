@@ -6,7 +6,7 @@ compiler.cfg.builder compiler.cfg.builder.alien compiler.cfg.finalization
 compiler.cfg.optimizer compiler.cfg.registers compiler.codegen compiler.crossref
 compiler.errors compiler.tree.builder compiler.tree.optimizer
 compiler.units compiler.utilities continuations definitions
-generic generic.single io kernel macros make namespaces
+generic generic.single hash-sets.identity io kernel macros make math namespaces
 sequences sets stack-checker.dependencies stack-checker.errors
 stack-checker.inlining vocabs.loader words ;
 IN: compiler
@@ -23,11 +23,16 @@ SYMBOL: compiled
 : compiler-message ( string -- )
     "trace-compilation" get [ [ print flush ] with-global ] [ drop ] if ;
 
+: <compiler-conditional-dependencies> ( -- set )
+    ! Predicate dependencies can contain opaque floating-point literals.
+    floating-point-supported?
+    [ HS{ } clone ] [ 0 <identity-hash-set> ] if ;
+
 : start-compilation ( word -- )
     dup name>> compiler-message
     H{ } clone dependencies namespaces:set
     H{ } clone generic-dependencies namespaces:set
-    HS{ } clone conditional-dependencies namespaces:set
+    <compiler-conditional-dependencies> conditional-dependencies namespaces:set
     clear-compiler-error ;
 
 GENERIC: no-compile? ( word -- ? )

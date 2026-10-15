@@ -108,7 +108,7 @@ IN: compiler.cfg.register-allocation.validation.tests
         2.0 5.0 x validation-vector-lane
         3.0 7.0 x validation-vector-lane 2array =
     ] all?
-] with-scope ] unit-test
+] with-scope ] floating-point-unit-test
 
 
 ! These are moving heap pointers, not just fixnum bits passing a GC clobber.

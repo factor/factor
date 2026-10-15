@@ -65,9 +65,12 @@ SYMBOL: fixnum-values
 
 GENERIC: compute-modular-candidates* ( node -- )
 
+: modular-literal? ( obj -- ? )
+    floating-point-supported? [ real? ] [ rational? ] if ;
+
 M: #push compute-modular-candidates*
     [ out-d>> first ] [ literal>> ] bi
-    real? [ [ modular-value ] [ fixnum-value ] bi ] [ drop ] if ;
+    modular-literal? [ [ modular-value ] [ fixnum-value ] bi ] [ drop ] if ;
 
 : small-shift? ( interval -- ? )
     0 cell-bits tag-bits get - 1 - [a,b] interval-subset? ;
@@ -132,7 +135,7 @@ SYMBOL: changed?
 GENERIC: optimize-modular-arithmetic* ( node -- nodes )
 
 M: #push optimize-modular-arithmetic*
-    dup { [ out-d>> first modular-value? ] [ literal>> real? ] } 1&&
+    dup { [ out-d>> first modular-value? ] [ literal>> modular-literal? ] } 1&&
     [ [ >fixnum ] change-literal ] when ;
 
 : redundant->fixnum? ( #call -- ? )

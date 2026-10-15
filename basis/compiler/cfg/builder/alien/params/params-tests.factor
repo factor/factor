@@ -1,5 +1,5 @@
 USING: alien arrays compiler.cfg.builder.alien.params cpu.architecture
-cpu.x86.assembler.operands kernel layouts literals locals math namespaces
+cpu.arm.64 cpu.x86.assembler.operands kernel layouts literals locals math namespaces
 sequences system tools.test vectors ;
 IN: compiler.cfg.builder.alien.params.tests
 
@@ -27,7 +27,7 @@ cpu x86.64? [
 ! Leave one FP register: the whole HFA must spill, along with the scalar
 ! following it. Each float member occupies four bytes, not eight.
 :: spilled-float-group ( count initial compact? -- offsets size )
-    [
+    arm.64 \ cpu [
         initial stack-params set
         compact? compact-stack-params? set
         0 stack-group-remaining set
@@ -41,7 +41,7 @@ cpu x86.64? [
         count float-rep f f 4 next-parameter
         stack-values get [ third ] map >array
         stack-params get
-    ] with-scope ;
+    ] with-variable ;
 
 cell 8 = [
     { { 0 4 8 } 16 } [ 2 0 f spilled-float-group ] unit-test

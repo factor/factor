@@ -34,9 +34,13 @@ M: insn unary-constant-fold?
     src>> vreg>insn ##load-integer? ;
 
 M: ##integer>float unary-constant-fold?
-    ! Inexact conversions must honor runtime rounding modes and exception flags.
-    dup call-next-method [
-        src>> vreg>integer abs 0x20000000000000 <=
+    ! Numeric conversion must not execute while optimizing for an integer-only
+    ! VM. Keep the instruction as metadata rather than evaluating >float.
+    floating-point-supported? [
+        ! Inexact conversions honor runtime rounding modes and exception flags.
+        dup call-next-method [
+            src>> vreg>integer abs 0x20000000000000 <=
+        ] [ drop f ] if
     ] [ drop f ] if ;
 
 GENERIC: unary-constant-fold* ( x insn -- y )

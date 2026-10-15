@@ -28,17 +28,28 @@ M:: float-rep alloc-stack-param ( rep size -- n )
       float-right-align-on-stack? [ + ] [ drop ] if ]
     if ;
 
+! Some ABIs shadow aggregate fields without allocating another slot.
+HOOK: alloc-abi-stack-param cpu ( rep size -- n )
+M: object alloc-abi-stack-param alloc-stack-param ;
+
+HOOK: abi-param-slot-count cpu ( rep -- n )
+M: object abi-param-slot-count rep-size cell /i 1 max ;
+
 : ?dummy-stack-params ( rep -- )
-    dummy-stack-params? [ cell alloc-stack-param drop ] [ drop ] if ;
+    dummy-stack-params? [ cell alloc-abi-stack-param drop ] [ drop ] if ;
 
 : ?dummy-int-params ( rep -- )
     dummy-int-params? [
-        rep-size cell /i 1 max
+        abi-param-slot-count
         [ int-regs get [ pop* ] unless-empty ] times
     ] [ drop ] if ;
 
 : ?dummy-fp-params ( rep -- )
     drop dummy-fp-params? [ float-regs get [ pop* ] unless-empty ] when ;
+
+HOOK: prepare-long-long-registers cpu ( regs -- )
+M: object prepare-long-long-registers
+    dup last even? [ pop* ] [ drop ] if ;
 
 GENERIC: next-reg-param ( odd-register? rep -- reg )
 
@@ -46,8 +57,7 @@ M: int-rep next-reg-param
     [ nip ?dummy-stack-params ]
     [ nip ?dummy-fp-params ]
     [ drop [
-        int-regs get last even?
-        [ int-regs get pop* ] when
+        int-regs get prepare-long-long-registers
     ] when ]
     2tri int-regs get pop ;
 
@@ -72,13 +82,18 @@ SYMBOLS: stack-values reg-values ;
 HOOK: prepare-abi-parameter-group cpu ( rep-tuple -- )
 M: object prepare-abi-parameter-group drop ;
 
+! Most grouped ABIs exhaust the register bank after an aggregate spills.
+! GNU SH4 leaves unused registers available to following arguments.
+HOOK: spill-abi-parameter-registers cpu ( regs -- )
+M: object spill-abi-parameter-registers delete-all ;
+
 :: prepare-parameter-group ( rep-tuple -- )
     rep-tuple prepare-abi-parameter-group
     rep-tuple length 4 > [
         rep-tuple first reg-class-of get :> regs
         4 rep-tuple nth :> count
         count regs length > [
-            regs delete-all
+            regs spill-abi-parameter-registers
             compact-stack-params? get [
                 ! A spilled aggregate retains its in-memory member layout.
                 ! Round the whole argument, not each float member, to a cell.
@@ -95,16 +110,29 @@ M: object prepare-abi-parameter-group drop ;
     stack-group-remaining get 0 or 0 > [
         nip stack-group-offset get swap stack-group-offset +@
         -1 stack-group-remaining +@
-    ] [ alloc-stack-param ] if ;
+    ] [ alloc-abi-stack-param ] if ;
+
+! Some ABIs pack several aggregate members into one parameter slot.
+! A CPU can allocate those members without changing ordinary parameters.
+HOOK: alloc-abi-parameter cpu ( vreg rep on-stack? odd-register? size -- handled? )
+M: object alloc-abi-parameter 5drop f ;
 
 :: next-parameter ( vreg rep on-stack? odd-register? size -- )
-    vreg rep on-stack?
-    [ dup dup reg-class-of get odd-register? reg-class-full? ] dip or
-    [ size alloc-parameter-stack-slot size 4array stack-values ]
-    [ odd-register? swap next-reg-param 3array reg-values ]
-    if get push ;
+    vreg rep on-stack? odd-register? size alloc-abi-parameter [ ] [
+        vreg rep on-stack?
+        [ dup dup reg-class-of get odd-register? reg-class-full? ] dip or
+        [ size alloc-parameter-stack-slot size 4array stack-values ]
+        [ odd-register? swap next-reg-param 3array reg-values ]
+        if get push
+    ] if ;
 
 : next-return-reg ( rep -- reg ) reg-class-of get pop ;
 
+HOOK: abi-return-register cpu ( rep-tuple -- reg )
+M: object abi-return-register first next-return-reg ;
+
 : with-return-regs ( quot -- )
     '[ return-regs init-regs @ ] with-scope ; inline
+
+:: with-return-type-regs ( c-type quot -- )
+    [ c-type return-regs-for-type init-regs quot call ] with-scope ; inline

@@ -41,7 +41,11 @@ GENERIC: emit-node ( block node -- block' )
 
 : begin-word ( block -- block' )
     t >>kill-block?
-    <gc-map> ##safepoint, ##prologue, ##branch,
+    entry-safepoint-after-prologue? [
+        ##prologue, <gc-map> ##safepoint,
+    ] [
+        <gc-map> ##safepoint, ##prologue,
+    ] if ##branch,
     begin-basic-block ;
 
 : (build-cfg) ( nodes word label -- )

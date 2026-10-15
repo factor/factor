@@ -41,22 +41,22 @@ IN: compiler.cfg.linear-scan.allocation.state.tests
 cpu x86.64? [
     {
         {
-            { XMM0 1/0. }
+            { XMM0 $[ allocation-infinity ] }
             { XMM1 25 }
-            { XMM2 1/0. }
-            { XMM3 1/0. }
-            { XMM4 1/0. }
-            { XMM5 1/0. }
-            { XMM6 1/0. }
-            { XMM7 1/0. }
-            { XMM8 1/0. }
-            { XMM9 1/0. }
-            { XMM10 1/0. }
-            { XMM11 1/0. }
-            { XMM12 1/0. }
-            { XMM13 1/0. }
-            { XMM14 1/0. }
-            { XMM15 1/0. }
+            { XMM2 $[ allocation-infinity ] }
+            { XMM3 $[ allocation-infinity ] }
+            { XMM4 $[ allocation-infinity ] }
+            { XMM5 $[ allocation-infinity ] }
+            { XMM6 $[ allocation-infinity ] }
+            { XMM7 $[ allocation-infinity ] }
+            { XMM8 $[ allocation-infinity ] }
+            { XMM9 $[ allocation-infinity ] }
+            { XMM10 $[ allocation-infinity ] }
+            { XMM11 $[ allocation-infinity ] }
+            { XMM12 $[ allocation-infinity ] }
+            { XMM13 $[ allocation-infinity ] }
+            { XMM14 $[ allocation-infinity ] }
+            { XMM15 $[ allocation-infinity ] }
         }
     } [
         25 XMM1 machine-registers float-regs free-positions
@@ -137,7 +137,7 @@ ${ cell } [
 ] unit-test
 
 ! interval/sync-point-key
-{ { 33 1/0. 1/0. } } [
+{ { 33 $[ allocation-infinity ] $[ allocation-infinity ] } } [
     T{ sync-point { n 33 } } interval/sync-point-key
 ] unit-test
 
@@ -163,7 +163,7 @@ ${ cell } [
 ! >unhandled-min-heap
 {
     {
-        { { 5 1/0. 1/0. } T{ sync-point { n 5 } } }
+        { { 5 $[ allocation-infinity ] $[ allocation-infinity ] } T{ sync-point { n 5 } } }
         {
             { 20 28 f }
             T{ live-interval-state { ranges V{ { 20 28 } } } }
@@ -176,8 +176,8 @@ ${ cell } [
             { 33 999 f }
             T{ live-interval-state { ranges V{ { 33 999 } } } }
         }
-        { { 33 1/0. 1/0. } T{ sync-point { n 33 } } }
-        { { 100 1/0. 1/0. } T{ sync-point { n 100 } } }
+        { { 33 $[ allocation-infinity ] $[ allocation-infinity ] } T{ sync-point { n 33 } } }
+        { { 100 $[ allocation-infinity ] $[ allocation-infinity ] } T{ sync-point { n 100 } } }
     }
 } [
     {

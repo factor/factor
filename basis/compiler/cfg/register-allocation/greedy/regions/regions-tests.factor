@@ -33,8 +33,8 @@ IN: compiler.cfg.register-allocation.greedy.regions.tests
 
 ! Independent exhaustive oracle for small networks. This enumerates every
 ! labeling, without residual paths, and compares the minimum energy.
-:: labeling-cost ( mask nodes edges -- cost )
-    nodes [| node i | node second mask i bit? and ] map-index [ ] any? [ 1/0. ] [
+:: labeling-cost ( mask nodes edges -- cost/f )
+    nodes [| node i | node second mask i bit? and ] map-index [ ] any? [ f ] [
         nodes [| node i | mask i bit? [ 0 ] [ node first ] if ] map-index sum
         edges [| edge |
             mask edge first bit? mask edge second bit? = [ 0 ] [ edge third ] if
@@ -49,7 +49,7 @@ IN: compiler.cfg.register-allocation.greedy.regions.tests
         seed 3 bit? [ { { 0 1 2 } { 1 2 5 } { 2 0 1 } } ]
         [ { { 0 1 8 } { 1 2 1 } } ] if
         [| nodes edges |
-            8 <iota> [ nodes edges labeling-cost ] map infimum
+            8 <iota> [ nodes edges labeling-cost ] map sift infimum
             nodes edges solve-residency cost>> =
         ] call
     ] all?

@@ -10,11 +10,13 @@ SYMBOLS: return-addresses gc-maps ;
 : gc-map-needed? ( gc-map/f -- ? )
     [ tuple-slots [ empty? ] all? not ] ?call ;
 
+: gc-map-at ( gc-map offset -- )
+    over gc-map-needed? [
+        [ gc-maps get push ] dip return-addresses get push
+    ] [ 2drop ] if ;
+
 : gc-map-here ( gc-map -- )
-    dup gc-map-needed? [
-        gc-maps get push
-        compiled-offset return-addresses get push
-    ] [ drop ] if ;
+    compiled-offset gc-map-at ;
 
 : integers>bits ( seq n -- bit-array )
     <bit-array> [ '[ [ t ] dip _ set-nth ] each ] keep ;

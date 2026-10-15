@@ -5,14 +5,14 @@ LIBRARY: varargs-outgoing
 STRUCT: align-prior { a longlong } { b longlong } { c longlong } ;
 STRUCT: align-hva { a float-4 } { b float-4 } ;
 FUNCTION: ulonglong varout_hva_alignment ( align-prior p, align-hva h, int tag, ... )
-{ 0 } [ 1 2 3 align-prior boa float-4{ 1 2 3 4 } float-4{ 5 6 7 8 } align-hva boa 1 varout_hva_alignment ] unit-test
+{ 0 } [ 1 2 3 align-prior boa float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 } align-hva boa 1 varout_hva_alignment ] floating-point-unit-test
 : indirect-alignment ( p h tag ptr -- n )
     ulonglong { align-prior align-hva int } cdecl 3 alien-indirect-varargs ;
-{ 0 } [ 1 2 3 align-prior boa float-4{ 1 2 3 4 } float-4{ 5 6 7 8 } align-hva boa 1 "varout_hva_alignment" "varargs-outgoing" library-dll dlsym indirect-alignment ] unit-test
+{ 0 } [ 1 2 3 align-prior boa float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 } align-hva boa 1 "varout_hva_alignment" "varargs-outgoing" library-dll dlsym indirect-alignment ] floating-point-unit-test
 
 STRUCT: align-result { alignment ulonglong } { value float-4 } ;
 FUNCTION: align-result varout_return_alignment ( align-prior p, int tag, ... )
-{ 0 } [ 1 2 3 align-prior boa 1 varout_return_alignment alignment>> ] unit-test
+{ 0 } [ 1 2 3 align-prior boa 1 varout_return_alignment alignment>> ] floating-point-unit-test
 
 STRUCT: align-vector-first { value float-4 } { tail ulonglong } ;
 UNION-STRUCT: align-vector-union { value float-4 } { integer longlong } ;
@@ -24,8 +24,8 @@ FUNCTION: double varout_vector_union_after_int ( int tag, ... int prefix, align-
 { t } [ align-vector-first heap-size varout_vector_first_size = ] unit-test
 { t } [ align-vector-first c-type-align varout_vector_first_align = ] unit-test
 { t } [ align-vector-union c-type-align varout_vector_union_align = ] unit-test
-{ 36.0 } [ 1 2 float-4{ 1 2 3 4 } 3 align-vector-first boa varout_vector_first_after_int ] unit-test
-{ 36.0 } [ 1 2 align-vector-union <struct> float-4{ 1 2 3 4 } >>value 3 varout_vector_union_after_int ] unit-test
+{ 36.0 } [ 1 2 float-4{ 1.0 2.0 3.0 4.0 } 3 align-vector-first boa varout_vector_first_after_int ] floating-point-unit-test
+{ 36.0 } [ 1 2 align-vector-union <struct> float-4{ 1.0 2.0 3.0 4.0 } >>value 3 varout_vector_union_after_int ] floating-point-unit-test
 ! The preceding promoted int occupies eight bytes; the union starts at 16.
 { 2 30.0 } [ [let
     64 malloc :> mem
@@ -40,4 +40,4 @@ FUNCTION: double varout_vector_union_after_int ( int tag, ... int prefix, align-
             { 1 2 3 4 } [ * ] 2map sum
         ] with-va-scope
     ] [ mem free ] finally
-] ] unit-test
+] ] floating-point-unit-test

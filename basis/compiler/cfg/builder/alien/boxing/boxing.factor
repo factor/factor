@@ -14,6 +14,12 @@ SYMBOL: windows-arm64-varargs?
 ! RISC-V applies the integer convention only to unnamed arguments.
 SYMBOL: varargs-parameter?
 
+HOOK: prepare-abi-call cpu ( params -- )
+M: object prepare-abi-call drop ;
+
+: with-abi-call ( ..a params quot: ( ..a -- ..b ) -- ..b )
+    [ [ prepare-abi-call ] dip call ] with-scope ; inline
+
 SYMBOL: struct-return-area
 
 SYMBOLS: int-reg-reps float-reg-reps ;
@@ -36,7 +42,9 @@ M: small-float-c-type flatten-c-type
     [ c-type-rep f f ] [ heap-size ] bi 4array 1array record-reg-reps ;
 
 M: long-long-type flatten-c-type
-    drop 2 [ int-rep long-long-on-stack? f 3array ] replicate record-reg-reps ;
+    drop int-rep long-long-on-stack?
+    long-long-odd-register? long-long-even-register? or 3array
+    int-rep long-long-on-stack? f 3array 2array record-reg-reps ;
 
 HOOK: flatten-struct-type cpu ( type -- pairs )
 HOOK: flatten-struct-type-return cpu ( type -- pairs )
@@ -72,21 +80,33 @@ M: object store-struct-component ##store-memory-imm, ;
 TUPLE: partial-struct-cell size ;
 C: <partial-struct-cell> partial-struct-cell
 
+TUPLE: right-partial-struct-cell < partial-struct-cell ;
+C: <right-partial-struct-cell> right-partial-struct-cell
+
+GENERIC: struct-cell-width ( part -- width )
+M: partial-struct-cell struct-cell-width drop cell ;
+M: right-partial-struct-cell struct-cell-width size>> ;
+
 :: integer-struct-components ( reps c-type -- offsets types )
     reps component-offsets dup [| offset |
         c-type heap-size offset - cell min
         dup cell < [ <partial-struct-cell> ] [ drop f ] if
     ] map ;
 
+! A partial ABI chunk retains the byte positions of a full register-sized
+! native load: big-endian bytes occupy the high end, little-endian the low.
+: struct-byte-shift ( index cell-size big-endian? -- shift )
+    [ swap - 1 - ] [ drop ] if 8 * ;
+
 M:: partial-struct-cell load-struct-component ( src offset rep part -- dst )
     part size>> <iota> 0 ^^load-integer [| dst index |
         src offset index + int-rep c:uchar ^^load-memory-imm
-        index 8 * ^^shl-imm dst swap ^^or
+        index part struct-cell-width big-endian-cpu? struct-byte-shift ^^shl-imm dst swap ^^or
     ] reduce ;
 
 M:: partial-struct-cell store-struct-component ( value src offset rep part -- )
     part size>> <iota> [| index |
-        value index 8 * ^^shr-imm
+        value index part struct-cell-width big-endian-cpu? struct-byte-shift ^^shr-imm
         src offset index + int-rep c:uchar ##store-memory-imm,
     ] each ;
 
@@ -184,7 +204,8 @@ M: vector-c-type unbox
 
 M: long-long-type unbox
     [ next-vreg next-vreg 2dup ] 2dip unboxer>> ##unbox-long-long, 2array
-    int-rep long-long-on-stack? long-long-odd-register? 3array
+    int-rep long-long-on-stack?
+    long-long-odd-register? long-long-even-register? or 3array
     int-rep long-long-on-stack? f 3array 2array record-reg-reps ;
 
 M: struct-c-type unbox
@@ -213,6 +234,11 @@ M: struct-c-type unbox-parameter unbox-struct-parameter ;
 
 : store-return ( vregs reps -- triples )
     [ [ dup next-return-reg 3array ] 2map ] with-return-regs ;
+
+: store-return-for-type ( vregs reps c-type -- triples )
+    [ [ dup next-return-reg 3array ] 2map ] with-return-type-regs ;
+HOOK: store-callback-return cpu ( vregs reps c-type -- triples )
+M: object store-callback-return store-return-for-type ;
 
 GENERIC: unbox-return ( src c-type -- vregs reps )
 
@@ -295,14 +321,16 @@ M: struct-c-type box-parameter box-struct-parameter ;
 GENERIC: load-return ( c-type -- triples )
 
 GENERIC: flatten-return-type ( c-type -- reps )
-M: abstract-c-type flatten-return-type flatten-c-type ;
+HOOK: flatten-scalar-return cpu ( c-type -- reps )
+M: object flatten-scalar-return flatten-c-type ;
+M: abstract-c-type flatten-return-type flatten-scalar-return ;
 M: struct-c-type flatten-return-type flatten-struct-type-return ;
 
 M: abstract-c-type load-return
-    [
-        flatten-return-type keys
-        [ [ next-vreg ] dip dup next-return-reg 3array ] map
-    ] with-return-regs ;
+    dup [
+        flatten-return-type
+        [ [ drop next-vreg ] [ first ] [ abi-return-register ] tri 3array ] map
+    ] with-return-type-regs ;
 
 M: struct-c-type load-return
     dup return-struct-in-registers?
@@ -310,7 +338,9 @@ M: struct-c-type load-return
 
 GENERIC: box-return ( vregs reps c-type -- dst )
 
-M: abstract-c-type box-return box ;
+HOOK: box-scalar-return cpu ( vregs reps c-type -- dst )
+M: object box-scalar-return box ;
+M: abstract-c-type box-return box-scalar-return ;
 
 M: struct-c-type box-return
     dup return-struct-in-registers?

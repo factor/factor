@@ -1,6 +1,6 @@
 USING: accessors alien arrays byte-arrays classes classes.private classes.algebra classes.algebra.private
 classes.builtin classes.mixin classes.predicate classes.singleton classes.tuple
-classes.union compiler.units continuations locals words
+classes.union compiler.units compiler.test.literal-metadata continuations locals words
 classes.struct compiler.tree.propagation.copy
 compiler.tree.propagation.info io.encodings.utf8 kernel literals math
 math.intervals layouts namespaces sequences sequences.private strings threads tools.test ;
@@ -23,7 +23,7 @@ IN: compiler.tree.propagation.info.tests
     10.0 <literal-info>
     value-info-intersect
     [ class>> ] [ >literal< ] bi
-] unit-test
+] literal-metadata-unit-test
 
 { null } [
     10 <literal-info>
@@ -39,7 +39,7 @@ IN: compiler.tree.propagation.info.tests
     [ class>> ] [ >literal< ] bi
 ] unit-test
 
-{ 3.0 t } [
+floating-point-supported? { 3.0 t } { f f } ? [
     3 3 [a,b] <interval-info> float <class-info>
     value-info-intersect >literal<
 ] unit-test

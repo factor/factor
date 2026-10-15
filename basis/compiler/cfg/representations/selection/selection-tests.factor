@@ -1,4 +1,4 @@
-USING: accessors arrays assocs compiler.cfg compiler.cfg.debugger
+USING: literals accessors arrays assocs compiler.cfg compiler.cfg.debugger
 compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.loop-detection compiler.cfg.optimizer compiler.cfg.registers
 compiler.cfg.representations compiler.cfg.representations.coalescing
@@ -90,7 +90,10 @@ IN: compiler.cfg.representations.selection.tests
 
 ! The repeated cold uses must not force the float loop phi to stay boxed.
 ! Verify lowering's actual allocation placement, independently of costs.
-{ 1 0 0 1 } [ f loop-box-counts t loop-box-counts ] unit-test
+! Primitive-call lowering keeps the float boxed across the loop; its
+! allocation occurs inside the primitive rather than in this CFG.
+[ \ float+ intrinsic-enabled? [ { 1 0 0 1 } ] [ { 0 0 0 0 } ] if ] call
+[ f loop-box-counts t loop-box-counts ] unit-test
 
 { t } [
     { f t } [| enabled? |
@@ -102,7 +105,7 @@ IN: compiler.cfg.representations.selection.tests
             ] all?
         ] with-scope
     ] all?
-] unit-test
+] floating-point-unit-test
 
 :: bit-preserving-loop-quot ( initial -- quot )
     [ { fixnum } declare ] initial 1array append
@@ -122,7 +125,7 @@ IN: compiler.cfg.representations.selection.tests
             ] with-scope
         ] map first2 =
     ] all?
-] unit-test
+] floating-point-unit-test
 
 ! A runtime NaN avoids asking constant propagation to solve a NaN-valued
 ! loop fixed point; still exercise the selected representation, FFI and GC.
@@ -138,4 +141,4 @@ IN: compiler.cfg.representations.selection.tests
             [ double>bits ] map
         ] with-scope
     ] map first2 =
-] unit-test
+] floating-point-unit-test

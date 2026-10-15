@@ -1,8 +1,8 @@
-USING: accessors alien assocs combinators.short-circuit compiler.cfg
+USING: accessors alien arrays assocs combinators.short-circuit compiler.cfg
 compiler.cfg.comparisons compiler.cfg.dce compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.representations
 compiler.cfg.ssa.destruction compiler.cfg.utilities
-compiler.cfg.value-numbering compiler.test cpu.architecture kernel
+compiler.cfg.value-numbering compiler.test compiler.test.literal-metadata cpu.architecture kernel
 layouts literals math namespaces sequences system tools.test ;
 ! need cfg simd loaded for some tests
 USE: compiler.cfg.value-numbering.simd
@@ -36,7 +36,7 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##load-reference f 0 0.0 }
         T{ ##load-reference f 1 -0.0 }
     } value-numbering-step
-] unit-test
+] literal-metadata-unit-test
 
 {
     {
@@ -48,7 +48,7 @@ IN: compiler.cfg.value-numbering.tests
         T{ ##load-reference f 0 0.0 }
         T{ ##load-reference f 1 0.0 }
     } value-numbering-step
-] unit-test
+] literal-metadata-unit-test
 
 {
     {
@@ -714,35 +714,36 @@ cpu x86.32? [
     ] unit-test
 ] when
 
-cpu x86.32? [
-    [
-        {
-            T{ ##peek f 0 D: 0 }
-            T{ ##load-reference f 1 3.5 }
-            T{ ##compare f 2 0 1 cc= }
-        }
-    ] [
-        {
-            T{ ##peek f 0 D: 0 }
-            T{ ##load-reference f 1 3.5 }
-            T{ ##compare f 2 0 1 cc= }
-        } value-numbering-step trim-temps
-    ] unit-test
+! Boxed literals may use a materialized immediate on CPUs such as ARM32.
+[
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-reference f 1 3.5 }
+    } 3.5 immediate-comparand?
+    [ T{ ##compare-imm f 2 0 3.5 cc= } ]
+    [ T{ ##compare f 2 0 1 cc= } ] if suffix
+] call 1array [
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-reference f 1 3.5 }
+        T{ ##compare f 2 0 1 cc= }
+    } value-numbering-step trim-temps
+] literal-metadata-unit-test
 
-    [
-        {
-            T{ ##peek f 0 D: 0 }
-            T{ ##load-reference f 1 3.5 }
-            T{ ##compare-branch f 0 1 cc= }
-        }
-    ] [
-        {
-            T{ ##peek f 0 D: 0 }
-            T{ ##load-reference f 1 3.5 }
-            T{ ##compare-branch f 0 1 cc= }
-        } value-numbering-step trim-temps
-    ] unit-test
-] unless
+[
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-reference f 1 3.5 }
+    } 3.5 immediate-comparand?
+    [ T{ ##compare-imm-branch f 0 3.5 cc= } ]
+    [ T{ ##compare-branch f 0 1 cc= } ] if suffix
+] call 1array [
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-reference f 1 3.5 }
+        T{ ##compare-branch f 0 1 cc= }
+    } value-numbering-step trim-temps
+] literal-metadata-unit-test
 
 {
     {
@@ -2393,33 +2394,53 @@ cell 8 = [
     } value-numbering-step
 ] unit-test
 
-{
+$[
+    floating-point-supported?
     {
-        T{ ##load-reference f 0 1.25 }
+        {
+            T{ ##load-reference f 0 1.25 }
         T{ ##load-reference f 1 B{ 0 0 160 63 0 0 160 63 0 0 160 63 0 0 160 63 } }
         T{ ##load-reference f 2 B{ 0 0 160 63 0 0 160 63 0 0 160 63 0 0 160 63 } }
     }
-} [
+}
+    {
+        {
+                T{ ##load-reference f 0 1.25 }
+                T{ ##scalar>vector f 1 0 float-4-rep }
+                T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
+            }
+    } ?
+] [
     {
         T{ ##load-reference f 0 1.25 }
         T{ ##scalar>vector f 1 0 float-4-rep }
         T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
     } value-numbering-step
-] unit-test
+] literal-metadata-unit-test
 
-{
+$[
+    floating-point-supported?
     {
-        T{ ##load-reference f 0 1.25 }
+        {
+            T{ ##load-reference f 0 1.25 }
         T{ ##load-reference f 1 B{ 0 0 160 63 0 0 160 63 0 0 160 63 0 0 160 63 } }
         T{ ##load-reference f 2 B{ 0 0 160 63 0 0 160 63 0 0 160 63 0 0 160 63 } }
     }
-} [
+}
+    {
+        {
+                T{ ##load-reference f 0 1.25 }
+                T{ ##scalar>vector f 1 0 float-4-rep }
+                T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
+            }
+    } ?
+] [
     {
         T{ ##load-reference f 0 1.25 }
         T{ ##scalar>vector f 1 0 float-4-rep }
         T{ ##shuffle-vector-imm f 2 1 { 0 0 0 0 } float-4-rep }
     } value-numbering-step
-] unit-test
+] literal-metadata-unit-test
 
 {
     {
@@ -2449,7 +2470,7 @@ cell 8 = [
         T{ ##load-reference f 2 3.75 }
         T{ ##gather-vector-2 f 4 0 2 double-2-rep }
     } value-numbering-step
-] unit-test
+] literal-metadata-unit-test
 
 {
     {
@@ -2465,15 +2486,27 @@ cell 8 = [
     } value-numbering-step
 ] unit-test
 
-{
+$[
+    floating-point-supported?
     {
-        T{ ##load-reference f 0 1.25 }
+        {
+            T{ ##load-reference f 0 1.25 }
         T{ ##load-reference f 1 2.50 }
         T{ ##load-reference f 2 3.75 }
         T{ ##load-reference f 3 5.00 }
         T{ ##load-reference f 4 B{ 0 0 160 63 0 0 32 64 0 0 112 64 0 0 160 64 } }
     }
-} [
+}
+    {
+        {
+                T{ ##load-reference f 0 1.25 }
+                T{ ##load-reference f 1 2.50 }
+                T{ ##load-reference f 2 3.75 }
+                T{ ##load-reference f 3 5.00 }
+                T{ ##gather-vector-4 f 4 0 1 2 3 float-4-rep }
+            }
+    } ?
+] [
     {
         T{ ##load-reference f 0 1.25 }
         T{ ##load-reference f 1 2.50 }
@@ -2481,7 +2514,7 @@ cell 8 = [
         T{ ##load-reference f 3 5.00 }
         T{ ##gather-vector-4 f 4 0 1 2 3 float-4-rep }
     } value-numbering-step
-] unit-test
+] literal-metadata-unit-test
 
 {
     {

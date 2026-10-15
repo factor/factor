@@ -3,7 +3,7 @@
 USING: accessors alien alien.accessors alien.arrays alien.c-types
 alien.c-types.varargs alien.data alien.private arrays byte-arrays
 classes.struct combinators combinators.short-circuit compiler.units continuations
-cpu.architecture cpu.arm.64.abi grouping kernel layouts libc locals math math.order
+cpu.architecture cpu.arm.64.abi cpu.s390x.abi grouping kernel layouts libc locals math math.bitwise math.order
 namespaces sequences system threads words ;
 IN: alien.varargs
 
@@ -38,10 +38,10 @@ PRIVATE>
         gr-offs >>gr-offs vr-offs >>vr-offs platform >>platform
         active-va-lifetime >>lifetime ;
 
-: va-platform ( -- platform ) cpu riscv? [ cpu ] [ os ] if ;
+: va-platform ( -- platform ) cpu riscv? cpu loongarch.64? or cpu mips? or cpu s390x? or cpu hppa? or [ cpu ] [ os ] if ;
 
 : <va-cursor> ( stack gr-top vr-top gr-offs vr-offs -- cursor )
-    cpu arm.64? cpu riscv? or
+    cpu arm.64? cpu riscv? cpu loongarch.64? or or cpu mips? or cpu s390x? or cpu hppa? or
     [ va-platform <platform-va-cursor> ] [ unsupported-va-list-platform ] if ;
 
 : check-va-list ( cursor -- )
@@ -56,7 +56,7 @@ PRIVATE>
 
 ! Metadata is compiled once for each literal va-arg type. The platform
 ! distinction is made by the reader so synthetic ABI tests can run anywhere.
-TUPLE: va-layout size alignment members aggregate? homogeneous? ;
+TUPLE: va-layout size alignment members aggregate? homogeneous? resolved ;
 
 :: <va-layout> ( type -- layout )
     type lookup-c-type :> resolved
@@ -64,14 +64,22 @@ TUPLE: va-layout size alignment members aggregate? homogeneous? ;
     va-layout new
         type heap-size >>size type c-type-align >>alignment
         members [ ] [ { } ] if* >>members resolved struct-c-type? >>aggregate?
-        members >boolean >>homogeneous? ;
+        members >boolean >>homogeneous? resolved >>resolved ;
 
 : align-va-pointer ( ptr alignment -- ptr' )
     [ alien-address ] dip align <alien> ;
 
 ! Synthetic platform cursors retain their target slot width even when
 ! tests run on a host with a different cell size.
-: va-abi-cell ( cursor -- n ) platform>> riscv.32? 4 8 ? ;
+: va-abi-cell ( cursor -- n ) platform>> dup riscv.32? over mips32? or swap hppa? or 4 8 ? ;
+
+! O32 and PA32 align eight-byte scalar arguments to an eight-byte home,
+! even when the host C type (for example x86-32 double) is four-aligned.
+:: va-target-alignment ( cursor layout -- alignment )
+    layout alignment>>
+    cursor platform>> dup mips32? swap hppa? or
+    layout aggregate?>> not and layout size>> 8 = and
+    [ 8 max ] when ;
 
 :: va-stack-address ( cursor size alignment -- ptr )
     cursor stack>> alignment cursor va-abi-cell max align-va-pointer :> ptr
@@ -104,8 +112,10 @@ TUPLE: va-layout size alignment members aggregate? homogeneous? ;
     bytes ;
 
 :: va-indirect? ( cursor layout -- ? )
-    layout aggregate?>> layout size>> cursor va-abi-cell 2 * > and
-    cursor platform>> dup windows? swap riscv? or layout homogeneous?>> not or and ;
+    cursor platform>> mips? [ f ] [
+        layout aggregate?>> layout size>> cursor va-abi-cell 2 * > and
+        cursor platform>> dup windows? over riscv? or swap loongarch.64? or layout homogeneous?>> not or and
+    ] if ;
 
 :: va-linux-address ( cursor layout indirect? -- ptr )
     indirect? [ cursor va-abi-cell dup ] [ layout size>> layout alignment>> ] if :> ( size alignment )
@@ -118,15 +128,63 @@ TUPLE: va-layout size alignment members aggregate? homogeneous? ;
         [ ] [ cursor size alignment va-stack-address ] if*
     ] if ;
 
-:: va-arg-address ( cursor layout -- ptr )
-    cursor check-va-list
-    cursor layout va-indirect? :> indirect?
-    cursor platform>> linux? [ cursor layout indirect? va-linux-address ] [
-        cursor indirect? [ cursor va-abi-cell dup ] [ layout size>> layout alignment>> ] if
-        cursor platform>> windows? [ 8 min ] when
-        va-stack-address
+! System z has five eight-byte GP slots and four eight-byte FP slots.
+! Small GP values are right justified; FP values start at the slot base.
+:: va-s390x-address ( cursor layout -- ptr )
+    layout resolved>> single-fp-rep >boolean :> fp?
+    layout aggregate?>>
+    layout resolved>> M\ s390x value-struct? execute not and :> indirect?
+    indirect? 8 layout size>> ? :> size
+    fp? [
+        cursor vr-offs>> :> offset
+        offset 0 < [
+            cursor offset 8 + >>vr-offs drop
+            offset cursor vr-top>> <displaced-alien>
+        ] [
+            cursor 8 8 va-stack-address
+            8 size - swap <displaced-alien>
+        ] if
+    ] [
+        cursor 8 8 va-gpr-address
+        [ ] [ cursor 8 8 va-stack-address ] if*
+        8 size - swap <displaced-alien>
     ] if
     indirect? [ 0 alien-cell ] when ;
+
+:: va-hppa-address ( cursor layout -- ptr )
+    layout aggregate?>> layout size>> 8 > and :> indirect?
+    indirect? [ 4 4 ] [
+        layout size>> cursor layout va-target-alignment
+        layout aggregate?>> layout size>> 4 > and [ 8 max ] when
+    ] if :> ( size alignment )
+    size 4 align :> slot-size
+    cursor stack>> alien-address slot-size -
+    alignment 4 max 1 - bitnot bitand <alien> :> base
+    cursor base >>stack drop
+    slot-size size - base <displaced-alien>
+    indirect? [ 0 alien-unsigned-4 <alien> ] when ;
+
+:: va-arg-address ( cursor layout -- ptr )
+    cursor check-va-list
+    cursor platform>> hppa? [ cursor layout va-hppa-address ] [
+    cursor platform>> s390x? [ cursor layout va-s390x-address ] [
+        cursor layout va-indirect? :> indirect?
+        cursor platform>> aapcs64-va-list-platform? [ cursor layout indirect? va-linux-address ] [
+            cursor indirect? [ cursor va-abi-cell dup ] [ layout size>> cursor layout va-target-alignment ] if
+            cursor platform>> windows? [ 8 min ] when
+            va-stack-address
+        ] if
+        ! N64 integer scalars occupy the low four bytes of an eight-byte GP slot.
+        ! On big endian targets this is the second word. Struct chunks retain
+        ! their ABI left justification and start at the unadjusted slot address.
+        cursor platform>> mips64? layout aggregate?>> not and [
+            cursor platform>> name>> cpu-name-big-endian?
+            layout size>> cursor va-abi-cell < and [
+                cursor va-abi-cell layout size>> - swap <displaced-alien>
+            ] when
+        ] when
+        indirect? [ 0 alien-cell ] when
+    ] if ] if ;
 
 PRIVATE>
 
@@ -134,9 +192,9 @@ MACRO: va-arg ( c-type -- quot: ( cursor -- value ) )
     promote-vararg-type [ <va-layout> ] [ ] bi
     '[ _ va-arg-address 0 _ alien-copy-value ] ;
 
-! ARM64 Linux's va_list is a structure passed according to normal aggregate ABI
+! ARM64 AAPCS systems use a structured va_list with normal aggregate ABI
 ! rules. Apple and Windows use a pointer. These are parameter types, not a
-! portable void* alias: in particular, Linux passes this 32-byte value by
+! portable void* alias: these systems pass this 32-byte value by
 ! reference to a copy made by the caller.
 STRUCT: native-va-list-storage
     { stack void* }
@@ -145,32 +203,58 @@ STRUCT: native-va-list-storage
     { gr-offs int }
     { vr-offs int } ;
 
+STRUCT: s390x-va-list-storage
+    { gpr-count long }
+    { fpr-count long }
+    { overflow void* }
+    { savearea void* } ;
+
+:: s390x-native-va-list>cursor ( ptr -- cursor )
+    ptr 24 alien-cell :> saved
+    ptr 16 alien-cell
+    56 saved <displaced-alien> 160 saved <displaced-alien>
+    ptr 0 alien-signed-8 5 - 0 min -5 max 8 *
+    ptr 8 alien-signed-8 4 - 0 min -4 max 8 *
+    s390x <platform-va-cursor> ;
+
+:: s390x-cursor>native-va-list ( cursor -- ptr )
+    s390x-va-list-storage <struct> :> native
+    native
+        cursor gr-offs>> 8 /i 5 + >>gpr-count
+        cursor vr-offs>> 8 /i 4 + >>fpr-count
+        cursor stack>> >>overflow
+        -56 cursor gr-top>> <displaced-alien> >>savearea >c-ptr ;
+
 :: native-va-list>cursor ( ptr -- cursor )
-    cpu arm.64? cpu riscv? or [
-        os linux? cpu arm.64? and [
-            ptr 0 alien-cell ptr 8 alien-cell ptr 16 alien-cell
-            ptr 24 alien-signed-4 ptr 28 alien-signed-4 <va-cursor>
-        ] [ ptr f f 0 0 <va-cursor> ] if
-    ] [ unsupported-va-list-platform ] if ;
+    cpu s390x? [ ptr s390x-native-va-list>cursor ] [
+        cpu arm.64? cpu riscv? cpu loongarch.64? or or cpu mips? or cpu s390x? or cpu hppa? or [
+            os aapcs64-va-list-platform? cpu arm.64? and [
+                ptr 0 alien-cell ptr 8 alien-cell ptr 16 alien-cell
+                ptr 24 alien-signed-4 ptr 28 alien-signed-4 <va-cursor>
+            ] [ ptr f f 0 0 <va-cursor> ] if
+        ] [ unsupported-va-list-platform ] if
+    ] if ;
 
 :: cursor>native-va-list ( cursor -- ptr )
     cursor check-va-list
     cursor platform>> va-platform = [ unsupported-va-list-platform ] unless
-    cpu arm.64? cpu riscv? or [
-        os linux? cpu arm.64? and [
-            native-va-list-storage <struct> :> native
-            native
-                cursor stack>> >>stack cursor gr-top>> >>gr-top
-                cursor vr-top>> >>vr-top cursor gr-offs>> >>gr-offs
-                cursor vr-offs>> >>vr-offs >c-ptr
-        ] [ cursor stack>> ] if
-    ] [ unsupported-va-list-platform ] if ;
+    cpu s390x? [ cursor s390x-cursor>native-va-list ] [
+        cpu arm.64? cpu riscv? cpu loongarch.64? or or cpu mips? or cpu s390x? or cpu hppa? or [
+            os aapcs64-va-list-platform? cpu arm.64? and [
+                native-va-list-storage <struct> :> native
+                native
+                    cursor stack>> >>stack cursor gr-top>> >>gr-top
+                    cursor vr-top>> >>vr-top cursor gr-offs>> >>gr-offs
+                    cursor vr-offs>> >>vr-offs >c-ptr
+            ] [ cursor stack>> ] if
+        ] [ unsupported-va-list-platform ] if
+    ] if ;
 
 SYMBOL: va_list
 
 [
-    cpu arm.64? cpu riscv? or [
-        os linux? cpu arm.64? and [ native-va-list-storage ] [ void* ] if
+    cpu arm.64? cpu riscv? cpu loongarch.64? or or cpu mips? or cpu s390x? or cpu hppa? or [
+        os aapcs64-va-list-platform? cpu arm.64? and [ native-va-list-storage ] [ void* ] if
         lookup-c-type clone
             va-cursor >>boxed-class
             [ native-va-list>cursor ] >>boxer-quot
@@ -180,7 +264,7 @@ SYMBOL: va_list
 ] with-compilation-unit
 
 : native-va-list-type? ( type -- ? )
-    cpu arm.64? cpu riscv? or [
+    cpu arm.64? cpu riscv? cpu loongarch.64? or or cpu mips? or cpu s390x? or cpu hppa? or [
         dup abstract-c-type? [ lookup-c-type ] unless
         va_list lookup-c-type eq?
     ] [ drop f ] if ;

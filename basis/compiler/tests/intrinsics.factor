@@ -476,15 +476,15 @@ ERROR: bug-in-fixnum* x y a b ;
 { -100000 } [ -100000 [ int <ref> ] [ { fixnum } declare ] prepend compile-call int deref ] unit-test
 { 4294867296 } [ -100000 [ uint <ref> ] [ { fixnum } declare ] prepend compile-call uint deref ] unit-test
 
-{ t } [ pi pi double <ref> double deref = ] unit-test
+{ t } [ pi double>bits pi double <ref> double deref double>bits = ] unit-test
 
-{ t } [ pi double <ref> [ { byte-array } declare double deref ] compile-call pi = ] unit-test
+{ t } [ pi double <ref> [ { byte-array } declare double deref ] compile-call double>bits pi double>bits = ] unit-test
 
 ! Silly
-{ t } [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-call ] keep c:float deref pi - -0.001 0.001 between? ] unit-test
-{ t } [ pi c:float <ref> [ { byte-array } declare c:float deref ] compile-call pi - -0.001 0.001 between? ] unit-test
+{ t } [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-call ] keep c:float deref pi - -0.001 0.001 between? ] floating-point-unit-test
+{ t } [ pi c:float <ref> [ { byte-array } declare c:float deref ] compile-call pi - -0.001 0.001 between? ] floating-point-unit-test
 
-{ t } [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-call ] keep double deref pi = ] unit-test
+{ t } [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-call ] keep double deref double>bits pi double>bits = ] unit-test
 
 { 4 } [
     2 B{ 1 2 3 4 5 6 } <displaced-alien> [

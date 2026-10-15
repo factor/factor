@@ -138,7 +138,9 @@ CODEGEN: ##call %call
 CODEGEN: ##jump %jump
 CODEGEN: ##return %return
 ! A fault resumes at the poll itself, so its map precedes the instruction.
-M: ##safepoint generate-insn gc-map>> gc-map-here %safepoint ;
+M: ##safepoint generate-insn
+    gc-map>> safepoint-gc-map
+    compiled-offset safepoint-gc-map-offset + gc-map-at %safepoint ;
 CODEGEN: ##slot %slot
 CODEGEN: ##slot-imm %slot-imm
 CODEGEN: ##set-slot %set-slot
@@ -178,6 +180,8 @@ CODEGEN: ##div-float %div-float
 CODEGEN: ##min-float %min-float
 CODEGEN: ##max-float %max-float
 CODEGEN: ##sqrt %sqrt
+CODEGEN: ##native-helper-long-long %native-helper-long-long
+CODEGEN: ##native-helper %native-helper
 CODEGEN: ##single>double-float %single>double-float
 CODEGEN: ##double>single-float %double>single-float
 CODEGEN: ##integer>float %integer>float
@@ -317,3 +321,6 @@ CODEGEN: ##fma-vector %fma-vector
 CODEGEN: ##mul-wide-vector %mul-wide-vector
 
 CODEGEN: ##blend-vector %blend-vector
+
+M: ##mapped-callback-inputs generate-insn
+    [ reg-outputs>> ] [ stack-outputs>> ] [ gc-map>> ] tri %mapped-callback-inputs ;

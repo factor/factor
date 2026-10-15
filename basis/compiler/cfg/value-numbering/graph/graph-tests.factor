@@ -1,6 +1,6 @@
-USING: accessors arrays compiler.cfg compiler.cfg.instructions
+USING: literals accessors arrays compiler.cfg compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.utilities compiler.cfg.value-numbering
-compiler.cfg.value-numbering.graph cpu.architecture kernel locals namespaces
+compiler.cfg.value-numbering.graph compiler.test.literal-metadata cpu.architecture kernel math locals namespaces
 sequences tools.test ;
 IN: compiler.cfg.value-numbering.graph.tests
 
@@ -14,13 +14,21 @@ IN: compiler.cfg.value-numbering.graph.tests
 
 ! SSA constants, including copies of them, remain available in later blocks.
 ! This benefits the existing integer folders as well as float conversions.
+$[ floating-point-supported?
 {
     {
         T{ ##load-integer { dst 2 } { val -7 } }
         T{ ##load-integer { dst 3 } { val 12 } }
         T{ ##load-reference { dst 4 } { obj 7.0 } }
     }
-} [
+}
+{
+    {
+        T{ ##load-integer { dst 2 } { val -7 } }
+        T{ ##load-integer { dst 3 } { val 12 } }
+        T{ ##integer>float { dst 4 } { src 1 } }
+    }
+} ? ] [
     [let
         V{
             T{ ##load-integer { dst 0 } { val 7 } }
@@ -41,7 +49,7 @@ IN: compiler.cfg.value-numbering.graph.tests
         first-block block>cfg value-numbering
         third-block instructions>> 3 head >array
     ]
-] unit-test
+] literal-metadata-unit-test
 
 ! A new CFG can reuse the same register numbers for nonconstant inputs.
 { t } [

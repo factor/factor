@@ -84,18 +84,27 @@ M: wrapper apply-object
 
 M: object apply-object push-literal ;
 
+! Quotation inference hides its caller's retain stack, but a throw consumes it.
+SYMBOL: enclosing-retain-stacks
+
+: retain-inference-frames ( -- frames )
+    enclosing-retain-stacks get
+    [ ] [ V{ } clone dup enclosing-retain-stacks set ] if* ;
+
 : terminate ( -- )
-    terminated? on meta-d clone meta-r clone #terminate, ;
+    terminated? on meta-d clone
+    retain-inference-frames meta-r suffix concat #terminate, ;
 
 : check->r ( -- )
     meta-r empty? [ too-many->r ] unless ;
 
 : infer-quot-here ( quot -- )
-    meta-r [
+    meta-r dup retain-inference-frames push [
         V{ } clone (meta-r) set
         [ apply-object terminated? get not ] all?
         [ commit-literals check->r ] [ literals get delete-all ] if
-    ] dip (meta-r) set ;
+    ] dip
+    retain-inference-frames pop* (meta-r) set ;
 
 : infer-quot ( quot rstate -- )
     recursive-state get [
@@ -149,6 +158,7 @@ M: object apply-object push-literal ;
 : with-infer ( quot -- effect visitor )
     [
         init-inference
+        V{ } clone enclosing-retain-stacks set
         H{ } clone known-values set
         stack-visitor off
         call

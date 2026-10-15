@@ -1,8 +1,8 @@
-USING: accessors alien.c-types arrays bit-arrays byte-arrays
+USING: accessors alien.c-types alien.data arrays bit-arrays byte-arrays
 classes.struct compiler.cfg compiler.cfg.instructions
 compiler.cfg.stack-frame compiler.cfg.utilities
 compiler.codegen compiler.codegen.gc-maps compiler.codegen.relocation
-cpu.architecture kernel layouts make math namespaces sequences
+cpu.architecture grouping kernel layouts make math namespaces sequences
 specialized-arrays system tools.test ;
 QUALIFIED: vm
 SPECIALIZED-ARRAY: uint
@@ -111,12 +111,17 @@ M: fake-cpu %safepoint B{ 0 0 0 0 } % ;
     derived-root-offsets
 ] unit-test
 
+! Tables contain native uint32 words, while these independent fixtures
+! spell their little-endian representation.
+: canonical-table-bytes ( bytes -- bytes' )
+    little-endian? [ ] [ 4 group [ reverse ] map concat >byte-array ] if ;
+
 ! emit-base-tables
 {
     3 B{ 255 255 255 255 255 255 255 255 4 0 0 0 }
 } [
     { T{ gc-map { derived-roots V{ { 2 4 } } } } }
-    [ emit-base-tables ] B{ } make
+    [ emit-base-tables ] B{ } make canonical-table-bytes
 ] unit-test
 
 ! serialize-gc-maps
@@ -131,7 +136,7 @@ M: fake-cpu %safepoint B{ 0 0 0 0 } % ;
 } [
     { 123 } return-addresses set
     { T{ gc-map } } gc-maps set
-    serialize-gc-maps
+    serialize-gc-maps canonical-table-bytes
 ] unit-test
 
 ! gc-info + ret-addr + 9bits (5+2+2) = 20 + 4 + 2 = 26

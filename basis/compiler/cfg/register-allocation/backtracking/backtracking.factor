@@ -1,6 +1,6 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compiler.cfg
+USING: compiler.utilities accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.linearization
 compiler.cfg.def-use compiler.cfg.liveness
 compiler.cfg.linear-scan compiler.cfg.linear-scan.allocation.state
@@ -108,7 +108,7 @@ ERROR: overlapping-backtracking-bundle intervals ;
 :: <allocation-bundle> ( intervals -- bundle )
     intervals [ interval-size ] map-sum :> size
     intervals intervals length 1 =
-    intervals [ minimal-interval? ] all? and [ 1/0. ] [
+    intervals [ minimal-interval? ] all? and [ spill-site-weights get compiler-spill-infinity ] [
         intervals [ uses>> [ spill-site-weight ] map-sum ] map-sum size /
     ] if size
     ! A queued/assigned bundle is immutable. Splitting discards the bundle;

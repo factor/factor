@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private tools.test math math.partial-dispatch
+USING: compiler.test.literal-metadata literals kernel kernel.private tools.test math math.partial-dispatch
 prettyprint math.private accessors slots.private sequences
 sequences.private strings sbufs compiler.tree.builder
 compiler.tree.normalization compiler.tree.debugger alien.accessors
@@ -246,13 +246,19 @@ cell {
     { fixnum+ >fixnum } inlined?
 ] unit-test
 
-{ [ [ 1 ] [ 4 ] if ] } [
+$[ floating-point-supported?
+    { [ [ 1 ] [ 4 ] if ] }
+    { [ [ 1.5 ] [ 4 ] if >fixnum ] } ?
+] [
     [ [ 1.5 ] [ 4 ] if >fixnum ] test-modular-arithmetic
-] unit-test
+] literal-metadata-unit-test
 
-{ [ [ 1 ] [ 2 ] if ] } [
+$[ floating-point-supported?
+    { [ [ 1 ] [ 2 ] if ] }
+    { [ [ 1.5 ] [ 2.3 ] if float>fixnum ] } ?
+] [
     [ [ 1.5 ] [ 2.3 ] if >fixnum ] test-modular-arithmetic
-] unit-test
+] literal-metadata-unit-test
 
 { f } [
     [ { fixnum fixnum boolean } declare [ [ 3 * ] [ 1 + ] dip ] [ [ 4 - ] [ 2 + ] dip ] if >fixnum ]

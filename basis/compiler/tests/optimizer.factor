@@ -155,8 +155,8 @@ GENERIC: void-generic ( obj -- * )
 
 { 0 } [ 5 [ 1 mod ] compile-call ] unit-test
 { 0 } [ 5 [ 1 rem ] compile-call ] unit-test
-{ 0.5 } [ 5.5 [ 1 mod ] compile-call ] unit-test
-{ 0.5 } [ 5.5 [ 1 rem ] compile-call ] unit-test
+{ 0.5 } [ 5.5 [ 1 mod ] compile-call ] floating-point-unit-test
+{ 0.5 } [ 5.5 [ 1 rem ] compile-call ] floating-point-unit-test
 
 { 5 } [ 5 [ -1 bitand ] compile-call ] unit-test
 { 0 } [ 5 [ 0 bitand ] compile-call ] unit-test
@@ -272,7 +272,7 @@ HINTS: recursive-inline-hang-3 array ;
 : counter-example' ( -- a' b' c' d' )
     1 2 3.0 3 counter-example ;
 
-{ 2 4 6.0 0 } [ counter-example' ] unit-test
+{ 2 4 6.0 0 } [ counter-example' ] floating-point-unit-test
 
 : member-test ( obj -- ? ) { + - * / /i } member? ;
 
@@ -430,7 +430,7 @@ TUPLE: grid-mesh-tuple { length read-only } { step read-only } ;
         ] 2curry times
     ] keep ;
 
-{ { 0.5 } } [ grid-mesh-test-case ] unit-test
+{ { 0.5 } } [ grid-mesh-test-case ] floating-point-unit-test
 
 { { 1 } "bar" } [ { 1 } [ [ [ [ "foo" throw ] [ "bar" throw ] recover ] attempt-all f ] [ ] recover ] compile-call ] unit-test
 

@@ -711,6 +711,20 @@ def: dst/tagged-rep
 use: src1/int-rep src2/int-rep
 literal: boxer gc-map ;
 
+! CPU-specific lowering introduces this only after representation selection.
+! Hidden native helpers can collect or capture a continuation on errors.
+VREG-INSN: ##native-helper
+def: dst
+use: src
+literal: helper rep src-rep vm? gc-map ;
+
+VREG-INSN: ##native-helper-long-long
+def: dst1/int-rep dst2/int-rep
+use: src/tagged-rep
+literal: helper gc-map ;
+
+UNION: native-helper-insn ##native-helper ##native-helper-long-long ;
+
 ! Alien call inputs and outputs are arrays of triples with shape
 ! { vreg rep stack#/reg }
 
@@ -726,6 +740,10 @@ literal: varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack
 
 VREG-INSN: ##callback-inputs
 literal: reg-outputs stack-outputs ;
+
+! A CPU can lower an allocating callback entry to this mapped subclass.
+! Existing callback operand/clobber methods apply through inheritance.
+TUPLE: ##mapped-callback-inputs < ##callback-inputs gc-map ;
 
 ! The native entry stack pointer of an ARM64 variadic callback. Its
 ! register-save areas stay on the native stack until the callback exits.
@@ -898,6 +916,8 @@ UNION: alien-call-insn
 UNION: gc-check-insn ##call-gc ##safepoint ;
 
 UNION: gc-map-insn
+    ##mapped-callback-inputs
+    native-helper-insn
     gc-check-insn
     ##box
     ##box-long-long

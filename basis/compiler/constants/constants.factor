@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien arrays byte-arrays kernel layouts literals math
-quotations sequences strings words ;
+USING: accessors alien arrays assocs byte-arrays kernel layouts literals math
+namespaces quotations sequences strings system words ;
 IN: compiler.constants
 
 CONSTANT: card-bits 8
@@ -56,6 +56,31 @@ CONSTANT: rc-absolute-2 10
 CONSTANT: rc-absolute-1 11
 CONSTANT: rc-absolute-riscv-i 12
 CONSTANT: rc-absolute-riscv-li 13
+! The image stores a four-bit class. These final slots are CPU-specific;
+! images contain machine code and are never transferable between CPUs.
+CONSTANT: rc-native-0 14
+CONSTANT: rc-native-1 15
+
+ERROR: unsupported-native-relocation class cpu-name ;
+
+: rc-native-absolute? ( class cpu-name -- ? )
+    dup H{
+        { "ppc.32" { t f } }
+        { "ppc.64" { t f } }
+        { "ppc.64le" { t f } }
+        { "mips.32" { t t } }
+        { "mipsel.32" { t t } }
+        { "mips.64" { t t } }
+        { "mipsel.64" { t t } }
+        { "sparc.32" { f t } }
+        { "sparc.64" { f t } }
+        { "alpha.64" { f t } }
+        { "s390x" { f t } }
+        { "loongarch.64" { f t } }
+        { "hppa.32" { t t } }
+        { "m88k.32" { t f } }
+    } at [ nip [ rc-native-0 - ] dip nth ]
+    [ unsupported-native-relocation ] if* ;
 
 CONSTANT: rt-dlsym 0
 CONSTANT: rt-entry-point 1
@@ -75,6 +100,7 @@ CONSTANT: rt-inline-cache-miss 14
 CONSTANT: rt-safepoint 15
 
 : rc-absolute? ( n -- ? )
+    dup rc-native-0 >= [ \ cpu get name>> rc-native-absolute? ] [
     ${
         $ rc-absolute-cell
         $ rc-absolute
@@ -84,4 +110,4 @@ CONSTANT: rt-safepoint 15
         $ rc-absolute-1
         $ rc-absolute-riscv-i
         $ rc-absolute-riscv-li
-    } member? ;
+    } member? ] if ;

@@ -108,11 +108,13 @@ M: abstract-c-type c-type-signed signed>> ;
 
 GENERIC: c-type-align ( name -- n ) foldable
 
-M: abstract-c-type c-type-align align>> ;
+M: abstract-c-type c-type-align
+    align>> cpu sh? [ 4 min ] when cpu m68k? os netbsd? not and [ 2 min ] when ;
 
 GENERIC: c-type-align-first ( name -- n )
 
-M: abstract-c-type c-type-align-first align-first>> ;
+M: abstract-c-type c-type-align-first
+    align-first>> cpu sh? [ 4 min ] when cpu m68k? os netbsd? not and [ 2 min ] when ;
 
 GENERIC: base-type ( c-type -- c-type )
 
@@ -209,11 +211,13 @@ CONSTANT: primitive-types
 
 <PRIVATE
 
+: 8-byte-alignment-for ( cpu os -- n )
+    swap dup vax? over sh? or [ 2drop 4 ] [
+        x86.32? swap windows? not and [ 4 ] [ 8 ] if
+    ] if ;
+
 : 8-byte-alignment ( c-type -- c-type )
-    {
-        { [ cpu x86.32? os windows? not and ] [ 4 >>align 4 >>align-first ] }
-        [ 8 >>align 8 >>align-first ]
-    } cond ;
+    cpu os 8-byte-alignment-for dup [ >>align ] dip >>align-first ;
 
 : resolve-pointer-typedef ( type -- base-type )
     dup "c-type" word-prop dup word?

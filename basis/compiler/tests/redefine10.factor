@@ -36,9 +36,9 @@ M: object fake-float? drop f ;
 
 { } [ [ float my-mixin add-mixin-instance ] with-compilation-unit ] unit-test
 
-{ 2.0 } [ 1.0 my-inline-1 ] unit-test
+{ 2.0 } [ 1.0 my-inline-1 ] floating-point-unit-test
 
-{ 2.0 } [ 1.0 my-inline-2 ] unit-test
+{ 2.0 } [ 1.0 my-inline-2 ] floating-point-unit-test
 
 { t } [ 1.0 my-inline-3 ] unit-test
 
@@ -68,9 +68,9 @@ M: object fake-float? drop f ;
 
 { } [ [ float my-mixin remove-mixin-instance ] with-compilation-unit ] unit-test
 
-{ 1.0 } [ 1.0 my-inline-1 ] unit-test
+{ 0x3ff0000000000000 } [ 1.0 my-inline-1 double>bits ] unit-test
 
-{ 1.0 } [ 1.0 my-inline-2 ] unit-test
+{ 0x3ff0000000000000 } [ 1.0 my-inline-2 double>bits ] unit-test
 
 { f } [ 1.0 my-inline-3 ] unit-test
 
