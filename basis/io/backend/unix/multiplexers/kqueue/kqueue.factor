@@ -13,6 +13,10 @@ TUPLE: kqueue-mx < mx events signals ;
 ! constant...
 CONSTANT: max-events 256
 
+! A callable wrapper lets tests mock the syscall without interpreting an FFI definition.
+: call-kevent ( kq changes nchanges events nevents timeout -- n )
+    kevent-func ;
+
 : <kqueue-mx> ( -- mx )
     kqueue-mx new-mx
         kqueue dup io-error >>fd
@@ -29,7 +33,7 @@ M: kqueue-mx dispose* fd>> close-file ;
 
 : register-kevent ( kevent mx -- )
     ! The changelist has already been applied if kevent returns EINTR (#505).
-    fd>> swap 1 f 0 f [ kevent-func ] unix-system-call-allow-eintr drop ;
+    fd>> swap 1 f 0 f [ call-kevent ] unix-system-call-allow-eintr drop ;
 
 M:: kqueue-mx add-signal-callback ( quot signal mx -- supported? )
     mx signals>> [ ] [ H{ } clone dup mx signals<< ] if* :> callbacks
@@ -74,7 +78,7 @@ M: kqueue-mx remove-output-callbacks
     [
         [ fd>> f 0 ]
         [ events>> dup length ] bi
-    ] dip kevent-func multiplexer-error ;
+    ] dip call-kevent multiplexer-error ;
 
 : handle-kevent ( mx kevent -- )
     [ ident>> swap ] [ filter>> ] bi {

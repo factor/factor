@@ -63,6 +63,8 @@ M: unix copy-file
 ! An easy way to return +unknown+ is to mount a .iso on macOS and
 ! call directory-entries on the mount point.
 
+<< os haiku? "io.directories.unix.haiku" "io.directories.unix.typed" ? require >>
+
 : next-dirent ( DIR* dirent* -- dirent* ? )
     f void* <ref> [
         readdir_r [ (throw-errno) ] unless-zero
@@ -70,7 +72,7 @@ M: unix copy-file
 
 : >directory-entry ( dirent* -- directory-entry )
     [ d_name>> alien>native-string ]
-    [ d_type>> dirent-type>file-type ] bi
+    [ dirent-file-type ] bi
     dup +unknown+ = [ drop dup file-info type>> ] when
     <directory-entry> ; inline
 

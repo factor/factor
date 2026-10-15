@@ -19,6 +19,7 @@ TYPEDEF: ulonglong __uint64_t
 
 TYPEDEF: void* caddr_t
 TYPEDEF: uint in_addr_t
+TYPEDEF: long suseconds_t
 TYPEDEF: uint socklen_t
 
 TYPEDEF: __uint64_t fsblkcnt_t

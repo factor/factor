@@ -4,7 +4,7 @@
 USING: accessors assocs calendar combinators concurrency.flags
 continuations debugger destructors environment fry init io io.backend
 io.encodings io.encodings.utf8 io.pipes io.pipes.private
-io.ports io.streams.duplex io.timeouts kernel math math.order
+io.ports io.streams.duplex io.timeouts kernel locals math math.order
 namespaces prettyprint sequences strings system threads vocabs ;
 
 IN: io.launcher
@@ -78,6 +78,10 @@ M: object (process-notifications?) f ;
 HOOK: (monitor-process) io-backend ( process -- monitor/f )
 M: object (monitor-process) drop f ;
 
+! Register native ownership only after the Factor handle is installed.
+HOOK: (process-started) os ( process -- )
+M: object (process-started) drop ;
+
 <PRIVATE
 
 SYMBOL: wait-flag
@@ -128,7 +132,7 @@ STARTUP-HOOK: [
 
 : process-started ( process handle -- )
     >>handle
-    V{ } clone swap processes get set-at
+    [ V{ } clone swap processes get set-at ] [ (process-started) ] bi
     wait-flag get-global raise-flag ;
 
 : notify-exit ( process status -- )
@@ -225,7 +229,7 @@ M: sequence wait-for-success
 HOOK: (kill-process) io-backend ( process -- )
 
 : kill-process ( process -- )
-    t >>killed
+    dup handle>> [ t >>killed ] when
     [ pipe>> [ dispose ] when* ]
     [ dup handle>> [ (kill-process) ] [ drop ] if ] bi ;
 
@@ -245,6 +249,23 @@ M: object run-pipeline-element
     ] with-destructors wait-for-process ;
 
 <PRIVATE
+
+! Record cancellation of this timed operation independently of child exit.
+TUPLE: process-io-scope process timed-out? ;
+
+M: process-io-scope timeout process>> timeout ;
+M: process-io-scope cancel-operation
+    t >>timed-out? process>> cancel-operation ;
+
+HOOK: process-io-error io-backend ( error scope -- * )
+M: object process-io-error drop rethrow ;
+
+:: with-process-io-timeout ( process quot -- )
+    process timeout [
+        process f process-io-scope boa :> scope
+        [ scope scope timeout [ process>> quot call ] with-timeout* ]
+        [ scope process-io-error ] recover
+    ] [ process quot call ] if ; inline
 
 : <process-with-pipe> ( desc -- process pipe )
     >process (pipe) |dispose [ >>pipe ] keep ;
@@ -269,7 +290,7 @@ PRIVATE>
 : with-process-reader* ( desc encoding quot -- process status )
     [ (process-reader) ] dip '[
         [ _ with-input-stream ] dip dup (wait-for-process)
-    ] with-timeout ; inline
+    ] with-process-io-timeout ; inline
 
 : with-process-reader ( desc encoding quot -- )
     with-process-reader* check-success ; inline
@@ -302,7 +323,7 @@ PRIVATE>
 : with-process-writer* ( desc encoding quot -- process status )
     [ (process-writer) ] dip '[
         [ _ with-output-stream ] dip dup (wait-for-process)
-    ] with-timeout ; inline
+    ] with-process-io-timeout ; inline
 
 : with-process-writer ( desc encoding quot -- )
     with-process-writer* check-success ; inline
@@ -334,7 +355,7 @@ PRIVATE>
 : with-process-stream* ( desc encoding quot -- process status )
     [ (process-stream) ] dip '[
         [ _ with-stream ] dip dup (wait-for-process)
-    ] with-timeout ; inline
+    ] with-process-io-timeout ; inline
 
 : with-process-stream ( desc encoding quot -- )
     with-process-stream* check-success ; inline
@@ -351,7 +372,7 @@ M: output-process-error error.
     +stdout+ >>stderr
     [ +closed+ or ] change-stdin
     utf8 (process-reader)
-    [ [ stream-contents ] [ dup (wait-for-process) ] bi* ] with-timeout
+    [ [ stream-contents ] [ dup (wait-for-process) ] bi* ] with-process-io-timeout
     0 = [ 2drop ] [ output-process-error ] if ;
 
 {

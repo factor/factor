@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct kernel layouts
-literals unix.types ;
+literals system unix.types vocabs ;
 IN: unix.statvfs.linux
 
 STRUCT: statvfs64
@@ -32,3 +32,5 @@ CONSTANT: ST_WRITE 128       ! Write on file/directory/symlink.
 CONSTANT: ST_APPEND 256      ! Append-only file.
 CONSTANT: ST_IMMUTABLE 512   ! Immutable file.
 CONSTANT: ST_NOATIME 1024    ! Do not update access times.
+
+cpu x86.64? [ "unix.statvfs.linux.x86.64" require ] when

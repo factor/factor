@@ -32,12 +32,12 @@ SYMBOL: kevent-calls
 ! Replay would apply the same deletion twice. EINTR already applied changes.
 { 1 } [
     [
-        \ kevent-func [ [ interrupted-kevent ] '[ _ _ mock-kevent ] ] annotate
+        \ call-kevent [ [ interrupted-kevent ] '[ _ _ mock-kevent ] ] annotate
         0 kevent-calls [
             42 EVFILT_READ EV_DELETE make-kevent kqueue-mx new -1234 >>fd
             register-kevent kevent-calls get
         ] with-variable
-    ] [ \ kevent-func reset ] finally
+    ] [ \ call-kevent reset ] finally
 ] unit-test
 
 : invalid-kevent ( kq changes nchanges events nevents timeout -- n )
@@ -50,7 +50,7 @@ SYMBOL: kevent-calls
 
 { t } [
     [
-        \ kevent-func [ [ invalid-kevent ] '[ _ _ mock-kevent ] ] annotate
+        \ call-kevent [ [ invalid-kevent ] '[ _ _ mock-kevent ] ] annotate
         failed-registration-keeps-callbacks
-    ] [ \ kevent-func reset ] finally
+    ] [ \ call-kevent reset ] finally
 ] unit-test

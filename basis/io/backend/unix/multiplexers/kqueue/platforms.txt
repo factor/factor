@@ -1,2 +1,5 @@
 macos
 freebsd
+netbsd
+openbsd
+dragonflybsd

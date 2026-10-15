@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct combinators
-system unix.types vocabs.loader ;
+system kernel literals unix.types vocabs.loader ;
 IN: unix.ffi
 
-CONSTANT: EAI_SYSTEM 11
+CONSTANT: EAI_SYSTEM $[ os openbsd? -11 11 ? ]
 
 CONSTANT: MAXPATHLEN 1024
 
@@ -16,7 +16,7 @@ CONSTANT: O_APPEND   0x0008
 CONSTANT: O_CREAT    0x0200
 CONSTANT: O_TRUNC    0x0400
 CONSTANT: O_EXCL     0x0800
-CONSTANT: O_NOCTTY   0x20000
+CONSTANT: O_NOCTTY $[ os freebsd? 0x20000 0x8000 ? ]
 ALIAS: O_NDELAY O_NONBLOCK
 
 CONSTANT: SOL_SOCKET 0xffff
@@ -51,19 +51,6 @@ STRUCT: sockaddr-un
     { family uchar }
     { path char[104] } ;
 
-STRUCT: passwd
-    { pw_name c-string }
-    { pw_passwd c-string }
-    { pw_uid uid_t }
-    { pw_gid gid_t }
-    { pw_change time_t }
-    { pw_class c-string }
-    { pw_gecos c-string }
-    { pw_dir c-string }
-    { pw_shell c-string }
-    { pw_expire time_t }
-    { pw_fields int } ;
-
 CONSTANT: max-un-path 104
 
 CONSTANT: SOCK_STREAM 1
@@ -88,3 +75,14 @@ CONSTANT: SEEK_CUR 1
 CONSTANT: SEEK_END 2
 
 
+CONSTANT: SO_DEBUG 0x1
+CONSTANT: SO_ACCEPTCONN 0x2
+CONSTANT: SO_KEEPALIVE 0x8
+CONSTANT: SO_DONTROUTE 0x10
+CONSTANT: SO_BROADCAST 0x20
+CONSTANT: SO_SNDBUF 0x1001
+CONSTANT: SO_RCVBUF 0x1002
+CONSTANT: SO_SNDLOWAT 0x1003
+CONSTANT: SO_RCVLOWAT 0x1004
+CONSTANT: SO_ERROR 0x1007
+CONSTANT: SO_TYPE 0x1008

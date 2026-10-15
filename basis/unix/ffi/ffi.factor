@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.libraries
-alien.syntax classes.struct sequences system unix.time
+alien.syntax classes.struct kernel sequences system literals unix.time
 unix.types vocabs ;
 IN: unix.ffi
 
@@ -43,9 +43,9 @@ CONSTANT: DT_WHT      14
 CONSTANT: AI_PASSIVE        0x0001
 CONSTANT: AI_CANONNAME      0x0002
 CONSTANT: AI_NUMERICHOST    0x0004
-CONSTANT: AI_V4MAPPED       0x0008
-CONSTANT: AI_ALL            0x0010
-CONSTANT: AI_ADDRCONFIG     0x0020
+CONSTANT: AI_V4MAPPED $[ os haiku? 0x0800 0x0008 ? ]
+CONSTANT: AI_ALL $[ os haiku? 0x0100 0x0010 ? ]
+CONSTANT: AI_ADDRCONFIG $[ os haiku? 0x0400 0x0020 ? ]
 
 CONSTANT: SHUT_RD     0
 CONSTANT: SHUT_WR     1
@@ -102,6 +102,8 @@ FUNCTION: int futimes ( int id, timeval[2] times )
 FUNCTION: c-string gai_strerror ( int ecode )
 FUNCTION: int getaddrinfo ( c-string hostname, c-string servname, addrinfo* hints, addrinfo** res )
 FUNCTION: c-string getcwd ( c-string buf, size_t size )
+FUNCTION-ALIAS: getcwd-into
+    void* getcwd ( void* buf, size_t size )
 FUNCTION: pid_t getpid ( )
 FUNCTION: int getdtablesize ( )
 FUNCTION: pid_t getpgrp ( )
@@ -204,6 +206,13 @@ TYPEDEF: void* sighandler_t
 FUNCTION: sighandler_t signal ( int signum, sighandler_t handler )
 
 C-LIBRARY: librt {
+    { haiku "libroot.so" }
     { linux "librt.so.1" }
     { unix "librt.so" }
 }
+
+! Versioned NetBSD interfaces use the modern directory and time layouts.
+os netbsd? [ "unix.ffi.netbsd.versioned" require ] when
+
+! Haiku exports its network ABI from a separate native library.
+os haiku? [ "unix.ffi.haiku.network" require ] when

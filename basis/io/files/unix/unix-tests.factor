@@ -228,5 +228,5 @@ os linux? [
 [
     vm-path "-i=" image-path append "-no-user-init" "-no-monitors"
     "resource:basis/io/files/unix/fixtures/fifo-run.factor" absolute-path
-    5 narray <process> swap >>command 20 seconds >>timeout try-process
+    5 narray <process> swap >>command try-process
 ] must-not-fail

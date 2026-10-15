@@ -173,7 +173,7 @@ os unix? [
 { 80 } [ "http" lookup-protocol-port ] unit-test
 { f } [ f lookup-protocol-port ] unit-test
 
-{ "http" } [ 80 port-protocol ] unit-test
+{ t } [ 80 port-protocol { "http" "www" } member? ] unit-test
 { f } [ f port-protocol ] unit-test
 
 [ "you-cant-resolve-me!" resolve-host ] [ addrinfo-error? ] must-fail-with

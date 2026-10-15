@@ -27,6 +27,9 @@ GENERIC: protocol-family ( addrspec -- af )
 
 GENERIC: sockaddr-size ( addrspec -- n )
 
+HOOK: init-sockaddr os ( sockaddr -- sockaddr )
+M: object init-sockaddr ;
+
 GENERIC: make-sockaddr ( addrspec -- sockaddr )
 
 GENERIC: make-sockaddr-outgoing ( addrspec -- sockaddr )
@@ -109,7 +112,7 @@ M: ipv4 empty-sockaddr drop sockaddr-in new ;
     sockaddr-in new
         AF_INET >>family
         swap
-        port>> 0 or htons >>port ; inline
+        port>> 0 or htons >>port init-sockaddr ; inline
 
 M: ipv4 make-sockaddr
     [ make-sockaddr-part ]
@@ -181,7 +184,7 @@ M: ipv6 empty-sockaddr drop sockaddr-in6 new ;
     sockaddr-in6 new
         AF_INET6 >>family
         swap
-        port>> 0 or htons >>port ; inline
+        port>> 0 or htons >>port init-sockaddr ; inline
 
 M: ipv6 make-sockaddr
     [ make-sockaddr-in6-part ]

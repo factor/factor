@@ -182,7 +182,7 @@ M: local make-sockaddr
     max-un-path 0 pad-tail
     sockaddr-un new
         AF_UNIX >>family
-        swap >>path ;
+        swap >>path init-sockaddr ;
 
 M: local parse-sockaddr
     drop
@@ -193,3 +193,4 @@ M: unix host-name
     ascii alien>string ;
 
 os linux? [ "io.sockets.unix.linux" require ] when
+os haiku? [ "io.sockets.unix.haiku" require ] when

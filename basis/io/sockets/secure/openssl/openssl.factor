@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
-alien.strings arrays assocs byte-arrays
+alien.libraries alien.strings arrays assocs byte-arrays
 classes.struct combinators combinators.short-circuit continuations destructors
 endian io io.backend io.buffers io.encodings.latin1
 io.encodings.string io.encodings.utf8 io.files io.pathnames
@@ -472,10 +472,10 @@ M: ssl-handle dispose*
     X509_get_issuer_name x509name>string ;
 
 : sk-value ( stack v -- obj )
-    ssl-new-api? get-global [ OPENSSL_sk_value ] [ sk_value ] if ;
+    "OPENSSL_sk_value" "libcrypto" dlsym? [ OPENSSL_sk_value ] [ sk_value ] if ;
 
 : sk-num ( stack -- num )
-    ssl-new-api? get-global [ OPENSSL_sk_num ] [ sk_num ] if ;
+    "OPENSSL_sk_num" "libcrypto" dlsym? [ OPENSSL_sk_num ] [ sk_num ] if ;
 
 : name-stack>sequence ( name-stack -- seq )
     dup sk-num <iota> [

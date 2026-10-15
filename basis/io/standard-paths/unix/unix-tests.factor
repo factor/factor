@@ -1,9 +1,22 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: environment io.directories io.encodings.utf8 io.files
+USING: accessors assocs continuations destructors environment hashtables io io.directories io.encodings.utf8 io.files
 io.files.info.unix io.files.links io.pathnames io.standard-paths
-io.standard-paths.unix kernel sequences splitting tools.test ;
+io.standard-paths.unix io.encodings.binary io.encodings.string io.launcher io.launcher.private io.streams.duplex kernel libc locals namespaces sequences splitting
+system tools.test unix.users ;
 IN: io.standard-paths.unix.tests
+
+! Haiku's package filesystem exposes ordinary commands in its native bin.
+! Retain the POSIX compatibility locations and every other platform case.
+: expected-ls-paths ( -- paths )
+    os haiku?
+    [ { "/bin/ls" "/usr/bin/ls" "/boot/system/bin/ls" } ]
+    [ { "/bin/ls" "/usr/bin/ls" } ] if ;
+
+: expected-ps-paths ( -- paths )
+    os haiku?
+    [ { "/bin/ps" "/sbin/ps" "/usr/bin/ps" "/boot/system/bin/ps" } ]
+    [ { "/bin/ps" "/sbin/ps" "/usr/bin/ps" } ] if ;
 
 : path-fixture ( -- )
     { "blocked" "directory" "valid" } [ make-directory ] each
@@ -64,3 +77,86 @@ IN: io.standard-paths.unix.tests
 ] unit-test
 
 { t } [ "ls" find-in-standard-login-path >boolean ] unit-test
+
+! Shell startup output must not become part of the search directories.
+{ { "/bin" "/usr/bin" } } [
+    "warning: startup\nfortune: text\n__FACTOR_LOGIN_PATH__/bin:/usr/bin\nlogout\n"
+    utf8 encode parse-login-paths
+] unit-test
+
+{ { } } [ "startup without PATH marker\n" utf8 encode parse-login-paths ] unit-test
+
+:: with-passwd-fixture ( entry quot -- )
+    H{ } clone :> cache
+    entry effective-user-id cache set-at
+    cache user-cache quot with-variable ; inline
+
+: shell-fixture ( contents -- passwd )
+    "login-shell" utf8 set-file-contents
+    "login-shell" 0o755 set-file-permissions
+    passwd new "login-shell" absolute-path >>shell ;
+
+! A completed login shell supplies its PATH even when the inherited PATH differs.
+{ { "/login-only" } } [
+    [
+        "#!/bin/sh\nPATH=/login-only; export PATH\nexec /bin/sh\n" shell-fixture
+        [ "/inherited-only" "PATH" [ standard-login-paths ] with-os-env ]
+        with-passwd-fixture
+    ] with-test-directory
+] unit-test
+
+! Startup can terminate before the shell reads our PATH command.
+{ { "/inherited-only" } } [
+    [
+        "#!/bin/sh\nexit 0\n" shell-fixture
+        [ "/inherited-only" "PATH" [ standard-login-paths ] with-os-env ]
+        with-passwd-fixture
+    ] with-test-directory
+] unit-test
+
+! A process UID need not appear in the passwd database.
+{ { "/inherited-only" } } [
+    f [ "/inherited-only" "PATH" [ standard-login-paths ] with-os-env ]
+    with-passwd-fixture
+] unit-test
+
+! Expected early stdin closure is the only I/O error eligible for PATH fallback.
+{ t } [ [ EPIPE (throw-errno) ] [ login-shell-pipe-closed? ] recover ] unit-test
+{ f } [ [ EIO (throw-errno) ] [ login-shell-pipe-closed? ] recover ] unit-test
+{ f } [ "unrelated error" login-shell-pipe-closed? ] unit-test
+
+! Force the real write/flush/disposal EPIPE path: the exact child has exited
+! before the probe is sent, rather than relying on scheduler timing.
+{ } [
+    { "/bin/sh" "-c" "exit 0" } binary (process-stream)
+    wait-for-process 0 assert=
+    [ write-login-command ] with-disposal
+] unit-test
+
+! A shell can emit a valid marked PATH and exit without reading stdin.
+{ { "/fast-shell" } } [
+    [
+        "#!/bin/sh\nprintf '__FACTOR_LOGIN_PATH__/fast-shell\\n'\nexit 0\n" shell-fixture
+        shell>> shell-login-paths
+    ] with-test-directory
+] unit-test
+
+! An EPIPE on probe stdin is expected; unrelated IO errors and non-IO
+! exceptions must propagate unchanged.
+{ } [ [ EPIPE "probe stdin closed" libc-error ] ignore-closed-login-input ] unit-test
+[ [ EACCES "permission denied" libc-error ] ignore-closed-login-input ]
+[ dup libc-error? [ errno>> EACCES = ] [ drop f ] if ] must-fail-with
+[ [ "unrelated login failure" throw ] ignore-closed-login-input ]
+[ "unrelated login failure" = ] must-fail-with
+
+! Closing the probe output must not suppress errors from reading stdout.
+:: read-closed-login-output ( -- )
+    { "/bin/sh" "-c" "exit 0" } binary (process-stream)
+    wait-for-process 0 assert= :> stream
+    [
+        stream write-login-command
+        stream in>> dispose
+        stream stream-read1 drop
+    ] [ stream dispose ] finally ;
+
+[ read-closed-login-output ] [ already-disposed? ] must-fail-with

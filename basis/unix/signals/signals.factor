@@ -5,15 +5,29 @@ system threads ;
 IN: unix.signals
 
 CONSTANT: signal-names $[
-    os linux? [
-        {
-            "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGTRAP" "SIGABRT"
-            "SIGBUS" "SIGFPE" "SIGKILL" "SIGUSR1" "SIGSEGV" "SIGUSR2"
-            "SIGPIPE" "SIGALRM" "SIGTERM" "SIGSTKFLT" "SIGCHLD"
-            "SIGCONT" "SIGSTOP" "SIGTSTP" "SIGTTIN" "SIGTTOU"
-            "SIGURG" "SIGXCPU" "SIGXFSZ" "SIGVTALRM" "SIGPROF"
-            "SIGWINCH" "SIGIO" "SIGPWR" "SIGSYS"
-        }
+    os haiku? [
+        { "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGCHLD" "SIGABRT" "SIGPIPE" "SIGFPE" "SIGKILL" "SIGSTOP" "SIGSEGV" "SIGCONT" "SIGTSTP" "SIGALRM" "SIGTERM" "SIGTTIN" "SIGTTOU" "SIGUSR1" "SIGUSR2" "SIGWINCH" "SIGKILLTHR" "SIGTRAP" "SIGPOLL" "SIGPROF" "SIGSYS" "SIGURG" "SIGVTALRM" "SIGXCPU" "SIGXFSZ" "SIGBUS" "SIGRESERVED1" "SIGRESERVED2" }
+    ] [
+    os linux? cpu alpha.64? not and [
+        cpu mips? [
+            {
+                "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGTRAP" "SIGABRT"
+                "SIGEMT" "SIGFPE" "SIGKILL" "SIGBUS" "SIGSEGV" "SIGSYS"
+                "SIGPIPE" "SIGALRM" "SIGTERM" "SIGUSR1" "SIGUSR2" "SIGCHLD"
+                "SIGPWR" "SIGWINCH" "SIGURG" "SIGIO" "SIGSTOP" "SIGTSTP"
+                "SIGCONT" "SIGTTIN" "SIGTTOU" "SIGVTALRM" "SIGPROF"
+                "SIGXCPU" "SIGXFSZ"
+            }
+        ] [
+            {
+                "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGTRAP" "SIGABRT"
+                "SIGBUS" "SIGFPE" "SIGKILL" "SIGUSR1" "SIGSEGV" "SIGUSR2"
+                "SIGPIPE" "SIGALRM" "SIGTERM" "SIGSTKFLT" "SIGCHLD"
+                "SIGCONT" "SIGSTOP" "SIGTSTP" "SIGTTIN" "SIGTTOU"
+                "SIGURG" "SIGXCPU" "SIGXFSZ" "SIGVTALRM" "SIGPROF"
+                "SIGWINCH" "SIGIO" "SIGPWR" "SIGSYS"
+            }
+        ] if
     ] [
         {
             "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGTRAP" "SIGABRT"
@@ -23,6 +37,7 @@ CONSTANT: signal-names $[
             "SIGXFSZ" "SIGVTALRM" "SIGPROF" "SIGWINCH" "SIGINFO"
             "SIGUSR1" "SIGUSR2"
         }
+    ] if
     ] if
 ]
 

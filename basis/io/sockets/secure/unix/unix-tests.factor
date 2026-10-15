@@ -3,6 +3,7 @@ concurrency.conditions concurrency.mailboxes
 concurrency.promises continuations destructors io
 io.backend.unix io.encodings.ascii io.files.temp io.sockets
 io.sockets.secure io.sockets.secure.debug io.sockets.secure.openssl
+io.sockets.secure.testing
 io.streams.duplex io.timeouts io.ports kernel namespaces sequences sets
 openssl.libcrypto openssl.libssl strings system threads tools.test ;
 FROM: namespaces => set ;
@@ -90,7 +91,7 @@ IN: io.sockets.secure.tests
     <promise> "port" set
     [ drop "hi" write ] server-test
     <secure-config> [
-        "localhost" "port" get ?promise-test <inet> f <secure> ascii
+        "127.0.0.1" "port" get ?promise-test <inet4> "localhost" <secure> ascii
         <client> drop dispose
     ] with-secure-context
 ] [ certificate-verify-error? ] must-fail-with
@@ -127,9 +128,10 @@ IN: io.sockets.secure.tests
     ] with-variable
 ] [ io-timeout? ] must-fail-with
 
-{ } [
-    ! Exercise an HTTPS download without requiring a published image for this CPU.
-    [ download-checksums drop ] with-temp-directory
+{ { { "boot.test.image" "d41d8cd98f00b204e9800998ecf8427e" } } } [
+    ! Exercise the real HTTPS checksum reader without a published CPU image.
+    "boot.test.image d41d8cd98f00b204e9800998ecf8427e"
+    [ download-checksums-from ] with-local-https-server
 ] unit-test
 
 ! Numeric endpoints must validate certificates too.
