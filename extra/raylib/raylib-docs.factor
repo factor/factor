@@ -2829,14 +2829,14 @@ HELP: file-rename
     fileRename: c-string
     int: int }
 { $description
-    "Rename file (if exists)" } ;
+    "Rename file (if exists), returns 0 on success" } ;
 
 HELP: file-remove
 { $values
     fileName: c-string
     int: int }
 { $description
-    "Remove file (if exists)" } ;
+    "Remove file (if exists), returns 0 on success" } ;
 
 HELP: file-copy
 { $values
@@ -2844,7 +2844,7 @@ HELP: file-copy
     dstPath: c-string
     int: int }
 { $description
-    "Copy file from one path to another, dstPath created if it doesn't exist" } ;
+    "Copy file from one path to another, dstPath created if it doesn't exist, returns 0 on success" } ;
 
 HELP: file-move
 { $values
@@ -2852,7 +2852,7 @@ HELP: file-move
     dstPath: c-string
     int: int }
 { $description
-    "Move file from one directory to another, dstPath created if it doesn't exist" } ;
+    "Move file from one directory to another, dstPath created if it doesn't exist, returns 0 on success" } ;
 
 HELP: file-text-replace
 { $values
@@ -2861,7 +2861,7 @@ HELP: file-text-replace
     replacement: c-string
     int: int }
 { $description
-    "Replace text in an existing file" } ;
+    "Replace text in an existing file, returns 0 on success" } ;
 
 HELP: file-text-find-index
 { $values
@@ -2869,7 +2869,7 @@ HELP: file-text-find-index
     search: c-string
     int: int }
 { $description
-    "Find text in existing file" } ;
+    "Find text in existing file, returns -1 if index not found or index otherwise" } ;
 
 HELP: file-exists
 { $values
@@ -2884,6 +2884,13 @@ HELP: directory-exists
     bool: bool }
 { $description
     "Check if a directory path exists" } ;
+
+HELP: is-file-hidden
+{ $values
+    filePath: c-string
+    bool: bool }
+{ $description
+    "Check if file path (file or directory) is hidden by OS" } ;
 
 HELP: is-file-extension
 { $values
@@ -2949,17 +2956,31 @@ HELP: get-application-directory
 
 HELP: change-directory
 { $values
-    dir: c-string
-    bool: bool }
+    dirPath: c-string
+    int: int }
 { $description
-    "Change working directory, return true on success" } ;
+    "Change working directory, returns 0 on success" } ;
 
 HELP: is-path-file
 { $values
     path: c-string
     bool: bool }
 { $description
-    "Check if a given path is a file or a directory" } ;
+    "Check if provided path points to a file" } ;
+
+HELP: is-path-directory
+{ $values
+    path: c-string
+    bool: bool }
+{ $description
+    "Check if provided path points to a directory" } ;
+
+HELP: is-path-absolute
+{ $values
+    path: c-string
+    bool: bool }
+{ $description
+    "Check if provided path is an absolute path" } ;
 
 HELP: load-directory-files
 { $values
@@ -3464,7 +3485,7 @@ HELP: update-camera-pro
 HELP: set-shapes-texture
 { $values
     texture: Texture2D
-    source: Rectangle
+    rec: Rectangle
 }
 { $description
     "Set texture and rectangle to be used on shapes drawing" } ;
@@ -3571,6 +3592,18 @@ HELP: draw-circle-sector-lines
 { $description
     "Draw circle sector outline" } ;
 
+HELP: draw-circle-sector-lines-ex
+{ $values
+    center: Vector2
+    radius: float
+    startAngle: float
+    endAngle: float
+    segments: int
+    thick: float
+    color: Color }
+{ $description
+    "Draw circle sector outline with thickness" } ;
+
 HELP: draw-circle-gradient
 { $values
     center: Vector2
@@ -3604,6 +3637,15 @@ HELP: draw-circle-lines-v
     color: Color }
 { $description
     "Draw circle outline (Vector version)" } ;
+
+HELP: draw-circle-lines-ex
+{ $values
+    center: Vector2
+    radius: float
+    thick: float
+    color: Color }
+{ $description
+    "Draw circle outline with line thickness" } ;
 
 HELP: draw-ellipse
 { $values
@@ -3643,6 +3685,16 @@ HELP: draw-ellipse-lines-v
 { $description
     "Draw ellipse outline (Vector version)" } ;
 
+HELP: draw-ellipse-lines-ex
+{ $values
+    center: Vector2
+    radiusH: float
+    radiusV: float
+    thick: float
+    color: Color }
+{ $description
+    "Draw ellipse outline with line thickness" } ;
+
 HELP: draw-ring
 { $values
     center: Vector2
@@ -3666,6 +3718,19 @@ HELP: draw-ring-lines
     color: Color }
 { $description
     "Draw ring outline" } ;
+
+HELP: draw-ring-lines-ex
+{ $values
+    center: Vector2
+    innerRadius: float
+    outerRadius: float
+    startAngle: float
+    endAngle: float
+    segments: int
+    thick: float
+    color: Color }
+{ $description
+    "Draw ring outline with line thickness" } ;
 
 HELP: draw-rectangle
 { $values
@@ -3726,12 +3791,12 @@ HELP: draw-rectangle-gradient-h
 HELP: draw-rectangle-gradient-ex
 { $values
     rec: Rectangle
-    topLeft: Color
-    bottomLeft: Color
-    topRight: Color
-    bottomRight: Color }
+    col1: Color
+    col2: Color
+    col3: Color
+    col4: Color }
 { $description
-    "Draw a gradient-filled rectangle with custom vertex colors" } ;
+    "Draw a gradient-filled rectangle with custom vertex colors, counter-clockwise color order" } ;
 
 HELP: draw-rectangle-lines
 { $values
@@ -3746,7 +3811,7 @@ HELP: draw-rectangle-lines
 HELP: draw-rectangle-lines-ex
 { $values
     rec: Rectangle
-    lineThick: float
+    thick: float
     color: Color }
 { $description
     "Draw rectangle outline with extended parameters" } ;
@@ -3778,6 +3843,17 @@ HELP: draw-triangle
 { $description
     "Draw a color-filled triangle (vertex in counter-clockwise order!)" } ;
 
+HELP: draw-triangle-gradient
+{ $values
+    v1: Vector2
+    v2: Vector2
+    v3: Vector2
+    c1: Color
+    c2: Color
+    c3: Color }
+{ $description
+    "Draw triangle with interpolated colors, counter-clockwise vertex/color order" } ;
+
 HELP: draw-triangle-lines
 { $values
     v1: Vector2
@@ -3786,6 +3862,16 @@ HELP: draw-triangle-lines
     color: Color }
 { $description
     "Draw triangle outline (vertex in counter-clockwise order!)" } ;
+
+HELP: draw-triangle-lines-ex
+{ $values
+    v1: Vector2
+    v2: Vector2
+    v3: Vector2
+    thick: float
+    color: Color }
+{ $description
+    "Draw triangle outline with line thickness, counter-clockwise vertex order" } ;
 
 HELP: draw-triangle-fan
 { $values
@@ -3829,7 +3915,7 @@ HELP: draw-poly-lines-ex
     sides: int
     radius: float
     rotation: float
-    lineThick: float
+    thick: float
     color: Color }
 { $description
     "Draw a polygon outline of n sides with extended parameters" } ;
@@ -3972,14 +4058,13 @@ HELP: get-spline-point-catmull-rom
 { $description
     "Get spline point: Catmull-Rom" } ;
 
-HELP: get-spline-point-bezier-quad
+HELP: get-spline-point-bezier-quadratic
 { $values
     p1: Vector2
     c2: Vector2
     p3: Vector2
     t: float
-    Vector2: Vector2
-}
+    Vector2: Vector2 }
 { $description
     "Get spline point: Quadratic Bezier" } ;
 
@@ -4460,7 +4545,7 @@ HELP: image-color-grayscale
 HELP: image-color-contrast
 { $values
     image: { "a " { $link pointer } " to a " { $link Image } }
-    contrast: float }
+    contrast: int }
 { $description
     "Modify image color: contrast (-100 to 100)" } ;
 
@@ -4608,6 +4693,16 @@ HELP: image-draw-circle-lines-v
 { $description
     "Draw circle within an image (Vector version)" } ;
 
+HELP: image-draw-circle-gradient
+{ $values
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    center: Vector2
+    radius: float
+    inner: Color
+    outer: Color }
+{ $description
+    "Draw a gradient-filled circle within an image" } ;
+
 HELP: image-draw-rectangle
 { $values
     dst: { "a " { $link pointer } " to a " { $link Image } }
@@ -4636,24 +4731,89 @@ HELP: image-draw-rectangle-rec
 { $description
     "Draw rectangle within an image" } ;
 
+HELP: image-draw-rectangle-pro
+{ $values
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    rec: Rectangle
+    origin: Vector2
+    rotation: float
+    color: Color }
+{ $description
+    "Draw a color-filled rectangle with pro parameters within an image" } ;
+
 HELP: image-draw-rectangle-lines
+{ $values
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    posX: int
+    posY: int
+    width: int
+    height: int
+    color: Color }
+{ $description
+    "Draw rectangle lines within an image" } ;
+
+HELP: image-draw-rectangle-lines-ex
 { $values
     dst: { "a " { $link pointer } " to a " { $link Image } }
     rec: Rectangle
     thick: int
     color: Color }
 { $description
-    "Draw rectangle lines within an image" } ;
+    "Draw rectangle lines within an image with line thickness" } ;
 
-HELP: image-draw
+HELP: image-draw-rectangle-gradient-ex
+{ $values
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    rec: Rectangle
+    col1: Color
+    col2: Color
+    col3: Color
+    col4: Color }
+{ $description
+    "Draw rectangle with gradient colors within an image, counter-clockwise color order" } ;
+
+HELP: image-draw-image
+{ $values
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    src: Image
+    posX: int
+    posY: int
+    tint: Color }
+{ $description
+    "Draw an image within an image" } ;
+
+HELP: image-draw-image-ex
+{ $values
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    src: Image
+    position: Vector2
+    rotation: float
+    scale: float
+    tint: Color }
+{ $description
+    "Draw an image with scaling and rotation within an image" } ;
+
+HELP: image-draw-image-rec
+{ $values
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    src: Image
+    srcRec: Rectangle
+    position: Vector2
+    tint: Color }
+{ $description
+    "Draw a part of an image defined by a rectangle within an image" } ;
+
+HELP: image-draw-image-pro
 { $values
     dst: { "a " { $link pointer } " to a " { $link Image } }
     src: Image
     srcRec: Rectangle
     dstRec: Rectangle
+    origin: Vector2
+    rotation: float
     tint: Color }
 { $description
-    "Draw a source image within a destination image (tint applied to source)" } ;
+    "Draw a part of an image defined by a rectangle into destination rectangle, with scaling and rotation, within an image" } ;
 
 HELP: image-draw-text
 { $values
@@ -4677,6 +4837,20 @@ HELP: image-draw-text-ex
     tint: Color }
 { $description
     "Draw text (custom sprite font) within an image (destination)" } ;
+
+HELP: image-draw-text-pro
+{ $values
+    dst: { "a " { $link pointer } " to a " { $link Image } }
+    font: Font
+    text: c-string
+    position: Vector2
+    origin: Vector2
+    rotation: float
+    fontSize: float
+    spacing: float
+    tint: Color }
+{ $description
+    "Draw text using Font and pro parameters (rotation)" } ;
 
 
 ! Texture loading functions
@@ -4710,6 +4884,15 @@ HELP: load-render-texture
     RenderTexture2D: RenderTexture2D }
 { $description
     "Load texture for rendering (framebuffer)" } ;
+
+HELP: load-render-texture-ex
+{ $values
+    width: int
+    height: int
+    format: PixelFormat
+    RenderTexture2D: RenderTexture2D }
+{ $description
+    "Load texture for rendering (framebuffer), with specific format" } ;
 
 HELP: is-texture-valid
 { $values
@@ -4806,7 +4989,7 @@ HELP: draw-texture-ex
 HELP: draw-texture-rec
 { $values
     texture: Texture2D
-    source: Rectangle
+    rec: Rectangle
     position: Vector2
     tint: Color }
 { $description
@@ -4815,19 +4998,19 @@ HELP: draw-texture-rec
 HELP: draw-texture-pro
 { $values
     texture: Texture2D
-    source: Rectangle
-    dest: Rectangle
+    srcrec: Rectangle
+    dstrec: Rectangle
     origin: Vector2
     rotation: float
     tint: Color }
 { $description
-    "Draw a part of a texture defined by a rectangle with 'pro' parameters" } ;
+    "Draw a part of a texture defined by a source rectangle to destination rectangle, with scaling and rotation" } ;
 
 HELP: draw-texture-npatch
 { $values
     texture: Texture2D
     nPatchInfo: NPatchInfo
-    dest: Rectangle
+    dstrec: Rectangle
     origin: Vector2
     rotation: float
     tint: Color }
@@ -5018,7 +5201,7 @@ HELP: load-font-data
     glyphCount: { "a writable " { $link pointer } " to an " { $link int } }
     GlyphInfo*: { "a " { $link pointer } " to " { $link GlyphInfo } } }
 { $description
-    "Loads font glyph data. Raylib 6.0 writes the actual glyph count through the seventh parameter; use that count with unload-font-data. The input is a binary font buffer with dataSize bytes." } ;
+    "Loads font glyph data. Raylib 6.2 writes the actual glyph count through the seventh parameter; use that count with unload-font-data. The input is a binary font buffer with dataSize bytes." } ;
 
 HELP: gen-image-font-atlas
 { $values
@@ -5566,7 +5749,7 @@ HELP: draw-cylinder
     radiusTop: float
     radiusBottom: float
     height: float
-    slices: int
+    sides: int
     color: Color }
 { $description
     "Draw a cylinder/cone" } ;
@@ -5588,7 +5771,7 @@ HELP: draw-cylinder-wires
     radiusTop: float
     radiusBottom: float
     height: float
-    slices: int
+    sides: int
     color: Color }
 { $description
     "Draw a cylinder/cone wires" } ;
@@ -5609,8 +5792,8 @@ HELP: draw-capsule
     startPos: Vector3
     endPos: Vector3
     radius: float
-    slices: int
     rings: int
+    slices: int
     color: Color }
 { $description
     "Draw a capsule with the center of its sphere caps at startPos and endPos" } ;
@@ -5620,8 +5803,8 @@ HELP: draw-capsule-wires
     startPos: Vector3
     endPos: Vector3
     radius: float
-    slices: int
     rings: int
+    slices: int
     color: Color }
 { $description
     "Draw capsule wireframe with the center of its sphere caps at startPos and endPos" } ;
@@ -5747,18 +5930,18 @@ HELP: draw-billboard-rec
 { $values
     camera: Camera
     texture: Texture2D
-    source: Rectangle
+    rec: Rectangle
     position: Vector3
     size: Vector2
     tint: Color }
 { $description
-    "Draw a billboard texture defined by source" } ;
+    "Draw a billboard texture defined by rectangle" } ;
 
 HELP: draw-billboard-pro
 { $values
     camera: Camera
     texture: Texture2D
-    source: Rectangle
+    rec: Rectangle
     position: Vector3
     up: Vector3
     size: Vector2
@@ -5766,7 +5949,7 @@ HELP: draw-billboard-pro
     rotation: float
     tint: Color }
 { $description
-    "Draw a billboard texture defined by source and rotation" } ;
+    "Draw a billboard texture defined by source rectangle with scaling and rotation" } ;
 
 
 ! Mesh management functions
@@ -6212,9 +6395,9 @@ HELP: update-sound
 { $values
     sound: Sound
     data: void*
-    sampleCount: int }
+    frameCount: int }
 { $description
-    "Update sound buffer with new data" } ;
+    "Update sound buffer with new data (default data format: 32 bit float, stereo)" } ;
 
 HELP: unload-wave
 { $values
@@ -6589,7 +6772,7 @@ ARTICLE: "raylib" "Raylib"
 
     { $heading About These Bindings }
         The { $vocab-link "raylib" } vocabulary provides bindings to
-        Raylib 6.0. The vocab is fully documented using Factor's help
+        Raylib 6.2. The vocab is fully documented using Factor's help
         system. So, you can reliably use the browser to find information about
         the various functions in raylib.
 
@@ -6659,17 +6842,17 @@ HELP: load-file-data-bytes
 { $description "Loads exactly the reported number of bytes into an owned Factor byte array and releases the native allocation, including on an exceptional exit. Returns f when loading fails." } ;
 
 HELP: ModelAnimPose
-{ $description "Raylib 6.0's Transform* alias. A pose contains one Transform per skeleton bone; ModelAnimation.keyframePoses points to an array of poses." } ;
+{ $description "Raylib 6.2's Transform* alias. A pose contains one Transform per skeleton bone; ModelAnimation.keyframePoses points to an array of poses." } ;
 
 ARTICLE: "raylib-memory-ownership" "Raylib memory ownership"
 "Binary file and memory APIs use native pointers with explicit lengths. load-file-data returns a native allocation; load-file-data-bytes copies the exact byte count and releases it."
 $nl
 "Allocating text APIs expose -raw words for native ownership. Their existing string-returning conveniences copy and release the native text automatically, even if decoding fails."
 { $subsections load-file-data load-file-data-bytes load-file-text-raw load-utf8-raw encode-data-base64-raw text-replace-alloc-raw text-replace-between-alloc-raw text-insert-alloc-raw }
-"TextReplace, TextReplaceBetween, TextInsert, GetTextBetween, TextJoin, TextTo* and TextSplit use static storage in Raylib 6.0. Their copied Factor strings require no native release; do not free static Raylib pointers. LoadTextLines is different: release its original char** and count together with unload-text-lines."
+"TextReplace, TextReplaceBetween, TextInsert, GetTextBetween, TextJoin, TextTo* and TextSplit use static storage in Raylib 6.2. Their copied Factor strings require no native release; do not free static Raylib pointers. LoadTextLines is different: release its original char** and count together with unload-text-lines."
 $nl
 "Native file-loader callbacks must return mem-alloc-compatible foreign storage because Raylib's unloaders release their results. Factor-managed strings and byte arrays cannot transfer ownership to C."
-{ $url "https://github.com/raysan5/raylib/blob/6.0/src/raylib.h" } ;
+{ $url "https://github.com/raysan5/raylib/blob/6.2/src/raylib.h" } ;
 
 HELP: FLAG_WINDOW_MOUSE_PASSTHROUGH
-{ $description "Raylib 6.0 window configuration flag 0x00004000. Allows mouse events to pass through the window." } ;
+{ $description "Raylib 6.2 window configuration flag 0x00004000. Allows mouse events to pass through the window." } ;

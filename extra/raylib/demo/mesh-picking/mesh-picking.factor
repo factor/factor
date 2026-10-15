@@ -141,7 +141,7 @@ SYMBOL: mesh-picking-frame
 
             camera CAMERA_FREE update-camera
 
-            get-mouse-position camera get-mouse-ray :> ray
+            get-mouse-position camera get-screen-to-world-ray :> ray
 
             the-hit-state dup reset-hit-state
             ray handle-ground-hit
