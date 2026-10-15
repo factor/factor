@@ -900,7 +900,12 @@ M: arm.64 %safepoint SAFEPOINT dup [] STR ;
 
 M: arm.64 %compare [ CMP ] [ cc>cond ] [ %boolean ] tri* ;
 
-: (%compare-imm) ( SRC1 src2 -- ) [ tag-fixnum ] [ \ f type-number ] if* CMP ;
+:: (%compare-imm) ( SRC1 src2 -- )
+    src2 [ tag-fixnum ] [ \ f type-number ] if* :> imm
+    ! Tagging can take an otherwise encodable comparand beyond imm12.
+    imm add/sub-immediate?
+    [ SRC1 imm CMP ]
+    [ temp imm (%load-immediate) SRC1 temp CMP ] if ;
 
 M: arm.64 %compare-imm [ (%compare-imm) ] [ cc>cond ] [ %boolean ] tri* ;
 M: arm.64 %compare-integer-imm %compare ;

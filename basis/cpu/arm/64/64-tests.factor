@@ -173,6 +173,14 @@ IN: cpu.arm.64.tests
 :: mul-imm-code ( n -- code )
     init-relocation [ X0 X1 n %mul-imm ] B{ } make ;
 
+:: boxed-compare-code ( n -- code )
+    init-relocation [ X0 X1 n cc= X2 %compare-imm ] B{ } make ;
+
+! MOVZ X9, #12928; CMP X1, X9. Tagging 808 overflows imm12.
+{ B{ 0x09 0x50 0x86 0xd2 0x3f 0x00 0x09 0xeb } } [
+    808 boxed-compare-code 8 head
+] unit-test
+
 ! A GC map for a C call is keyed by the address execution resumes at,
 ! immediately after BLR. The branch and inline dlsym literal pool come later.
 { t t t t } [
@@ -261,6 +269,24 @@ IN: cpu.arm.64.tests
 ] unit-test
 
 cpu arm.64? [
+    ! Boxed comparisons select the immediate form before tagging the literal.
+    ! 808 becomes 12928, which cannot be encoded as an add/sub immediate.
+    { t f f t f t } [
+        808 [ 808 = ] compile-call
+        807 [ 808 = ] compile-call
+        3.5 [ 808 = ] compile-call
+        255 [ 255 = ] compile-call
+        255 [ 256 = ] compile-call
+        256 [ 256 = ] compile-call
+    ] unit-test
+
+    { 1 2 2 1 } [
+        808 [ 808 = [ 1 ] [ 2 ] if ] compile-call
+        809 [ 808 = [ 1 ] [ 2 ] if ] compile-call
+        f [ 808 = [ 1 ] [ 2 ] if ] compile-call
+        -1 [ -1 = [ 1 ] [ 2 ] if ] compile-call
+    ] unit-test
+
     ! EXT only has a four-bit byte offset. Handle the identity and zero cases
     ! without emitting the out-of-range offsets 16 or greater.
     {
