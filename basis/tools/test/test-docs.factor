@@ -107,3 +107,33 @@ HELP: with-test-file
 { $description "Creates an empty temporary file and applies the quotation to it. The file is deleted after the word returns." } ;
 
 ABOUT: "tools.test"
+
+HELP: floating-point-unit-test
+{ $syntax "{ expected... } [ quot ] floating-point-unit-test" }
+{ $description "Runs an ordinary unit test when the runtime supports floating point. Otherwise records an unsupported test in " { $link test-skips } " with its experiment, file, line number and reason. Use this form only for a case that executes floating-point operations; integer cases and tests of opaque floating-point metadata remain ordinary tests." } ;
+
+HELP: test-skips
+{ $description "A sequence of skipped test records, separate from test failures. Each record retains the reason, experiment, source file and line number. Skipped tests are not passing tests." } ;
+
+HELP: floating-point-unit-test~
+{ $syntax "{ expected... tolerance } [ quot ] floating-point-unit-test~" }
+{ $description "The capability-aware form of approximate scalar comparison. Records an unsupported test when floating point is unavailable." } ;
+
+HELP: floating-point-unit-test-v~
+{ $syntax "{ expected... tolerance } [ quot ] floating-point-unit-test-v~" }
+{ $description "The capability-aware form of approximate vector comparison. Records an unsupported test when floating point is unavailable." } ;
+
+HELP: floating-point-must-not-fail
+{ $syntax "[ quot ] floating-point-must-not-fail" }
+{ $description "Runs a quotation expecting no error when floating point is supported; otherwise records an unsupported test." } ;
+
+HELP: floating-point-must-fail
+{ $syntax "[ quot ] floating-point-must-fail" }
+{ $description "Tests failure of a quotation requiring floating-point execution. Records an unsupported test when floating point is unavailable. Tests of the unsupported-operation error itself must use ordinary must-fail or must-fail-with so they remain enabled." } ;
+
+HELP: floating-point-must-fail-with
+{ $syntax "[ quot ] [ pred ] floating-point-must-fail-with" }
+{ $description "Tests a specific failure of a quotation requiring floating-point execution. Records an unsupported test when floating point is unavailable. Tests of unsupported-operation rejection must use ordinary must-fail-with." } ;
+
+HELP: :test-skips
+{ $description "Prints every skipped test record with its reason, experiment, source file and line number. The command-line test runner prints these records after the separate skipped count." } ;

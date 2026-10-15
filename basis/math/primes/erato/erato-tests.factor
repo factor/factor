@@ -6,6 +6,11 @@ ranges sequences tools.test ;
 [ 120 100 sieve marked-prime? ] [ bounds-error? ] must-fail-with
 { f } [ 119 100 sieve marked-prime? ] unit-test
 { t } [ 113 100 sieve marked-prime? ] unit-test
+{ f t t } [
+    53 sieve
+    [ 49 swap marked-prime? ] [ 47 swap marked-prime? ]
+    [ 53 swap marked-prime? ] tri
+] unit-test
 
 ! There are 25997 primes below 300000. 1 must be removed and 3 5 7 added.
 { 25997 } [ 299999 sieve [ bit-count ] map-sum 2 + ] unit-test

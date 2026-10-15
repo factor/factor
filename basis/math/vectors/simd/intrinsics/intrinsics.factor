@@ -17,6 +17,15 @@ IN: math.vectors.simd.intrinsics
 
 <PRIVATE
 
+! Representation metadata and bitwise storage remain usable without FP.
+: floating-simd-rep? ( rep -- ? )
+    [ float-vector-rep? ] [ small-float-vector-rep? ] bi or ; inline
+
+: check-simd-floating-point ( rep -- rep )
+    dup floating-simd-rep? [
+        dup require-floating-point
+    ] when ; inline
+
 ! Floating SIMD operations use minimum/maximum-number semantics.
 ! Do not inherit the host's scalar min/max handling of NaNs or signed zeros.
 :: min-vector-lane ( a b -- c )
@@ -171,10 +180,10 @@ M: float native/ /f ; inline
 
 PRIVATE>
 
-: (simd-v+)                ( a b rep -- c ) [ + ] components-2map ;
-: (simd-v-)                ( a b rep -- c ) [ - ] components-2map ;
-: (simd-vneg)              ( a   rep -- c ) [ neg ] components-map ;
-:: (simd-v+-)              ( a b rep -- c )
+: (simd-v+)                ( a b rep -- c ) check-simd-floating-point [ + ] components-2map ;
+: (simd-v-)                ( a b rep -- c ) check-simd-floating-point [ - ] components-2map ;
+: (simd-vneg)              ( a   rep -- c ) check-simd-floating-point [ neg ] components-map ;
+:: (simd-v+-)              ( a b rep -- c ) rep check-simd-floating-point drop
     a b rep 2byte>rep-array :> ( a' b' )
     rep <rep-array> :> c'
     0  rep rep-length [ 1 -  2 <range> ] [ 2 /i ] bi [| n |
@@ -185,16 +194,16 @@ PRIVATE>
         n 1 + c' set-nth-unsafe
     ] unrolled-each-unsafe
     c' underlying>> ;
-: (simd-vs+)               ( a b rep -- c )
+: (simd-vs+)               ( a b rep -- c ) check-simd-floating-point
     dup rep-component-type '[ + _ c:c-type-clamp ] components-2map ;
-: (simd-vs-)               ( a b rep -- c )
+: (simd-vs-)               ( a b rep -- c ) check-simd-floating-point
     dup rep-component-type '[ - _ c:c-type-clamp ] components-2map ;
-: (simd-vs*)               ( a b rep -- c )
+: (simd-vs*)               ( a b rep -- c ) check-simd-floating-point
     dup rep-component-type '[ * _ c:c-type-clamp ] components-2map ;
-: (simd-v*)                ( a b rep -- c ) [ * ] components-2map ;
-: (simd-v*high)            ( a b rep -- c )
+: (simd-v*)                ( a b rep -- c ) check-simd-floating-point [ * ] components-2map ;
+: (simd-v*high)            ( a b rep -- c ) check-simd-floating-point
     dup rep-component-type c:heap-size -8 * '[ * _ shift ] components-2map ;
-:: (simd-v*hs+)            ( a b rep -- c )
+:: (simd-v*hs+)            ( a b rep -- c ) rep check-simd-floating-point drop
     rep { char-16-rep uchar-16-rep } member-eq?
     [ uchar-16-rep char-16-rep ]
     [ rep rep ] if :> ( a-rep b-rep )
@@ -207,20 +216,20 @@ PRIVATE>
         [ [ second ] bi@ * ] 2bi +
         wide-type c:c-type-clamp
     ] wide-rep <rep-array> unrolled-2map-as-unsafe underlying>> ;
-: (simd-v/)                ( a b rep -- c ) [ native/ ] components-2map ;
-: (simd-vavg)              ( a b rep -- c )
+: (simd-v/)                ( a b rep -- c ) check-simd-floating-point [ native/ ] components-2map ;
+: (simd-vavg)              ( a b rep -- c ) check-simd-floating-point
     [ + dup integer? [ 1 + -1 shift ] [ 0.5 * ] if ] components-2map ;
-: (simd-vmin)              ( a b rep -- c ) [ min-vector-lane ] components-2map ;
-: (simd-vmax)              ( a b rep -- c ) [ max-vector-lane ] components-2map ;
+: (simd-vmin)              ( a b rep -- c ) check-simd-floating-point [ min-vector-lane ] components-2map ;
+: (simd-vmax)              ( a b rep -- c ) check-simd-floating-point [ max-vector-lane ] components-2map ;
 ! Accumulate scalar products without narrowing them to the lane type. In
 ! particular, integer dot products must retain values larger than one lane.
-: (simd-vdot)              ( a b rep -- n )
+: (simd-vdot)              ( a b rep -- n ) check-simd-floating-point
     [ 2byte>rep-array [ [ first ] bi@ * ] 2keep ] keep
     1 swap rep-length [a..b) [ '[ _ swap nth-unsafe ] bi@ * + ] 2with each ;
-: (simd-vsqrt)             ( a   rep -- c ) [ fsqrt ] components-map ;
-: (simd-vsad)              ( a b rep -- c ) 2byte>rep-array [ - abs ] [ + ] 2map-reduce ;
-: (simd-sum)               ( a   rep -- n ) [ + ] components-reduce ;
-: (simd-vabs)              ( a   rep -- c ) [ abs ] components-map ;
+: (simd-vsqrt)             ( a   rep -- c ) \ (simd-vsqrt) require-floating-point [ fsqrt ] components-map ;
+: (simd-vsad)              ( a b rep -- c ) check-simd-floating-point 2byte>rep-array [ - abs ] [ + ] 2map-reduce ;
+: (simd-sum)               ( a   rep -- n ) check-simd-floating-point [ + ] components-reduce ;
+: (simd-vabs)              ( a   rep -- c ) check-simd-floating-point [ abs ] components-map ;
 : (simd-vbitand)           ( a b rep -- c ) [ bitand ] bitwise-components-2map ;
 : (simd-vbitandn)          ( a b rep -- c ) [ [ bitnot ] dip bitand ] bitwise-components-2map ;
 : (simd-vbitor)            ( a b rep -- c ) [ bitor ] bitwise-components-2map ;
@@ -264,17 +273,17 @@ PRIVATE>
     [ quot call -1 0 ? ] rep >bitwise-vector-rep <rep-array>
     2map-as underlying>> ; inline
 
-: (simd-v<=)               ( a b rep -- c )
+: (simd-v<=)               ( a b rep -- c ) check-simd-floating-point
     [ <= ] compare-components ;
-: (simd-v<)                ( a b rep -- c )
+: (simd-v<)                ( a b rep -- c ) check-simd-floating-point
     [ < ] compare-components ;
-: (simd-v=)                ( a b rep -- c )
+: (simd-v=)                ( a b rep -- c ) check-simd-floating-point
     [ = ] compare-components ;
-: (simd-v>)                ( a b rep -- c )
+: (simd-v>)                ( a b rep -- c ) check-simd-floating-point
     [ > ] compare-components ;
-: (simd-v>=)               ( a b rep -- c )
+: (simd-v>=)               ( a b rep -- c ) check-simd-floating-point
     [ >= ] compare-components ;
-: (simd-vunordered?)       ( a b rep -- c )
+: (simd-vunordered?)       ( a b rep -- c ) check-simd-floating-point
     [ unordered? ] compare-components ;
 : (simd-vany?)             ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero? not ;
 : (simd-vall?)             ( a   rep -- ? ) [ bitand ] bitwise-components-reduce zero? not ;
@@ -282,28 +291,28 @@ PRIVATE>
 : (simd-vgetmask)          ( a   rep -- n )
     { float-4-rep double-2-rep } member?
     [ uint-4-rep (vgetmask) ] [ uchar-16-rep (vgetmask) ] if ;
-: (simd-v>float)           ( a   rep -- c )
+: (simd-v>float)           ( a   rep -- c ) \ (simd-v>float) require-floating-point
     [ [ byte>rep-array ] [ rep-length ] bi [ >float ] ]
     [ >float-vector-rep <rep-array> ] bi unrolled-map-as-unsafe underlying>> ;
-: (simd-v>integer)         ( a   rep -- c )
+: (simd-v>integer)         ( a   rep -- c ) check-simd-floating-point
     [ [ byte>rep-array ] [ rep-length ] bi [ >integer ] ]
     [ >int-vector-rep <rep-array> ] bi unrolled-map-as-unsafe underlying>> ;
-: (simd-v>unsigned-integer) ( a rep -- c )
+: (simd-v>unsigned-integer) ( a rep -- c ) check-simd-floating-point
     [ [ byte>rep-array ] [ rep-length ] bi [ >integer ] ]
     [ >int-vector-rep >uint-vector-rep <rep-array> ] bi
     unrolled-map-as-unsafe underlying>> ;
-: (simd-vpack-signed)      ( a b rep -- c )
+: (simd-vpack-signed)      ( a b rep -- c ) check-simd-floating-point
     [ [ 2byte>rep-array cord-append ] [ rep-length 2 * ] bi ]
     [ narrow-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
     '[ _ c:c-type-clamp ] swap unrolled-map-as-unsafe underlying>> ;
-: (simd-vpack-unsigned)    ( a b rep -- c )
+: (simd-vpack-unsigned)    ( a b rep -- c ) check-simd-floating-point
     [ [ 2byte>rep-array cord-append ] [ rep-length 2 * ] bi ]
     [ narrow-vector-rep >uint-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
     '[ _ c:c-type-clamp ] swap unrolled-map-as-unsafe underlying>> ;
-: (simd-vunpack-head)      ( a   rep -- c )
+: (simd-vunpack-head)      ( a   rep -- c ) check-simd-floating-point
     [ byte>rep-array ] [ widen-vector-rep [ rep-length ] [ '[ _ >rep-array ] ] bi ] bi
     [ head-slice ] dip call( a' -- c' ) underlying>> ;
-: (simd-vunpack-tail)      ( a   rep -- c )
+: (simd-vunpack-tail)      ( a   rep -- c ) check-simd-floating-point
     [ byte>rep-array ] [ widen-vector-rep [ rep-length ] [ '[ _ >rep-array ] ] bi ] bi
     [ tail-slice ] dip call( a' -- c' ) underlying>> ;
 : (simd-with)              ( n rep -- v )
@@ -347,7 +356,7 @@ PRIVATE>
     [ [ min-vector-lane ] reduce ] [ [ max-vector-lane ] reduce ] if ;
 PRIVATE>
 
-:: (simd-unary) ( a op rep -- c )
+:: (simd-unary) ( a op rep -- c ) rep check-simd-floating-point drop
     rep rep-component-type c:heap-size 8 * :> width
     op {
         { "floor" [ a rep [ floor ] components-map ] }
@@ -361,7 +370,7 @@ PRIVATE>
         { "bit-reverse" [ a rep [ width reverse-lane-bits ] components-map ] }
     } case ;
 
-:: (simd-binary) ( a b op rep -- c )
+:: (simd-binary) ( a b op rep -- c ) rep check-simd-floating-point drop
     op {
         { "shift" [
             rep rep-component-type c:heap-size 8 * :> width
@@ -375,20 +384,20 @@ PRIVATE>
 ! three type switches together creates a needlessly large fallback method.
 : fma-rep-array ( data rep -- array ) byte>rep-array ;
 
-:: (simd-vfma) ( a b c rep -- d )
+:: (simd-vfma) ( a b c rep -- d ) \ (simd-vfma) require-floating-point
     a rep fma-rep-array b rep fma-rep-array c rep fma-rep-array
     rep float-4-rep eq?
     [ [ ffmaf ] rep <rep-array> 3map-as ]
     [ [ ffma ] rep <rep-array> 3map-as ] if underlying>> ;
 
-:: (simd-mul-wide-head) ( a b rep -- c )
+:: (simd-mul-wide-head) ( a b rep -- c ) rep check-simd-floating-point drop
     a b rep 2byte>rep-array [ * ] { } 2map-as
     rep rep-length 2 /i head rep widen-vector-rep >rep-array underlying>> ;
-:: (simd-mul-wide-tail) ( a b rep -- c )
+:: (simd-mul-wide-tail) ( a b rep -- c ) rep check-simd-floating-point drop
     a b rep 2byte>rep-array [ * ] { } 2map-as
     rep rep-length 2 /i tail rep widen-vector-rep >rep-array underlying>> ;
 
-:: (simd-reduce) ( a op rep -- n )
+:: (simd-reduce) ( a op rep -- n ) rep check-simd-floating-point drop
     a rep byte>rep-array op reduce-vector-array ;
 
 "compiler.cfg.intrinsics.simd" require

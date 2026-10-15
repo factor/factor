@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct kernel system ;
+USING: alien.c-types alien.syntax classes.struct kernel literals system vocabs ;
 IN: io.serial.linux.ffi
 
 CONSTANT: NCCS 32
@@ -9,15 +9,9 @@ TYPEDEF: uchar cc_t
 TYPEDEF: uint speed_t
 TYPEDEF: uint tcflag_t
 
-STRUCT: termios
-    { iflag tcflag_t }
-    { oflag tcflag_t }
-    { cflag tcflag_t }
-    { lflag tcflag_t }
-    { line cc_t }
-    { cc { cc_t NCCS } }
-    { ispeed speed_t }
-    { ospeed speed_t } ;
+<< cpu alpha.64?
+[ "io.serial.linux.ffi.alpha.termios" ]
+[ "io.serial.linux.ffi.generic.termios" ] if require >>
 
 FUNCTION: speed_t cfgetispeed ( termios* t )
 FUNCTION: speed_t cfgetospeed ( termios* t )
@@ -33,9 +27,9 @@ FUNCTION: void cfmakeraw ( termios* t )
 FUNCTION: int cfsetspeed ( termios* t, speed_t s )
 
 ! See /usr/include/bits/termios.h
-CONSTANT: TCSANOW     0
-CONSTANT: TCSADRAIN   1
-CONSTANT: TCSAFLUSH   2
+CONSTANT: TCSANOW $[ cpu mips? 21518 0 ? ]
+CONSTANT: TCSADRAIN $[ cpu mips? 21519 1 ? ]
+CONSTANT: TCSAFLUSH $[ cpu mips? 21520 2 ? ]
 
 CONSTANT: TCIFLUSH    0
 CONSTANT: TCOFLUSH    1
@@ -116,29 +110,31 @@ CONSTANT: ECHOE   0o0000020
 CONSTANT: ECHOK   0o0000040
 CONSTANT: ECHONL  0o0000100
 CONSTANT: NOFLSH  0o0000200
-CONSTANT: TOSTOP  0o0000400
+CONSTANT: TOSTOP $[ cpu mips? 32768 0o0000400 ? ]
 CONSTANT: ECHOCTL 0o0001000
 CONSTANT: ECHOPRT 0o0002000
 CONSTANT: ECHOKE  0o0004000
-CONSTANT: FLUSHO  0o0010000
+CONSTANT: FLUSHO $[ cpu mips? 8192 0o0010000 ? ]
 CONSTANT: PENDIN  0o0040000
-CONSTANT: IEXTEN  0o0100000
+CONSTANT: IEXTEN $[ cpu mips? 256 0o0100000 ? ]
 
 ! c_cc characters
 CONSTANT: VINTR 0
 CONSTANT: VQUIT 1
 CONSTANT: VERASE 2
 CONSTANT: VKILL 3
-CONSTANT: VEOF 4
+CONSTANT: VEOF $[ cpu mips? 16 4 ? ]
 CONSTANT: VTIME 5
-CONSTANT: VMIN 6
+CONSTANT: VMIN $[ cpu mips? cpu sparc? or 4 6 ? ]
 CONSTANT: VSWTC 7
 CONSTANT: VSTART 8
 CONSTANT: VSTOP 9
 CONSTANT: VSUSP 10
-CONSTANT: VEOL 11
+CONSTANT: VEOL $[ cpu sparc? [ 5 ] [ cpu mips? 17 11 ? ] if ]
 CONSTANT: VREPRINT 12
 CONSTANT: VDISCARD 13
 CONSTANT: VWERASE 14
 CONSTANT: VLNEXT 15
-CONSTANT: VEOL2 16
+CONSTANT: VEOL2 $[ cpu sparc? [ 6 ] [ cpu mips? 6 16 ? ] if ]
+
+cpu alpha.64? [ "io.serial.linux.ffi.alpha" require ] when

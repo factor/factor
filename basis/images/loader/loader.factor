@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: ascii assocs byte-arrays combinators destructors
 io.encodings.binary io.files io.pathnames io.streams.byte-array
-kernel namespaces strings system vocabs ;
+kernel namespaces sequences strings system vocabs ;
 IN: images.loader
 
 ERROR: unknown-image-extension extension ;
@@ -56,9 +56,12 @@ GENERIC: image>stream ( image extension class -- )
     dup file-extension dup (image-class) rot
     binary [ image>stream ] with-file-writer ;
 
+: pure-image-loaders? ( os -- ? )
+    { freebsd netbsd openbsd } member? ;
+
 {
     { [ os macos? ] [ "images.loader.cocoa" require ] }
     { [ os windows? ] [ "images.loader.gdiplus" require ] }
-    { [ os freebsd? ] [ "images.png" require "images.tiff" require ] }
+    { [ os pure-image-loaders? ] [ "images.png" require "images.tiff" require ] }
     [ "images.loader.gtk" require ]
 } cond

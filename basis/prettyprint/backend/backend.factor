@@ -87,7 +87,37 @@ M: real pprint*
         [ unsupported-number-base ]
     } case ;
 
+! The number parser already formats finite IEEE payloads with integer
+! arithmetic. Classify special values here without invoking float comparison.
+: pprint-prefixed-float ( n quot: ( n -- str ) pre -- )
+    [ call ] dip over first CHAR: - =
+    [ [ rest ] dip prepend "-" prepend ] [ prepend ] if text ; inline
+
+: integer-only-float-pprint ( n -- )
+    dup double>bits {
+        { [ dup 0x7ff8000000000000 = ] [ 2drop "0/0." text ] }
+        { [ dup 0xfff8000000000000 = ] [ 2drop "-0/0." text ] }
+        { [ dup 0x7fffffffffffffff bitand 0x7ff0000000000000 > ] [
+            drop \ NAN: [
+                [ fp-nan-payload ] [ fp-sign ] bi
+                [ 0xfffffffffffff bitxor 1 + neg ] when >hex text
+            ] pprint-prefix
+        ] }
+        { [ dup 0x7ff0000000000000 = ] [ 2drop "1/0." text ] }
+        { [ dup 0xfff0000000000000 = ] [ 2drop "-1/0." text ] }
+        { [ dup zero? ] [ 2drop "0.0" text ] }
+        { [ dup 0x8000000000000000 = ] [ 2drop "-0.0" text ] }
+        [ drop number-base get {
+            { 10 [ number>string text ] }
+            { 16 [ [ >hex ] "0x" pprint-prefixed-float ] }
+            {  8 [ [ >oct ] "0o" pprint-prefixed-float ] }
+            {  2 [ [ >bin ] "0b" pprint-prefixed-float ] }
+            [ unsupported-number-base ]
+        } case ]
+    } cond ;
+
 M: float pprint*
+    floating-point-supported? [
     {
         { [ dup 0/0. fp-bitwise= ] [ drop "0/0." text ] }
         { [ dup -0/0. fp-bitwise= ] [ drop "-0/0." text ] }
@@ -102,7 +132,8 @@ M: float pprint*
         { [ dup 0.0 fp-bitwise= ] [ drop "0.0" text ] }
         { [ dup -0.0 fp-bitwise= ] [ drop "-0.0" text ] }
         [ call-next-method ]
-    } cond ;
+    } cond
+    ] [ integer-only-float-pprint ] if ;
 
 M: f pprint* drop \ f pprint-word ;
 

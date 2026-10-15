@@ -23,3 +23,15 @@ IN: gobject-introspection.loader.tests
 
 ! Match the C identifier, not a short method name shared by unrelated types.
 { { "test_keep" "test_override" } } [ { "override" } skipped-methods ] unit-test
+
+{ t } [
+    "<parameter name='allocation' direction='out' caller-allocates='1'>
+       <type name='Allocation'/>
+     </parameter>" string>xml xml>parameter caller-allocates?>>
+] unit-test
+
+{ f } [
+    "<parameter name='error' direction='out'>
+       <type name='GLib.Error'/>
+     </parameter>" string>xml xml>parameter caller-allocates?>>
+] unit-test

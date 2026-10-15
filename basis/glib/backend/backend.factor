@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types classes.struct
 continuations glib.ffi io.backend.unix.multiplexers io.thread
-kernel libc literals locals math namespaces threads ;
+kernel libc literals locals math namespaces system threads ;
 IN: glib.backend
 
 <PRIVATE
@@ -42,11 +42,32 @@ CONSTANT: poll-fd-events
 
 PRIVATE>
 
+! Haiku select has no single descriptor for GLib to poll. Its source uses
+! GLib's monotonic deadline, reset before dispatch, to check IO at most 20 Hz.
+: haiku-io-schedule ( source -- )
+    g_get_monotonic_time 50,000 + g_source_set_ready_time ;
+
+: haiku-io-check ( source -- ? )
+    drop f ;
+
+: haiku-io-dispatch ( source callback user-data -- ? )
+    2drop haiku-io-schedule
+    0 mx get-global wait-for-events
+    yield t ;
+
+: <haiku-funcs> ( -- funcs )
+    GSourceFuncs malloc-struct
+        [ io-prepare ] GSourceFuncsPrepareFunc >>prepare
+        [ haiku-io-check ] GSourceFuncsCheckFunc >>check
+        [ haiku-io-dispatch ] GSourceFuncsDispatchFunc >>dispatch ;
+
 :: with-io ( quot -- )
     stop-io-thread
-    <funcs> &free
+    os haiku? [ <haiku-funcs> ] [ <funcs> ] if &free
     GSource heap-size g_source_new &g_source_unref :> source
-    source <poll-fd> g_source_add_poll
+    os haiku? [ source haiku-io-schedule ] [
+        source <poll-fd> g_source_add_poll
+    ] if
     source f g_source_attach drop
     [ quot call( -- ) ]
     [

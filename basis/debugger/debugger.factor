@@ -105,6 +105,12 @@ HOOK: signal-error. os ( obj -- )
 : fixnum-range-error. ( obj -- )
     "Cannot convert to fixnum: " write third . ;
 
+M: floating-point-unsupported summary
+    drop "Floating-point operations are unsupported by this integer-only VM." ;
+
+: float-unsupported-error. ( obj -- )
+    drop "Floating-point operations are unsupported by this integer-only VM." print ;
+
 : ffi-error. ( obj -- )
     "FFI error" print drop ;
 
@@ -175,6 +181,7 @@ PREDICATE: vm-error < array
         [ fp-trap-error.           ]
         [ interrupt-error.         ]
         [ callback-space-overflow. ]
+        [ float-unsupported-error. ]
     } ; inline
 
 M: vm-error summary drop "VM error" ;

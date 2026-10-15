@@ -60,3 +60,13 @@ os { linux windows } member? [
 { { 1024 768 } } [
     "vocab:gpu/demos/bunny/loading.tiff" load-image dim>>
 ] unit-test
+
+! BSDs use the existing pure codecs, not Linux-only GTK registration.
+{ { t t t f f f f f } } [
+    { freebsd netbsd openbsd linux macos windows dragonflybsd haiku }
+    [ pure-image-loaders? ] map
+] unit-test
+
+os pure-image-loaders? [
+    { { 32 32 } } [ open-png-image dim>> ] unit-test
+] when

@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs combinators destructors
+USING: accessors arrays assocs colors combinators destructors
 environment formatting io io.streams.escape-codes
 io.streams.string io.styles kernel math math.functions
 math.order namespaces ranges sequences sorting strings
@@ -41,7 +41,7 @@ intensities [| r i |
 
 : color>rgb ( color -- r g b )
     [ red>> ] [ green>> ] [ blue>> ] tri
-    [ 255 * round >integer ] tri@ ;
+    [ color-component>byte ] tri@ ;
 
 : gray? ( r g b -- ? )
     [ max max ] [ min min ] 3bi - 8 < ;
@@ -56,7 +56,7 @@ intensities [| r i |
     } cond ;
 
 : rgb>256color ( r g b -- color )
-    [ 55 - 40 /f 0 max round ] tri@
+    [ 55 - 40 floating-point-supported? [ /f ] [ / ] if 0 max round ] tri@
     [ 36 * ] [ 6 * + ] [ + ] tri* 16 + >integer ;
 
 : color>256color ( color -- 256color )

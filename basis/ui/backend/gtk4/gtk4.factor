@@ -79,7 +79,9 @@ CONSTANT: gtk4-modifiers
     gtk_event_controller_get_current_event_state gtk4-modifiers modifier ;
 
 : key-sym ( keyval -- string/f action? )
-    code>sym [ dup integer? [ gdk_keyval_to_unicode 1string ] when ] dip ;
+    code>sym [
+        dup integer? [ [ gdk_keyval_to_unicode ] keysym>unicode 1string ] when
+    ] dip ;
 
 : on-motion ( controller x y data -- )
     drop 2array dup record-motion swap controller-world move-hand fire-motion ;

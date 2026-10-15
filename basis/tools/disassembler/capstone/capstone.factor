@@ -163,15 +163,25 @@ DESTRUCTOR: cs_close
 : cs-version ( -- major minor )
     { int int } [ cs_version drop ] with-out-parameters ;
 
-: <csh> ( -- csh )
-    \ cpu get {
+: capstone-arch-mode ( cpu -- arch mode )
+    {
         { x86.32 [ CS_ARCH_X86 CS_MODE_32 ] }
         { x86.64 [ CS_ARCH_X86 CS_MODE_64 ] }
         { arm.32 [ CS_ARCH_ARM CS_MODE_ARM ] }
         { arm.64 [ CS_ARCH_ARM64 CS_MODE_ARM ] }
+        { ppc.32 [ CS_ARCH_PPC CS_MODE_32 CS_MODE_BIG_ENDIAN [ enum>number ] bi@ bitor ] }
+        { ppc.64 [ CS_ARCH_PPC CS_MODE_64 CS_MODE_BIG_ENDIAN [ enum>number ] bi@ bitor ] }
+        { ppc.64le [ CS_ARCH_PPC CS_MODE_64 ] }
+        { mips.32 [ CS_ARCH_MIPS CS_MODE_MIPS32 CS_MODE_BIG_ENDIAN [ enum>number ] bi@ bitor ] }
+        { mipsel.32 [ CS_ARCH_MIPS CS_MODE_MIPS32 ] }
+        { mips.64 [ CS_ARCH_MIPS CS_MODE_MIPS64 CS_MODE_BIG_ENDIAN [ enum>number ] bi@ bitor ] }
+        { mipsel.64 [ CS_ARCH_MIPS CS_MODE_MIPS64 ] }
         { riscv.32 [ CS_ARCH_RISCV CS_MODE_RISCV32 CS_MODE_RISCVC [ enum>number ] bi@ bitor ] }
         { riscv.64 [ CS_ARCH_RISCV CS_MODE_RISCV64 CS_MODE_RISCVC [ enum>number ] bi@ bitor ] }
-    } case 0 csh <ref> [ cs_open CS_ERR_OK assert= ] keep ;
+    } case ;
+
+: <csh> ( -- csh )
+    \ cpu get capstone-arch-mode 0 csh <ref> [ cs_open CS_ERR_OK assert= ] keep ;
 
 : with-csh ( ..a quot: ( ..a csh -- ..b ) -- ..b )
     '[ <csh> &cs_close @ ] with-destructors ; inline

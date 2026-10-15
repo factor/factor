@@ -1,6 +1,6 @@
 ! Copyright (C) 2012 Alex Vondrak.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: graphviz help.markup help.syntax images.viewer
+USING: graphviz help.markup help.syntax
 io.encodings.latin1 io.encodings.utf8 io.launcher kernel
 strings ;
 IN: graphviz.render
@@ -91,7 +91,7 @@ HELP: preview
 { $values
     { "graph" graph }
 }
-{ $description "Renders " { $snippet "graph" } " to a temporary file using " { $link preview-format } " and " { $link default-layout } ". Then, using " { $link image. } ", displays the image in the UI listener before deleting the temporary file." }
+{ $description "Renders " { $snippet "graph" } " to a temporary file using " { $link preview-format } " and " { $link default-layout } ". Then, using " { $snippet "image." } " from " { $vocab-link "images.viewer" } ", displays the image in the UI listener before deleting the temporary file." }
 { $errors
 "Throws " { $instance unsupported-preview-format } " error if " { $link preview-format } " is not supported by " { $vocab-link "images.loader" } "."
 $nl
@@ -104,7 +104,7 @@ HELP: preview-window
 { $values
     { "graph" graph }
 }
-{ $description "Renders " { $snippet "graph" } " to a temporary file using " { $link preview-format } " and " { $link default-layout } ". Then, using " { $link image-window } ", opens a new window displaying the image before deleting the temporary file." }
+{ $description "Renders " { $snippet "graph" } " to a temporary file using " { $link preview-format } " and " { $link default-layout } ". Then, using " { $snippet "image-window" } " from " { $vocab-link "images.viewer" } ", opens a new window displaying the image before deleting the temporary file." }
 { $errors
 "Throws " { $instance unsupported-preview-format } " error if " { $link preview-format } " is not supported by " { $vocab-link "images.loader" } "."
 $nl

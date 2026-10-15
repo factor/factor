@@ -63,3 +63,25 @@ io.pathnames kernel namespaces sequences tools.test vocabs.loader ;
     command-line-options
     "foo" get "bar" get "baz" get
 ] unit-test
+
+! A bootstrap image may have been saved while compilation tracing was on.
+! Startup restores the quiet default before applying this invocation's flags.
+{ f } [
+    t "trace-compilation" set-global
+    default-cli-args
+    { "factor" } parse-command-line
+    "trace-compilation" get
+] unit-test
+
+{ t } [
+    default-cli-args
+    { "factor" "-trace-compilation" } parse-command-line
+    "trace-compilation" get
+] unit-test
+
+{ f } [
+    t "trace-compilation" set-global
+    default-cli-args
+    { "factor" "-no-trace-compilation" } parse-command-line
+    "trace-compilation" get
+] unit-test

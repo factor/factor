@@ -3,7 +3,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii arrays assocs combinators grouping
 io.encodings.utf8 io.files kernel lexer math math.functions
-math.parser sequences splitting vocabs.loader ;
+math.parser math.parser.integer-float locals sequences splitting vocabs.loader ;
 IN: colors
 
 MIXIN: color
@@ -40,10 +40,33 @@ CONSTANT: transparent T{ rgba f 0.0 0.0 0.0 0.0 }
 : color= ( color1 color2 -- ? )
     [ >rgba-components 4array ] bi@ [ 0.00000001 ~ ] 2all? ;
 
+! Formatting color metadata does not require executing floating-point operations.
+ERROR: non-finite-color-component component ;
+
+:: color-component>rational ( component -- rational )
+    component float? [
+        component double>bits :> bits
+        bits -52 shift 0x7ff bitand :> exponent
+        exponent 0x7ff = [ component non-finite-color-component ] when
+        bits 0xfffffffffffff bitand :> significand
+        exponent zero?
+        [ significand -1074 ]
+        [ significand 0x10000000000000 bitor exponent 1075 - ] if
+        dup 0 < [ neg 1 swap shift / ] [ shift ] if
+        bits 63 bit? [ neg ] when
+    ] [ component ] if ;
+
+: color-component>byte ( component -- byte )
+    floating-point-supported? [ ] [ color-component>rational ] if
+    255 * round >integer ;
+
 <PRIVATE
 
+: color-component-ratio ( component maximum -- float )
+    floating-point-supported? [ /f ] [ ratio>binary64-bits bits>double ] if ;
+
 : parse-line ( line -- name color )
-    first4 [ [ string>number 255 /f ] tri@ 1.0 <rgba> ] dip swap ;
+    first4 [ [ string>number 255 color-component-ratio ] tri@ 1.0 <rgba> ] dip swap ;
 
 : parse-colors ( lines -- assoc )
     [ "!" head? ] reject [
@@ -64,15 +87,15 @@ ERROR: invalid-hex-color hex ;
 
 : hex>rgba ( hex -- rgba )
     dup length {
-        { 6 [ 2 group [ hex> 255 /f ] map first3 1.0 ] }
-        { 8 [ 2 group [ hex> 255 /f ] map first4 ] }
-        { 3 [ [ digit> 15 /f ] { } map-as first3 1.0 ] }
-        { 4 [ [ digit> 15 /f ] { } map-as first4 ] }
+        { 6 [ 2 group [ hex> 255 color-component-ratio ] map first3 1.0 ] }
+        { 8 [ 2 group [ hex> 255 color-component-ratio ] map first4 ] }
+        { 3 [ [ digit> 15 color-component-ratio ] { } map-as first3 1.0 ] }
+        { 4 [ [ digit> 15 color-component-ratio ] { } map-as first4 ] }
         [ drop invalid-hex-color ]
     } case <rgba> ;
 
 : component>hex ( f -- s )
-    255 * round >integer >hex 2 CHAR: 0 pad-head ;
+    color-component>byte >hex 2 CHAR: 0 pad-head ;
 
 : (color>hex) ( seq -- hex )
     [ component>hex ] map concat "#" prepend ;
@@ -80,7 +103,8 @@ ERROR: invalid-hex-color hex ;
 PRIVATE>
 
 : color>hex ( color -- hex )
-    >rgba-components dup 1 number=
+    >rgba-components dup
+    floating-point-supported? [ ] [ color-component>rational ] if 1 number=
     [ drop 3array ] [ 4array ] if (color>hex) ;
 
 : named-colors ( -- keys ) colors keys ;

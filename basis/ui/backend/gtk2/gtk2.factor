@@ -1,6 +1,6 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types alien.strings
+USING: bootstrap.ui.platform accessors alien.accessors alien.c-types alien.strings
 arrays assocs cairo.ffi classes.struct combinators continuations
 destructors environment gdk2.ffi gdk2.gl.ffi gdk-pixbuf.ffi
 glib.backend glib.ffi gobject gobject.ffi gtk2.ffi gtk2.gl.ffi
@@ -132,7 +132,9 @@ CONSTANT: events-mask
     ] dip window send-scroll t ;
 
 : key-sym ( keyval -- string/f action? )
-    code>sym [ dup integer? [ gdk_keyval_to_unicode 1string ] when ] dip ;
+    code>sym [
+        dup integer? [ [ gdk_keyval_to_unicode ] keysym>unicode 1string ] when
+    ] dip ;
 
 : key-event>gesture ( event -- key-gesture )
     [ event-modifiers ] [ keyval>> key-sym ] [
@@ -200,7 +202,7 @@ icon-data [ default-icon-data ] initialize
 
 : on-configure ( window event user-data -- ? )
     drop swap dup gtk_widget_get_toplevel [ = ] keep window dup active?>> [
-        swap [ swap GdkEventConfigure memory>struct ] dip
+        swap [ swap ] dip
         [ event-loc >>window-loc drop ]
         [ event-dim >>dim relayout-1 ] if
     ] [ 3drop ] if f ;
@@ -495,7 +497,7 @@ M: gtk2-ui-backend (with-ui)
 M: gtk2-ui-backend stop-event-loop
     gtk_main_quit ;
 
-os { linux freebsd } member? [
+os gtk2-backend-platform? [
     gtk2-ui-backend ui-backend set-global
 ] when
 

@@ -92,7 +92,8 @@ TUPLE: parameter
     type
     direction
     allow-none?
-    transfer-ownership ;
+    transfer-ownership
+    caller-allocates? ;
 
 TUPLE: function
     name

@@ -1,2 +1,6 @@
 linux
 freebsd
+netbsd
+openbsd
+dragonflybsd
+haiku

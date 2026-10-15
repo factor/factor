@@ -8,7 +8,10 @@ IN: tools.time
     nano-count [ call nano-count ] dip - ; inline
 
 : time. ( time -- )
-    "Running time: " write 1000000000 /f pprint " seconds" print ;
+    "Running time: " write
+    floating-point-supported?
+    [ 1000000000 /f pprint " seconds" ]
+    [ pprint " nanoseconds" ] if print ;
 
 : time-banner. ( -- )
     "Additional information was collected." print
