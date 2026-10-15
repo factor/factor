@@ -1,0 +1,20 @@
+include vm/Config.unix
+PLAF_DLL_OBJS += $(BUILD_DIR)/os-genunix.o $(BUILD_DIR)/os-openbsd.o $(BUILD_DIR)/mvm-unix.o
+PLAF_MASTER_HEADERS += vm/os-genunix.hpp vm/os-openbsd.hpp
+LIBS := -lm -pthread -Wl,--export-dynamic -Wl,-z,wxneeded
+FFI_TEST_CFLAGS := -fPIC
+CFLAGS += -fPIC
+CXXFLAGS += -fPIC
+
+# Moving GC rewrites saved JIT return PCs; retguard protects their original value.
+# Compiler support varies between the native Clang and packaged GCC drivers.
+# Probe each language without producing objects; preserve explicit overrides.
+ifeq ($(origin RETGUARD_FLAGS),undefined)
+RETGUARD_CFLAGS := $(shell $(TOOLCHAIN_PREFIX)$(CC) -Werror -fno-ret-protector -x c -fsyntax-only /dev/null >/dev/null 2>&1 && printf '%s' '-fno-ret-protector')
+RETGUARD_CXXFLAGS := $(shell $(TOOLCHAIN_PREFIX)$(CXX) -Werror -fno-ret-protector -x c++ -fsyntax-only /dev/null >/dev/null 2>&1 && printf '%s' '-fno-ret-protector')
+else
+RETGUARD_CFLAGS = $(RETGUARD_FLAGS)
+RETGUARD_CXXFLAGS = $(RETGUARD_FLAGS)
+endif
+CFLAGS += $(RETGUARD_CFLAGS)
+CXXFLAGS += $(RETGUARD_CXXFLAGS)
