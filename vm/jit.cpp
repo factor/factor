@@ -19,13 +19,17 @@ jit::jit(cell owner, factor_vm* vm)
       position(0),
       offset(0),
       parent(vm) {
-  fixnum old_count = atomic::fetch_add(&parent->current_jit_count, 1);
+  // Only the VM thread writes this nesting count; sampler threads read it.
+  // Publishing each update atomically does not require a multiwriter RMW.
+  fixnum old_count = atomic::load(&parent->current_jit_count);
+  atomic::store(&parent->current_jit_count, old_count + 1);
   FACTOR_ASSERT(old_count >= 0);
   (void)old_count;
 }
 
 jit::~jit() {
-  fixnum old_count = atomic::fetch_subtract(&parent->current_jit_count, 1);
+  fixnum old_count = atomic::load(&parent->current_jit_count);
+  atomic::store(&parent->current_jit_count, old_count - 1);
   FACTOR_ASSERT(old_count >= 1);
   (void)old_count;
 }
@@ -57,6 +61,25 @@ void jit::emit_relocation(cell relocation_template_) {
 void jit::emit(cell code_template_) {
   data_root<array> code_template(code_template_, parent);
 
+  // A code block cannot represent more than code_length_max instruction bytes.
+  // Reject an inevitable size error before growing its relocation, parameter,
+  // and instruction buffers; constructing the full quotation can exhaust a
+  // constrained process before add_code_block() reaches the same size check.
+  cell instruction_count = array_capacity(
+      untag<byte_array>(array_nth(code_template.untagged(), 1)));
+  if (code.count > code_length_max ||
+      instruction_count > code_length_max - code.count) {
+    // Match add_code_block(): earlier definitions in this batch must be
+    // initialized before the recoverable size error unwinds native frames.
+    parent->initialize_uninitialized_code_blocks();
+    parent->code_length_error(code.count + instruction_count);
+  }
+
+  // Special templates may append fixed parameters after caller-supplied ones.
+  // append() roots its source across growth; code_template remains rooted too.
+  if (array_capacity(code_template.untagged()) >= 3)
+    parameters.append(untag<array>(array_nth(code_template.untagged(), 2)));
+
   emit_relocation(array_nth(code_template.untagged(), 0));
 
   data_root<byte_array> insns(array_nth(code_template.untagged(), 1), parent);
@@ -64,6 +87,31 @@ void jit::emit(cell code_template_) {
   if (computing_offset_p) {
     cell size = array_capacity(insns.untagged());
 
+    // ARM32 returns halfway through its 16-byte word-call template, before
+    // the branch and target literal. This still names the current word.
+#ifdef FACTOR_ARM32
+    if (size == 16 &&
+        code_template.value() == parent->special_objects[JIT_WORD_CALL] &&
+        offset == 8) {
+      computing_offset_p = false;
+    } else
+#endif
+#ifdef FACTOR_SH
+    // JSR returns after its delay slot, before the literal pool and padding
+    // at the end of a call template. That PC still names the called word.
+    if (offset >= 4 && offset < size && (offset & 1) == 0 &&
+        (sh_load_instruction(insns->data<uint8_t>() + offset - 4,
+                             sh_little_endian) & 0xf0ff) == 0x400b &&
+        sh_load_instruction(insns->data<uint8_t>() + offset - 2,
+                            sh_little_endian) == 0x0009) {
+      // Fused dip templates consume the preceding quotation and dip word.
+      if (code_template.value() == parent->special_objects[JIT_DIP] ||
+          code_template.value() == parent->special_objects[JIT_2DIP] ||
+          code_template.value() == parent->special_objects[JIT_3DIP])
+        position++;
+      computing_offset_p = false;
+    } else
+#endif
     if (offset == 0) {
       position--;
       computing_offset_p = false;

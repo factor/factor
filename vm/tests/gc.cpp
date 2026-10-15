@@ -94,6 +94,112 @@ struct failing_fixup : no_fixup {
   }
 };
 
+#ifdef FACTOR_PPC
+static void test_ppc_interrupted_roots() {
+  alignas(data_alignment) uint8_t storage[256] = {};
+  code_block* block = (code_block*)storage;
+  block->header = sizeof(storage);
+  gc_info* info = block->block_gc_info();
+  info->gc_root_count = 12;
+  info->derived_root_count = 0;
+  info->return_address_count = 1;
+  info->return_addresses()[0] = 4;
+  memset(info->gc_info_bitmap(), 0, info->total_bitmap_bytes());
+  info->gc_info_bitmap()[1] = 1; // spill slot eight
+
+  for (auto state : {ppc_leaf, ppc_pre, ppc_active, ppc_post,
+                     ppc_temporary, ppc_temporary_leaf}) {
+    cell frames[64] = {};
+    cell frame = (cell)(frames + 4);
+    cell continuation_size = 4 * sizeof(cell);
+    *(cell*)(frame + PPC_SIGNAL_FRAME_METADATA) = PPC_SIGNAL_FRAME_MARKER | state;
+    check(ppc_signal_frame_p(frame, continuation_size),
+          "PowerPC signal continuation metadata was not recognized");
+    cell extra = state == ppc_temporary ? 32 : 0;
+    cell* spills = (cell*)(frame + continuation_size + extra);
+    spills[8] = 0x10009;
+    frames[4 + 8] = 0x30009; // wrong signal-frame spill address
+    slot_visitor<failing_fixup> visitor(NULL, failing_fixup(0));
+    call_frame_slot_visitor<failing_fixup> visit_frame(&visitor);
+    visit_frame(frame, continuation_size, block, block->address_for_offset(4));
+    bool active = state == ppc_active || state == ppc_temporary;
+    check(spills[8] == (active ? 0x11009 : 0x10009),
+          "PowerPC interrupted root used the wrong frame or disposition");
+    check(frames[4 + 8] == 0x30009,
+          "PowerPC signal continuation was mistaken for caller spills");
+  }
+  std::cout << "PowerPC interrupted roots: width=" << sizeof(cell) * 8
+            << " all six frame dispositions passed\n";
+}
+#endif
+
+#ifdef FACTOR_ALPHA
+struct alpha_relocated_fixup : failing_fixup {
+  code_block* translated;
+  explicit alpha_relocated_fixup(code_block* translated)
+      : failing_fixup(0), translated(translated) {}
+  code_block* translate_code(const code_block*) { return translated; }
+};
+
+static void test_alpha_leaf_roots() {
+  alignas(data_alignment) uint8_t code_storage[160] = {};
+  code_block* block = (code_block*)code_storage;
+  block->header = sizeof(code_storage);
+  gc_info* info = block->block_gc_info();
+  info->gc_root_count = 6;
+  info->derived_root_count = 6;
+  info->return_address_count = 1;
+  info->return_addresses()[0] = 4;
+  std::fill(info->base_pointer_map(), info->base_pointer_map() + 6, UINT32_MAX);
+  info->base_pointer_map()[5] = 4;
+  info->gc_info_bitmap()[0] = 0x10;
+  for (cell caller_size : {cell(32), cell(80), cell(160)}) {
+    block->set_stack_frame_size(caller_size);
+    for (bool synthetic_leaf : {false, true}) {
+      cell frame_size = caller_size - (synthetic_leaf ? 16 : 0);
+      cell frames[24] = {};
+      cell* frame = frames + 4;
+      // Linked frames point to the caller's FP, above its spill area.
+      // A synthetic leaf has 16 bytes of linkage; an ordinary callee has 32.
+      cell* root = frame + (synthetic_leaf ? 2 : 4);
+      root[0] = 0x10009; root[1] = 0x10031;
+      frame[6] = 0x30009;
+      slot_visitor<failing_fixup> visitor(NULL, failing_fixup(0));
+      call_frame_slot_visitor<failing_fixup> visit_frame(&visitor);
+      visit_frame((cell)frame, frame_size, block, block->address_for_offset(4));
+      check(root[0] == 0x11009 && root[1] == 0x11031,
+            "Alpha interrupted caller root/derived alias was not forwarded");
+      check(frame[6] == 0x30009, "Alpha collector modified an unrelated slot");
+    }
+  }
+  // Compaction can free or overwrite the old owner before visiting roots.
+  // Frame layout, like the map, must come from the translated code block.
+  block->set_stack_frame_size(48);
+  alignas(data_alignment) uint8_t old_storage[160] = {};
+  code_block* old_owner = (code_block*)old_storage;
+  for (bool freed : {false, true}) {
+    old_owner->header = sizeof(old_storage);
+    old_owner->set_stack_frame_size(64);
+    if (freed) old_owner->header = sizeof(old_storage) | 1;
+    for (bool synthetic_leaf : {false, true}) {
+      cell frames[24] = {};
+      cell* frame = frames + 4;
+      cell* root = frame + (synthetic_leaf ? 2 : 4);
+      root[0] = 0x10009; root[1] = 0x10031;
+      frame[6] = 0x30009;
+      slot_visitor<alpha_relocated_fixup> visitor(NULL, alpha_relocated_fixup(block));
+      call_frame_slot_visitor<alpha_relocated_fixup> visit_frame(&visitor);
+      visit_frame((cell)frame, synthetic_leaf ? 32 : 48, old_owner,
+                  old_owner->address_for_offset(4));
+      check(root[0] == 0x11009 && root[1] == 0x11031,
+            "Alpha relocated caller map used the stale owner's frame layout");
+      check(frame[6] == 0x30009,
+            "Alpha relocated caller map modified an unrelated slot");
+    }
+  }
+}
+#endif
+
 static void test_derived_roots(cell fail_at) {
   alignas(data_alignment) uint8_t storage[128] = {};
   code_block* block = (code_block*)storage;
@@ -108,13 +214,23 @@ static void test_derived_roots(cell fail_at) {
   info->base_pointer_map()[3] = 2;
   info->gc_info_bitmap()[0] = 0x5; // Base roots in slots 0 and 2.
 
+#if defined(FACTOR_SPARC) || defined(FACTOR_HPPA) || defined(FACTOR_GC_ROOTS_AT_PREDECESSOR_SP)
+  // The return address describes roots in the preceding frame on these ABIs.
+  cell frame_storage[8] = {0, 0, 0, 0, 0x10009, 0x10031, 0x20009, 0x20002};
+  cell* stack = frame_storage + 4;
+  cell frame_top = (cell)frame_storage;
+  cell frame_size = 4 * sizeof(cell);
+#else
   cell stack[] = {0x10009, 0x10031, 0x20009, 0x20002};
+  cell frame_top = (cell)stack;
+  cell frame_size = sizeof(stack);
+#endif
   cell offsets[] = {stack[1] - stack[0], stack[3] - stack[2]};
   slot_visitor<failing_fixup> visitor(NULL, failing_fixup(fail_at));
   call_frame_slot_visitor<failing_fixup> visit_frame(&visitor);
   bool failed = false;
   try {
-    visit_frame((cell)stack, sizeof(stack), block, block->address_for_offset(4));
+    visit_frame(frame_top, frame_size, block, block->address_for_offset(4));
   } catch (const must_start_gc_again&) {
     failed = true;
   }
@@ -124,7 +240,7 @@ static void test_derived_roots(cell fail_at) {
 
   // The higher-generation retry must see pointers, not the temporary offsets.
   visitor.fixup.fail_at = 0;
-  visit_frame((cell)stack, sizeof(stack), block, block->address_for_offset(4));
+  visit_frame(frame_top, frame_size, block, block->address_for_offset(4));
   check(stack[1] - stack[0] == offsets[0] && stack[3] - stack[2] == offsets[1],
         "collection retry corrupted derived roots");
 }
@@ -357,6 +473,224 @@ static void test_stack_frame_size_header() {
   }
 }
 
+#if defined(FACTOR_HPPA)
+static void test_hppa_callback_frames() {
+  test_vm vm;
+  vm.datastack_size = vm.retainstack_size = vm.callstack_size = deck_size;
+  code_block* block = vm.code->allocator->allot(64);
+  check(block != NULL, "HPPA callback code allocation failed");
+  block->set_type(CODE_BLOCK_UNOPTIMIZED);
+  block->owner = block->parameters = block->relocation = false_object;
+  memset(block->block_gc_info(), 0, sizeof(gc_info));
+  vm.code->initialize_all_blocks_set();
+  cell bottom = vm.ctx->callstack_bottom;
+  cell top = bottom - 32;
+  *(cell*)top = top + 16;
+  *(cell*)(top + 4) = block->address_for_offset(4);
+  *(cell*)(top + 16) = bottom;
+  *(cell*)(top + 20) = (cell)vm.callbacks->seg->start + 16;
+  vm.ctx->callstack_top = top;
+  int visits = 0;
+  auto visitor = [&](cell frame, cell size, code_block* owner, cell addr) {
+    check(frame == top && size == 16 && owner == block &&
+              addr == block->address_for_offset(4),
+          "HPPA callback chain visited wrong moving frame");
+    ++visits;
+  };
+  vm.iterate_callstack(vm.ctx, visitor);
+  check(visits == 1, "HPPA callback native return was not skipped");
+  data_root<callstack> saved(vm.allot_callstack(32), &vm);
+  memcpy((void*)saved->top(), (void*)top, 32);
+  *(cell*)saved->top() = 16;
+  *(cell*)(saved->top() + 16) = 16;
+  visits = 0;
+  auto saved_visitor = [&](cell frame, cell size, code_block* owner, cell addr) {
+    check(frame == saved->top() && size == 16 && owner == block &&
+              addr == block->address_for_offset(4),
+          "HPPA saved callback chain visited wrong frame");
+    ++visits;
+  };
+  vm.iterate_callstack_object(saved.untagged(), saved_visitor);
+  check(visits == 1, "HPPA saved callback native return was not skipped");
+  vm.begin_callback(false_object);
+  check(vm.ctx->callstack_top == top && vm.ctx->callstack_bottom == bottom - 16,
+        "HPPA begin-callback lost active frames or retained its native boundary");
+  data_root<callstack> captured(vm.capture_callstack(vm.ctx), &vm);
+  check(untag_fixnum(captured->length) == 16 &&
+            *(cell*)(captured->top() + FRAME_RETURN_ADDRESS) ==
+                block->address_for_offset(4),
+        "HPPA capture serialized its process-local callback return");
+  // Leave no synthetic frame alive while the fixture tears down its VM.
+  vm.ctx->callstack_top = vm.ctx->callstack_bottom;
+}
+
+struct hppa_saved_image_fixup : no_fixup {
+  static const bool translated_code_block_map = true;
+  cell offset;
+  explicit hppa_saved_image_fixup(cell offset_) : offset(offset_) {}
+  code_block* translate_code(const code_block* block) {
+    return (code_block*)((cell)block + offset);
+  }
+};
+
+static void test_hppa_saved_image_frames() {
+  test_vm vm;
+  code_block* block = vm.code->allocator->allot(64);
+  check(block != NULL, "HPPA saved image code allocation failed");
+  block->set_type(CODE_BLOCK_UNOPTIMIZED);
+  block->owner = block->parameters = block->relocation = false_object;
+  memset(block->block_gc_info(), 0, sizeof(gc_info));
+  vm.code->initialize_all_blocks_set();
+  data_root<callstack> saved(vm.allot_callstack(16), &vm);
+  cell current_pc = block->address_for_offset(4);
+  cell old_pc = current_pc - vm.code->seg->size;
+  check(!vm.code->seg->in_segment_p(old_pc),
+        "HPPA saved image fixture did not move the old PC outside the heap");
+  *(cell*)saved->top() = 16;
+  *(cell*)(saved->top() + FRAME_RETURN_ADDRESS) = old_pc;
+  hppa_saved_image_fixup fixup(current_pc - old_pc);
+  int visits = 0;
+  auto visitor = [&](cell frame, cell size, code_block* owner, cell addr) {
+    check(frame == saved->top() && size == 16 && owner == block &&
+              addr == current_pc,
+          "HPPA saved image frame was not translated before heap lookup");
+    ++visits;
+  };
+  vm.iterate_callstack_object(saved.untagged(), visitor, fixup);
+  check(visits == 1, "HPPA saved image frame was skipped");
+}
+
+static void test_hppa_optimizer_roots() {
+  alignas(data_alignment) uint8_t code_storage[160] = {};
+  code_block* block = (code_block*)code_storage;
+  block->header = sizeof(code_storage);
+  gc_info* info = block->block_gc_info();
+  info->gc_root_count = 8;
+  info->derived_root_count = 8;
+  info->return_address_count = 1;
+  info->return_addresses()[0] = 4;
+  std::fill(info->base_pointer_map(), info->base_pointer_map() + 8, UINT32_MAX);
+  info->base_pointer_map()[5] = 4;
+  info->base_pointer_map()[7] = 6;
+  info->gc_info_bitmap()[0] = 0x50;
+  for (cell frame_size : {cell(32), cell(80), cell(160)}) {
+    cell frames[64] = {};
+    cell* caller = frames + frame_size / sizeof(cell);
+    frames[0] = (cell)caller;
+    frames[1] = block->address_for_offset(4);
+    for (int i = 4; i != 8; ++i) frames[i] = 0x30009 + 0x100 * i;
+    caller[4] = 0x10009; caller[5] = 0x10031;
+    caller[6] = 0x20009; caller[7] = 0x20002;
+    slot_visitor<failing_fixup> visitor(NULL, failing_fixup(0));
+    call_frame_slot_visitor<failing_fixup> visit_frame(&visitor);
+    visit_frame((cell)frames, frame_size, block, block->address_for_offset(4));
+    check(caller[4] == 0x11009 && caller[5] == 0x11031 &&
+              caller[6] == 0x21009 && caller[7] == 0x21002,
+          "HPPA caller optimizer spills/derived roots were not forwarded");
+    for (int i = 4; i != 8; ++i)
+      check(frames[i] == cell(0x30009 + 0x100 * i),
+            "HPPA GC map visited child locals instead of caller roots");
+  }
+}
+static void test_hppa_sampled_leaf_roots() {
+  test_vm vm;
+  code_block* caller = vm.code->allocator->allot(160);
+  code_block* leaf = vm.code->allocator->allot(64);
+  for (code_block* block : {caller, leaf}) {
+    block->set_type(CODE_BLOCK_UNOPTIMIZED);
+    block->owner = block->parameters = block->relocation = false_object;
+    memset(block->block_gc_info(), 0, sizeof(gc_info));
+  }
+  gc_info* info = caller->block_gc_info();
+  info->gc_root_count = 6;
+  info->derived_root_count = 6;
+  info->return_address_count = 1;
+  info->return_addresses()[0] = 4;
+  std::fill(info->base_pointer_map(), info->base_pointer_map() + 6, UINT32_MAX);
+  info->base_pointer_map()[5] = 4;
+  info->gc_info_bitmap()[0] = 0x10;
+  vm.code->initialize_all_blocks_set();
+  word* handler = vm.allot<word>(sizeof(word));
+  memset((char*)handler + sizeof(object), 0, sizeof(word) - sizeof(object));
+  handler->subprimitive = tag_fixnum(0);
+  handler->entry_point = leaf->entry_point();
+  vm.special_objects[LEAF_SIGNAL_HANDLER_WORD] = tag<word>(handler);
+  data_root<byte_array> base(vm.allot_byte_array(100), &vm);
+  cell original_sp = vm.ctx->callstack_bottom - 64;
+  *(cell*)original_sp = vm.ctx->callstack_bottom;
+  *(cell*)(original_sp + FRAME_RETURN_ADDRESS) = vm.callbacks->seg->start + 16;
+  cell* roots = (cell*)original_sp;
+  roots[4] = base.value();
+  roots[5] = (cell)base->data<uint8_t>() + 7;
+  cell old_base = base.value();
+  cell sp = original_sp, pc = leaf->entry_point();
+  vm.dispatch_resumable_signal(&sp, &pc, pc);
+  check(*(cell*)sp == sp + 16 && *(cell*)(sp + 16) == original_sp,
+        "HPPA sampled entry omitted the caller's synthetic frame");
+  // The leaf-handler template saves interrupted r2 in this second header.
+  *(cell*)(sp + 20) = caller->address_for_offset(4);
+  vm.ctx->callstack_top = sp;
+  vm.gc(COLLECT_NURSERY_OP, 0);
+  check(base.value() != old_base && roots[4] == base.value(),
+        "HPPA sampled entry did not forward its caller's live spill");
+  check(roots[5] == (cell)base->data<uint8_t>() + 7,
+        "HPPA sampled entry did not forward its derived alias");
+  vm.ctx->callstack_top = vm.ctx->callstack_bottom;
+}
+
+static void test_hppa_relocations() {
+  test_hppa_callback_frames();
+  test_hppa_saved_image_frames();
+  test_hppa_optimizer_roots();
+  test_hppa_sampled_leaf_roots();
+  for (int32_t lhs : {INT32_MIN, -1001, -1, 0, 1, 1001, INT32_MAX}) {
+    for (int32_t rhs : {-100, -3, -1, 1, 3, 100}) {
+      const int64_t quotient = int64_t(lhs) / rhs;
+      const int64_t remainder = int64_t(lhs) % rhs;
+      check(hppa_divide_i32(lhs, rhs) == int32_t(quotient),
+            "HPPA native integer divide boundary failed");
+      check(hppa_remainder_i32(lhs, rhs) == int32_t(remainder),
+            "HPPA native integer remainder boundary failed");
+    }
+  }
+  struct {
+    code_block block;
+    uint32_t instructions[4];
+  } buffer;
+  buffer.instructions[0] = 0x22c00000;
+  buffer.instructions[1] = 0x36d60000;
+  buffer.instructions[2] = 0xe6c02000;
+  buffer.instructions[3] = 0x37e23ffb;
+  instruction_operand address(
+      relocation_entry(RT_UNTAGGED, RC_NATIVE_0, 8), &buffer.block, 0);
+  const cell return_address = buffer.block.entry_point() + 16;
+  for (uint32_t value : {0u, 42u, 0x12345678u, 0x7fffffffu,
+                         0x80000000u, 0xffffffffu}) {
+    address.store_value(fixnum(value));
+    check(cell(address.load_value(address.pointer)) == cell(value),
+          "HPPA relocated address failed to round trip");
+    check(cell(get_call_target(return_address)) == cell(value),
+          "HPPA call target disagrees with relocated address");
+    set_call_target(return_address, cell(value ^ 0x12345678u));
+    check(cell(get_call_target(return_address)) == cell(value ^ 0x12345678u),
+          "HPPA call target patch failed");
+    check(!tail_call_site_p(return_address), "HPPA call mistaken for tail call");
+  }
+  buffer.instructions[2] = 0xeac0c000;
+  buffer.instructions[3] = 0x08000240;
+  check(tail_call_site_p(return_address), "HPPA tail call mistaken for call");
+  instruction_operand immediate(
+      relocation_entry(RT_UNTAGGED, RC_NATIVE_1, 8), &buffer.block, 0);
+  for (fixnum value : {-8192, -1, 0, 1, 8191}) {
+    immediate.store_value(value);
+    check(immediate.load_value(immediate.pointer) == value,
+          "HPPA signed instruction immediate failed to round trip");
+    check((buffer.instructions[1] & 0xffffc000u) == 0x36d60000u,
+          "HPPA immediate patch corrupted opcode/register fields");
+  }
+}
+#endif
+
 static void test_arm64_relocations() {
   struct {
     code_block block;
@@ -420,7 +754,55 @@ static void test_riscv32_cell_relocation() {
 }
 #endif
 
+#if defined(FACTOR_MIPS)
+static void test_mips_cell_relocation_and_calls() {
+#ifdef FACTOR_MIPS64
+  uint32_t code[] = {0x34190000, 0x0019cc38, 0x37390000, 0x0019cc38,
+      0x37390000, 0x0019cc38, 0x37390000, 0x0320f809, 0, 0xdeadbeef};
+#else
+  uint32_t code[] = {0x3c190000, 0x37390000, 0x0320f809, 0, 0xdeadbeef};
+#endif
+  instruction_operand op(relocation_entry(RT_LITERAL, (relocation_class)14,
+      MIPS_LITERAL_BYTES), (code_block*)((cell)code - sizeof(code_block)), 0);
+  for (cell value : {cell(0), cell(1), cell(-1), cell(1) << (WORD_SIZE - 1)}) {
+    op.store_value(value);
+    check(cell(op.load_value(0)) == value, "MIPS instruction operand lost literal bits");
+    check(code[MIPS_CALL_BYTES / 4] == 0xdeadbeef, "MIPS relocation overwrote its template");
+    const cell end = (cell)code + MIPS_CALL_BYTES;
+    check((cell)get_call_target(end) == value, "MIPS call target decoder disagrees with relocation");
+    check(!tail_call_site_p(end), "MIPS JALR misidentified as tail call");
+    set_call_target(end, value ^ TAG_MASK);
+    check((cell)get_call_target(end) == (value ^ TAG_MASK), "MIPS call target patch failed");
+    code[MIPS_LITERAL_BYTES / 4] = 0x03200008;
+    check(tail_call_site_p(end), "MIPS JR tail call misidentified");
+    code[MIPS_LITERAL_BYTES / 4] = 0x0320f809;
+  }
+}
+#endif
+
+#include "jit_templates.hpp"
+
 int main(int argc, char** argv) {
+#ifdef FACTOR_PPC
+  if (argc == 1 || strcmp(argv[1], "ppc-interrupted-roots") == 0)
+    test_ppc_interrupted_roots();
+#endif
+#ifdef FACTOR_ALPHA
+  if (argc == 1 || strcmp(argv[1], "alpha-leaf-roots") == 0)
+    test_alpha_leaf_roots();
+#endif
+  if (argc == 1 || strcmp(argv[1], "jit-templates") == 0)
+    test_jit_templates();
+#if defined(FACTOR_MIPS)
+  test_mips_cell_relocation_and_calls();
+#endif
+
+#if defined(FACTOR_HPPA)
+  if (argc > 1 && strcmp(argv[1], "hppa-sampled-leaf-roots") == 0)
+    test_hppa_sampled_leaf_roots();
+  if (argc == 1 || strcmp(argv[1], "hppa-relocations") == 0)
+    test_hppa_relocations();
+#endif
   if (argc == 1 || strcmp(argv[1], "arm64-relocations") == 0)
     test_arm64_relocations();
   if (argc == 1 || strcmp(argv[1], "stack-frame-size") == 0)

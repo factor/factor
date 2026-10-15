@@ -103,6 +103,13 @@ void factor_vm::set_profiling(fixnum rate) {
 
 // Allocates memory
 void factor_vm::start_sampling_profiler(fixnum rate) {
+#if defined(FACTOR_ATOMIC_RMW_UNAVAILABLE) || defined(FACTOR_NETBSD_RAS) || \
+    defined(FACTOR_OPENBSD_HPPA_MASKED_RMW)
+  if (!atomic::rmw_supported()) {
+    general_error(ERROR_IO, tag_fixnum(ENOTSUP), false_object);
+    return;
+  }
+#endif
   special_objects[OBJ_SAMPLE_CALLSTACKS] = tag<array>(allot_growarr());
   samples_per_second = rate;
   current_sample.clear_counts();

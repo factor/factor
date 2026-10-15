@@ -1,0 +1,5 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-sh.o $(BUILD_DIR)/cpu-sh-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-sh.hpp vm/sh.hpp
+CFLAGS += -m4 -Wa,--isa=sh4
+CXXFLAGS += -m4 -Wa,--isa=sh4
+ASFLAGS += -m4 -Wa,--isa=sh4

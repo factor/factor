@@ -1,0 +1,10 @@
+# The SH3 soft ABI is available only with the explicit integer-only VM.
+# NetBSD physical SH4 ports also use this compiler ABI.
+ifneq ($(INTEGER_ONLY),1)
+$(error The SH3 soft ABI requires INTEGER_ONLY=1)
+endif
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-sh.o $(BUILD_DIR)/cpu-sh-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-sh.hpp vm/sh.hpp
+CFLAGS += -m3 -Wa,--isa=sh3
+CXXFLAGS += -m3 -Wa,--isa=sh3
+ASFLAGS += -m3 -Wa,--isa=sh3

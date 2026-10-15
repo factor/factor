@@ -145,8 +145,15 @@ void quotation_jit::iterate_quotation() {
   set_position(0);
 
   if (stack_frame) {
+#if defined(FACTOR_SPARC) || defined(FACTOR_SH)
+    // Publish the caller's return address and frame link before a safepoint
+    // walks these linked frames and visits the caller's spilled roots.
+    emit(parent->special_objects[JIT_PROLOG]);
+    emit(parent->special_objects[JIT_SAFEPOINT]);
+#else
     emit(parent->special_objects[JIT_SAFEPOINT]);
     emit(parent->special_objects[JIT_PROLOG]);
+#endif
   }
 
   cell length = array_capacity(elements.untagged());

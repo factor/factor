@@ -1,4 +1,9 @@
 #include "master.hpp"
+#if defined(FACTOR_LOONGARCH64)
+#include <poll.h>
+#endif
+#include "../src/netbsd-riscv-fma.h"
+#include "../src/netbsd-riscv-network-symbols.h"
 
 namespace factor {
 
@@ -44,7 +49,12 @@ void* native_dlopen(const char* path) {
 }
 
 void* native_dlsym(void* handle, const char* symbol) {
-  return dlsym(handle, symbol);
+  void* result = dlsym(handle, symbol);
+  result = factor_netbsd_network_symbol(result, handle, symbol);
+#if defined(__NetBSD__) && defined(__riscv) && __riscv_xlen == 64
+  if (!result) result = factor_netbsd_math_symbol(symbol);
+#endif
+  return result;
 }
 
 void native_dlclose(void* handle) {
@@ -58,7 +68,7 @@ void factor_vm::ffi_dlopen(dll* dll) {
 }
 
 cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
-  return (cell)dlsym(dll ? dll->handle : null_dll, symbol);
+  return (cell)native_dlsym(dll ? dll->handle : null_dll, symbol);
 }
 
 void factor_vm::ffi_dlclose(dll* dll) {
@@ -98,8 +108,15 @@ segment::segment(cell size_, bool executable_p, cell low_guard_size_) {
   else
     prot = PROT_READ | PROT_WRITE;
   int flags = MAP_ANON | MAP_PRIVATE;
+#if defined(__NetBSD__)
+  if (executable_p) prot |= PROT_MPROTECT(PROT_EXEC);
+#endif
 #endif
 
+#if defined(__OpenBSD__)
+  // OpenBSD requires syscall stacks in MAP_STACK memory.
+  if (!executable_p) flags |= MAP_STACK;
+#endif
   cell alloc_size = low_guard_size + pagesize + size;
   char* array = (char*)mmap(NULL, alloc_size, prot, flags, -1, 0);
 
@@ -131,6 +148,10 @@ segment::~segment() {
 static factor_vm* volatile sampling_profiler_vm = NULL;
 
 void factor_vm::start_sampling_profiler_timer() {
+#ifdef FACTOR_ATOMIC_RMW_UNAVAILABLE
+  // set_profiling reports ENOTSUP before reaching these internal entrypoints.
+  ::abort();
+#else
   struct itimerval timer;
   memset((void*)&timer, 0, sizeof(struct itimerval));
   fixnum interval = std::max(fixnum(1), fixnum(1000000) / samples_per_second);
@@ -140,14 +161,19 @@ void factor_vm::start_sampling_profiler_timer() {
   atomic::store(&sampling_profiler_vm, this);
   if (setitimer(ITIMER_REAL, &timer, NULL) < 0)
     fatal_error("setitimer failed", errno);
+#endif
 }
 
 void factor_vm::end_sampling_profiler_timer() {
+#ifdef FACTOR_ATOMIC_RMW_UNAVAILABLE
+  ::abort();
+#else
   struct itimerval timer;
   memset((void*)&timer, 0, sizeof(struct itimerval));
   if (setitimer(ITIMER_REAL, &timer, NULL) < 0)
     fatal_error("setitimer failed", errno);
   atomic::store(&sampling_profiler_vm, (factor_vm*)NULL);
+#endif
 }
 
 // Signal delivery must not change the interrupted code's syscall result.
@@ -157,10 +183,115 @@ struct signal_handler_scope {
   ~signal_handler_scope() { errno = saved_errno; }
 };
 
+static char* append_signal_hex(char* destination, cell value) {
+  *destination++ = '0';
+  *destination++ = 'x';
+  bool started = false;
+  for (size_t nibble = sizeof(cell) * 2; nibble > 0; --nibble) {
+    unsigned digit = (unsigned)((value >> ((nibble - 1) * 4)) & 0xf);
+    if (digit || started || nibble == 1) {
+      *destination++ = "0123456789abcdef"[digit];
+      started = true;
+    }
+  }
+  return destination;
+}
+
+// A fault on a foreign thread has no Factor stacks to inspect. Report its
+// interrupted PC using only stack storage and async-signal-safe system calls.
+// Native unwinding can allocate, acquire locks or fault inside the handler.
+[[noreturn]] static void fatal_signal_without_vm(int signal, cell pc) {
+  char diagnostic[128];
+  char* end = diagnostic;
+  const char prefix[] = "fatal_error: Foreign thread received signal: ";
+  for (const char* p = prefix; *p; ++p)
+    *end++ = *p;
+  end = append_signal_hex(end, (cell)signal);
+  const char location[] = "; pc=";
+  for (const char* p = location; *p; ++p)
+    *end++ = *p;
+  end = append_signal_hex(end, pc);
+  *end++ = '\n';
+  ssize_t ignored = write(STDERR_FILENO, diagnostic, (size_t)(end - diagnostic));
+  (void)ignored;
+  _exit(1);
+}
+
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {
+#if defined(FACTOR_HPPA)
+  cell hppa_sp = UAP_STACK_POINTER(uap);
+  cell hppa_pc = UAP_PROGRAM_COUNTER(uap) & ~cell(3);
+  dispatch_signal_handler(&hppa_sp, &hppa_pc, (cell)FUNCTION_CODE_POINTER(handler));
+  UAP_STACK_POINTER(uap) = hppa_sp;
+  UAP_PROGRAM_COUNTER(uap) = hppa_pc | 3;
+  UAP_NEXT_PROGRAM_COUNTER(uap) = (hppa_pc + 4) | 3;
+  if (signal_resumable) signal_handler_addr = (cell)handler;
+  else UAP_GLOBAL_POINTER(uap) = FUNCTION_TOC_POINTER(handler);
+#elif defined(FACTOR_PPC)
+  dispatch_ppc_signal((cell*)&UAP_STACK_POINTER(uap),
+                      (cell*)&UAP_PROGRAM_COUNTER(uap),
+                      (cell)UAP_LINK_REGISTER(uap),
+                      (cell)FUNCTION_CODE_POINTER(handler));
+#ifdef FACTOR_PPC_TOC
+  if (signal_resumable) signal_handler_addr = (cell)handler;
+#endif
+  if (!signal_resumable) {
+#if defined(UAP_GLOBAL_ENTRY_REGISTER)
+    UAP_GLOBAL_ENTRY_REGISTER(uap) = (cell)FUNCTION_CODE_POINTER(handler);
+#endif
+#if defined(UAP_TOC_REGISTER)
+    UAP_TOC_REGISTER(uap) = (cell)FUNCTION_TOC_POINTER(handler);
+#endif
+  }
+#elif defined(FACTOR_SPARC)
+  dispatch_sparc_signal(uap, (cell)FUNCTION_CODE_POINTER(handler));
+#elif defined(FACTOR_M88K)
+  struct reg* regs = m88k_signal_registers(uap);
+  cell sp = regs->r[31];
+  cell pc = regs->sxip & XIP_ADDR;
+  dispatch_signal_handler(&sp, &pc, (cell)FUNCTION_CODE_POINTER(handler));
+  regs->r[31] = sp;
+  // OpenBSD sigreturn resumes the next/future instruction pipeline slots.
+  regs->snip = pc | NIP_V;
+  regs->sfip = (pc + 4) | FIP_V;
+  // The redirected handler replaces the interrupted memory operation.
+  // OpenBSD restores the saved data pipeline on sigreturn; leaving DMT0
+  // valid can replay the failed access before the new instruction pointer.
+  regs->dmt0 = 0;
+#else
   dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
                           (cell*)&UAP_PROGRAM_COUNTER(uap),
                           (cell)FUNCTION_CODE_POINTER(handler));
+#if defined(__linux__) && defined(FACTOR_ARM32)
+  arm32_signal_set_entry(uap, UAP_PROGRAM_COUNTER(uap));
+#endif
+#if defined(__NetBSD__) && defined(FACTOR_VAX)
+  if (!signal_resumable) {
+    // A native VAX entry starts with a CALLS mask, not an instruction.
+    UAP_NATIVE_HANDLER_REGISTER(uap) = (cell)handler;
+    UAP_PROGRAM_COUNTER(uap) = (cell)vax_non_resumable_signal_entry;
+  }
+#endif
+#ifdef FACTOR_PPC_TOC
+  if (signal_resumable)
+    signal_handler_addr = (cell)handler;
+#endif
+#ifdef FACTOR_PPC64
+  // Native global entries derive their TOC from r12 (ELFv2) or require the
+  // descriptor's TOC in r2 (ELFv1). Kernel signal return must install it.
+  if (!signal_resumable) {
+    UAP_GLOBAL_ENTRY_REGISTER(uap) = (cell)FUNCTION_CODE_POINTER(handler);
+#ifdef FACTOR_PPC_TOC
+    UAP_TOC_REGISTER(uap) = (cell)FUNCTION_TOC_POINTER(handler);
+#endif
+  }
+#endif
+#ifdef UAP_NATIVE_ENTRY
+  // Native PIC entry derives gp from t9 (MIPS) or pv (Alpha). A PC-only
+  // redirection retains the interrupted callee's entry register.
+  if (!signal_resumable) UAP_NATIVE_ENTRY(uap, UAP_PROGRAM_COUNTER(uap));
+#endif
+#endif
 }
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
@@ -169,7 +300,7 @@ void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
   factor_vm* vm = current_vm_p();
   if (!vm)
-    fatal_error("Foreign thread received signal", signal);
+    fatal_signal_without_vm(signal, fault_pc);
   vm->set_memory_protection_error(fault_addr, fault_pc);
   vm->dispatch_signal(uap, factor::memory_signal_handler_impl);
 }
@@ -182,7 +313,7 @@ void synchronous_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 
   factor_vm* vm = current_vm_p();
   if (!vm)
-    fatal_error("Foreign thread received signal", signal);
+    fatal_signal_without_vm(signal, (cell)UAP_PROGRAM_COUNTER(uap));
   vm->signal_number = signal;
   vm->dispatch_signal(uap, factor::synchronous_signal_handler_impl);
 }
@@ -230,7 +361,7 @@ void fep_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
     vm->enqueue_fep();
     enqueue_signal(vm, signal);
   } else
-    fatal_error("Foreign thread received signal", signal);
+    fatal_signal_without_vm(signal, (cell)UAP_PROGRAM_COUNTER(uap));
 }
 
 void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
@@ -256,9 +387,19 @@ void fpe_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   signal_handler_scope scope;
   factor_vm* vm = current_vm_p();
   if (!vm)
-    fatal_error("Foreign thread received signal", signal);
+    fatal_signal_without_vm(signal, (cell)UAP_PROGRAM_COUNTER(uap));
   vm->signal_number = signal;
+#if defined(FACTOR_LOONGARCH64) || \
+    (defined(__linux__) && (defined(FACTOR_HPPA) || defined(FACTOR_SPARC)))
+  vm->signal_fpu_status = signal_fpu_status(uap_fpu_status(uap), siginfo->si_code);
+#elif defined(__NetBSD__) && defined(FACTOR_MIPS)
+  vm->signal_fpu_status = signal_fpu_status(uap_fpu_status(uap), siginfo->si_trap);
+#else
   vm->signal_fpu_status = fpu_status(uap_fpu_status(uap));
+#endif
+#if defined(FACTOR_VAX)
+  vm->signal_fpu_status |= vax_fpe_flags(siginfo->si_code);
+#endif
   uap_clear_fpu_status(uap);
 
   vm->dispatch_signal(
@@ -346,6 +487,12 @@ void factor_vm::unix_init_signals() {
   cell signal_callstack_size =
       std::max(callstack_size, align_page((cell)SIGSTKSZ));
   signal_callstack_seg = new segment(signal_callstack_size, false);
+#if defined(FACTOR_SPARC) && defined(__OpenBSD__)
+  for (auto& slot : sparc_signal_slots) {
+    slot.region = new segment(signal_callstack_size, false);
+    slot.saved.snapshot = new unsigned char[signal_callstack_size];
+  }
+#endif
 
   stack_t signal_callstack;
   signal_callstack.ss_sp = (char*)signal_callstack_seg->start;
@@ -384,7 +531,11 @@ void factor_vm::unix_init_signals() {
     sigaction_safe(SIGUSR1, &enqueue_sigaction, NULL);
     sigaction_safe(SIGCONT, &enqueue_sigaction, NULL);
     sigaction_safe(SIGURG, &enqueue_sigaction, NULL);
+#ifdef SIGIO
     sigaction_safe(SIGIO, &enqueue_sigaction, NULL);
+#elif defined(SIGPOLL)
+    sigaction_safe(SIGPOLL, &enqueue_sigaction, NULL);
+#endif
     sigaction_safe(SIGPROF, &enqueue_sigaction, NULL);
     sigaction_safe(SIGVTALRM, &enqueue_sigaction, NULL);
 #ifdef SIGINFO
@@ -467,6 +618,40 @@ bool safe_read(int fd, void* data, ssize_t size) {
     return (bytes == size);
 }
 
+#if defined(FACTOR_LOONGARCH64)
+// A closed control writer wakes both an idle worker and a worker waiting for
+// stdin. It also lets shutdown complete when the debugger holds stdin_mutex.
+// Avoid cancellation unwinding through a native signal frame on LoongArch.
+static bool wait_console_input() {
+  for (;;) {
+    int locked = pthread_mutex_trylock(&stdin_mutex);
+    if (locked != 0 && locked != EBUSY)
+      fatal_error("stdin mutex lock failed", locked);
+    if (locked == 0)
+      pthread_mutex_unlock(&stdin_mutex);
+
+    struct pollfd fds[] = {{STDIN_FILENO, POLLIN, 0}, {control_read, 0, 0}};
+    int result = poll(locked == 0 ? fds : fds + 1,
+                      locked == 0 ? 2 : 1, locked == 0 ? -1 : 50);
+    if (result < 0) {
+      if (errno == EINTR)
+        continue;
+      fatal_error("stdin poll failed", errno);
+    }
+    if (fds[1].revents & (POLLHUP | POLLERR | POLLNVAL))
+      return false;
+    if (locked == 0 && fds[0].revents != 0) {
+      // Keep debugger input exclusive between readiness and the read.
+      locked = pthread_mutex_trylock(&stdin_mutex);
+      if (locked == 0)
+        return true;
+      if (locked != EBUSY)
+        fatal_error("stdin mutex lock failed", locked);
+    }
+  }
+}
+#endif
+
 void* stdin_loop(void* arg) {
   (void) arg;
   unsigned char buf[4096];
@@ -480,9 +665,11 @@ void* stdin_loop(void* arg) {
   sigdelset(&mask, SIGQUIT);
   pthread_sigmask(SIG_SETMASK, &mask, NULL);
 
+#if !defined(FACTOR_LOONGARCH64)
   int unused;
   pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &unused);
   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &unused);
+#endif
 
   while (loop_running) {
     if (!safe_read(control_read, buf, 1))
@@ -494,9 +681,19 @@ void* stdin_loop(void* arg) {
     for (;;) {
       // If we fep, the parent thread will grab stdin_mutex and send us
       // SIGUSR2 to interrupt the read() call.
+#if defined(FACTOR_LOONGARCH64)
+      if (!wait_console_input()) {
+        loop_running = false;
+        break;
+      }
+#else
       pthread_mutex_lock(&stdin_mutex);
       pthread_mutex_unlock(&stdin_mutex);
+#endif
       ssize_t bytes = read(0, buf, sizeof(buf));
+#if defined(FACTOR_LOONGARCH64)
+      pthread_mutex_unlock(&stdin_mutex);
+#endif
       if (bytes < 0) {
         if (errno == EINTR)
           continue;
@@ -525,9 +722,9 @@ void open_console() {
   safe_pipe(&control_read, &control_write);
   safe_pipe(&size_read, &size_write);
   safe_pipe(&stdin_read, &stdin_write);
+  pthread_mutex_init(&stdin_mutex, NULL);
   stdin_thread = start_thread(stdin_loop, NULL);
   stdin_thread_initialized_p = true;
-  pthread_mutex_init(&stdin_mutex, NULL);
 }
 
 // This method is used to kill the stdin_loop before exiting from factor.
@@ -535,8 +732,15 @@ void open_console() {
 //   http://www.nvnews.net/vbulletin/showthread.php?t=164619
 void close_console() {
   if (stdin_thread_initialized_p) {
+#if defined(FACTOR_LOONGARCH64)
+    safe_close(control_write);
+#else
     pthread_cancel(stdin_thread);
+#endif
     pthread_join(stdin_thread, 0);
+#if defined(FACTOR_LOONGARCH64)
+    stdin_thread_initialized_p = false;
+#endif
   }
 }
 

@@ -186,6 +186,24 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
 
   }
 
+  // Validate only the serialized extent, before the allocator installs its tail
+  // free block or any relocation pass follows code-block pointers.
+  cell cursor = code->allocator->start;
+  cell remaining = h->code_size;
+  while (remaining != 0) {
+    if (remaining < sizeof(cell))
+      fatal_error("Invalid code block in image", cursor);
+    cell header = *(cell*)cursor;
+    bool free = (header & 1) != 0;
+    cell block_size = header & (free ? ~(cell)7 : (cell)0xFFFFF8);
+    cell minimum = free ? data_alignment : sizeof(code_block);
+    if (block_size < minimum || block_size % data_alignment != 0 ||
+        block_size > remaining)
+      fatal_error("Invalid code block in image", cursor);
+    cursor += block_size;
+    remaining -= block_size;
+  }
+
   code->allocator->initial_free_list(h->code_size);
   code->initialize_all_blocks_set();
 }

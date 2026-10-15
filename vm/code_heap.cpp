@@ -122,7 +122,9 @@ code_block* code_heap::code_block_for_address(cell address) {
 }
 
 cell code_heap::frame_predecessor(cell frame_top) {
-#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
+#if defined(FACTOR_SPARC)
+  return sparc_frame_predecessor(frame_top);
+#elif defined(FACTOR_LINKED_FRAMES)
   return *(cell*)frame_top;
 #else
   cell addr = *(cell*)frame_top;

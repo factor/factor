@@ -1,6 +1,9 @@
 #include "master.hpp"
 
 int main(int argc, char** argv) {
+#ifdef __OpenBSD__
+  factor::set_vm_executable_path(argv[0]);
+#endif
 #ifdef __APPLE__
   factor::reexec_from_app_bundle(argv);
 #endif

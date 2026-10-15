@@ -1,4 +1,5 @@
 #include "master.hpp"
+#include "native_relocations.hpp"
 
 namespace factor {
 
@@ -17,13 +18,14 @@ constexpr fixnum decode_signed_instruction_field(uint32_t instruction,
                                                  cell scaling) {
   cell width = msb - lsb + 1;
   uint32_t mask = width == 32 ? 0xffffffff : ((uint32_t)1 << width) - 1;
-  fixnum value = (instruction >> lsb) & mask;
-
-  uint32_t sign_bit = (uint32_t)1 << (width - 1);
-  if (value & sign_bit)
-    value -= (fixnum)1 << width;
-
-  return value * ((fixnum)1 << scaling);
+  cell value = (instruction >> lsb) & mask;
+  cell sign_bit = (cell)1 << (width - 1);
+  if (value & sign_bit) {
+    cell magnitude = (cell)mask - value + 1;
+    cell scaled = magnitude << scaling;
+    return -(fixnum)(scaled - 1) - 1;
+  }
+  return (fixnum)(value << scaling);
 }
 
 static_assert(decode_signed_instruction_field(0x00000001, 25, 0, 2) == 4,
@@ -60,7 +62,11 @@ fixnum instruction_operand::load_value(cell relative_to) {
     case RC_RELATIVE:
       return load_unaligned<int32_t>(pointer - sizeof(uint32_t)) + relative_to;
     case RC_RELATIVE_ARM_B:
+#if defined(FACTOR_ARM32)
+      return load_value_masked(23, 0, 2) + relative_to + 4;
+#else
       return load_value_masked(25, 0, 2) + relative_to - 4;
+#endif
     case RC_RELATIVE_ARM_B_COND_LDR:
       return load_value_masked(23, 5, 2) + relative_to - 4;
     case RC_ABSOLUTE_ARM_LDUR:
@@ -73,8 +79,15 @@ fixnum instruction_operand::load_value(cell relative_to) {
       return relative_to - 4 + riscv_jal_displacement(load_unaligned<uint32_t>(pointer - 4));
     case RC_RELATIVE_RISCV_BRANCH:
       return relative_to - 4 + riscv_branch_displacement(load_unaligned<uint32_t>(pointer - 4));
+    case RC_NATIVE_0:
+    case RC_NATIVE_1:
+      return load_native_operand(rel.klass(), pointer, relative_to);
     case RC_ABSOLUTE_RISCV_I:
+#if defined(FACTOR_LOONGARCH64)
+      return loongarch_signed(load_unaligned<uint32_t>(pointer - 4) >> 10, 12);
+#else
       return riscv_signed_field(load_unaligned<uint32_t>(pointer - 4) >> 20, 12);
+#endif
     case RC_ABSOLUTE_RISCV_LI:
 #if defined(FACTOR_RISCV32)
       return riscv_load_li32((uint32_t*)(pointer - 8));
@@ -126,10 +139,17 @@ void instruction_operand::store_value(fixnum absolute_value) {
                                (int32_t)relative_value);
       break;
     case RC_RELATIVE_ARM_B:
+#if defined(FACTOR_ARM32)
+      FACTOR_ASSERT(relative_value - 4 < 0x2000000);
+      FACTOR_ASSERT(relative_value - 4 >= -0x2000000);
+      FACTOR_ASSERT((relative_value & 3) == 0);
+      store_value_masked(relative_value - 4, rel_arm_b_mask, 0, 2);
+#else
       FACTOR_ASSERT(relative_value + 4 < 0x8000000);
       FACTOR_ASSERT(relative_value + 4 >= -0x8000000);
       FACTOR_ASSERT((relative_value & 3) == 0);
       store_value_masked(relative_value + 4, rel_arm_b_mask, 0, 2);
+#endif
       break;
     case RC_RELATIVE_ARM_B_COND_LDR:
       FACTOR_ASSERT(relative_value + 4 < 0x100000);
@@ -162,9 +182,17 @@ void instruction_operand::store_value(fixnum absolute_value) {
       store_unaligned<uint32_t>(pointer - 4,
           (load_unaligned<uint32_t>(pointer - 4) & 0x01fff07f) | riscv_branch_bits(relative_value + 4));
       break;
+    case RC_NATIVE_0:
+    case RC_NATIVE_1:
+      store_native_operand(rel.klass(), pointer, absolute_value);
+      break;
     case RC_ABSOLUTE_RISCV_I:
       FACTOR_ASSERT(absolute_value >= -2048 && absolute_value <= 2047);
+#if defined(FACTOR_LOONGARCH64)
+      store_value_masked(absolute_value, 0x003ffc00, 10, 0);
+#else
       store_value_masked(absolute_value, 0xfff00000, 20, 0);
+#endif
       break;
     case RC_ABSOLUTE_RISCV_LI:
 #if defined(FACTOR_RISCV32)

@@ -190,22 +190,6 @@ set_cc() {
         fi
     fi
 
-    # Check for musl build - accept any non-empty value except explicit "0" or "false"
-    if [[ -n "$MUSL" ]] && [[ "$MUSL" != "0" ]] && [[ "${MUSL,,}" != "false" ]]; then
-        # MUSL builds are not supported on Windows and macOS
-        if [[ "$OS" == "windows" ]] || [[ "$OS" == "macos" ]]; then
-            $ECHO "Error: MUSL=1 is not supported on $OS (only on Linux and BSD systems)"
-            exit_script 16
-        fi
-        $ECHO "Building with static C/C++ runtime (musl-style)..."
-        # For musl builds, statically link the C/C++ runtime but keep dlopen working
-        # Full static linking breaks dlopen which Factor needs for FFI
-        [ -z "$LDFLAGS" ] && LDFLAGS="-static-libgcc -static-libstdc++"
-        # Don't override CFLAGS/CXXFLAGS, append to them
-        SITE_CFLAGS="$SITE_CFLAGS -fno-stack-protector"
-        SITE_CXXFLAGS="$SITE_CXXFLAGS -fno-stack-protector"
-    fi
-
     # clang and clang++ commands will fail to correctly build Factor on Cygwin, need "cross compiler"
     if test_programs_installed clang clang++ ; then
         [ -z "$CC" ] && CC=clang
@@ -235,7 +219,7 @@ set_cc_versions() {
 
 set_make() {
     case $OS in
-        freebsd) MAKE="gmake" ;;
+        freebsd | dragonflybsd | netbsd | openbsd) MAKE="gmake" ;;
         *) MAKE="make" ;;
     esac
     if [[ $MAKE = "gmake" ]] ; then
@@ -348,7 +332,9 @@ find_os() {
         *linux*) OS=linux ;;
         *Linux*) OS=linux ;;
         FreeBSD) OS=freebsd ;;
-        DragonFly) OS=freebsd ;;
+        NetBSD) OS=netbsd ;;
+        OpenBSD) OS=openbsd ;;
+        DragonFly) OS=dragonflybsd ;;
         Haiku) OS=haiku ;;
     esac
 }
@@ -363,12 +349,17 @@ find_architecture() {
        i686) ARCH=x86 ;;
        i86pc) ARCH=x86 ;;
        amd64) ARCH=x86 ;;
-       ppc64) ARCH=ppc ;;
+       ppc64|powerpc64) ARCH=ppc ;;
+       macppc) ARCH=ppc ;;
        *86) ARCH=x86 ;;
        *86_64) ARCH=x86 ;;
        aarch64) ARCH=arm ;;
        arm64) ARCH=arm ;;
+       arm|armv[5-8]*|earm*) ARCH=arm ;;
        riscv64|riscv32) ARCH=riscv ;;
+       loongarch64) ARCH=loongarch ;;
+       s390x) ARCH=s390x ;;
+       m68k|amiga|atari|cesfic|hb68k|hp300|luna68k|mac68k|mvme68k|news68k|next68k|sun3|virt68k|x68k) ARCH=m68k ;;
        iPhone5*[3-9]) ARCH=arm ;;
        iPhone[6-9]*) ARCH=arm ;;
        iPhone[1-9][0-9]*) ARCH=arm ;;
@@ -388,7 +379,7 @@ find_num_cores() {
     case $uname_s in
         CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32* | MINGW64* | MSYS_NT*) NUM_CORES=${NUMBER_OF_PROCESSORS:-1} ;;
         *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN 2>/dev/null || nproc 2>/dev/null || echo 1) ;;
-        *darwin* | *Darwin* | freebsd | FreeBSD) NUM_CORES=$(sysctl -n hw.ncpu 2>/dev/null || echo 1) ;;
+        *darwin* | *Darwin* | freebsd | FreeBSD | DragonFly) NUM_CORES=$(sysctl -n hw.ncpu 2>/dev/null || echo 1) ;;
     esac
 }
 
@@ -399,8 +390,8 @@ find_word_size() {
 }
 
 find_word_size_cpp() {
-    SIXTY_FOUR='defined(__aarch64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(__PPC64__) || defined(__64BIT__) || (defined(__riscv) && __riscv_xlen == 64)'
-    THIRTY_TWO='defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86) || (defined(__riscv) && __riscv_xlen == 32)'
+    SIXTY_FOUR='defined(__loongarch64) || defined(__s390x__) || defined(__aarch64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(__PPC64__) || defined(__64BIT__) || (defined(__riscv) && __riscv_xlen == 64)'
+    THIRTY_TWO='defined(__arm__) || defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86) || (defined(__riscv) && __riscv_xlen == 32)'
     $CC -E -xc <(echo -e "#if ${SIXTY_FOUR}\n64\n#elif ${THIRTY_TWO}\n32\n#endif") | tail -1
 }
 
@@ -493,6 +484,10 @@ set_build_info() {
     else
         MAKE_IMAGE_TARGET=unix-$ARCH.$WORD
         MAKE_TARGET=$OS-$ARCH-$WORD
+    fi
+    if [[ $ARCH == s390x ]] ; then
+        MAKE_IMAGE_TARGET=unix-s390x
+        MAKE_TARGET=$OS-s390x
     fi
     BOOT_IMAGE=boot.$MAKE_IMAGE_TARGET.image
 }
@@ -626,7 +621,35 @@ make_clean() {
     invoke_make clean
 }
 
+check_musl_toolchain() {
+    [[ -z "$MUSL" || "$MUSL" == "0" || "${MUSL,,}" == "false" ]] && return
+    if [[ "$OS" != linux ]]; then
+        $ECHO "Error: MUSL=1 requires a Linux musl toolchain"
+        exit_script 16
+    fi
+    ensure_program_installed readelf
+    local probe_dir compiler interpreter
+    probe_dir=$(mktemp -d "${TMPDIR:-/tmp}/factor-musl-toolchain.XXXXXX") || exit_script 16
+    echo 'int main(void) { return 0; }' > "$probe_dir/probe.c"
+    for compiler in "$CC" "$CXX"; do
+        # CC/CXX may contain a compiler wrapper and arguments, as in make.
+        if ! $compiler "$probe_dir/probe.c" -o "$probe_dir/probe"; then
+            rm -rf "$probe_dir"
+            $ECHO "Error: cannot compile the MUSL=1 toolchain probe with $compiler"
+            exit_script 16
+        fi
+        interpreter=$(LC_ALL=C readelf -l "$probe_dir/probe")
+        if [[ "$interpreter" != *"/ld-musl-"*".so.1"* ]]; then
+            rm -rf "$probe_dir"
+            $ECHO "Error: MUSL=1 requires $compiler to produce a dynamically linked musl executable"
+            exit_script 16
+        fi
+    done
+    rm -rf "$probe_dir"
+}
+
 make_factor() {
+    check_musl_toolchain
     $ECHO "Building factor with $NUM_CORES cores"
     export CC_OPT CXX_OPT SITE_CFLAGS SITE_CXXFLAGS LDFLAGS
     $ECHO "CC_OPT=$CC_OPT" "CXX_OPT=$CXX_OPT" "SITE_CFLAGS=$SITE_CFLAGS" "SITE_CXXFLAGS=$SITE_CXXFLAGS" "LDFLAGS=$LDFLAGS" invoke_make "CC=$CC" "CXX=$CXX" "$MAKE_TARGET" "-j$NUM_CORES"
@@ -872,7 +895,7 @@ install_deps_apk() {
     select_ui_backend
     local gtk_package=gtk4.0-dev
     [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=gtk+3.0-dev
-    sudo apk add --no-cache bash git make gcc g++ libc-dev musl-dev pango-dev "$gtk_package" libepoxy-dev wget rlwrap clang tmux screen openssl-dev glu-dev mesa-dev
+    sudo apk add --no-cache bash git make gcc g++ binutils libc-dev musl-dev pango-dev "$gtk_package" libepoxy-dev wget rlwrap clang tmux screen openssl-dev glu-dev mesa-dev
     check_ret sudo
 }
 
@@ -924,8 +947,10 @@ usage() {
     $ECHO "The same option selects GTK dependencies for UI dependency commands."
     $ECHO "You can also set FACTOR_UI_BACKEND=gtk3 in the environment."
     $ECHO ""
-    $ECHO "To build with musl libc (static linking), invoke as:"
-    $ECHO "env MUSL=1 $0 <command>"
+    $ECHO "On Alpine, the native compiler builds with dynamic musl libc automatically."
+    $ECHO "To require a musl compiler on Linux, invoke as:"
+    $ECHO "env MUSL=1 CC=<musl-cc> CXX=<musl-c++> $0 compile"
+    $ECHO "MUSL=1 verifies the compiler's ELF interpreter; it does not change libc."
     $ECHO ""
     $ECHO "Example for overriding the default target:"
     $ECHO "    $0 update macos-x86-32"

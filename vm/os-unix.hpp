@@ -30,7 +30,7 @@ typedef char symbol_char;
 #define OPEN_READ(path) fopen(path, "rb")
 #define OPEN_WRITE(path) fopen(path, "wb")
 
-#ifdef _GNU_SOURCE
+#if defined(__GLIBC__) && defined(_GNU_SOURCE)
 extern "C" {
   extern int __xpg_strerror_r (int __errnum, char *__buf, size_t __buflen);
 }
@@ -55,7 +55,12 @@ void native_dlclose(void* handle);
 
 void check_ENOMEM(const char* msg);
 
+#if defined(FACTOR_M88K)
+// The native debugger receives an ordinary user breakpoint signal.
+static inline void breakpoint() { raise(SIGTRAP); }
+#else
 static inline void breakpoint() { __builtin_trap(); }
+#endif
 
 #define AS_UTF8(ptr) ptr
 }
