@@ -1,0 +1,14 @@
+diff --git a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+index 550a6d44e..810e23f34 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+@@ -161,7 +162,8 @@ M88kLegalizerInfo::M88kLegalizerInfo(const M88kSubtarget &ST) {
+       .clampScalar(0, S32, S64);
+   getActionDefinitionsBuilder({G_SREM, G_UREM})
+       .lowerFor({S32})
+-      .libcallFor({S64});
++      .libcallFor({S64})
++      .clampScalar(0, S32, S64);
+   getActionDefinitionsBuilder({G_UMULH, G_SMULH}).lower();
+   getActionDefinitionsBuilder({G_AND, G_OR, G_XOR})
+       .legalFor({S32})

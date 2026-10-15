@@ -1,0 +1,34 @@
+diff --git a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+index 912c73f10..685a3859b 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+@@ -498,7 +498,7 @@ bool M88kInstructionSelector::selectSExtInreg(MachineInstr &I,
+ 
+   // For G_SEXT_INREG, the width is the immediate in operand 2. The offset is
+   // always 0.
+-  Width = I.getOperand(2).getImm() + 1;
++  Width = I.getOperand(2).getImm();
+   assert(Width < 32 && "Can't sign-extend 32bit value");
+ 
+   I.setDesc(TII.get(M88k::EXTrwo));
+@@ -971,8 +971,18 @@ bool M88kInstructionSelector::selectExt(MachineInstr &I, MachineBasicBlock &MBB,
+              .addReg(Temp, RegState::Kill)
+              .addImm(1)
+              .addImm(int64_t(CCCode));
+-  } else
+-    return false;
++  } else {
++    unsigned SrcBits = MRI.getType(SrcReg).getSizeInBits();
++    if (MRI.getType(DstReg).getSizeInBits() != 32 ||
++        (SrcBits != 1 && SrcBits != 8 && SrcBits != 16))
++      return false;
++    // Any extension may choose zero extension. Extract the declared low bits
++    // rather than relying on an i1/i8/i16 register's unspecified upper bits.
++    MI = BuildMI(MBB, I, I.getDebugLoc(), TII.get(NewOpc), DstReg)
++             .addReg(SrcReg)
++             .addImm(SrcBits)
++             .addImm(0);
++  }
+ 
+   I.eraseFromParent();
+   return constrainSelectedInstRegOperands(*MI, MRI, TII, TRI, RBI);

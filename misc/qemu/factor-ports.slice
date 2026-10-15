@@ -1,0 +1,7 @@
+[Unit]
+Description=Factor portability job resource pool
+[Slice]
+MemoryAccounting=yes
+MemoryHigh=72G
+MemoryMax=84G
+CPUQuota=2400%

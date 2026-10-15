@@ -1,0 +1,11 @@
+--- a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+@@ -991,7 +991,7 @@
+   int64_t SImm16;
+   if (mi_match(SrcReg, MRI,
+                m_GICmp(m_Pred(Pred), m_Reg(LHS), m_ICst(SImm16))) &&
+-      isInt<16>(SImm16)) {
++      isUInt<16>(SImm16)) {
+     Register Temp = MRI.createVirtualRegister(&M88k::GPRRegClass);
+     ICC CCCode = getCCforICMP(Pred);
+     MI = BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::CMPri))

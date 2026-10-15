@@ -1,0 +1,27 @@
+--- a/sys/arch/alpha/alpha/machdep.c
++++ b/sys/arch/alpha/alpha/machdep.c
+@@ -1882 +1882,3 @@
+-		mcp->__fpregs.__fp_fpcr = alpha_read_fp_c(l);
++		/* Preserve dynamic rounding in FP_C's implementation-reserved bits. */
++		mcp->__fpregs.__fp_fpcr = alpha_read_fp_c(l) |
++		    (pcb->pcb_fp.fpr_cr & FPCR_DYN_RM);
+@@ -1932,0 +1935,5 @@
++		/* The context stores software FP_C plus saved dynamic rounding,
++		 * not a raw hardware FPCR. Rebuild its hardware control bits. */
++		pcb->pcb_fp.fpr_cr = alpha_fpcr_from_fp_c(
++		    mcp->__fpregs.__fp_fpcr,
++		    mcp->__fpregs.__fp_fpcr & MDLWP_FP_C);
+--- a/sys/arch/alpha/alpha/fp_complete.c
++++ b/sys/arch/alpha/alpha/fp_complete.c
+@@ -402,0 +403,7 @@
++}
++
++/* Reconstruct hardware state from a user context's FP_C and saved DYN. */
++uint64_t
++alpha_fpcr_from_fp_c(uint64_t fpcr, uint64_t fp_c)
++{
++	return fp_c_to_fpcr_1(fpcr, fp_c);
+--- a/sys/arch/alpha/include/alpha.h
++++ b/sys/arch/alpha/include/alpha.h
+@@ -177,0 +178 @@
++uint64_t alpha_fpcr_from_fp_c(uint64_t, uint64_t);

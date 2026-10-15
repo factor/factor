@@ -1,0 +1,107 @@
+.text
+.globl backend_call
+.globl backend_call_fp
+backend_call_fp:
+backend_call:
+ subu %r31,%r31,48
+ st %r1,%r31,4
+ st %r19,%r31,16
+ st %r20,%r31,20
+ st %r21,%r31,24
+ st %r22,%r31,28
+ st %r25,%r31,32
+ st %r30,%r31,36
+ or %r10,%r0,%r2
+ or %r2,%r0,%r3
+ or %r3,%r0,%r4
+ jsr %r10
+ ld %r19,%r31,16
+ ld %r20,%r31,20
+ ld %r21,%r31,24
+ ld %r22,%r31,28
+ ld %r25,%r31,32
+ ld %r30,%r31,36
+ ld %r1,%r31,4
+ addu %r31,%r31,48
+ jmp %r1
+
+.globl backend_float_cmp
+backend_float_cmp:
+ subu %r31,%r31,48
+ st %r1,%r31,4
+ st %r19,%r31,16
+ st %r20,%r31,20
+ st %r21,%r31,24
+ st %r22,%r31,28
+ st %r25,%r31,32
+ st %r30,%r31,36
+ or %r10,%r0,%r2
+ or %r2,%r0,%r4
+ or %r3,%r0,%r5
+ or %r4,%r0,%r6
+ or %r5,%r0,%r7
+ jsr %r10
+ ld %r19,%r31,16
+ ld %r20,%r31,20
+ ld %r21,%r31,24
+ ld %r22,%r31,28
+ ld %r25,%r31,32
+ ld %r30,%r31,36
+ ld %r1,%r31,4
+ addu %r31,%r31,48
+ jmp %r1
+
+.globl backend_native_call
+backend_native_call:
+ subu %r31,%r31,64
+ st %r1,%r31,4
+ st %r16,%r31,8
+ st %r19,%r31,12
+ st %r20,%r31,16
+ st %r21,%r31,20
+ st %r24,%r31,24
+ st %r25,%r31,28
+ st %r30,%r31,32
+ st %r22,%r31,40
+ or %r10,%r0,%r2
+ or %r21,%r0,%r3
+ or %r16,%r0,%r4
+ or %r24,%r0,%r5
+ jsr %r10
+ ld %r1,%r31,4
+ ld %r16,%r31,8
+ ld %r19,%r31,12
+ ld %r20,%r31,16
+ ld %r21,%r31,20
+ ld %r24,%r31,24
+ ld %r25,%r31,28
+ ld %r30,%r31,32
+ ld %r22,%r31,40
+ addu %r31,%r31,64
+ jmp %r1
+
+.globl backend_cfg_call
+backend_cfg_call:
+ subu %r31,%r31,48
+ st %r1,%r31,4
+ st %r14,%r31,8
+ st %r19,%r31,16
+ st %r20,%r31,20
+ st %r21,%r31,24
+ st %r22,%r31,28
+ st %r25,%r31,32
+ st %r30,%r31,36
+ or %r10,%r0,%r2
+ or %r14,%r0,%r3
+ jsr %r10
+ ld %r2,%r14,0
+ ld %r1,%r31,4
+ ld %r14,%r31,8
+ ld %r19,%r31,16
+ ld %r20,%r31,20
+ ld %r21,%r31,24
+ ld %r22,%r31,28
+ ld %r25,%r31,32
+ ld %r30,%r31,36
+ addu %r31,%r31,48
+ jmp %r1

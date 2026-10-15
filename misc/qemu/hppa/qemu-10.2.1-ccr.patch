@@ -1,0 +1,51 @@
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -761,0 +762,39 @@
++
++#ifndef CONFIG_USER_ONLY
++/* PA-RISC 1.1 table 6-7 requires an assist-emulation trap when the
++ * floating-point coprocessor pair is disabled in CCR.  Check at runtime
++ * because a preceding MTCTL may change CCR within the same TB.
++ */
++static void gen_fpu_enable_check(DisasContext *ctx, uint32_t insn)
++{
++    TCGv_i64 ccr;
++    TCGLabel *nullified = NULL;
++    DisasDelayException *e;
++
++    if (ctx->is_pa20) {
++        return;
++    }
++    switch (insn >> 26) {
++    case 0x06: case 0x09: case 0x0b:
++    case 0x0c: case 0x0e: case 0x26:
++        break;
++    default:
++        return;
++    }
++
++    if (ctx->null_cond.c != TCG_COND_NEVER) {
++        nullified = gen_new_label();
++        tcg_gen_brcond_i64(ctx->null_cond.c, ctx->null_cond.a0,
++                          ctx->null_cond.a1, nullified);
++    }
++    ccr = tcg_temp_new_i64();
++    tcg_gen_ld_i64(ccr, tcg_env,
++                   offsetof(CPUHPPAState, cr[CR_SCRCCR]));
++    tcg_gen_andi_i64(ccr, ccr, 0xc0);
++    e = delay_excp(ctx, EXCP_ASSIST_EMU);
++    tcg_gen_brcondi_i64(TCG_COND_EQ, ccr, 0, e->lab);
++    if (nullified) {
++        gen_set_label(nullified);
++    }
++}
++#endif
+@@ -4754,0 +4794,3 @@
++#ifndef CONFIG_USER_ONLY
++            gen_fpu_enable_check(ctx, insn);
++#endif
+--- a/hw/hppa/machine.c
++++ b/hw/hppa/machine.c
+@@ -747,0 +748,2 @@
++        /* The emulation firmware uses FP before PDC_COPROC config. */
++        cpu[i]->env.cr[CR_SCRCCR] = 0xc0;

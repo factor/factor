@@ -1,0 +1,70 @@
+diff --git a/llvm/lib/Target/M88k/GISel/M88kPreLegalizerCombiner.cpp b/llvm/lib/Target/M88k/GISel/M88kPreLegalizerCombiner.cpp
+index 4d368e5fc..0e3747e85 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kPreLegalizerCombiner.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kPreLegalizerCombiner.cpp
+@@ -77,6 +77,8 @@ public:
+   bool tryCombineAll(MachineInstr &I) const override;
+ 
+ private:
++  bool matchM88kHoistLogic(MachineInstr &MI, InstructionStepsMatchInfo &Info) const;
++
+   bool matchBitfieldExtractFromAndAShr(
+       MachineInstr &MI, MachineRegisterInfo &MRI,
+       std::function<void(MachineIRBuilder &)> &MatchInfo) const;
+@@ -87,6 +89,21 @@ private:
+ };
+ } // namespace
+ 
++bool M88kPreLegalizerCombinerImpl::matchM88kHoistLogic(
++    MachineInstr &MI, InstructionStepsMatchInfo &Info) const {
++  // commute_shift distributes (x | C1) << C2 into two shifts. Let the
++  // constant shift fold before hoisting; otherwise these rules undo each
++  // other indefinitely as each rewrite creates fresh virtual registers.
++  for (unsigned Op : {1u, 2u}) {
++    MachineInstr *Hand = getDefIgnoringCopies(MI.getOperand(Op).getReg(), MRI);
++    if (Hand && Hand->getOpcode() == TargetOpcode::G_SHL &&
++        getIConstantVRegValWithLookThrough(Hand->getOperand(1).getReg(), MRI) &&
++        getIConstantVRegValWithLookThrough(Hand->getOperand(2).getReg(), MRI))
++      return false;
++  }
++  return Helper.matchHoistLogicOpWithSameOpcodeHands(MI, Info);
++}
++
+ /// Form a G_UBFX from "(a sra b) & mask", where b and mask are constants.
+ /// This is similar to CombinerHelper::matchBitfieldExtractFromAnd(), but
+ /// matches an arithmetic shift right instructions (instead of locigal shift
+@@ -188,6 +205,8 @@ void M88kPreLegalizerCombiner::getAnalysisUsage(AnalysisUsage &AU) const {
+ 
+ M88kPreLegalizerCombiner::M88kPreLegalizerCombiner() : MachineFunctionPass(ID) {
+   initializeM88kPreLegalizerCombinerPass(*PassRegistry::getPassRegistry());
++  if (!RuleConfig.parseCommandLineOption())
++    report_fatal_error("Invalid M88k prelegalizer combiner rule identifier");
+ }
+ 
+ bool M88kPreLegalizerCombiner::runOnMachineFunction(MachineFunction &MF) {
+diff --git a/llvm/lib/Target/M88k/M88kCombine.td b/llvm/lib/Target/M88k/M88kCombine.td
+index 7e03a7899..d8590db80 100644
+--- a/llvm/lib/Target/M88k/M88kCombine.td
++++ b/llvm/lib/Target/M88k/M88kCombine.td
+@@ -23,6 +23,12 @@ def bitfield_extract_from_and_ashr : GICombineRule<
+                                                    ${matchinfo}); }]),
+   (apply [{ Helper.applyBuildFn(*${root}, ${matchinfo}); }])>;
+ 
++def m88k_hoist_logic_op_with_same_opcode_hands: GICombineRule <
++  (defs root:$root, instruction_steps_matchdata:$info),
++  (match (wip_match_opcode G_AND, G_OR, G_XOR):$root,
++    [{ return matchM88kHoistLogic(*${root}, ${info}); }]),
++  (apply [{ Helper.applyBuildInstructionSteps(*${root}, ${info}); }])>;
++
+ // Like all_combines, but removed vector, fma and funnel shift combines.
+ // intdiv_combines and mulh_combines result in worse code generation because
+ // G_UMULH is mapped to a library call, and G_CTTZ results in a lengthy
+@@ -30,7 +36,7 @@ def bitfield_extract_from_and_ashr : GICombineRule<
+ def m88k_combines : GICombineGroup<[integer_reassoc_combines, trivial_combines,
+     freeze_combines, cast_combines, combines_for_extload,
+     undef_combines, identity_combines, phi_combines,
+-    simplify_add_to_sub, hoist_logic_op_with_same_opcode_hands, shifts_too_big,
++    simplify_add_to_sub, m88k_hoist_logic_op_with_same_opcode_hands, shifts_too_big,
+     reassocs, ptr_add_immed_chain,
+     shl_ashr_to_sext_inreg, sext_inreg_of_load,
+     width_reduction_combines, select_combines,

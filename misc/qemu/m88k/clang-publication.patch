@@ -1,0 +1,63 @@
+diff --git a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+index 912c73f10..91925a2e5 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+@@ -1164,9 +1164,36 @@ bool M88kInstructionSelector::earlySelect(MachineInstr &I) {
+ 
+   auto &MBB = *I.getParent();
+   auto &MF = *MBB.getParent();
+-  [[maybe_unused]] auto &MRI = MF.getRegInfo();
++  auto &MRI = MF.getRegInfo();
+ 
+   switch (I.getOpcode()) {
++  case TargetOpcode::G_LOAD:
++  case TargetOpcode::G_ZEXTLOAD:
++  case TargetOpcode::G_STORE: {
++    if (!TM.getTargetTriple().isOSOpenBSD() || I.memoperands_empty())
++      return false;
++    MachineMemOperand *MMO = *I.memoperands_begin();
++    if (!MMO->isAtomic())
++      return false;
++    unsigned Bits = MMO->getMemoryType().getSizeInBits();
++    if ((Bits != 8 && Bits != 32) || MMO->getAlign().value() < Bits / 8)
++      return false;
++    Register Value = I.getOperand(0).getReg();
++    Register Address = I.getOperand(1).getReg();
++    if (!RBI.constrainGenericRegister(Value, M88k::GPRRegClass, MRI) ||
++        !RBI.constrainGenericRegister(Address, M88k::GPRRegClass, MRI))
++      return false;
++    bool Load = I.getOpcode() != TargetOpcode::G_STORE;
++    unsigned Opcode = Load ? (Bits == 8 ? M88k::LDurib : M88k::LDriw)
++                           : (Bits == 8 ? M88k::STrib : M88k::STriw);
++    BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::MEMBAR));
++    auto Access = BuildMI(MBB, I, I.getDebugLoc(), TII.get(Opcode));
++    Access.addReg(Value, Load ? RegState::Define : 0)
++        .addReg(Address).addImm(0).cloneMemRefs(I);
++    BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::MEMBAR));
++    I.eraseFromParent();
++    return true;
++  }
+   default:
+     return false;
+   }
+diff --git a/llvm/lib/Target/M88k/M88kInstrInfo.td b/llvm/lib/Target/M88k/M88kInstrInfo.td
+index f90cf4b3e..52211c6c4 100644
+--- a/llvm/lib/Target/M88k/M88kInstrInfo.td
++++ b/llvm/lib/Target/M88k/M88kInstrInfo.td
+@@ -938,6 +938,16 @@ let isBranch = 1, isTerminator = 1 in {
+   }
+ }
+ 
++// OpenBSD userland full pipeline/memory barrier. Not a control-flow barrier:
++// bit zero of r0 is clear, so this instruction cannot take its trap.
++def MEMBAR : InstM88k<(outs), (ins), "tb1", "0, %r0, 128"> {
++  let Inst = 0xf000d880;
++  let isCodeGenOnly = 1;
++  let hasSideEffects = 1;
++  let mayLoad = 1;
++  let mayStore = 1;
++}
++
+ let isTrap = 1, isBarrier = 1 in {
+   def TB0 : F_TB<0b1101000, (outs), (ins imm32zx5:$b5, GPROpnd:$rs1, Vec9:$vec9),
+                  "tb0">;

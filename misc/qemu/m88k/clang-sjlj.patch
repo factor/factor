@@ -1,0 +1,313 @@
+diff --git a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+index 912c73f10..3931fec34 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+@@ -1213,6 +1213,24 @@ bool M88kInstructionSelector::select(MachineInstr &I) {
+     return true;
+ 
+   switch (I.getOpcode()) {
++  case TargetOpcode::G_STACKSAVE: {
++    Register Dst = I.getOperand(0).getReg();
++    if (!RBI.constrainGenericRegister(Dst, M88k::GPRRegClass, MRI))
++      return false;
++    BuildMI(MBB, I, I.getDebugLoc(), TII.get(TargetOpcode::COPY), Dst)
++        .addReg(M88k::R31);
++    I.eraseFromParent();
++    return true;
++  }
++  case TargetOpcode::G_STACKRESTORE: {
++    Register Src = I.getOperand(0).getReg();
++    if (!RBI.constrainGenericRegister(Src, M88k::GPRRegClass, MRI))
++      return false;
++    BuildMI(MBB, I, I.getDebugLoc(), TII.get(TargetOpcode::COPY), M88k::R31)
++        .addReg(Src);
++    I.eraseFromParent();
++    return true;
++  }
+   case TargetOpcode::G_INTTOPTR:
+   case TargetOpcode::G_PTRTOINT:
+   case TargetOpcode::G_FREEZE:
+diff --git a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+index 550a6d44e..53bc4b324 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+@@ -80,6 +80,7 @@ M88kLegalizerInfo::M88kLegalizerInfo(const M88kSubtarget &ST) {
+   getActionDefinitionsBuilder(G_PTRTOINT)
+       .legalFor({{S32, P0}})
+       .minScalar(0, S32);
++  getActionDefinitionsBuilder({G_STACKSAVE, G_STACKRESTORE}).legalFor({P0});
+   getActionDefinitionsBuilder(G_PTRMASK)
+       .legalFor({{P0, S32}})
+       .clampScalar(1, S32, S32);
+@@ -490,4 +491,4 @@ bool M88kLegalizerInfo::legalizeCustom(
+   }
+ 
+   return true;
+-}
+\ No newline at end of file
++}
+diff --git a/clang/lib/Driver/ToolChain.cpp b/clang/lib/Driver/ToolChain.cpp
+index 56bc500da..f2d02655e 100644
+--- a/clang/lib/Driver/ToolChain.cpp
++++ b/clang/lib/Driver/ToolChain.cpp
+@@ -1083,6 +1083,8 @@ ObjCRuntime ToolChain::getDefaultObjCRuntime(bool isNonFragile) const {
+ 
+ llvm::ExceptionHandling
+ ToolChain::GetExceptionModel(const llvm::opt::ArgList &Args) const {
++  if (getTriple().getArch() == llvm::Triple::m88k)
++    return llvm::ExceptionHandling::SjLj;
+   return llvm::ExceptionHandling::None;
+ }
+ 
+diff --git a/llvm/lib/Target/M88k/CMakeLists.txt b/llvm/lib/Target/M88k/CMakeLists.txt
+index b2a06fcbc..1e5aa787d 100644
+--- a/llvm/lib/Target/M88k/CMakeLists.txt
++++ b/llvm/lib/Target/M88k/CMakeLists.txt
+@@ -36,6 +36,7 @@ add_llvm_target(M88kCodeGen
+   M88kAsmPrinter.cpp
+   M88kCallingConv.cpp
+   M88kDelaySlotFiller.cpp
++  M88kSjLjEH.cpp
+   M88kFFS.cpp
+   M88kFrameLowering.cpp
+   M88kISelLowering.cpp
+diff --git a/llvm/lib/Target/M88k/M88k.h b/llvm/lib/Target/M88k/M88k.h
+index b0c4f835d..2ec7feba4 100644
+--- a/llvm/lib/Target/M88k/M88k.h
++++ b/llvm/lib/Target/M88k/M88k.h
+@@ -37,6 +37,7 @@ FunctionPass *createM88kPostLegalizerCombiner(bool IsOptNone);
+ FunctionPass *createM88kPostLegalizerLowering(bool IsOptNone);
+ FunctionPass *createM88kDelaySlotFiller();
+ FunctionPass *createM88kFFS();
++FunctionPass *createM88kSjLjEH();
+ 
+ void initializeM88kPreLegalizerCombinerPass(PassRegistry &Registry);
+ void initializeM88kPostLegalizerCombinerPass(PassRegistry &Registry);
+diff --git a/llvm/lib/Target/M88k/M88kISelLowering.cpp b/llvm/lib/Target/M88k/M88kISelLowering.cpp
+index 0efae2a96..1295f7fe0 100644
+--- a/llvm/lib/Target/M88k/M88kISelLowering.cpp
++++ b/llvm/lib/Target/M88k/M88kISelLowering.cpp
+@@ -42,6 +42,7 @@ M88kTargetLowering::M88kTargetLowering(const TargetMachine &TM,
+ 
+   // Set up special registers.
+   setStackPointerRegisterToSaveRestore(M88k::R31);
++  setLibcallName(RTLIB::UNWIND_RESUME, "_Unwind_SjLj_Resume");
+ 
+   // How we extend i1 boolean values.
+   setBooleanContents(ZeroOrOneBooleanContent);
+diff --git a/llvm/lib/Target/M88k/M88kMCInstLower.cpp b/llvm/lib/Target/M88k/M88kMCInstLower.cpp
+index f6073cfe8..bebbfa06c 100644
+--- a/llvm/lib/Target/M88k/M88kMCInstLower.cpp
++++ b/llvm/lib/Target/M88k/M88kMCInstLower.cpp
+@@ -50,6 +50,10 @@ MCOperand M88kMCInstLower::lowerSymbolOperand(const MachineOperand &MO) const {
+     HasOffset = false;
+     break;
+ 
++  case MachineOperand::MO_MCSymbol:
++    Symbol = MO.getMCSymbol();
++    break;
++
+   case MachineOperand::MO_GlobalAddress:
+     Symbol = Printer.getSymbol(MO.getGlobal());
+     break;
+diff --git a/llvm/lib/Target/M88k/M88kRegisterInfo.cpp b/llvm/lib/Target/M88k/M88kRegisterInfo.cpp
+index fd820fd1e..a91aa98a9 100644
+--- a/llvm/lib/Target/M88k/M88kRegisterInfo.cpp
++++ b/llvm/lib/Target/M88k/M88kRegisterInfo.cpp
+@@ -38,6 +38,20 @@ using namespace llvm;
+ 
+ M88kRegisterInfo::M88kRegisterInfo() : M88kGenRegisterInfo(M88k::R1) {}
+ 
++const uint32_t *M88kRegisterInfo::getCustomEHPadPreservedMask(
++    const MachineFunction &MF) const {
++  // GNU builtin_longjmp restores FP/SP/PC only. The exceptional edge must
++  // clobber registers at block entry, before an allocator can spill them.
++  static const std::vector<uint32_t> Mask = [] {
++    std::vector<uint32_t> Result(MachineOperand::getRegMaskSize(M88k::NUM_TARGET_REGS), 0);
++    for (unsigned R : {M88k::R0, M88k::R28, M88k::R29, M88k::R30, M88k::R31, M88k::X0})
++      Result[R / 32] |= 1u << (R % 32);
++    return Result;
++  }();
++  return Mask.data();
++}
++
++
+ bool M88kRegisterInfo::isArgumentRegister(const MachineFunction &MF,
+                                           MCRegister Reg) const {
+   CallingConv::ID CC = MF.getFunction().getCallingConv();
+diff --git a/llvm/lib/Target/M88k/M88kRegisterInfo.h b/llvm/lib/Target/M88k/M88kRegisterInfo.h
+index d50d55d58..d3249e5ce 100644
+--- a/llvm/lib/Target/M88k/M88kRegisterInfo.h
++++ b/llvm/lib/Target/M88k/M88kRegisterInfo.h
+@@ -28,6 +28,8 @@ namespace llvm {
+ struct M88kRegisterInfo : public M88kGenRegisterInfo {
+   M88kRegisterInfo();
+ 
++  const uint32_t *getCustomEHPadPreservedMask(const MachineFunction &MF) const override;
++
+   bool isArgumentRegister(const MachineFunction &MF,
+                           MCRegister Reg) const override;
+ 
+diff --git a/llvm/lib/Target/M88k/M88kTargetMachine.cpp b/llvm/lib/Target/M88k/M88kTargetMachine.cpp
+index 53a7ef5a0..9b2d5b342 100644
+--- a/llvm/lib/Target/M88k/M88kTargetMachine.cpp
++++ b/llvm/lib/Target/M88k/M88kTargetMachine.cpp
+@@ -231,6 +231,7 @@ bool M88kPassConfig::addIRTranslator() {
+ }
+ 
+ void M88kPassConfig::addPreLegalizeMachineIR() {
++  addPass(createM88kSjLjEH());
+   if (PreLegalizer)
+     addPass(createM88kPreLegalizerCombiner());
+   addPass(new Localizer());
+diff --git a/llvm/lib/Target/M88k/M88kSjLjEH.cpp b/llvm/lib/Target/M88k/M88kSjLjEH.cpp
+new file mode 100644
+index 000000000..1cd4f0769
+--- /dev/null
++++ b/llvm/lib/Target/M88k/M88kSjLjEH.cpp
+@@ -0,0 +1,145 @@
++//===-- M88kSjLjEH.cpp - GlobalISel SjLj lowering ------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++// GNU builtin-setjmp SjLj context ABI: prefix32, then saved FP/PC/SP words.
++#include "M88k.h"
++#include "M88kSubtarget.h"
++#include "MCTargetDesc/M88kBaseInfo.h"
++#include "llvm/CodeGen/GlobalISel/GenericMachineInstrs.h"
++#include "llvm/CodeGen/MachineFrameInfo.h"
++#include "llvm/CodeGen/MachineFunctionPass.h"
++#include "llvm/CodeGen/MachineInstrBuilder.h"
++#include "llvm/CodeGen/MachineRegisterInfo.h"
++#include "llvm/IR/Instructions.h"
++#include "llvm/IR/Intrinsics.h"
++#include "llvm/MC/MCContext.h"
++using namespace llvm;
++namespace {
++class M88kSjLjEH : public MachineFunctionPass {
++public:
++  static char ID;
++  M88kSjLjEH() : MachineFunctionPass(ID) {}
++  StringRef getPassName() const override { return "M88k SjLj lowering"; }
++  bool runOnMachineFunction(MachineFunction &MF) override {
++    auto &MRI = MF.getRegInfo();
++    auto &MFI = MF.getFrameInfo();
++    const auto &TII = *MF.getSubtarget<M88kSubtarget>().getInstrInfo();
++    MachineInstr *Setup = nullptr;
++    int FI = 0;
++    SmallVector<MachineInstr *, 8> Erase;
++    SmallVector<MachineInstr *, 4> LSDAs;
++    for (auto &BB : MF) for (auto &MI : BB) {
++      if (MI.getOpcode() != TargetOpcode::G_INTRINSIC &&
++          MI.getOpcode() != TargetOpcode::G_INTRINSIC_W_SIDE_EFFECTS) continue;
++      switch (cast<GIntrinsic>(MI).getIntrinsicID()) {
++      case Intrinsic::eh_sjlj_setup_dispatch: Setup = &MI; Erase.push_back(&MI); break;
++      case Intrinsic::eh_sjlj_functioncontext: {
++        auto *Def = MRI.getVRegDef(MI.getOperand(1).getReg());
++        if (!Def || Def->getOpcode() != TargetOpcode::G_FRAME_INDEX)
++          report_fatal_error("SjLj function context must be a static alloca");
++        FI = Def->getOperand(1).getIndex();
++        MFI.setFunctionContextIndex(FI);
++        Erase.push_back(&MI); break;
++      }
++      case Intrinsic::eh_sjlj_callsite: Erase.push_back(&MI); break;
++      case Intrinsic::eh_sjlj_lsda: LSDAs.push_back(&MI); break;
++      default: break;
++      }
++    }
++    if (!Setup) return false;
++    auto NewReg = [&]() { return MRI.createVirtualRegister(&M88k::GPRRegClass); };
++    auto Address = [&](MachineBasicBlock &BB, MachineBasicBlock::iterator Pos,
++                       Register Dest, const MachineOperand &Sym) {
++      auto Hi = NewReg();
++      auto H = BuildMI(BB, Pos, DebugLoc(), TII.get(M88k::ORriu), Hi).addReg(M88k::R0);
++      auto L = BuildMI(BB, Pos, DebugLoc(), TII.get(M88k::ORri), Dest).addReg(Hi);
++      MachineOperand HSym = Sym, LSym = Sym;
++      HSym.setTargetFlags(M88kII::MO_ABS_HI);
++      LSym.setTargetFlags(M88kII::MO_ABS_LO);
++      H.add(HSym); L.add(LSym);
++    };
++    for (auto *MI : LSDAs) {
++      Register Dst = MI->getOperand(0).getReg();
++      MRI.setRegClass(Dst, &M88k::GPRRegClass);
++      auto *Sym = MF.getContext().getOrCreateSymbol(Twine("GCC_except_table") + Twine(MF.getFunctionNumber()));
++      Address(*MI->getParent(), MI->getIterator(), Dst, MachineOperand::CreateMCSymbol(Sym));
++      Erase.push_back(MI);
++    }
++    // SjLjEHPrepare numbers invokes in IR block order, starting at one.
++    SmallVector<MachineBasicBlock *, 8> Pads;
++    unsigned Site = 0;
++    for (auto &BB : MF.getFunction()) {
++      auto *Invoke = dyn_cast<InvokeInst>(BB.getTerminator());
++      if (!Invoke) continue;
++      ++Site;
++      MachineBasicBlock *InvokeBB = nullptr, *Pad = nullptr;
++      for (auto &MBB : MF) {
++        if (MBB.getBasicBlock() == &BB) InvokeBB = &MBB;
++        if (MBB.getBasicBlock() == Invoke->getUnwindDest()) Pad = &MBB;
++      }
++      if (!InvokeBB || !Pad) report_fatal_error("Missing SjLj invoke blocks");
++      MCSymbol *PadSym = nullptr;
++      for (auto &MI : *Pad) if (MI.isEHLabel()) { PadSym = MI.getOperand(0).getMCSymbol(); break; }
++      if (!PadSym) {
++        PadSym = MF.addLandingPad(Pad);
++        BuildMI(*Pad, Pad->begin(), DebugLoc(), TII.get(TargetOpcode::EH_LABEL)).addSym(PadSym);
++      }
++      MF.setCallSiteLandingPad(PadSym, {Site});
++      bool Region = false;
++      for (auto &MI : *InvokeBB) {
++        if (MI.getOpcode() == TargetOpcode::G_INVOKE_REGION_START) Region = true;
++        else if (Region && MI.isEHLabel()) {
++          MF.setCallSiteBeginLabel(MI.getOperand(0).getMCSymbol(), Site);
++          break;
++        }
++      }
++      Pads.push_back(Pad);
++    }
++    SmallVector<MachineBasicBlock *, 32> OriginalBlocks;
++    for (auto &BB : MF) OriginalBlocks.push_back(&BB);
++    auto *Dispatch = MF.CreateMachineBasicBlock();
++    MF.push_back(Dispatch);
++    Dispatch->setIsEHPad();
++    Dispatch->setMachineBlockAddressTaken();
++    auto Addr = NewReg();
++    Address(*Setup->getParent(), Setup->getIterator(), Addr, MachineOperand::CreateMBB(Dispatch));
++    BuildMI(*Setup->getParent(), *Setup, DebugLoc(), TII.get(M88k::STriw))
++      .addReg(Addr).addFrameIndex(FI).addImm(36);
++    // Register the exceptional-edge clobbers for callee-save accounting.
++    const auto &TRI = *MF.getSubtarget().getRegisterInfo();
++    MRI.addPhysRegsUsedFromRegMask(TRI.getCustomEHPadPreservedMask(MF));
++    auto CallSite = NewReg();
++    BuildMI(*Dispatch, Dispatch->end(), DebugLoc(), TII.get(M88k::LDriw), CallSite).addFrameIndex(FI).addImm(4);
++    auto *Test = Dispatch;
++    for (unsigned I = 0; I < Pads.size(); ++I) {
++      auto *Next = MF.CreateMachineBasicBlock();
++      MF.push_back(Next);
++      auto Cmp = NewReg();
++      BuildMI(*Test, Test->end(), DebugLoc(), TII.get(M88k::CMPri), Cmp).addReg(CallSite).addImm(I);
++      BuildMI(*Test, Test->end(), DebugLoc(), TII.get(M88k::BB1)).addImm(2).addReg(Cmp).addMBB(Pads[I]);
++      BuildMI(*Test, Test->end(), DebugLoc(), TII.get(M88k::BR)).addMBB(Next);
++      Test->addSuccessor(Pads[I]);
++      Test->addSuccessor(Next);
++      Test = Next;
++    }
++    BuildMI(*Test, Test->end(), DebugLoc(), TII.get(M88k::BR)).addMBB(Test);
++    Test->addSuccessor(Test);
++    // Preserve exceptional CFG reachability but route every invoke to dispatch.
++    for (auto *BB : OriginalBlocks) {
++      SmallVector<MachineBasicBlock *, 4> Old;
++      for (auto *Succ : BB->successors()) if (Succ->isEHPad()) Old.push_back(Succ);
++      if (Old.empty()) continue;
++      for (auto *Succ : Old) BB->removeSuccessor(Succ);
++      BB->addSuccessor(Dispatch);
++    }
++    for (auto *MI : Erase) MI->eraseFromParent();
++    return true;
++  }
++};
++char M88kSjLjEH::ID;
++}
++FunctionPass *llvm::createM88kSjLjEH() { return new M88kSjLjEH(); }

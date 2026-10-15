@@ -1,0 +1,206 @@
+--- a/src/cpus/cpu_m88k.c
++++ b/src/cpus/cpu_m88k.c
+@@ -718,7 +718,8 @@
+ 		break;
+ 
+ 	case M88K_EXCEPTION_SFU1_PRECISE:
+-		debugmsg_cpu(cpu, SUBSYS_EXCEPTION, "SFU1_PRECISE", VERBOSITY_ERROR, "");
++		debugmsg_cpu(cpu, SUBSYS_EXCEPTION, "SFU1_PRECISE", VERBOSITY_INFO, "");
++		implemented = true;
+ 		break;
+ 
+ 	case M88K_EXCEPTION_SFU1_IMPRECISE:
+@@ -788,7 +789,8 @@
+ 
+ 		/*  SNIP is the address to return to, when executing rte:  */
+ 		if (cpu->delay_slot) {
+-			if (vector == M88K_EXCEPTION_DATA_ACCESS) {
++			if (vector == M88K_EXCEPTION_DATA_ACCESS ||
++			    vector == M88K_EXCEPTION_SFU1_PRECISE) {
+ 				cpu->cd.m88k.cr[M88K_CR_SNIP] = cpu->cd.m88k.delay_target | M88K_NIP_V;
+ 				cpu->cd.m88k.cr[M88K_CR_SFIP] = cpu->cd.m88k.cr[M88K_CR_SNIP]+4;
+ 			} else if (vector == M88K_EXCEPTION_INSTRUCTION_ACCESS) {
+@@ -878,16 +880,10 @@
+ 			break;
+ #endif
+ 
+-#if 0
+-		// TODO: Read up more about SFU1 exceptions and how the
+-		// control registers look when they happen.
+ 		case M88K_EXCEPTION_SFU1_PRECISE:
+-			cpu->cd.m88k.cr[M88K_CR_SNIP] = 0; //?
+-			cpu->cd.m88k.cr[M88K_CR_SFIP] = 0;
+-			//cpu->cd.m88k.cr[M88K_CR_SNIP] -= 4;
+-			//cpu->cd.m88k.cr[M88K_CR_SFIP] -= 4;
+-			break;
+-#endif
++            /* The faulting operation is completed by supervisor software;
++             * retain SNIP/SFIP so rte resumes the following instruction. */
++            break;
+ 
+ 		default:debugmsg_cpu(cpu, SUBSYS_EXCEPTION, "m88k",
+ 			    VERBOSITY_ERROR, "internal error");
+--- a/src/cpus/cpu_m88k_instr.c
++++ b/src/cpus/cpu_m88k_instr.c
+@@ -1242,6 +1242,45 @@
+ 	reg(ic->arg[0]) = d >> 32;	/*  High 32-bit word,  */
+ 	reg(ic->arg[0] + 4) = d;	/*  and low word.  */
+ }
++/* Reserved operands are completed in supervisor software (6.8.1.1). */
++static int m88k_fdiv_reserved(uint64_t value, int dbl)
++{
++    uint64_t fraction = value & (dbl ? 0xfffffffffffffULL : 0x7fffffULL);
++    unsigned exponent = (value >> (dbl ? 52 : 23)) & (dbl ? 0x7ff : 0xff);
++    return exponent == (dbl ? 0x7ff : 0xff) || (exponent == 0 && fraction != 0);
++}
++
++/* Capture the architected precise-exception operands (MC88100 6.8.1.4-8).
++ * Exception enables other than inexact are interpreted by supervisor software.
++ */
++static void m88k_fdiv_precise_state(struct cpu *cpu,
++    struct m88k_instr_call *ic, uint64_t s1, uint64_t s2,
++    int d1, int d2, int dd)
++{
++    uint64_t src[2] = { s1, s2 };
++    int dbl[2] = { d1, d2 };
++    for (int i = 0; i < 2; i++) {
++        uint32_t hi, lo;
++        if (dbl[i]) {
++            hi = src[i] >> 32;
++            lo = src[i];
++        } else {
++            uint32_t single = src[i];
++            uint32_t exp = (single >> 23) & 0xff;
++            if (exp & 0x80)
++                exp |= 0x700;
++            hi = (single & 0x80000000) | (exp << 20)
++                | ((single & 0x7fffff) >> 3);
++            lo = single << 29;
++        }
++        cpu->cd.m88k.fcr[1 + 2 * i] = hi;
++        cpu->cd.m88k.fcr[2 + 2 * i] = lo;
++    }
++    unsigned rd = ((uint32_t *)ic->arg[0]) - &cpu->cd.m88k.r[0];
++    cpu->cd.m88k.fcr[5] = (0x0e << 11) | (d1 << 9)
++        | (d2 << 7) | (dd << 5) | rd;
++}
++
+ X(fdiv_sss)
+ {
+ 	struct ieee_float_value f1;
+@@ -1251,6 +1290,7 @@
+ 	uint32_t s2 = reg(ic->arg[2]);
+ 
+ 	if (cpu->cd.m88k.cr[M88K_CR_PSR] & M88K_PSR_SFD1) {
++		m88k_fdiv_precise_state(cpu, ic, s1, s2, 0, 0, 0);
+ 		SYNCH_PC;
+ 		cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = M88K_FPECR_FUNIMP;
+ 		m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
+@@ -1261,11 +1301,20 @@
+ 	ieee_interpret_float_value(s2, &f2, IEEE_FMT_S);
+ 
+ 	if (f2.f == 0) {
++		m88k_fdiv_precise_state(cpu, ic, s1, s2, 0, 0, 0);
+ 		SYNCH_PC;
+ 		cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = M88K_FPECR_FDVZ;
+ 		m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
+ 		return;
+ 	}
++
++    if (m88k_fdiv_reserved(s1, 0) || m88k_fdiv_reserved(s2, 0)) {
++        m88k_fdiv_precise_state(cpu, ic, s1, s2, 0, 0, 0);
++        SYNCH_PC;
++        cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = 1 << 4; /* FROP */
++        m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
++        return;
++    }
+ 
+ 	d = ieee_store_float_value(f1.f / f2.f, IEEE_FMT_S);
+ 
+@@ -1280,6 +1329,7 @@
+ 	uint32_t s2 = reg(ic->arg[2]);
+ 
+ 	if (cpu->cd.m88k.cr[M88K_CR_PSR] & M88K_PSR_SFD1) {
++		m88k_fdiv_precise_state(cpu, ic, s1, s2, 0, 0, 1);
+ 		SYNCH_PC;
+ 		cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = M88K_FPECR_FUNIMP;
+ 		m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
+@@ -1290,11 +1340,20 @@
+ 	ieee_interpret_float_value(s2, &f2, IEEE_FMT_S);
+ 
+ 	if (f2.f == 0) {
++		m88k_fdiv_precise_state(cpu, ic, s1, s2, 0, 0, 1);
+ 		SYNCH_PC;
+ 		cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = M88K_FPECR_FDVZ;
+ 		m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
+ 		return;
+ 	}
++
++    if (m88k_fdiv_reserved(s1, 0) || m88k_fdiv_reserved(s2, 0)) {
++        m88k_fdiv_precise_state(cpu, ic, s1, s2, 0, 0, 1);
++        SYNCH_PC;
++        cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = 1 << 4; /* FROP */
++        m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
++        return;
++    }
+ 
+ 	d = ieee_store_float_value(f1.f / f2.f, IEEE_FMT_D);
+ 
+@@ -1311,6 +1370,7 @@
+ 	s2 = (s2 << 32) + reg(ic->arg[2] + 4);
+ 
+ 	if (cpu->cd.m88k.cr[M88K_CR_PSR] & M88K_PSR_SFD1) {
++		m88k_fdiv_precise_state(cpu, ic, s1, s2, 0, 1, 1);
+ 		SYNCH_PC;
+ 		cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = M88K_FPECR_FUNIMP;
+ 		m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
+@@ -1321,11 +1381,20 @@
+ 	ieee_interpret_float_value(s2, &f2, IEEE_FMT_D);
+ 
+ 	if (f2.f == 0) {
++		m88k_fdiv_precise_state(cpu, ic, s1, s2, 0, 1, 1);
+ 		SYNCH_PC;
+ 		cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = M88K_FPECR_FDVZ;
+ 		m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
+ 		return;
+ 	}
++
++    if (m88k_fdiv_reserved(s1, 0) || m88k_fdiv_reserved(s2, 1)) {
++        m88k_fdiv_precise_state(cpu, ic, s1, s2, 0, 1, 1);
++        SYNCH_PC;
++        cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = 1 << 4; /* FROP */
++        m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
++        return;
++    }
+ 
+ 	d = ieee_store_float_value(f1.f / f2.f, IEEE_FMT_D);
+ 
+@@ -1343,6 +1412,7 @@
+ 	s2 = (s2 << 32) + reg(ic->arg[2] + 4);
+ 
+ 	if (cpu->cd.m88k.cr[M88K_CR_PSR] & M88K_PSR_SFD1) {
++		m88k_fdiv_precise_state(cpu, ic, s1, s2, 1, 1, 1);
+ 		SYNCH_PC;
+ 		cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = M88K_FPECR_FUNIMP;
+ 		m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
+@@ -1353,11 +1423,20 @@
+ 	ieee_interpret_float_value(s2, &f2, IEEE_FMT_D);
+ 
+ 	if (f2.f == 0) {
++		m88k_fdiv_precise_state(cpu, ic, s1, s2, 1, 1, 1);
+ 		SYNCH_PC;
+ 		cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = M88K_FPECR_FDVZ;
+ 		m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
+ 		return;
+ 	}
++
++    if (m88k_fdiv_reserved(s1, 1) || m88k_fdiv_reserved(s2, 1)) {
++        m88k_fdiv_precise_state(cpu, ic, s1, s2, 1, 1, 1);
++        SYNCH_PC;
++        cpu->cd.m88k.fcr[M88K_FPCR_FPECR] = 1 << 4; /* FROP */
++        m88k_exception(cpu, M88K_EXCEPTION_SFU1_PRECISE, 0);
++        return;
++    }
+ 
+ 	d = ieee_store_float_value(f1.f / f2.f, IEEE_FMT_D);
+ 

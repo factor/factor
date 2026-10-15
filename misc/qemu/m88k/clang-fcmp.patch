@@ -1,0 +1,109 @@
+diff --git a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+index 550a6d44e..a42803c80 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+@@ -187,6 +189,8 @@ M88kLegalizerInfo::M88kLegalizerInfo(const M88kSubtarget &ST) {
+   getActionDefinitionsBuilder(G_ICMP)
+       .legalForCartesianProduct({S1}, {S32, P0})
+       .clampScalar(1, S32, S32);
++  getActionDefinitionsBuilder(G_FCMP)
++      .legalForCartesianProduct({S1}, {S32, S64});
+   getActionDefinitionsBuilder(G_BRCOND).legalFor({S1});
+   getActionDefinitionsBuilder(G_BRJT).legalFor({{P0, S32}});
+   getActionDefinitionsBuilder(G_BRINDIRECT).legalFor({P0});
+diff --git a/llvm/lib/Target/M88k/GISel/M88kRegisterBankInfo.cpp b/llvm/lib/Target/M88k/GISel/M88kRegisterBankInfo.cpp
+index d6e65a2b4..fbae5e8fb 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kRegisterBankInfo.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kRegisterBankInfo.cpp
+@@ -107,6 +107,15 @@ M88kRegisterBankInfo::getInstrMapping(const MachineInstr &MI) const {
+     OperandsMapping = getOperandsMapping({getValueMapping(RBIdx), nullptr});
+     break;
+   }
++  case TargetOpcode::G_FCMP: {
++    LLT Ty = MRI.getType(MI.getOperand(2).getReg());
++    if (Ty.getSizeInBits() != 32 && Ty.getSizeInBits() != 64)
++      return getInvalidInstructionMapping();
++    PartialMappingIdx RBIdx = Ty.getSizeInBits() == 64 ? PMI_GR64 : PMI_GR32;
++    OperandsMapping = getOperandsMapping({getValueMapping(PMI_GR32), nullptr,
++                                         getValueMapping(RBIdx), getValueMapping(RBIdx)});
++    break;
++  }
+   case TargetOpcode::G_FPTOSI:
+   case TargetOpcode::G_FPTOUI: {
+     LLT Ty = MRI.getType(MI.getOperand(1).getReg());
+
+diff --git a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+index 912c73f10..0da09dbff 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+@@ -97,6 +97,8 @@ private:
+                          MachineRegisterInfo &MRI) const;
+   bool selectSExtInreg(MachineInstr &I, MachineBasicBlock &MBB,
+                        MachineRegisterInfo &MRI) const;
++  bool selectFCmp(MachineInstr &I, MachineBasicBlock &MBB,
++                  MachineRegisterInfo &MRI) const;
+   bool selectICmp(MachineInstr &I, MachineBasicBlock &MBB,
+                   MachineRegisterInfo &MRI) const;
+   bool selectBrCond(MachineInstr &I, MachineBasicBlock &MBB,
+@@ -579,6 +581,51 @@ static CC0 getCCforBCOND(CmpInst::Predicate Pred) {
+   }
+ }
+ 
++bool M88kInstructionSelector::selectFCmp(MachineInstr &I,
++                                        MachineBasicBlock &MBB,
++                                        MachineRegisterInfo &MRI) const {
++  unsigned Bit;
++  bool Invert = false;
++  switch (I.getOperand(1).getPredicate()) {
++  case CmpInst::FCMP_UNO: Bit = 0; break;
++  case CmpInst::FCMP_ORD: Bit = 1; break;
++  case CmpInst::FCMP_OEQ: Bit = 2; break;
++  case CmpInst::FCMP_ONE: Bit = 3; break;
++  case CmpInst::FCMP_OGT: Bit = 4; break;
++  case CmpInst::FCMP_OLE: Bit = 5; break;
++  case CmpInst::FCMP_OLT: Bit = 6; break;
++  case CmpInst::FCMP_OGE: Bit = 7; break;
++  case CmpInst::FCMP_UEQ: Bit = 3; Invert = true; break;
++  case CmpInst::FCMP_UNE: Bit = 2; Invert = true; break;
++  case CmpInst::FCMP_UGT: Bit = 5; Invert = true; break;
++  case CmpInst::FCMP_UGE: Bit = 6; Invert = true; break;
++  case CmpInst::FCMP_ULT: Bit = 7; Invert = true; break;
++  case CmpInst::FCMP_ULE: Bit = 4; Invert = true; break;
++  default: return false;
++  }
++  Register Dst = I.getOperand(0).getReg();
++  Register LHS = I.getOperand(2).getReg();
++  Register RHS = I.getOperand(3).getReg();
++  unsigned Bits = MRI.getType(LHS).getSizeInBits();
++  if (Bits != 32 && Bits != 64) return false;
++  Register Flags = MRI.createVirtualRegister(&M88k::GPRRegClass);
++  auto Compare = BuildMI(MBB, I, I.getDebugLoc(),
++                         TII.get(Bits == 64 ? M88k::FCMPgsdd : M88k::FCMPgsss), Flags)
++                     .addReg(LHS).addReg(RHS);
++  if (!constrainSelectedInstRegOperands(*Compare, MRI, TII, TRI, RBI)) return false;
++  Register Result = Invert ? MRI.createVirtualRegister(&M88k::GPRRegClass) : Dst;
++  auto Extract = BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::EXTUrwo), Result)
++                     .addReg(Flags).addImm(1).addImm(Bit);
++  if (!constrainSelectedInstRegOperands(*Extract, MRI, TII, TRI, RBI)) return false;
++  if (Invert) {
++    auto Flip = BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::XORri), Dst)
++                    .addReg(Result).addImm(1);
++    if (!constrainSelectedInstRegOperands(*Flip, MRI, TII, TRI, RBI)) return false;
++  }
++  I.eraseFromParent();
++  return true;
++}
++
+ bool M88kInstructionSelector::selectICmp(MachineInstr &I,
+                                          MachineBasicBlock &MBB,
+                                          MachineRegisterInfo &MRI) const {
+@@ -1227,6 +1349,8 @@ bool M88kInstructionSelector::select(MachineInstr &I) {
+     return selectVaStart(I, MBB, MRI);
+   case TargetOpcode::G_SEXT_INREG:
+     return selectSExtInreg(I, MBB, MRI);
++  case TargetOpcode::G_FCMP:
++    return selectFCmp(I, MBB, MRI);
+   case TargetOpcode::G_ICMP:
+     return selectICmp(I, MBB, MRI);
+   case TargetOpcode::G_BRCOND:
+

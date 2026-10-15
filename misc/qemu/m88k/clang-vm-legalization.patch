@@ -1,0 +1,52 @@
+--- a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+@@ -92,6 +92,12 @@
+   getActionDefinitionsBuilder(G_SEXT_INREG).legalForTypeWithAnyImm({S32});
+   getActionDefinitionsBuilder(G_TRUNC).alwaysLegal();
+   getActionDefinitionsBuilder(G_FENCE).alwaysLegal();
++  getActionDefinitionsBuilder(G_ABS).lower();
++  getActionDefinitionsBuilder(G_IS_FPCLASS).lower();
++  getActionDefinitionsBuilder({G_FCEIL, G_FFLOOR, G_FRINT, G_FNEARBYINT,
++                               G_INTRINSIC_TRUNC, G_INTRINSIC_ROUND,
++                               G_INTRINSIC_ROUNDEVEN})
++      .libcallFor({S32, S64});
+   getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD})
+       .legalForTypesWithMemDesc({{S32, P0, S8, 8}, {S32, P0, S16, 16}})
+       .customIf(typePairAndMemDescInSet(/*TypeIdx0*/ 0, /*TypeIdx1*/ 1,
+@@ -170,6 +176,7 @@
+       .legalFor({S32})
+       .clampScalar(0, S32, S32);
+   getActionDefinitionsBuilder({G_SBFX, G_UBFX})
++      .customFor({{S64, S64}})
+       .legalFor({{S32, S32}})
+       .clampScalar(0, S32, S32);
+   getActionDefinitionsBuilder({G_SHL, G_LSHR, G_ASHR})
+@@ -253,6 +260,28 @@
+   const LLT P0 = LLT::pointer(0, 32);
+ 
+   switch (MI.getOpcode()) {
++  case G_SBFX:
++  case G_UBFX: {
++    Register Dst = MI.getOperand(0).getReg();
++    Register Src = MI.getOperand(1).getReg();
++    auto Lsb = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
++    auto Width = getIConstantVRegValWithLookThrough(MI.getOperand(3).getReg(), MRI);
++    if (!Lsb || !Width)
++      return false;
++    uint64_t Offset = Lsb->Value.getZExtValue();
++    uint64_t Bits = Width->Value.getZExtValue();
++    if (Bits == 0 || Bits > 64 || Offset > 64 - Bits)
++      return false;
++    auto Left = MIRBuilder.buildConstant(S64, 64 - Offset - Bits);
++    auto Right = MIRBuilder.buildConstant(S64, 64 - Bits);
++    auto Shifted = MIRBuilder.buildShl(S64, Src, Left);
++    if (MI.getOpcode() == G_SBFX)
++      MIRBuilder.buildAShr(Dst, Shifted, Right);
++    else
++      MIRBuilder.buildLShr(Dst, Shifted, Right);
++    MI.eraseFromParent();
++    break;
++  }
+   case G_SEXTLOAD:
+   case G_ZEXTLOAD:
+   case G_LOAD: {

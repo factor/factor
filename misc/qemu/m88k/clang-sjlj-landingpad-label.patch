@@ -1,0 +1,15 @@
+diff --git a/llvm/lib/Target/M88k/M88kSjLjEH.cpp b/llvm/lib/Target/M88k/M88kSjLjEH.cpp
+--- a/llvm/lib/Target/M88k/M88kSjLjEH.cpp
++++ b/llvm/lib/Target/M88k/M88kSjLjEH.cpp
+@@ -82,8 +82,9 @@
+         if (MBB.getBasicBlock() == Invoke->getUnwindDest()) Pad = &MBB;
+       }
+       if (!InvokeBB || !Pad) report_fatal_error("Missing SjLj invoke blocks");
+-      MCSymbol *PadSym = nullptr;
+-      for (auto &MI : *Pad) if (MI.isEHLabel()) { PadSym = MI.getOperand(0).getMCSymbol(); break; }
++      // An invoke inside the landing pad has its own EH_LABEL. Only the
++      // landing-pad metadata identifies the label at exceptional block entry.
++      MCSymbol *PadSym = MF.getOrCreateLandingPadInfo(Pad).LandingPadLabel;
+       if (!PadSym) {
+         PadSym = MF.addLandingPad(Pad);
+         BuildMI(*Pad, Pad->begin(), DebugLoc(), TII.get(TargetOpcode::EH_LABEL)).addSym(PadSym);

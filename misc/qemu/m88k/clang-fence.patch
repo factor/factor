@@ -1,0 +1,26 @@
+--- a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+@@ -91,6 +91,7 @@
+       .widenScalarToNextPow2(1, 32);
+   getActionDefinitionsBuilder(G_SEXT_INREG).legalForTypeWithAnyImm({S32});
+   getActionDefinitionsBuilder(G_TRUNC).alwaysLegal();
++  getActionDefinitionsBuilder(G_FENCE).alwaysLegal();
+   getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD})
+       .legalForTypesWithMemDesc({{S32, P0, S8, 8}, {S32, P0, S16, 16}})
+       .customIf(typePairAndMemDescInSet(/*TypeIdx0*/ 0, /*TypeIdx1*/ 1,
+--- a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+@@ -1224,6 +1224,13 @@
+   auto &MRI = MF.getRegInfo();
+ 
+   switch (I.getOpcode()) {
++  case TargetOpcode::G_FENCE:
++    if (!TM.getTargetTriple().isOSOpenBSD())
++      return false;
++    // OpenBSD user TB1 is a full barrier; stronger ordering is intentional.
++    BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::MEMBAR));
++    I.eraseFromParent();
++    return true;
+   case TargetOpcode::G_LOAD:
+   case TargetOpcode::G_ZEXTLOAD:
+   case TargetOpcode::G_STORE: {

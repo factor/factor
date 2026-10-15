@@ -1,0 +1,69 @@
+diff --git a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+index 550a6d44e..d307de84d 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+@@ -175,10 +177,8 @@ M88kLegalizerInfo::M88kLegalizerInfo(const M88kSubtarget &ST) {
+       .clampScalar(1, S32, S32);
+   getActionDefinitionsBuilder(G_ROTR).legalFor({{S32}, {S32}});
+   getActionDefinitionsBuilder({G_ROTL, G_FSHL, G_FSHR}).lower();
+-  getActionDefinitionsBuilder(G_CTLZ)
+-    .customFor({{S32}, {S32}});
+-  getActionDefinitionsBuilder(G_CTLZ_ZERO_UNDEF)
+-      .legalFor({{S32}, {S32}});
++  getActionDefinitionsBuilder({G_CTLZ, G_CTLZ_ZERO_UNDEF})
++      .customFor({{S32, S32}, {S64, S64}});
+   getActionDefinitionsBuilder({G_CTTZ, G_CTTZ_ZERO_UNDEF, G_CTPOP}).lower();
+   getActionDefinitionsBuilder({G_SMAX, G_UMAX, G_SMIN, G_UMIN}).lower();
+ 
+@@ -459,29 +461,29 @@ bool M88kLegalizerInfo::legalizeCustom(
+     MI.eraseFromParent();
+     break;
+   }
+-  case G_CTLZ: {
+-    // The instruction
+-    //   %7:_(s32) = G_CTLZ %0(s32)
+-    // is lowered to:
+-    //   %1:_(s32) = G_INTRINSIC intrinsic(@llvm.m88k.ff1), %0(s32)
+-    //   %2:_(s32) = G_CONSTANT i32 31
+-    //   %3:_(s32) = G_CONSTANT i32 0
+-    //   %4:_(s32), %3:_(s32) = G_USUBO %2, %1
+-    //   %5:_(s32) = G_AND %2, %4
+-    //   %6:_(s32), %3:_(s32) = G_UADDE %5, %3, %4
++  case G_CTLZ:
++  case G_CTLZ_ZERO_UNDEF: {
+     Register Dst = MI.getOperand(0).getReg();
+-
+-    auto FF1 =
+-        MIRBuilder.buildIntrinsic(Intrinsic::m88k_ff1, {S32}, false, false);
+-    FF1.addUse(MI.getOperand(1).getReg());
+-    Register USub = MRI.createGenericVirtualRegister(S32);
+-    Register Carry = MRI.createGenericVirtualRegister(S32);
+-    Register Dead = MRI.createGenericVirtualRegister(S32);
+-    auto Const31 = MIRBuilder.buildConstant(S32, 31);
+-    auto Const0 = MIRBuilder.buildConstant(S32, 0);
+-    MIRBuilder.buildUSubo(USub, Carry, Const31, FF1);
+-    auto And = MIRBuilder.buildAnd(S32, USub, Const31);
+-    MIRBuilder.buildUAdde(Dst, Dead, And, Const0, Carry);
++    Register Src = MI.getOperand(1).getReg();
++    auto Zero = MIRBuilder.buildConstant(S32, 0);
++    auto ThirtyTwo = MIRBuilder.buildConstant(S32, 32);
++    if (MRI.getType(Dst) == S64) {
++      auto Parts = MIRBuilder.buildUnmerge(S32, Src);
++      auto LowCount = MIRBuilder.buildCTLZ(S32, Parts.getReg(0));
++      auto HighCount = MIRBuilder.buildCTLZ(S32, Parts.getReg(1));
++      auto LowPlus32 = MIRBuilder.buildAdd(S32, LowCount, ThirtyTwo);
++      auto HighZero = MIRBuilder.buildICmp(CmpInst::ICMP_EQ, LLT::scalar(1),
++                                           Parts.getReg(1), Zero);
++      auto Count = MIRBuilder.buildSelect(S32, HighZero, LowPlus32, HighCount);
++      MIRBuilder.buildMergeValues(Dst, {Count.getReg(0), Zero.getReg(0)});
++    } else {
++      auto FF1 = MIRBuilder.buildIntrinsic(Intrinsic::m88k_ff1, {S32}, false, false);
++      FF1.addUse(Src);
++      auto ThirtyOne = MIRBuilder.buildConstant(S32, 31);
++      auto NonzeroCount = MIRBuilder.buildSub(S32, ThirtyOne, FF1);
++      auto IsZero = MIRBuilder.buildICmp(CmpInst::ICMP_EQ, LLT::scalar(1), Src, Zero);
++      MIRBuilder.buildSelect(Dst, IsZero, ThirtyTwo, NonzeroCount);
++    }
+     MI.eraseFromParent();
+     break;
+   }

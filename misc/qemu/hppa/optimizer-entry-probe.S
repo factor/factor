@@ -1,0 +1,41 @@
+/* C entry: generated code, tagged native function, argument a, argument b. */
+.text
+.align 4
+.globl hppa_optimizer_enter
+.type hppa_optimizer_enter,@function
+hppa_optimizer_enter:
+ stw %r2,-20(%r30)
+ ldo 128(%r30),%r30
+ stw %r11,-120(%r30)
+ stw %r16,-116(%r30)
+ stw %r18,-112(%r30)
+ stw %r19,-108(%r30)
+ stw %r6,-104(%r30)
+ stw %r7,-100(%r30)
+ stw %r17,-96(%r30)
+ ldil L'hppa_optimizer_vm,%r17
+ ldo R'hppa_optimizer_vm(%r17),%r17
+ ldil L'hppa_optimizer_context,%r16
+ ldo R'hppa_optimizer_context(%r16),%r16
+ ldil L'hppa_optimizer_frames+512,%r18
+ ldo R'hppa_optimizer_frames+512(%r18),%r18
+ ldil L'trampoline2,%r11
+ ldo R'trampoline2(%r11),%r11
+ copy %r26,%r20
+ copy %r25,%r26
+ copy %r24,%r25
+ copy %r23,%r24
+ ble 0(%sr4,%r20)
+ copy %r31,%r2
+ ldw -96(%r30),%r17
+ ldw -100(%r30),%r7
+ ldw -104(%r30),%r6
+ ldw -108(%r30),%r19
+ ldw -112(%r30),%r18
+ ldw -116(%r30),%r16
+ ldw -120(%r30),%r11
+ ldw -148(%r30),%r2
+ bv %r0(%r2)
+ ldo -128(%r30),%r30
+.size hppa_optimizer_enter,.-hppa_optimizer_enter
+.section .note.GNU-stack,"",@progbits

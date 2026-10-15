@@ -1,0 +1,12 @@
+--- a/clang/lib/Basic/Targets/M88k.cpp
++++ b/clang/lib/Basic/Targets/M88k.cpp
+@@ -103,6 +103,9 @@
+   if (getTriple().isOSOpenBSD()) {
+     Builder.defineMacro("__m88k__");
+     Builder.defineMacro("__m88k");
++    // This fork lowers aligned QI/SI atomic load/store with user TB1 barriers.
++    // It deliberately makes no CAS or arithmetic-RMW capability claim.
++    Builder.defineMacro("__M88K_OPENBSD_ATOMIC_PUBLICATION__");
+ 
+     // For sub-architecture
+     switch (CPU) {

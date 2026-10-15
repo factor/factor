@@ -1,0 +1,221 @@
+--- a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+@@ -418,7 +418,7 @@
+ 
+   // Store the number of the first var arg register.
+   Register Temp = MRI.createVirtualRegister(&M88k::GPRRegClass);
+-  MachineInstr *MI = BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::ORriu))
++  MachineInstr *MI = BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::ORri))
+                          .addReg(Temp, RegState::Define)
+                          .addReg(M88k::R0)
+                          .addImm(FuncInfo->getVarArgsFirstReg());
+--- a/llvm/lib/Target/M88k/GISel/M88kCallLowering.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kCallLowering.cpp
+@@ -347,56 +347,39 @@
+     MachineFrameInfo &MFI = MF.getFrameInfo();
+ 
+     unsigned FirstVariadicReg = CCInfo.getFirstUnallocated(ArgRegs);
+-    unsigned GPRSaveSize = 4 * (ArgRegsSize - FirstVariadicReg);
+-    if (GPRSaveSize != 0) {
+-      const LLT P0 = LLT::pointer(0, 32);
+-      const LLT S32 = LLT::scalar(32);
+-      const LLT S64 = LLT::scalar(64);
+-
+-      // Align the size of the save area to 8. The first slot will be empty if
+-      // an odd number of registers need to be saved.
+-      unsigned GPRIdx =
+-          MFI.CreateStackObject(alignTo(GPRSaveSize, 8), Align(8), false);
+-      auto FIN = MIRBuilder.buildFrameIndex(P0, GPRIdx);
+-      auto Offset =
+-          MIRBuilder.buildConstant(MRI.createGenericVirtualRegister(S32), 8);
+-
+-      // Assign the registers. The first register requires special handling if
+-      // it has a odd number, because st.d cannot be used in this case.
+-      unsigned OddRegNo = FirstVariadicReg & 0x1;
+-      unsigned FirstVariadicPairReg = (FirstVariadicReg + OddRegNo) >> 1;
+-      if (OddRegNo) {
+-        auto Offset =
+-            MIRBuilder.buildConstant(MRI.createGenericVirtualRegister(S32), 4);
+-        Register Val = MRI.createGenericVirtualRegister(S32);
+-        ArgHandler.assignValueToReg(
+-            Val, ArgRegs[I],
+-            CCValAssign::getReg(I + MF.getFunction().getNumOperands(), MVT::i32,
+-                                ArgRegs[I], MVT::i32, CCValAssign::Full));
+-        auto MPO = MachinePointerInfo::getFixedStack(MF, GPRIdx, 4);
+-        FIN = MIRBuilder.buildPtrAdd(MRI.createGenericVirtualRegister(P0),
+-                                     FIN.getReg(0), Offset);
+-        MIRBuilder.buildStore(Val, FIN, MPO, inferAlignFromPtrInfo(MF, MPO));
+-        FIN = MIRBuilder.buildPtrAdd(MRI.createGenericVirtualRegister(P0),
+-                                     FIN.getReg(0), Offset);
+-      }
+-      for (unsigned I = FirstVariadicPairReg, E = ArgPairRegsSize; I < E;
+-           ++I) {
+-        Register Val = MRI.createGenericVirtualRegister(S64);
+-        ArgHandler.assignValueToReg(
+-            Val, ArgPairRegs[I],
+-            CCValAssign::getReg(I + MF.getFunction().getNumOperands(), MVT::i64,
+-                                ArgPairRegs[I], MVT::i64, CCValAssign::Full));
+-        auto MPO = MachinePointerInfo::getFixedStack(MF, GPRIdx, I * 8);
+-        MIRBuilder.buildStore(Val, FIN, MPO, inferAlignFromPtrInfo(MF, MPO));
+-
+-        FIN = MIRBuilder.buildPtrAdd(MRI.createGenericVirtualRegister(P0),
+-                                     FIN.getReg(0), Offset);
+-      }
+-
+-      FuncInfo->setVarArgsFirstReg(FirstVariadicReg);
+-      FuncInfo->setVarArgsRegIndex(GPRIdx);
++    const LLT P0 = LLT::pointer(0, 32);
++    const LLT S32 = LLT::scalar(32);
++    const LLT S64 = LLT::scalar(64);
++
++    // va_list indexes this area by the original argument register number.
++    int GPRIdx = MFI.CreateStackObject(ArgRegsSize * 4, Align(8), false);
++    auto Base = MIRBuilder.buildFrameIndex(P0, GPRIdx);
++    if (FirstVariadicReg & 1) {
++      Register Val = MRI.createGenericVirtualRegister(S32);
++      ArgHandler.assignValueToReg(
++          Val, ArgRegs[FirstVariadicReg],
++          CCValAssign::getReg(FirstVariadicReg, MVT::i32,
++                              ArgRegs[FirstVariadicReg], MVT::i32,
++                              CCValAssign::Full));
++      auto Offset = MIRBuilder.buildConstant(S32, FirstVariadicReg * 4);
++      auto Addr = MIRBuilder.buildPtrAdd(P0, Base, Offset);
++      auto MPO = MachinePointerInfo::getStack(MF, FirstVariadicReg * 4);
++      MIRBuilder.buildStore(Val, Addr, MPO, Align(4));
+     }
++    for (unsigned Reg = (FirstVariadicReg + 1) / 2;
++         Reg < ArgPairRegsSize; ++Reg) {
++      Register Val = MRI.createGenericVirtualRegister(S64);
++      ArgHandler.assignValueToReg(
++          Val, ArgPairRegs[Reg],
++          CCValAssign::getReg(Reg, MVT::i64, ArgPairRegs[Reg], MVT::i64,
++                              CCValAssign::Full));
++      auto Offset = MIRBuilder.buildConstant(S32, Reg * 8);
++      auto Addr = MIRBuilder.buildPtrAdd(P0, Base, Offset);
++      auto MPO = MachinePointerInfo::getStack(MF, Reg * 8);
++      MIRBuilder.buildStore(Val, Addr, MPO, Align(8));
++    }
++    FuncInfo->setVarArgsFirstReg(FirstVariadicReg);
++    FuncInfo->setVarArgsRegIndex(GPRIdx);
+ 
+     // Create frame index of first var arg stack parameter.
+     FuncInfo->setStackIndex(
+--- a/clang/lib/CodeGen/Targets/M88k.cpp
++++ b/clang/lib/CodeGen/Targets/M88k.cpp
+@@ -100,70 +100,56 @@
+ RValue M88kABIInfo::EmitVAArg(CodeGen::CodeGenFunction &CGF,
+                               CodeGen::Address VAListAddr, QualType Ty,
+                               AggValueSlot Slot) const {
+-  // Assume that va_list type is correct; should be pointer to LLVM type:
+-  // struct {
+-  //    int __va_arg;
+-  //    int *__va_stk;
+-  //    int *__va_reg;
+-  // };
++  // GNU va_list contains a register word index, stack cursor and register base.
++  Ty = getContext().getCanonicalType(Ty);
++  CharUnits Size = getContext().getTypeSizeInChars(Ty);
++  CharUnits Align = CharUnits::fromQuantity(Size.getQuantity() > 4 ? 8 : 4);
++  unsigned Words = (Size.getQuantity() + 3) / 4;
++  Address IndexAddr = CGF.Builder.CreateStructGEP(VAListAddr, 0);
++  llvm::Value *Index = CGF.Builder.CreateLoad(IndexAddr);
++  if (Align.getQuantity() == 8) {
++    Index = CGF.Builder.CreateAdd(Index, CGF.Builder.getInt32(1));
++    Index = CGF.Builder.CreateAnd(Index, CGF.Builder.getInt32(~1u));
++  }
++  llvm::Value *Fits = CGF.Builder.CreateICmpULE(
++      Index, CGF.Builder.getInt32(Words <= 8 ? 8 - Words : 0));
++  if (Words > 8)
++    Fits = CGF.Builder.getFalse();
+ 
+-  // How are structures handled?
++  llvm::BasicBlock *RegBlock = CGF.createBasicBlock("vaarg.reg");
++  llvm::BasicBlock *StackBlock = CGF.createBasicBlock("vaarg.stack");
++  llvm::BasicBlock *EndBlock = CGF.createBasicBlock("vaarg.end");
++  CGF.Builder.CreateCondBr(Fits, RegBlock, StackBlock);
+ 
+-  // Align the argument
+-  CharUnits PtrAlign = CharUnits::fromQuantity(4);
+-  CharUnits DirectAlign = CharUnits::fromQuantity(8);
+-  CharUnits SlotSize = CharUnits::fromQuantity(4);
++  CGF.EmitBlock(RegBlock);
++  Address RegAddr = CGF.Builder.CreateStructGEP(VAListAddr, 2);
++  llvm::Value *Base = CGF.Builder.CreateLoad(RegAddr);
++  llvm::Value *Offset = CGF.Builder.CreateMul(Index, CGF.Builder.getInt32(4));
++  llvm::Value *RegPtr = CGF.Builder.CreateGEP(CGF.Int8Ty, Base, Offset);
++  CGF.Builder.CreateStore(
++      CGF.Builder.CreateAdd(Index, CGF.Builder.getInt32(Words)), IndexAddr);
++  CGF.Builder.CreateBr(EndBlock);
+ 
+-  Ty = getContext().getCanonicalType(Ty);
+-  auto TyInfo = getContext().getTypeInfoInChars(Ty);
+-  CharUnits DirectSize = TyInfo.Width;
+-  TypeInfoChars TypeInfo(DirectSize, DirectAlign, AlignRequirementKind::None);
++  CGF.EmitBlock(StackBlock);
++  Address StackAddr = CGF.Builder.CreateStructGEP(VAListAddr, 1);
++  llvm::Value *StackPtr = CGF.Builder.CreateLoad(StackAddr);
++  if (Align.getQuantity() > 4)
++    StackPtr = emitRoundPointerUpToAlignment(CGF, StackPtr, Align);
++  llvm::Value *Next = CGF.Builder.CreateConstGEP1_32(
++      CGF.Int8Ty, StackPtr, Words * 4);
++  CGF.Builder.CreateStore(Next, StackAddr);
++  // A later scalar may still consume an odd saved-register slot.
++  CGF.Builder.CreateBr(EndBlock);
+ 
+-  // Decide which pointer to use: __va_arg < 8 ? __va_reg : __va_stk.
+-  Address VaArgPtr =
+-      CGF.Builder.CreateStructGEP(VAListAddr, 0, "__va_arg.addr");
+-  llvm::Value *VaArg = CGF.Builder.CreateLoad(VaArgPtr, "__va_arg");
+-  llvm::Value *MaxRegs = llvm::ConstantInt::get(CGF.Int32Ty, 8);
+-  llvm::Value *InRegs =
+-      CGF.Builder.CreateICmpULT(VaArg, MaxRegs, "fits_in_regs");
+-
+-  llvm::BasicBlock *InRegBlock = CGF.createBasicBlock("vaarg.in_reg");
+-  llvm::BasicBlock *InStkBlock = CGF.createBasicBlock("vaarg.in_stk");
+-  llvm::BasicBlock *ContBlock = CGF.createBasicBlock("vaarg.end");
+-  CGF.Builder.CreateCondBr(InRegs, InRegBlock, InStkBlock);
+-
+-  // Value comes from register.
+-  CGF.EmitBlock(InRegBlock);
+-  Address VaRegPtr =
+-      CGF.Builder.CreateStructGEP(VAListAddr, 2, "__va_reg.addr");
+-  Address VaReg = Address(CGF.Builder.CreateLoad(VaRegPtr, "__va_reg"),
+-                          CGF.Int8Ty, PtrAlign);
+-  CGF.Builder.CreateBr(ContBlock);
+-
+-  // Value comes from stack.
+-  CGF.EmitBlock(InStkBlock);
+-  Address VaStkPtr =
+-      CGF.Builder.CreateStructGEP(VAListAddr, 1, "__va_stk.addr");
+-  Address VaStk = Address(CGF.Builder.CreateLoad(VaStkPtr, "__va_stk"),
+-                          CGF.Int8Ty, PtrAlign);
+-  CGF.Builder.CreateBr(ContBlock);
+-
+-  CGF.EmitBlock(ContBlock);
+-  Address VaAddr =
+-      emitMergePHI(CGF, VaReg, InRegBlock, VaStk, InStkBlock, "va_arg.addr");
+-
+-  // Load value and increment pointer.
+-  RValue ResAddr =
+-      emitVoidPtrVAArg(CGF, VaAddr, Ty, /*Indirect*/ false, TypeInfo, SlotSize,
+-                       /*AllowHigher*/ true, Slot,
+-                       /*ForceRightAdjust*/ true);
+-
+-  // Increment and store __va_arg.
+-  llvm::Value *One = llvm::ConstantInt::get(CGF.Int32Ty, 1);
+-  llvm::Value *NewVaArg = CGF.Builder.CreateAdd(VaArg, One, "__va_arg.inc");
+-  CGF.Builder.CreateStore(NewVaArg, VaArgPtr);
+-
+-  return ResAddr;
++  CGF.EmitBlock(EndBlock);
++  Address Result = emitMergePHI(CGF, Address(RegPtr, CGF.Int8Ty, Align),
++                                RegBlock, Address(StackPtr, CGF.Int8Ty, Align),
++                                StackBlock, "vaarg.addr");
++  if (Size.getQuantity() < 4)
++    Result = CGF.Builder.CreateConstInBoundsByteGEP(
++        Result, CharUnits::fromQuantity(4) - Size);
++  Result = Result.withElementType(CGF.ConvertTypeForMem(Ty));
++  return CGF.EmitLoadOfAnyValue(CGF.MakeAddrLValue(Result, Ty), Slot);
+ }
+ 
+ std::unique_ptr<TargetCodeGenInfo>

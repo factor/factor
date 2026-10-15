@@ -1,0 +1,14 @@
+--- a/llvm/lib/Target/M88k/M88kCombine.td
++++ b/llvm/lib/Target/M88k/M88kCombine.td
+@@ -34,7 +34,10 @@
+ // G_UMULH is mapped to a library call, and G_CTTZ results in a lengthy
+ // instruction sequence.
+ def m88k_combines : GICombineGroup<[integer_reassoc_combines, trivial_combines,
+-    freeze_combines, cast_combines, combines_for_extload,
++    // Generic load_and_mask narrows at the original address, which selects
++    // the high bytes on this big-endian target. Retain extending loads;
++    // leave mask narrowing disabled until its pointer offset is corrected.
++    freeze_combines, cast_combines, extending_loads,
+     undef_combines, identity_combines, phi_combines,
+     simplify_add_to_sub, m88k_hoist_logic_op_with_same_opcode_hands, shifts_too_big,
+     reassocs, ptr_add_immed_chain,
