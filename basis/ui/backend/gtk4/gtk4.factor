@@ -369,6 +369,9 @@ M:: gtk4-ui-backend system-alert ( caption text -- )
     dialog gtk_window_present ;
 
 : init-gtk4 ( -- ? )
+    ! Wayland app_id must match factor.desktop.
+    "factor" utf8 string>alien g_set_prgname
+
     ! Factor's GLSL shaders require desktop GL. GDK's shared context must
     ! use the same API (not its default GLES choice on some drivers).
     ! gl-prefer-gl was introduced in GTK 4.14.
