@@ -50,6 +50,51 @@ directory and run:
 
 Now you should have a complete Factor system ready to run.
 
+### Alpine Linux (musl, x86-64)
+
+Alpine's native GCC and G++ build Factor against dynamic musl libc. Use
+native Alpine libraries for the FFI and desktop; no glibc compatibility
+package is needed. Full static libc linking cannot provide Factor's dynamic
+library loading. The musl compatibility changes currently target x86-64.
+The native C++ build and ABI probe passed on Alpine 3.24.2 with musl 1.2.6.
+Fresh bootstrap, the entire Core, compiler and I/O suites, and the GTK4
+rendering and clipboard smoke test passed with those Alpine-built binaries
+and libraries on a Linux host. Factor loaded only native Alpine libraries;
+host Xvfb supplied the X11 server. The bounded Alpine VM run did not complete
+bootstrap; full runtime validation inside that VM remains unverified.
+
+With Bash and sudo available, install the build and GTK4 desktop dependencies
+from the checkout:
+
+```bash
+bash build.sh deps-apk
+MUSL=1 CC=gcc CXX=g++ bash build.sh compile
+```
+
+`MUSL=1` verifies that both compilers produce musl ELF interpreters. It does
+not turn a glibc toolchain into a musl toolchain or disable stack protection.
+
+Use a Unix x86-64 boot image matching this checkout. To generate one from
+the same sources in an already working Factor environment, run:
+
+```bash
+./factor -no-user-init -e='USING: bootstrap.image ; "unix-x86.64" make-image'
+```
+
+Copy `boot.unix-x86.64.image` into the Alpine checkout, then bootstrap and
+save the normal image:
+
+```bash
+./factor -i="$PWD/boot.unix-x86.64.image" -no-user-init \
+    -output-image=factor.image -ui-backend=gtk4
+./factor -i="$PWD/factor.image"
+```
+
+For GTK3, use `bash build.sh deps-apk -ui-backend=gtk3` and pass
+`-ui-backend=gtk3` during bootstrap. Launch the desktop from an X11 session
+or an environment providing XWayland. Musl's utmpx APIs do not provide login
+records; this functionality remains unsupported.
+
 The ARM64 assembler and compiler backend are in `cpu.arm.64`. RISC-V Linux
 development targets RV64GC with the LP64D ABI and RV32GC with the ILP32D ABI.
 Their assemblers and compiler backends are in `cpu.riscv.64` and `cpu.riscv.32`.
