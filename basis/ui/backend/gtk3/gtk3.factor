@@ -515,6 +515,8 @@ M:: gtk3-ui-backend system-alert ( caption text -- )
     ] with-destructors ;
 
 M: gtk3-ui-backend (with-ui)
+    ! Wayland app_id must match factor.desktop.
+    "factor" utf8 string>alien g_set_prgname
     f f gtk_init_check [ "Unable to initialize GTK" throw ] unless
     setup-gl3-hooks
     load-icon
