@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor authors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 ! Shared acceptance stages for misc/riscv/test-qemu.sh.
 USING: accessors arrays assocs combinators command-line compiler.errors continuations

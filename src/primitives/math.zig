@@ -711,6 +711,8 @@ pub export fn primitive_bits_double(vm_asm: *VMAssemblyFields) callconv(.c) void
 
 const FloatComparison = enum { less, lesseq, greater, greatereq };
 
+extern "c" fn feraiseexcept(exceptions: c_int) c_int;
+
 fn compareFloatBits(x_bits: u64, y_bits: u64, comptime op: FloatComparison, ordered: bool) bool {
     @setFloatMode(.strict);
     const x_nan = x_bits & 0x7fffffffffffffff > 0x7ff0000000000000;
@@ -719,13 +721,21 @@ fn compareFloatBits(x_bits: u64, y_bits: u64, comptime op: FloatComparison, orde
         if (ordered or (x_nan and x_bits & 0x0008000000000000 == 0) or
             (y_nan and y_bits & 0x0008000000000000 == 0))
         {
-            // Use the platform's FP environment without depending on libc's
-            // target-specific exception constants. Volatile loads prevent folding.
-            var snan: f64 = @bitCast(@as(u64, 0x7ff0000000000001));
-            const source: *volatile f64 = &snan;
-            var result: f64 = undefined;
-            const sink: *volatile f64 = &result;
-            sink.* = source.* + source.*;
+            if (builtin.cpu.arch == .arm and switch (builtin.os.tag) {
+                .linux, .freebsd, .netbsd, .openbsd => true,
+                else => false,
+            }) {
+                // ARM Unix FE_INVALID is 0x01; soft-float helpers do not update FPSCR.
+                _ = feraiseexcept(0x01);
+            } else {
+                // Use the platform's FP environment without depending on libc's
+                // target-specific exception constants. Volatile loads prevent folding.
+                var snan: f64 = @bitCast(@as(u64, 0x7ff0000000000001));
+                const source: *volatile f64 = &snan;
+                var result: f64 = undefined;
+                const sink: *volatile f64 = &result;
+                sink.* = source.* + source.*;
+            }
         }
         return false;
     }
@@ -798,9 +808,10 @@ pub export fn primitive_float_eq(vm_asm: *VMAssemblyFields) callconv(.c) void {
 // platform's printf-family conversion — round-half-to-even, "e+08"-style
 // exponents). Going through libc directly guarantees byte-for-byte parity.
 extern "c" fn snprintf(buf: [*c]u8, size: usize, fmt: [*c]const u8, ...) c_int;
+extern "c" fn snprintf_l(buf: [*c]u8, size: usize, loc: ?*anyopaque, fmt: [*c]const u8, ...) c_int;
 extern "c" fn newlocale(category_mask: c_int, locale: [*c]const u8, base: ?*anyopaque) ?*anyopaque;
 extern "c" fn uselocale(loc: ?*anyopaque) ?*anyopaque;
-extern "c" fn freelocale(loc: ?*anyopaque) c_int;
+extern "c" fn freelocale(loc: ?*anyopaque) void;
 
 const locale_h = @import("locale_c");
 const lc_all_mask: c_int = if (builtin.os.tag == .windows) locale_h.LC_ALL else locale_h.LC_ALL_MASK;
@@ -808,11 +819,22 @@ extern "c" fn _create_locale(c_int, [*c]const u8) ?*anyopaque;
 extern "c" fn _free_locale(*anyopaque) void;
 extern "c" fn factor_windows_format_float([*c]u8, usize, [*c]const u8, *anyopaque, c_int, f64) c_int;
 fn createLocale(name: [*c]const u8) ?*anyopaque {
+    if (builtin.os.tag == .netbsd) {
+        // NetBSD newlocale currently returns a clone even when a category
+        // loader fails; it reports missing locale data through errno.
+        std.c._errno().* = 0;
+        const locale = newlocale(lc_all_mask, name, null) orelse return null;
+        if (std.c._errno().* != 0) {
+            freelocale(locale);
+            return null;
+        }
+        return locale;
+    }
     return if (builtin.os.tag == .windows) _create_locale(lc_all_mask, name) else newlocale(lc_all_mask, name, null);
 }
 fn freeLocale(loc: *anyopaque) void {
     if (builtin.os.tag == .windows) _free_locale(loc) else {
-        _ = freelocale(loc);
+        freelocale(loc);
     }
 }
 
@@ -873,6 +895,8 @@ pub export fn primitive_format_float(vm_asm: *VMAssemblyFields) callconv(.c) voi
     var buf: [256]u8 = undefined;
     const written = if (builtin.os.tag == .windows)
         factor_windows_format_float(&buf, buf.len, &fmt_buf, loc, prec_arg, value)
+    else if (builtin.os.tag == .netbsd)
+        snprintf_l(&buf, buf.len, loc, &fmt_buf, prec_arg, value)
     else blk: {
         const old_loc = uselocale(loc);
         defer _ = uselocale(old_loc);
@@ -1056,4 +1080,9 @@ test "format_float reproduces printf-style fixed/scientific/general formatting" 
         try testing.expectEqualStrings(c.expected, ba.data()[0..len]);
     }
     try testing.expectEqual(stack_base, vm.vm_asm.ctx.datastack);
+}
+
+// Zig builds retain floating point support; integer-only is a C++ build mode.
+pub export fn primitive_floating_point_supported(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    vm_asm.ctx.push(vm_asm.getVM().tagBoolean(true));
 }

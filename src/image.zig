@@ -67,6 +67,10 @@ fn mapDummyMemoryIfNeeded(address: Cell, allocator: std.mem.Allocator) void {
 }
 
 // Image format constants
+// Images are native snapshots for one target CPU, cell width and byte order.
+// Cells, doubles and relocation entries use target native representation;
+// byte arrays and machine code remain raw. The asymmetric magic detects a
+// reversed-endian header without changing version 5 or reserved fields.
 pub const image_magic: Cell = 0x0f0e0d0c;
 // Integer arithmetic now normalizes results; old compiled code is incompatible.
 pub const image_version: Cell = 5;
@@ -182,13 +186,30 @@ pub const VMParameters = struct {
 };
 
 fn alignPageBytes(n: Cell) Cell {
-    const page: Cell = @intCast(std.heap.page_size_min);
+    const page: Cell = if (@inComptime()) std.heap.page_size_min else segments.pageSize();
     return (n + page - 1) & ~(page - 1);
 }
 
 fn parseUsizeFlag(arg: []const u8, prefix: []const u8) ?Cell {
     if (!std.mem.startsWith(u8, arg, prefix)) return null;
     return std.fmt.parseInt(Cell, arg[prefix.len..], 10) catch null;
+}
+
+// Check the serialized extent before allocator initialization or relocation.
+// A free block has only a header; an allocated block has the full CodeBlock.
+fn validateCodeHeap(region: []align(layouts.data_alignment) const u8) ImageError!void {
+    var offset: usize = 0;
+    while (offset < region.len) {
+        const remaining = region.len - offset;
+        if (remaining < @sizeOf(Cell)) return ImageError.InvalidSize;
+        const header: *const Cell = @ptrCast(@alignCast(region.ptr + offset));
+        const free = (header.* & 1) != 0;
+        const size = header.* & (if (free) ~@as(Cell, 7) else @as(Cell, 0xFFFFF8));
+        const minimum = if (free) layouts.data_alignment else @sizeOf(code_blocks_mod.CodeBlock);
+        if (size < minimum or size % layouts.data_alignment != 0 or size > remaining)
+            return ImageError.InvalidSize;
+        offset += size;
+    }
 }
 
 pub const ImageError = error{
@@ -216,8 +237,8 @@ const DlsymKey = struct { symbol: Cell, library: Cell };
 pub const ImageLoader = struct {
     const Self = @This();
 
-    test "ARM64 saved callstack relocation follows relative frame links" {
-        if (builtin.cpu.arch != .aarch64 and builtin.cpu.arch != .riscv64 and builtin.cpu.arch != .riscv32) return error.SkipZigTest;
+    test "linked saved callstack relocation follows relative frame links" {
+        if (builtin.cpu.arch != .arm and builtin.cpu.arch != .aarch64 and builtin.cpu.arch != .riscv64 and builtin.cpu.arch != .riscv32 and builtin.cpu.arch != .s390x) return error.SkipZigTest;
         var vm: vm_mod.FactorVM = undefined;
         vm.code = null;
         var loader: Self = undefined;
@@ -513,7 +534,7 @@ pub const ImageLoader = struct {
 
         // Heap capacity comes from -codeheap=N (megabytes) via VMParameters,
         // matching C++ load_code_heap(p->code_size). Default is 128MB.
-        const page_size = std.heap.page_size_min;
+        const page_size = segments.pageSize();
         const heap_size = layouts.alignCell(self.params.code_size, page_size);
 
         // Image body must fit; C++ fatals with "Code heap too small to fit image".
@@ -626,6 +647,8 @@ pub const ImageLoader = struct {
             self.code_region = code_start[0..0]; // Empty slice but with valid pointer
         }
 
+        try validateCodeHeap(@alignCast(self.code_region.?));
+
         // Set up the CodeHeap struct in the VM
         // We allocate it with the VM's allocator
         const code_heap_struct = self.vm.allocator.create(vm_mod.CodeHeap) catch {
@@ -655,7 +678,7 @@ pub const ImageLoader = struct {
     pub fn makeCodeExecutable(self: *Self) void {
         if (self.code_region) |cr| {
             const full_heap_size = if (self.vm.code) |code| code.code_size else cr.len;
-            const aligned_code_size = layouts.alignCell(full_heap_size, std.heap.page_size_min);
+            const aligned_code_size = layouts.alignCell(full_heap_size, segments.pageSize());
 
             const is_arm64 = builtin.cpu.arch == .aarch64;
             if (is_arm64 and (builtin.os.tag == .macos or builtin.os.tag == .ios)) {
@@ -883,7 +906,7 @@ pub const ImageLoader = struct {
         // the saved FP). Must match cpu-{x86.64,arm.64}.hpp FRAME_RETURN_ADDRESS,
         // otherwise the frame chain is fixed up at the wrong slot and set-callstack
         // walks a corrupt chain.
-        const FRAME_RETURN_ADDRESS = @import("contexts.zig").FRAME_RETURN_ADDRESS;
+        const frame_contexts = @import("contexts.zig");
         const LEAF_FRAME_SIZE: Cell = 16;
 
         var frame_offset: Cell = 0;
@@ -892,8 +915,7 @@ pub const ImageLoader = struct {
             const frame_top = cs.frameTopAt(frame_offset);
 
             // Read the old (unrelocated) return address
-            const ret_addr_ptr: *Cell = @ptrFromInt(frame_top + FRAME_RETURN_ADDRESS);
-            const old_addr = ret_addr_ptr.*;
+            const old_addr = frame_contexts.frameReturnAddress(frame_top);
 
             if (old_addr == 0) {
                 // End of callstack or invalid frame
@@ -903,12 +925,12 @@ pub const ImageLoader = struct {
             // Translate the address by adding code_offset
             const fixed_addr = old_addr +% code_offset;
 
-            if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
-                const frame_size = @as(*const Cell, @ptrFromInt(frame_top)).*;
+            if (builtin.cpu.arch == .arm or builtin.cpu.arch == .powerpc or builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x or frame_contexts.sparc_frames) {
+                const frame_size = frame_contexts.capturedFrameSize(frame_top);
                 std.debug.assert(frame_size >= 16 and frame_size % 16 == 0);
                 std.debug.assert(frame_size <= frame_length - frame_offset);
-                ret_addr_ptr.* = fixed_addr;
-                frame_offset += frame_size;
+                frame_contexts.setFrameReturnAddress(frame_top, fixed_addr);
+                frame_offset += frame_contexts.capturedFrameAdvance(frame_top, frame_size, frame_length - frame_offset);
                 continue;
             }
 
@@ -930,7 +952,7 @@ pub const ImageLoader = struct {
             }
 
             // Write back the translated return address
-            ret_addr_ptr.* = fixed_addr;
+            frame_contexts.setFrameReturnAddress(frame_top, fixed_addr);
 
             // Move to next frame
             frame_offset += frame_size;
@@ -1036,6 +1058,7 @@ pub const ImageLoader = struct {
                 },
                 .untagged => old_value, // Untagged numbers don't need relocation
                 .dlsym => blk: {
+                    const symbol_operand = code_blocks_mod.InstructionOperand.atPointer(pointer, rel_class);
                     // DLL symbol - look up via cache to avoid redundant dlsym calls
                     const params_arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(block.parameters));
                     const key = DlsymKey{
@@ -1043,14 +1066,14 @@ pub const ImageLoader = struct {
                         .library = params_arr.data()[param_index + 1],
                     };
                     if (self.dlsym_cache.get(key)) |cached| {
-                        break :blk cached;
+                        break :blk code_blocks_mod.relocationSymbolAddress(cached, &symbol_operand);
                     }
                     const result = resolveDlsym(block, param_index);
                     self.dlsym_cache.put(self.vm.allocator, key, result) catch {};
-                    break :blk result;
+                    break :blk code_blocks_mod.relocationSymbolAddress(result, &symbol_operand);
                 },
-                .trampoline => if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) @intFromPtr(&trampolines.trampoline) else unreachable,
-                .trampoline2 => if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) @intFromPtr(&trampolines.trampoline2) else unreachable,
+                .trampoline => if (builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x or builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64) @intFromPtr(&trampolines.trampoline) else unreachable,
+                .trampoline2 => if (builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x or builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64) @intFromPtr(&trampolines.trampoline2) else unreachable,
                 .megamorphic_cache_hits => @intFromPtr(&self.vm.dispatch_stats.megamorphic_cache_hits),
                 .vm => blk: {
                     // VM address + offset from parameter

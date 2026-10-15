@@ -11,6 +11,7 @@ const Cell = layouts.Cell;
 extern "c" fn fgetc(stream: *std.c.FILE) c_int;
 extern "c" fn fputc(c: c_int, stream: *std.c.FILE) c_int;
 extern "c" fn ftello(stream: *std.c.FILE) std.c.off_t;
+extern "c" fn ftello64(stream: *std.c.FILE) i64;
 extern "c" fn _ftelli64(stream: *std.c.FILE) i64;
 extern "c" fn _fseeki64(stream: *std.c.FILE, offset: i64, whence: c_int) c_int;
 extern "c" fn fflush(stream: *std.c.FILE) c_int;
@@ -18,6 +19,7 @@ extern "c" fn feof(stream: *std.c.FILE) c_int;
 extern "c" fn ferror(stream: *std.c.FILE) c_int;
 extern "c" fn clearerr(stream: *std.c.FILE) void;
 extern "c" fn fseeko(stream: *std.c.FILE, offset: std.c.off_t, whence: c_int) c_int;
+extern "c" fn fseeko64(stream: *std.c.FILE, offset: i64, whence: c_int) c_int;
 
 // C constants
 const EOF: c_int = -1;
@@ -45,7 +47,7 @@ const F_SETFD: c_int = 2;
 const F_GETFL: c_int = 3;
 const F_SETFL: c_int = 4;
 const FD_CLOEXEC: c_int = 1;
-const O_NONBLOCK_C: c_int = if (builtin.os.tag == .macos) 0x0004 else 0x800;
+const O_NONBLOCK_C: c_int = if (builtin.os.tag == .windows) 0 else @bitCast(std.c.O{ .NONBLOCK = true });
 
 // Create a pipe pair with close-on-exec flags set
 // Returns [read_fd, write_fd]
@@ -239,7 +241,7 @@ pub fn safeFwrite(ptr: *const anyopaque, size: usize, nitems: usize, stream: *st
 // Safe ftell - retries on EINTR
 pub fn safeFtell(stream: *std.c.FILE) !i64 {
     while (true) {
-        const offset = if (builtin.os.tag == .windows) _ftelli64(stream) else ftello(stream);
+        const offset = if (builtin.os.tag == .windows) _ftelli64(stream) else if (builtin.os.tag == .linux and builtin.abi.isGnu() and @sizeOf(Cell) == 4) ftello64(stream) else ftello(stream);
         if (offset != -1) {
             return offset;
         }
@@ -266,7 +268,7 @@ pub fn safeFseek(stream: *std.c.FILE, offset: i64, whence: i32) !void {
     };
 
     while (true) {
-        const result = if (builtin.os.tag == .windows) _fseeki64(stream, offset, c_whence) else fseeko(stream, offset, c_whence);
+        const result = if (builtin.os.tag == .windows) _fseeki64(stream, offset, c_whence) else if (builtin.os.tag == .linux and builtin.abi.isGnu() and @sizeOf(Cell) == 4) fseeko64(stream, offset, c_whence) else fseeko(stream, offset, c_whence);
         if (result == 0) {
             return;
         }

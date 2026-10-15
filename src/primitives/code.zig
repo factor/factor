@@ -137,15 +137,21 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
                     word_after.entry_point = vm.lazyJitCompileEntryPoint();
                 }
 
-                // Compile pic_def and pic_tail_def if present.
-                if (word_after.pic_def != layouts.false_object) {
-                    vm.jitCompileQuotation(word_after.pic_def, false);
-                }
-                // The pic_def compilation above can move the word. Re-derive
-                // it from the registered word cell before reading pic_tail_def.
-                const word_after_pic: *const layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
-                if (word_after_pic.pic_tail_def != layouts.false_object) {
-                    vm.jitCompileQuotation(word_after_pic.pic_tail_def, false);
+                // A suspended compilation can install an older definition after
+                // another unit rebuilds this generic. Only compile PICs belonging
+                // to the installed definition; newer PICs may reference engines
+                // that have not yet been compiled by their compilation unit.
+                if (rooted_code == word_after.def) {
+                    // Compile pic_def and pic_tail_def if present.
+                    if (word_after.pic_def != layouts.false_object) {
+                        vm.jitCompileQuotation(word_after.pic_def, false);
+                    }
+                    // The pic_def compilation above can move the word. Re-derive
+                    // it from the registered word cell before reading pic_tail_def.
+                    const word_after_pic: *const layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
+                    if (word_after_pic.pic_tail_def != layouts.false_object) {
+                        vm.jitCompileQuotation(word_after_pic.pic_tail_def, false);
+                    }
                 }
             },
             .array => {
@@ -323,7 +329,7 @@ fn modifyCodeHeapWithMalformedEntry(malformed: MalformedEntry) !void {
     vm.vm_asm.spare_ctx = try vm.newContext();
     vm.fep_disabled = true;
     vm.setDataHeap(try data_heap.DataHeap.init(allocator, 4096, 4096, 4096));
-    var segment = try segments.Segment.init(segments.page_size, false);
+    var segment = try segments.Segment.init(segments.pageSize(), false);
     var code_allocator = free_list.FreeListAllocator.init(allocator, segment.start, segment.size);
     var code_heap = vm_mod.CodeHeap{
         .seg = &segment,
@@ -693,8 +699,7 @@ pub export fn primitive_innermost_stack_frame_executing(vm_asm: *VMAssemblyField
 
     // Get the top frame
     const frame = callstack.top();
-    const addr_ptr: *const Cell = @ptrFromInt(frame + contexts.FRAME_RETURN_ADDRESS);
-    const addr = addr_ptr.*;
+    const addr = contexts.frameReturnAddress(frame);
 
     // Find the code block for this address
     const block = code.codeBlockForAddress(addr) orelse {
@@ -719,8 +724,7 @@ pub export fn primitive_innermost_stack_frame_scan(vm_asm: *VMAssemblyFields) ca
 
     // Get the top frame
     const frame = callstack.top();
-    const addr_ptr: *const Cell = @ptrFromInt(frame + contexts.FRAME_RETURN_ADDRESS);
-    const addr = addr_ptr.*;
+    const addr = contexts.frameReturnAddress(frame);
 
     // Find the code block for this address
     const block = code.codeBlockForAddress(addr) orelse {
@@ -757,9 +761,8 @@ pub export fn primitive_set_innermost_stack_frame_quotation(vm_asm: *VMAssemblyF
     const code = vm.code orelse return;
 
     // Get the innermost frame
-    const inner = callstack.top() + contexts.FRAME_RETURN_ADDRESS;
-    const addr_ptr: *Cell = @ptrFromInt(inner);
-    const addr = addr_ptr.*;
+    const inner = callstack.top();
+    const addr = contexts.frameReturnAddress(inner);
 
     // Find the code block for the current address
     const block = code.codeBlockForAddress(addr) orelse return;
@@ -768,7 +771,7 @@ pub export fn primitive_set_innermost_stack_frame_quotation(vm_asm: *VMAssemblyF
     const offset_val = block.offset(addr);
 
     // Patch the return address to point to the new quotation at the same offset
-    addr_ptr.* = quot.entry_point + offset_val;
+    contexts.setFrameReturnAddress(inner, quot.entry_point + offset_val);
 }
 
 // --- Quotation Primitives ---
@@ -888,7 +891,7 @@ pub export fn primitive_mega_cache_miss(vm_asm: *VMAssemblyFields) callconv(.c) 
     const vm = vm_asm.getVM();
     const ctx = vm_asm.ctx;
     // ( methods index cache -- method )
-    vm.dispatch_stats.megamorphic_cache_misses += 1;
+    vm.dispatch_stats.megamorphic_cache_misses +%= 1;
 
     const cache = ctx.pop();
     const index_cell = ctx.pop();
@@ -1083,13 +1086,13 @@ pub export fn primitive_callstack_for(vm_asm: *VMAssemblyFields) callconv(.c) vo
         // them back (FP = top + delta). Mirrors C++ capture_callstack
         // (vm/callstack.cpp) and the FACTOR_ARM64 block there. Without this the
         // restore loop follows garbage frame pointers and overruns the stack.
-        if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
+        if (builtin.cpu.arch == .powerpc or builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le or builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64 or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x or contexts.mips_frames or contexts.sparc_frames) {
             var scan_top = top;
             var scan_dst = callstack.top();
             while (scan_top < bottom) {
-                const saved_fp = @as(*const Cell, @ptrFromInt(scan_top)).*;
+                const saved_fp = contexts.frameParent(scan_top);
                 if (saved_fp <= scan_top) break;
-                const dst_ptr: *Cell = @ptrFromInt(scan_dst);
+                const dst_ptr: *Cell = @ptrFromInt(scan_dst + contexts.FRAME_CHAIN_OFFSET);
                 dst_ptr.* = saved_fp - scan_top;
                 scan_top = saved_fp;
                 scan_dst += dst_ptr.*;
@@ -1122,7 +1125,7 @@ test "code_blocks initializes discarded snapshots before retrying" {
     }
 
     const block_count = heap.nursery.size / (6 * @sizeOf(Cell)) + 2;
-    const code_size = layouts.alignCell(block_count * 48, segments.page_size);
+    const code_size = layouts.alignCell(block_count * 48, segments.pageSize());
     var segment = try segments.Segment.init(code_size, false);
     defer segment.deinit();
     var code_allocator = free_list.FreeListAllocator.init(allocator, segment.start, code_size);

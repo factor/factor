@@ -192,6 +192,7 @@ pub const PrimitiveIndex = enum(u16) {
     float_unordered_lesseq = 154,
     float_unordered_greater = 155,
     float_unordered_greatereq = 156,
+    floating_point_supported = 157,
 };
 
 pub const primitive_count = @typeInfo(PrimitiveIndex).@"enum".field_names.len;
@@ -202,6 +203,8 @@ pub const primitives: [primitive_count]PrimitiveFn = init_primitives();
 
 fn init_primitives() [primitive_count]PrimitiveFn {
     var table: [primitive_count]PrimitiveFn = @splat(misc.primitive_stub);
+
+    table[@backingInt(PrimitiveIndex.floating_point_supported)] = math_prims.primitive_floating_point_supported;
 
     // Object primitives
     table[@backingInt(PrimitiveIndex.clone)] = obj.primitive_clone;
@@ -602,6 +605,7 @@ pub fn getAllPrimitives() [primitive_count]PrimitiveFn {
         code.primitive_set_innermost_stack_frame_quotation,
         misc.primitive_enable_ctrl_break,
         misc.primitive_disable_ctrl_break,
+        math_prims.primitive_floating_point_supported,
     };
 }
 

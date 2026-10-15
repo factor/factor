@@ -22,9 +22,7 @@ const FactorVM = vm_mod.FactorVM;
 const Fixnum = layouts.Fixnum;
 const VMAssemblyFields = vm_mod.VMAssemblyFields;
 
-const PTHREAD_CANCEL_ASYNCHRONOUS = 0; // macOS value (2 is DEFERRED)
-
-pub extern "c" fn pthread_setcanceltype(ty: c_int, old_ty: ?*c_int) c_int;
+extern "c" fn factor_stdin_cancel_async() void;
 
 // Fixnum range (60 bits on 64-bit systems, accounting for 4-bit tag)
 const fixnum_min: Fixnum = std.math.minInt(Fixnum) >> @intCast(layouts.tag_bits);
@@ -61,7 +59,7 @@ pub export var size_write: c_int = -1;
 pub export var stdin_thread_initialized_p: bool = false;
 
 // Stdin thread handle
-var stdin_thread: ?std.Thread = null;
+var stdin_thread: ?WorkerThread = null;
 
 // Native pthread handle for sending signals
 var stdin_pthread: std.c.pthread_t = undefined;
@@ -85,8 +83,7 @@ fn stdinLoop() void {
     _ = std.c.pthread_sigmask(std.c.SIG.SETMASK, &mask, &old_mask);
 
     // Enable async cancellation so pthread_cancel can interrupt blocking reads
-    _ = std.c.pthread_setcancelstate(.ENABLE, null);
-    _ = pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, null);
+    factor_stdin_cancel_async();
 
     var buf: [4096]u8 = undefined;
 
@@ -194,7 +191,7 @@ pub export fn open_console() callconv(.c) void {
 
     // Start the stdin thread
     stdin_loop_running.store(true, .release);
-    const thread = std.Thread.spawn(.{}, stdinLoop, .{}) catch {
+    const thread = WorkerThread.spawn(.{}, stdinLoop, .{}) catch {
         _ = std.c.close(control_pipe[0]);
         _ = std.c.close(control_pipe[1]);
         _ = std.c.close(size_pipe[0]);
@@ -287,8 +284,35 @@ pub export fn begin_callback(vm_asm: *VMAssemblyFields, quot: Cell) callconv(.c)
     parent.data_roots.appendAssumeCapacity(&rooted_quot);
     defer _ = parent.data_roots.pop();
 
-    // Reset the current context
-    parent.vm_asm.ctx.reset();
+    if (contexts.sparc_frames) {
+        // Leave the pinned callback window as the physical anchor. Its return
+        // PC belongs to this process and must not enter a saved callstack.
+        const ctx = parent.vm_asm.ctx;
+        const callback_segment = parent.callbacks.?.segment.?;
+        var frame = ctx.callstack_top;
+        while (frame < ctx.callstack_bottom) {
+            const next = contexts.frameParent(frame);
+            if (next <= frame or next > ctx.callstack_bottom)
+                @panic("Invalid SPARC callback frame link");
+            if (next == ctx.callstack_bottom and
+                callback_segment.contains(contexts.frameReturnAddress(frame)))
+            {
+                ctx.callstack_bottom = frame;
+                break;
+            }
+            frame = next;
+        }
+    }
+
+    // The SPARC gate publishes live frames before callback entry. Preserve
+    // them so moving GC can repair return PCs and callback exit can unwind.
+    if (contexts.sparc_frames) {
+        parent.vm_asm.ctx.resetDatastack();
+        parent.vm_asm.ctx.resetRetainstack();
+        parent.vm_asm.ctx.resetContextObjects();
+    } else {
+        parent.vm_asm.ctx.reset();
+    }
 
     parent.vm_asm.spare_ctx = parent.newContext() catch @panic("OOM");
 
@@ -605,7 +629,7 @@ fn findDlsymRelocation(block: *code_blocks.CodeBlock, return_address: Cell) Dlsy
     const entries: [*]const code_blocks.RelocationEntry = @ptrCast(@alignCast(reloc_array.data()));
 
     // Scan relocations for the RT_DLSYM entry of THIS call site. On x86 the reloc
-    // (call immediate) sits before the return address; on arm64 the symbol pointer
+    // (end of the call immediate) can equal the return address; on arm64 the symbol pointer
     // lives in the trailing literal pool, AFTER the call site, so pointer >=
     // return_address. Match the dlsym reloc nearest the return address either way.
     var best_offset: Cell = 0;
@@ -622,7 +646,7 @@ fn findDlsymRelocation(block: *code_blocks.CodeBlock, return_address: Cell) Dlsy
 
         if (rel_type == .dlsym) {
             const pointer = entry_point + offset;
-            if (builtin.cpu.arch == .aarch64) {
+            if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .arm) {
                 const dist = if (pointer >= return_address) pointer - return_address else return_address - pointer;
                 if (dist < best_dist) {
                     best_dist = dist;
@@ -630,7 +654,7 @@ fn findDlsymRelocation(block: *code_blocks.CodeBlock, return_address: Cell) Dlsy
                     found = true;
                 }
             } else {
-                if (pointer < return_address and offset > best_offset) {
+                if (pointer <= return_address and (!found or offset >= best_offset)) {
                     best_offset = offset;
                     best_param_index = param_index;
                     found = true;
@@ -654,3 +678,45 @@ fn findDlsymRelocation(block: *code_blocks.CodeBlock, return_address: Cell) Dlsy
 }
 
 // Tests
+
+const WorkerThread = if (builtin.os.tag == .netbsd) @import("netbsd_thread.zig").Thread else std.Thread;
+
+
+
+test "x86 undefined symbols match relocation at the return address" {
+    if (builtin.cpu.arch != .x86 and builtin.cpu.arch != .x86_64) return error.SkipZigTest;
+    // Parameters consume two entries per dlsym and one per VM relocation.
+    // The zero-offset site also covers an image relocation at entry point.
+    var params_storage: [9]Cell align(layouts.data_alignment) = .{
+        0, layouts.tagFixnum(7),
+        layouts.tagFixnum(100), layouts.tagFixnum(101), layouts.tagFixnum(999),
+        layouts.tagFixnum(200), layouts.tagFixnum(201),
+        layouts.tagFixnum(300), layouts.tagFixnum(301),
+    };
+    const rels = [_]code_blocks.RelocationEntry{
+        code_blocks.RelocationEntry.init(.dlsym, .relative, 0),
+        code_blocks.RelocationEntry.init(.vm, .absolute_cell, 8),
+        code_blocks.RelocationEntry.init(.dlsym, .relative, 20),
+        code_blocks.RelocationEntry.init(.dlsym, .relative, 32),
+    };
+    var rel_storage: [@sizeOf(layouts.ByteArray) + @sizeOf(@TypeOf(rels))]u8 align(layouts.data_alignment) = undefined;
+    const rel_array: *layouts.ByteArray = @ptrCast(&rel_storage);
+    rel_array.header = 0;
+    rel_array.capacity = layouts.tagFixnum(@sizeOf(@TypeOf(rels)));
+    @memcpy(rel_array.data()[0..@sizeOf(@TypeOf(rels))], std.mem.asBytes(&rels));
+    var block = code_blocks.CodeBlock{
+        .header = 0, .owner = layouts.false_object,
+        .parameters = layouts.RETAG(@intFromPtr(&params_storage), @backingInt(layouts.TypeTag.array)),
+        .relocation = layouts.RETAG(@intFromPtr(rel_array), @backingInt(layouts.TypeTag.byte_array)),
+    };
+    const first = findDlsymRelocation(&block, block.entryPoint());
+    try std.testing.expectEqual(layouts.tagFixnum(100), first.symbol);
+    try std.testing.expectEqual(layouts.tagFixnum(101), first.library);
+    // x86 call relocation points at the byte immediately AFTER its operand.
+    const second = findDlsymRelocation(&block, block.entryPoint() + 20);
+    try std.testing.expectEqual(layouts.tagFixnum(200), second.symbol);
+    try std.testing.expectEqual(layouts.tagFixnum(201), second.library);
+    const between = findDlsymRelocation(&block, block.entryPoint() + 31);
+    try std.testing.expectEqual(second.symbol, between.symbol);
+    try std.testing.expectEqual(second.library, between.library);
+}

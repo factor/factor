@@ -6,6 +6,7 @@ const std = @import("std");
 const platform = @import("platform.zig");
 
 const code_blocks = @import("code_blocks.zig");
+const contexts = @import("contexts.zig");
 const layouts = @import("layouts.zig");
 const vm_mod = @import("vm.zig");
 
@@ -387,8 +388,20 @@ fn printCallstack(vm: *FactorVM) void {
         var frame_addr = ctx.callstack_top;
         var i: usize = 0;
         while (frame_addr < ctx.callstack_bottom and i < 30) : (i += 1) {
-            const ret_addr = @as(*const Cell, @ptrFromInt(frame_addr)).*;
+            const ret_addr = if (contexts.sparc_frames) contexts.frameReturnAddress(frame_addr) else @as(*const Cell, @ptrFromInt(frame_addr)).*;
             std.debug.print("    [{:2}] 0x{x}", .{ i, ret_addr });
+            if (contexts.sparc_frames) {
+                if (vm.code) |code_heap| {
+                    if (code_heap.codeBlockForAddress(ret_addr)) |block| {
+                        printCodeBlockOwner(block);
+                    } else std.debug.print(" (no code block)", .{});
+                }
+                std.debug.print("\n", .{});
+                const parent = contexts.frameParent(frame_addr);
+                if (parent <= frame_addr or parent > ctx.callstack_bottom) break;
+                frame_addr = parent;
+                continue;
+            }
             if (vm.code) |code_heap| {
                 if (code_heap.codeBlockForAddress(ret_addr)) |block| {
                     printCodeBlockOwner(block);

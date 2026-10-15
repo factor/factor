@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor authors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays assocs biassocs classes.struct
 combinators cpu.riscv.32.assembler cpu.riscv.32.assembler.registers

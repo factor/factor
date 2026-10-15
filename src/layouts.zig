@@ -304,6 +304,7 @@ pub const Wrapper = extern struct {
 // Boxed float - assembly code makes assumptions about layout
 pub const BoxedFloat = extern struct {
     header: Cell,
+    padding: [8 - @sizeOf(Cell)]u8 = undefined,
     n: f64,
 
     pub const type_number = TypeTag.float;
@@ -588,6 +589,10 @@ pub fn tagFloat(boxed: *BoxedFloat) Cell {
 
 // Verify struct layouts at compile time
 comptime {
+    // JIT float loads use byte offset 8 on both cell widths.
+    std.debug.assert(@offsetOf(BoxedFloat, "n") == 8);
+    std.debug.assert(@sizeOf(BoxedFloat) == 16);
+
     // Ensure Object is the correct size
     std.debug.assert(@sizeOf(Object) == @sizeOf(Cell));
 

@@ -333,7 +333,8 @@ pub const CodeHeap = struct {
 
     // Get the predecessor frame (caller's frame) given the current frame top
     pub fn framePredecessor(self: *Self, frame_top: Cell) Cell {
-        if ((builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)) {
+        if (@import("contexts.zig").sparc_frames or builtin.cpu.arch == .powerpc or builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le) return @import("contexts.zig").frameParent(frame_top);
+        if ((builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64 or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x)) {
             // ARM64: frame_top[0] contains the saved frame pointer (x29)
             // which points directly to the previous frame
             return @as(*const Cell, @ptrFromInt(frame_top)).*;

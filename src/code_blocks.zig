@@ -6,6 +6,7 @@ const alien = @import("primitives/alien.zig");
 const icache = @import("icache.zig");
 const layouts = @import("layouts.zig");
 const riscv = @import("riscv.zig");
+const native_relocations = @import("native_relocations.zig");
 const trampolines = @import("trampolines.zig");
 
 const Cell = layouts.Cell;
@@ -270,11 +271,13 @@ pub const RelocationClass = enum(u4) {
     absolute_1 = 11, // 1-byte absolute
     absolute_riscv_i = 12,
     absolute_riscv_li = 13,
-    _reserved14 = 14,
-    _reserved15 = 15,
+    // CPU-specific slots; the image entry remains four class bits.
+    native_0 = 14,
+    native_1 = 15,
 };
 
-pub const rel_arm_b_mask: u32 = 0x03ffffff;
+const arm32 = builtin.cpu.arch == .arm or builtin.cpu.arch == .thumb;
+pub const rel_arm_b_mask: u32 = if (arm32) 0x00ffffff else 0x03ffffff;
 pub const rel_arm_b_cond_ldr_mask: u32 = 0x00ffffe0;
 pub const rel_arm_ldur_mask: u32 = 0x001ff000;
 pub const rel_arm_cmp_mask: u32 = 0x003ffc00;
@@ -432,37 +435,7 @@ pub const InstructionOperand = struct {
     }
 
     pub fn loadValue(self: *const Self) layouts.Fixnum {
-        return switch (self.rel.getClass()) {
-            .absolute_cell => @bitCast(@as(*align(1) const Cell, @ptrFromInt(self.pointer - @sizeOf(Cell))).*),
-            .absolute => @bitCast(@as(Cell, @as(*align(1) const u32, @ptrFromInt(self.pointer - @sizeOf(u32))).*)),
-            .absolute_2 => @as(*align(1) const u16, @ptrFromInt(self.pointer - @sizeOf(u16))).*,
-            .absolute_1 => @as(*const u8, @ptrFromInt(self.pointer - @sizeOf(u8))).*, // u8 always aligned
-            .relative => blk: {
-                const offset: i32 = @as(*align(1) const i32, @ptrFromInt(self.pointer - @sizeOf(i32))).*;
-                break :blk @as(layouts.Fixnum, offset) +% @as(layouts.Fixnum, @bitCast(self.pointer));
-            },
-            .relative_arm_b => blk: {
-                const masked = self.loadValueMasked(25, 0, 2);
-                break :blk masked +% @as(layouts.Fixnum, @bitCast(self.pointer)) -% 4;
-            },
-            .relative_arm_b_cond_ldr => blk: {
-                const masked = self.loadValueMasked(23, 5, 2);
-                break :blk masked +% @as(layouts.Fixnum, @bitCast(self.pointer)) -% 4;
-            },
-            .absolute_arm_ldur => self.loadValueMasked(20, 12, 0),
-            .absolute_arm_cmp => self.loadValueMasked(21, 10, 0) & 0xfff,
-            .relative_riscv => @as(layouts.Fixnum, @truncate(riscv.pairDisplacement(@ptrFromInt(self.pointer - 8)))) +% @as(layouts.Fixnum, @bitCast(self.pointer)) -% 8,
-            .relative_riscv_jal => @as(layouts.Fixnum, @truncate(riscv.jalDisplacement(@as(*align(1) const u32, @ptrFromInt(self.pointer - 4)).*))) +% @as(layouts.Fixnum, @bitCast(self.pointer)) -% 4,
-            .relative_riscv_branch => @as(layouts.Fixnum, @truncate(riscv.branchDisplacement(@as(*align(1) const u32, @ptrFromInt(self.pointer - 4)).*))) +% @as(layouts.Fixnum, @bitCast(self.pointer)) -% 4,
-            .absolute_riscv_i => @intCast(riscv.signedField(@as(*align(1) const u32, @ptrFromInt(self.pointer - 4)).* >> 20, 12)),
-            .absolute_riscv_li => if (builtin.cpu.arch == .riscv32) @bitCast(riscv.loadLiteral32(@ptrFromInt(self.pointer - 8))) else @bitCast(riscv.loadLiteral(@ptrFromInt(self.pointer - 32))),
-            ._reserved14, ._reserved15 => {
-                std.debug.print("[RELOC] FATAL: invalid relocation class {} in entry raw=0x{x} pointer=0x{x}\n", .{
-                    @backingInt(self.rel.getClass()), self.rel.value, self.pointer,
-                });
-                unreachable;
-            },
-        };
+        return self.loadValueRelative(self.pointer);
     }
 
     pub fn loadValueRelative(self: *const Self, relative_to: Cell) layouts.Fixnum {
@@ -476,8 +449,8 @@ pub const InstructionOperand = struct {
                 break :blk @as(layouts.Fixnum, offset) +% @as(layouts.Fixnum, @bitCast(relative_to));
             },
             .relative_arm_b => blk: {
-                const masked = self.loadValueMasked(25, 0, 2);
-                break :blk masked +% @as(layouts.Fixnum, @bitCast(relative_to)) -% 4;
+                const masked = self.loadValueMasked(if (arm32) 23 else 25, 0, 2);
+                break :blk masked +% @as(layouts.Fixnum, @bitCast(relative_to)) +% (if (arm32) @as(layouts.Fixnum, 4) else -4);
             },
             .relative_arm_b_cond_ldr => blk: {
                 const masked = self.loadValueMasked(23, 5, 2);
@@ -488,14 +461,9 @@ pub const InstructionOperand = struct {
             .relative_riscv => @as(layouts.Fixnum, @truncate(riscv.pairDisplacement(@ptrFromInt(self.pointer - 8)))) +% @as(layouts.Fixnum, @bitCast(relative_to)) -% 8,
             .relative_riscv_jal => @as(layouts.Fixnum, @truncate(riscv.jalDisplacement(@as(*align(1) const u32, @ptrFromInt(self.pointer - 4)).*))) +% @as(layouts.Fixnum, @bitCast(relative_to)) -% 4,
             .relative_riscv_branch => @as(layouts.Fixnum, @truncate(riscv.branchDisplacement(@as(*align(1) const u32, @ptrFromInt(self.pointer - 4)).*))) +% @as(layouts.Fixnum, @bitCast(relative_to)) -% 4,
-            .absolute_riscv_i => @intCast(riscv.signedField(@as(*align(1) const u32, @ptrFromInt(self.pointer - 4)).* >> 20, 12)),
-            .absolute_riscv_li => if (builtin.cpu.arch == .riscv32) @bitCast(riscv.loadLiteral32(@ptrFromInt(self.pointer - 8))) else @bitCast(riscv.loadLiteral(@ptrFromInt(self.pointer - 32))),
-            ._reserved14, ._reserved15 => {
-                std.debug.print("[RELOC] FATAL: invalid relocation class {} in entry raw=0x{x} relative_to=0x{x}\n", .{
-                    @backingInt(self.rel.getClass()), self.rel.value, relative_to,
-                });
-                unreachable;
-            },
+            .absolute_riscv_i => if (builtin.cpu.arch == .loongarch64) @intCast(@import("loongarch.zig").signedField(@as(*align(1) const u32, @ptrFromInt(self.pointer - 4)).* >> 10, 12)) else @intCast(riscv.signedField(@as(*align(1) const u32, @ptrFromInt(self.pointer - 4)).* >> 20, 12)),
+            .absolute_riscv_li => if (builtin.cpu.arch == .riscv32) @bitCast(riscv.loadLiteral32(@ptrFromInt(self.pointer - 8))) else if (@sizeOf(Cell) == 8) @bitCast(riscv.loadLiteral(@ptrFromInt(self.pointer - 32))) else unreachable,
+            .native_0, .native_1 => @bitCast(@as(Cell, @truncate(native_relocations.load(builtin.cpu.arch, @intCast(@backingInt(self.rel.getClass()) - 14), self.pointer, relative_to)))),
         };
     }
 
@@ -534,9 +502,10 @@ pub const InstructionOperand = struct {
                 ptr.* = @truncate(relative_value);
             },
             .relative_arm_b => {
-                const adjusted = relative_value + 4;
-                std.debug.assert(adjusted < 0x8000000);
-                std.debug.assert(adjusted >= -0x8000000);
+                const adjusted = relative_value +% (if (arm32) @as(layouts.Fixnum, -4) else 4);
+                const bound: layouts.Fixnum = if (arm32) 0x2000000 else 0x8000000;
+                std.debug.assert(adjusted < bound);
+                std.debug.assert(adjusted >= -bound);
                 std.debug.assert((adjusted & 3) == 0);
 
                 self.storeValueMasked(adjusted, rel_arm_b_mask, 0, 2);
@@ -572,15 +541,11 @@ pub const InstructionOperand = struct {
             },
             .absolute_riscv_i => {
                 std.debug.assert(absolute_value >= -2048 and absolute_value < 2048);
-                self.storeValueMasked(absolute_value, 0xfff00000, 20, 0);
+                if (builtin.cpu.arch == .loongarch64) self.storeValueMasked(absolute_value, 0x003ffc00, 10, 0)
+                else self.storeValueMasked(absolute_value, 0xfff00000, 20, 0);
             },
-            .absolute_riscv_li => if (builtin.cpu.arch == .riscv32) riscv.storeLiteral32(@ptrFromInt(self.pointer - 8), @bitCast(absolute_value)) else riscv.storeLiteral(@ptrFromInt(self.pointer - 32), @bitCast(absolute_value)),
-            ._reserved14, ._reserved15 => {
-                std.debug.print("[RELOC] FATAL: invalid relocation class {} in storeValue, entry raw=0x{x} pointer=0x{x}\n", .{
-                    @backingInt(self.rel.getClass()), self.rel.value, self.pointer,
-                });
-                unreachable;
-            },
+            .absolute_riscv_li => if (builtin.cpu.arch == .riscv32) riscv.storeLiteral32(@ptrFromInt(self.pointer - 8), @bitCast(absolute_value)) else if (@sizeOf(Cell) == 8) riscv.storeLiteral(@ptrFromInt(self.pointer - 32), @bitCast(absolute_value)) else unreachable,
+            .native_0, .native_1 => native_relocations.store(builtin.cpu.arch, @intCast(@backingInt(self.rel.getClass()) - 14), self.pointer, @as(Cell, @bitCast(absolute_value))),
         }
     }
 
@@ -677,7 +642,7 @@ pub fn applyRelocations(block: *CodeBlock, ctx: *const RelocationContext) void {
                 std.debug.assert(layouts.hasTag(lit, .fixnum));
                 break :blk layouts.untagFixnum(lit);
             },
-            .dlsym => @bitCast(computeDlsymAddress(requireParameters(ctx, param_index, 2), param_index)),
+            .dlsym => @bitCast(computeDlsymAddressForOperand(requireParameters(ctx, param_index, 2), param_index, &op)),
             .vm => blk: {
                 const offset_cell = requireParameters(ctx, param_index, 1).data()[param_index];
                 std.debug.assert(layouts.hasTag(offset_cell, .fixnum));
@@ -688,11 +653,11 @@ pub fn applyRelocations(block: *CodeBlock, ctx: *const RelocationContext) void {
             .megamorphic_cache_hits => @bitCast(ctx.megamorphic_cache_hits_ptr),
             .inline_cache_miss => @bitCast(ctx.inline_cache_miss_ptr),
             .safepoint => @bitCast(ctx.safepoint_page),
-            .trampoline => if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)
+            .trampoline => if (builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x or builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64)
                 @as(layouts.Fixnum, @bitCast(@intFromPtr(&trampolines.trampoline)))
             else
                 unreachable,
-            .trampoline2 => if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)
+            .trampoline2 => if (builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x or builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64)
                 @as(layouts.Fixnum, @bitCast(@intFromPtr(&trampolines.trampoline2)))
             else
                 unreachable,
@@ -844,6 +809,29 @@ pub fn clearDlsymCache() void {
     }
     dlsym_cache.deinit(std.heap.c_allocator);
     dlsym_cache = .empty;
+}
+
+// ELFv1 dlsym returns a function descriptor; ELFv2 returns a code address.
+// Keep cached values raw so entry and TOC relocations share the same cache.
+fn usesFunctionDescriptors() bool {
+    if (builtin.cpu.arch != .powerpc64) return false;
+    const convention = std.Target.cCallingConvention(&builtin.target) orelse return false;
+    return switch (convention) {
+        .powerpc64_elf, .powerpc64_elf_altivec => true,
+        else => false,
+    };
+}
+
+pub fn computeDlsymAddressForOperand(parameters: *const layouts.Array, index: Cell, op: *const InstructionOperand) Cell {
+    return relocationSymbolAddress(computeDlsymAddress(parameters, index), op);
+}
+
+pub fn relocationSymbolAddress(raw: Cell, op: *const InstructionOperand) Cell {
+    const toc = if (op.rel.getClass() == .native_0)
+        native_relocations.isTocOperand(builtin.cpu.arch, op.pointer)
+    else
+        false;
+    return native_relocations.descriptorAddress(usesFunctionDescriptors(), raw, toc);
 }
 
 pub fn computeDlsymAddress(parameters: *const layouts.Array, index: Cell) Cell {
@@ -1127,6 +1115,16 @@ test "relocation entry" {
     try std.testing.expectEqual(@as(u24, 0x1234), entry.getOffset());
 }
 
+test "relative operands decode moved bases with wrapping addresses" {
+    var displacement: i32 = -32;
+    const operand = InstructionOperand.atPointer(@intFromPtr(&displacement) + 4, .relative);
+    try std.testing.expectEqual(@as(layouts.Fixnum, @bitCast(operand.pointer)) -% 32, operand.loadValue());
+    try std.testing.expectEqual(@as(layouts.Fixnum, -16), operand.loadValueRelative(16));
+    displacement = 32;
+    const base: Cell = @bitCast(@as(layouts.Fixnum, std.math.maxInt(layouts.Fixnum)));
+    try std.testing.expectEqual(std.math.minInt(layouts.Fixnum) + 31, operand.loadValueRelative(base));
+}
+
 test "ARM64 CMP relocation is unsigned and LDUR is signed" {
     var instruction: u32 = 0xf100001f; // CMP X0, #0
     var operand = InstructionOperand{
@@ -1204,5 +1202,36 @@ test "RV32 instruction operands relocate wrapped code addresses and cell literal
         const target = end - 8 +% offset;
         operand.storeValue(@bitCast(target));
         try std.testing.expectEqual(target, @as(Cell, @bitCast(operand.loadValue())));
+    }
+}
+
+test "native slots preserve the image relocation bitfield and parameter counts" {
+    const symbol = RelocationEntry.init(.dlsym, .native_0, 0xffffff);
+    try std.testing.expectEqual(@as(u32, 0x0effffff), symbol.value);
+    try std.testing.expectEqual(RelocationClass.native_0, symbol.getClass());
+    try std.testing.expectEqual(@as(u24, 0xffffff), symbol.getOffset());
+    try std.testing.expectEqual(@as(u32, 2), symbol.numberOfParameters());
+    const last = RelocationEntry.init(.safepoint, .native_1, 0xffffff);
+    try std.testing.expectEqual(@as(u32, 0xffffffff), last.value);
+    try std.testing.expectEqual(RelocationType.safepoint, last.getType());
+    try std.testing.expectEqual(RelocationClass.native_1, last.getClass());
+    try std.testing.expectEqual(@as(u32, 0), last.numberOfParameters());
+}
+
+
+test "ARM32 branch operands use PC plus eight and preserve condition and link bits" {
+    if (!arm32) return error.SkipZigTest;
+    var instruction: u32 = 0xea000000;
+    var operand = InstructionOperand.atPointer(@intFromPtr(&instruction) + 4, .relative_arm_b);
+    for ([_]u32{ 0xea000000, 0xeb000000, 0x1a000000, 0x0b000000 }) |opcode| {
+        for ([_]i32{ -33554432, -4, 0, 4, 33554428 }) |displacement| {
+            instruction = opcode;
+            const target = operand.pointer +% 4 +% @as(u32, @bitCast(displacement));
+            operand.storeValue(@bitCast(target));
+            try std.testing.expectEqual(opcode, instruction & 0xff000000);
+            try std.testing.expectEqual(@as(u32, @bitCast(displacement >> 2)) & 0xffffff, instruction & 0xffffff);
+            try std.testing.expectEqual(target, @as(Cell, @bitCast(operand.loadValue())));
+            try std.testing.expectEqual(target +% 32, @as(Cell, @bitCast(operand.loadValueRelative(operand.pointer +% 32))));
+        }
     }
 }

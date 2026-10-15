@@ -13,6 +13,10 @@ const Cell = layouts.Cell;
 const Fixnum = layouts.Fixnum;
 const FactorVM = vm_mod.FactorVM;
 
+test {
+    _ = @import("jit_template_tests.zig");
+}
+
 // JIT template indices (stored in special_objects)
 pub const JitTemplate = enum(u32) {
     // Basic templates
@@ -210,6 +214,16 @@ fn patchRelativeJump(code_buffer: []u8, patch_offset: usize, target_pos: usize) 
             // Write the offset in little-endian format
             std.mem.writeInt(i32, code_buffer[patch_offset + 1 ..][0..4], rel_offset, .little);
         },
+        .arm => {
+            if (patch_offset + 4 > code_buffer.len) return error.PatchOffsetOutOfBounds;
+            const delta = @as(i64, @intCast(target_pos)) - @as(i64, @intCast(patch_offset)) - 8;
+            if (delta & 3 != 0 or delta < -0x2000000 or delta >= 0x2000000)
+                return error.BranchOutOfRange;
+            const bytes = code_buffer[patch_offset..][0..4];
+            const opcode = std.mem.readInt(u32, bytes, .little);
+            const imm24: u32 = @truncate(@as(u64, @bitCast(@divExact(delta, 4))));
+            std.mem.writeInt(u32, bytes, (opcode & 0xff000000) | (imm24 & 0x00ffffff), .little);
+        },
         .aarch64 => {
             // ARM64: branch offset is encoded in the instruction
             // B/BL format: [6-bit opcode][26-bit signed offset]
@@ -233,6 +247,10 @@ fn patchRelativeJump(code_buffer: []u8, patch_offset: usize, target_pos: usize) 
             // Write back
             std.mem.writeInt(u32, @as(*[4]u8, @ptrCast(insn_ptr)), insn, .little);
         },
+        .loongarch64 => {
+            if (patch_offset + 8 > code_buffer.len) return error.PatchOffsetOutOfBounds;
+            @import("loongarch.zig").storePair(@ptrCast(code_buffer.ptr + patch_offset), @as(i64,@intCast(target_pos)) - @as(i64,@intCast(patch_offset)));
+        },
         .riscv64, .riscv32 => {
             if (patch_offset + 8 > code_buffer.len) return error.PatchOffsetOutOfBounds;
             const pair: *align(1) [2]u32 = @ptrCast(code_buffer.ptr + patch_offset);
@@ -241,6 +259,25 @@ fn patchRelativeJump(code_buffer: []u8, patch_offset: usize, target_pos: usize) 
             } else {
                 @import("riscv.zig").storePair(pair, @as(i64, @intCast(target_pos)) - @as(i64, @intCast(patch_offset)));
             }
+        },
+        .s390x => {
+            if (patch_offset + 6 > code_buffer.len) return error.PatchOffsetOutOfBounds;
+            @import("s390x.zig").storeBranch(code_buffer.ptr + patch_offset, @as(i64, @intCast(target_pos)) - @as(i64, @intCast(patch_offset)));
+        },
+        .mips, .mipsel, .mips64, .mips64el => {
+            if (patch_offset > code_buffer.len or code_buffer.len - patch_offset < 4) return error.PatchOffsetOutOfBounds;
+            const instruction: *align(1) u32 = @ptrCast(code_buffer.ptr + patch_offset);
+            @import("mips.zig").storeBranch(instruction, @as(i64, @intCast(target_pos)) - @as(i64, @intCast(patch_offset)) - 4);
+        },
+        .sparc, .sparc64 => {
+            if (patch_offset > code_buffer.len or code_buffer.len - patch_offset < 4)
+                return error.PatchOffsetOutOfBounds;
+            const delta = @as(i64, @intCast(target_pos)) - @as(i64, @intCast(patch_offset));
+            try @import("sparc.zig").patchBranch(code_buffer.ptr + patch_offset, delta);
+        },
+        .powerpc, .powerpc64, .powerpc64le => {
+            if (patch_offset + 4 > code_buffer.len) return error.PatchOffsetOutOfBounds;
+            @import("powerpc.zig").storeBranch(@ptrCast(code_buffer.ptr + patch_offset), @as(i64, @intCast(target_pos)) - @as(i64, @intCast(patch_offset)));
         },
         .unsupported => return error.UnsupportedArchitecture,
     }
@@ -440,12 +477,12 @@ pub const Jit = struct {
         try self.emitTemplateCell(template_cell);
     }
 
-    // Emit a raw template array (2-element: {reloc, code})
+    // Emit a raw template array: {reloc, code, optional static parameters}.
     pub fn emitRaw(self: *Self, template_cell: Cell) !void {
         try self.emitTemplateCell(template_cell);
     }
 
-    // Emit a template cell (2-element array: { relocation-info, machine-code })
+    // Static parameters follow any dynamic parameters supplied by the caller.
     fn emitTemplateCell(self: *Self, template_cell_: Cell) !void {
         var template_cell = template_cell_;
         self.vm.data_roots.appendAssumeCapacity(&template_cell);
@@ -454,7 +491,13 @@ pub const Jit = struct {
         const tmpl = getArrayFromCell(template_cell) orelse return;
         if (layouts.untagFixnumUnsigned(tmpl.capacity) < 2) return;
 
-        const data = tmpl.data();
+        if (layouts.untagFixnumUnsigned(tmpl.capacity) >= 3) {
+            try self.appendParameters(tmpl.data()[2]);
+        }
+
+        // Appending parameters can collect the template and its children.
+        const tmpl_with_parameters = getArrayFromCell(template_cell) orelse return;
+        const data = tmpl_with_parameters.data();
 
         // Emit relocation info
         try self.emitRelocation(data[0]);
@@ -472,7 +515,15 @@ pub const Jit = struct {
                 const ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(code_cell));
                 const size = layouts.untagFixnumUnsigned(ba.capacity);
 
-                if (self.offset == 0) {
+                // ARM32 returns halfway through its 16-byte word-call
+                // template, before the branch and literal, at this word.
+                if (builtin.cpu.arch == .arm and
+                    size == 16 and
+                    template_cell == self.vm.vm_asm.special_objects[@backingInt(objects.SpecialObject.jit_word_call)] and
+                    self.offset == 8)
+                {
+                    self.computing_offset_p = false;
+                } else if (self.offset == 0) {
                     self.position -= 1;
                     self.computing_offset_p = false;
                 } else if (self.offset < size) {
@@ -648,7 +699,7 @@ pub const Jit = struct {
         // Adjust relocation offsets and append
         for (0..entry_count) |i| {
             const entry_bytes = reloc_data[i * 4 .. (i + 1) * 4];
-            var entry: code_blocks.RelocationEntry = .{ .value = @bitCast(entry_bytes[0..4].*) };
+            var entry: code_blocks.RelocationEntry = .{ .value = std.mem.readInt(u32, entry_bytes[0..4], builtin.cpu.arch.endian()) };
 
             // Adjust offset to account for code already emitted
             const new_offset = current_offset + entry.getOffset();
@@ -794,9 +845,9 @@ pub const Jit = struct {
 };
 
 // Stack frame size constants
-// Must match cpu-{x86.64,arm.64}.hpp. arm64 frames differ from x86-64.
-pub const JIT_FRAME_SIZE: Cell = if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) 16 else 32;
-pub const SIGNAL_HANDLER_STACK_FRAME_SIZE: Cell = if (builtin.cpu.arch == .riscv32) 416 else if (builtin.cpu.arch == .riscv64) 544 else if (builtin.cpu.arch == .aarch64) 288 else 192;
+// Must match bootstrap CPU frames, including PowerPC native argument slots.
+pub const JIT_FRAME_SIZE: Cell = if (@import("contexts.zig").sparc_frames) @import("sparc.zig").Frame(Cell).minimum_size else if (@import("contexts.zig").mips_frames) 16 else if (builtin.cpu.arch == .powerpc) 80 else if (builtin.cpu.arch == .powerpc64) 144 else if (builtin.cpu.arch == .powerpc64le) 128 else if (builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x) 16 else 32;
+pub const SIGNAL_HANDLER_STACK_FRAME_SIZE: Cell = if (@import("contexts.zig").sparc_frames) JIT_FRAME_SIZE + 256 else if (@import("contexts.zig").mips_frames) (if (@sizeOf(Cell) == 4) 320 else 592) else if (builtin.cpu.arch == .powerpc or builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le) 672 else if (builtin.cpu.arch == .arm) 224 else if (builtin.cpu.arch == .s390x) 448 else if (builtin.cpu.arch == .riscv32) 416 else if ((builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64)) 544 else if (builtin.cpu.arch == .aarch64) 288 else if (builtin.cpu.arch == .x86) 64 else 192;
 
 // Quotation-specific JIT compiler
 // This implements the non-optimizing compiler that compiles quotations by
@@ -996,8 +1047,15 @@ pub const QuotationJit = struct {
 
         // Emit prolog if needed
         if (stack_frame) {
-            try self.jit.emit(.safepoint);
-            try self.jit.emit(.prolog);
+            if (builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64) {
+                // SAVE publishes the caller's o7 in the new window's i7 so a
+                // faulting poll can find the caller's spill-root GC map.
+                try self.jit.emit(.prolog);
+                try self.jit.emit(.safepoint);
+            } else {
+                try self.jit.emit(.safepoint);
+                try self.jit.emit(.prolog);
+            }
         }
 
         const len = self.length();
@@ -1042,6 +1100,12 @@ pub const QuotationJit = struct {
                         }
                         try self.jit.parameter(obj);
                         try self.jit.parameter(layouts.false_object);
+                        // ELFv1 templates relocate the native code and TOC
+                        // with separate DLSYM operands for the same symbol.
+                        if (@import("callbacks.zig").usesFunctionDescriptors) {
+                            try self.jit.parameter(obj);
+                            try self.jit.parameter(layouts.false_object);
+                        }
                         try self.jit.emit(.primitive);
                         i += 1; // Skip the primitive word
                     } else {
@@ -1121,7 +1185,7 @@ pub const QuotationJit = struct {
     fn wordJump(self: *Self, word_cell: Cell) !void {
         // On 32-bit platforms, emit an extra literal for xt_tail_pic_offset
         const is_64bit = @sizeOf(Cell) == 8;
-        if (!is_64bit and builtin.cpu.arch != .riscv32) {
+        if (!is_64bit and builtin.cpu.arch != .riscv32 and builtin.cpu.arch != .sparc and builtin.cpu.arch != .arm and builtin.cpu.arch != .powerpc and !@import("contexts.zig").mips_frames) {
             const xt_tail_pic_offset: Fixnum = if (comptime cpu.Arch.current().isX86Family()) 5 else 4;
             try self.jit.literal(layouts.tagFixnum(xt_tail_pic_offset));
         }
@@ -1418,4 +1482,59 @@ test "undefined label error" {
     // Try to fixup - should fail because label is undefined
     const result = mgr.fixupLabels(code_buffer.items);
     try std.testing.expectError(error.UndefinedLabel, result);
+}
+
+test "System z JIT branches use signed halfword displacements" {
+    if (builtin.cpu.arch != .s390x) return error.SkipZigTest;
+    var code = [_]u8{ 0, 0, 0xc0, 0xf4, 0, 0, 0, 0, 0, 0 };
+    try patchRelativeJump(&code, 2, 0);
+    try std.testing.expectEqualSlices(u8, &.{ 0xc0, 0xf4, 0xff, 0xff, 0xff, 0xff }, code[2..8]);
+    try patchRelativeJump(&code, 2, 8);
+    try std.testing.expectEqualSlices(u8, &.{ 0xc0, 0xf4, 0, 0, 0, 3 }, code[2..8]);
+    try std.testing.expectError(error.PatchOffsetOutOfBounds, patchRelativeJump(&code, 6, 0));
+}
+
+test "JIT relocation templates preserve native byte order while adjusting offsets" {
+    const data_heap = @import("data_heap.zig");
+    const vm = try FactorVM.init(std.testing.allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    const heap = try data_heap.DataHeap.init(std.testing.allocator, 4096, 4096, 8192);
+    vm.setDataHeap(heap);
+    defer {
+        vm.deinit();
+        heap.deinit();
+    }
+    var compiler = Jit.init(vm, layouts.false_object);
+    compiler.registerRoot();
+    defer compiler.deinit();
+    try compiler.code.appendSlice(vm.allocator, &.{ 0, 0, 0, 0 });
+    const relocation = vm.allotByteArray(4);
+    const bytes = layouts.untag(layouts.ByteArray, relocation).data()[0..4];
+    const expected_input: [4]u8 = if (builtin.cpu.arch.endian() == .big) .{ 0xfe, 0, 0, 8 } else .{ 8, 0, 0, 0xfe };
+    @memcpy(bytes, &expected_input);
+    try compiler.emitRelocation(relocation);
+    const expected_output: [4]u8 = if (builtin.cpu.arch.endian() == .big) .{ 0xfe, 0, 0, 12 } else .{ 12, 0, 0, 0xfe };
+    try std.testing.expectEqualSlices(u8, &expected_output, compiler.relocation.items);
+}
+
+test "JIT relocation templates decode bytes in target memory order" {
+    const data_heap = @import("data_heap.zig");
+    const allocator = std.testing.allocator;
+    const vm = try FactorVM.init(allocator);
+    const heap = try data_heap.DataHeap.init(allocator, 4096, 4096, 4096);
+    vm.setDataHeap(heap);
+    defer { vm.deinit(); heap.deinit(); }
+    var compiler = Jit.init(vm, layouts.false_object);
+    compiler.registerRoot();
+    defer compiler.deinit();
+    try compiler.code.appendNTimes(allocator, 0, 16);
+    const template = vm.allotByteArray(4);
+    const bytes = layouts.untag(layouts.ByteArray, template).data()[0..4];
+    const original = code_blocks.RelocationEntry.init(.dlsym, .native_0, 8);
+    std.mem.writeInt(u32, bytes[0..4], original.value, builtin.cpu.arch.endian());
+    try compiler.emitRelocation(template);
+    const relocated = code_blocks.RelocationEntry{ .value = std.mem.readInt(u32, compiler.relocation.items[0..4], builtin.cpu.arch.endian()) };
+    try std.testing.expectEqual(original.getType(), relocated.getType());
+    try std.testing.expectEqual(original.getClass(), relocated.getClass());
+    try std.testing.expectEqual(@as(u24, 24), relocated.getOffset());
 }

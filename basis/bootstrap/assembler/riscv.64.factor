@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor authors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: assocs bootstrap.image.private compiler.codegen.relocation
 compiler.constants compiler.units cpu.riscv.64.assembler

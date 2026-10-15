@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor authors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 ! Instruction bytes checked against LLVM's RV32GC assembler.
 USING: byte-arrays cpu.riscv.32.assembler cpu.riscv.32.assembler.registers

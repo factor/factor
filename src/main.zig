@@ -33,6 +33,8 @@ const vm_mod = @import("vm.zig");
 
 // Comptime verification of struct layouts that JIT code relies on
 comptime {
+    if (contexts.mips_frames and @sizeOf(usize) == 4 and (builtin.cpu.arch == .mips64 or builtin.cpu.arch == .mips64el)) @compileError("Factor MIPS64 requires the N64 ABI; N32 is unsupported");
+    if ((builtin.cpu.arch == .mips or builtin.cpu.arch == .mipsel) and (std.Target.mips.featureSetHas(builtin.cpu.features, .fp64) or std.Target.mips.featureSetHas(builtin.cpu.features, .fpxx))) @compileError("Factor MIPS O32 requires paired 32-bit floating registers; disable fp64 and fpxx");
     if (builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .riscv64) {
         if (!std.Target.riscv.featureSetHasAll(builtin.cpu.features, &.{ .m, .a, .f, .d })) {
             @compileError("Factor RISC-V requires M, A, F, and D extensions; use -Dcpu=generic_rv32+m+a+f+d+c or -Dcpu=generic_rv64+m+a+f+d+c");
@@ -47,29 +49,22 @@ comptime {
     if (@offsetOf(vm_mod.VMAssemblyFields, "ctx") != 0) @compileError("ctx must be at offset 0 in VMAssemblyFields");
 }
 
-// C stdio FILE* pointers — needed for Factor's OBJ_STDIN/STDOUT/STDERR aliens.
-// Platform-specific symbol names: macOS uses __stdinp, Linux uses stdin.
-// On both macOS and Linux, stdin/stdout/stderr are global variables of type
-// FILE*. @extern gives us the address of the variable itself, so we need
-// *const *FILE (pointer to the variable) and dereference to get the FILE*.
-extern "c" fn __acrt_iob_func(c_uint) *std.c.FILE;
+// BSD stdio streams can be macros indexing a FILE array rather than symbols.
+// Let C resolve their representation instead of guessing exported names.
+extern "c" fn factor_stdin() *std.c.FILE;
+extern "c" fn factor_stdout() *std.c.FILE;
+extern "c" fn factor_stderr() *std.c.FILE;
 
 fn getCStdin() *std.c.FILE {
-    if (builtin.os.tag == .windows) return __acrt_iob_func(0);
-    const name = if (builtin.os.tag == .macos) "__stdinp" else "stdin";
-    return @extern(*const *std.c.FILE, .{ .name = name }).*;
+    return factor_stdin();
 }
 
 fn getCStdout() *std.c.FILE {
-    if (builtin.os.tag == .windows) return __acrt_iob_func(1);
-    const name = if (builtin.os.tag == .macos) "__stdoutp" else "stdout";
-    return @extern(*const *std.c.FILE, .{ .name = name }).*;
+    return factor_stdout();
 }
 
 fn getCStderr() *std.c.FILE {
-    if (builtin.os.tag == .windows) return __acrt_iob_func(2);
-    const name = if (builtin.os.tag == .macos) "__stderrp" else "stderr";
-    return @extern(*const *std.c.FILE, .{ .name = name }).*;
+    return factor_stderr();
 }
 
 const posix_paths = struct {
@@ -128,19 +123,38 @@ fn findBundleImage(allocator: std.mem.Allocator) ?[]const u8 {
 }
 
 const build_options = @import("build_options");
+comptime {
+    if (builtin.cpu.arch == .sparc) _ = @import("sparc_compiler_rt.zig");
+}
 
 // Version/build info strings
 const FACTOR_CPU_STRING = switch (builtin.cpu.arch) {
     .x86_64 => "x86.64",
     .aarch64 => "arm.64",
+    .arm => "arm.32",
     .riscv64 => "riscv.64",
+    .loongarch64 => "loongarch.64",
     .riscv32 => "riscv.32",
+    .s390x => "s390x",
+    .mips => "mips.32",
+    .mipsel => "mipsel.32",
+    .mips64 => "mips.64",
+    .mips64el => "mipsel.64",
+    .sparc => "sparc.32",
+    .sparc64 => "sparc.64",
     .x86 => "x86.32",
+    .powerpc => "ppc.32",
+    .powerpc64 => "ppc.64",
+    .powerpc64le => "ppc.64le",
     else => @compileError("unsupported CPU architecture"),
 };
 const FACTOR_OS_STRING = switch (builtin.os.tag) {
     .macos => "macos",
     .linux => "linux",
+    .freebsd => "freebsd",
+    .netbsd => "netbsd",
+    .openbsd => "openbsd",
+    .dragonfly => "dragonflybsd",
     .windows => "windows",
     else => @compileError("unsupported OS"),
 };
@@ -704,3 +718,15 @@ pub fn keepPrimitives() void {
 
 // Export primitive table
 pub export var primitive_table: [primitives.primitive_count]primitives.PrimitiveFn = primitives.getAllPrimitives();
+
+test "FreeBSD ARM expected-OOM tracing retains native frames" {
+    if (builtin.os.tag != .freebsd or builtin.cpu.arch != .arm) return error.SkipZigTest;
+    var addresses: [64]usize = undefined;
+    const trace = std.debug.captureCurrentStackTrace(.{}, &addresses);
+    try std.testing.expect(trace.return_addresses.len >= 2);
+    try std.testing.expect(trace.return_addresses.len < addresses.len);
+    var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{ .fail_index = 0 });
+    try std.testing.expectError(error.OutOfMemory, failing.allocator().alloc(u8, 16));
+    try std.testing.expect(failing.has_induced_failure);
+    try std.testing.expect(failing.stack_addresses[0] != 0);
+}

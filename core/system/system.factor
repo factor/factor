@@ -9,19 +9,31 @@ PRIMITIVE: disable-ctrl-break ( -- )
 PRIMITIVE: enable-ctrl-break ( -- )
 PRIMITIVE: nano-count ( -- ns )
 
-SINGLETONS: x86.32 x86.64 arm.32 arm.64 ppc.32 ppc.64 riscv.32 riscv.64 ;
+SINGLETONS: x86.32 x86.64 arm.32 arm.64 ppc.32 ppc.64 ppc.64le riscv.32 riscv.64 sparc.32 sparc.64 mips.32 mipsel.32 mips.64 mipsel.64 m68k.32 s390x alpha.64 loongarch.64 hppa.32 m88k.32 vax.32 sh3.32 sh4.32 sh3be.32 sh4be.32 ;
 
 UNION: x86 x86.32 x86.64 ;
 UNION: arm arm.32 arm.64 ;
-UNION: ppc ppc.32 ppc.64 ;
+UNION: ppc64 ppc.64 ppc.64le ;
+UNION: ppc ppc.32 ppc64 ;
 UNION: riscv riscv.32 riscv.64 ;
+UNION: sparc sparc.32 sparc.64 ;
+UNION: mips32 mips.32 mipsel.32 ;
+UNION: mips64 mips.64 mipsel.64 ;
+UNION: mips mips32 mips64 ;
+UNION: m68k m68k.32 ;
+UNION: hppa hppa.32 ;
+UNION: m88k m88k.32 ;
+UNION: vax vax.32 ;
+UNION: sh3 sh3.32 sh3be.32 ;
+UNION: sh4 sh4.32 sh4be.32 ;
+UNION: sh sh3 sh4 ;
 
 : cpu ( -- class ) \ cpu get-global ; foldable
 
-SINGLETONS: windows macos linux freebsd ;
+SINGLETONS: windows macos linux freebsd netbsd openbsd dragonflybsd haiku ;
 
-UNION: bsd freebsd ;
-UNION: unix macos linux freebsd bsd ;
+UNION: bsd freebsd netbsd openbsd dragonflybsd ;
+UNION: unix macos linux bsd haiku ;
 
 : os ( -- class ) \ os get-global ; foldable
 
@@ -61,8 +73,26 @@ UNION: unix macos linux freebsd bsd ;
         { "arm.64" arm.64 }
         { "ppc.32" ppc.32 }
         { "ppc.64" ppc.64 }
+        { "ppc.64le" ppc.64le }
         { "riscv.32" riscv.32 }
         { "riscv.64" riscv.64 }
+        { "loongarch.64" loongarch.64 }
+        { "sparc.32" sparc.32 }
+        { "sparc.64" sparc.64 }
+        { "mips.32" mips.32 }
+        { "mipsel.32" mipsel.32 }
+        { "mips.64" mips.64 }
+        { "mipsel.64" mipsel.64 }
+        { "m68k.32" m68k.32 }
+        { "sh3.32" sh3.32 }
+        { "sh4.32" sh4.32 }
+        { "sh3be.32" sh3be.32 }
+        { "sh4be.32" sh4be.32 }
+        { "alpha.64" alpha.64 }
+        { "vax.32" vax.32 }
+        { "s390x" s390x }
+        { "hppa.32" hppa.32 }
+        { "m88k.32" m88k.32 }
     } at ;
 
 : string>os ( str -- class )
@@ -70,7 +100,12 @@ UNION: unix macos linux freebsd bsd ;
         { "windows" windows }
         { "macos" macos }
         { "freebsd" freebsd }
+        { "netbsd" netbsd }
+        { "openbsd" openbsd }
+        { "dragonflybsd" dragonflybsd }
+        { "dragonfly" dragonflybsd }
         { "linux" linux }
+        { "haiku" haiku }
     } at ;
 
 PRIVATE>

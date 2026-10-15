@@ -113,7 +113,7 @@ pub const GCEvent = extern struct {
     comptime {
         std.debug.assert(@sizeOf(DataHeapRoom) == 14 * @sizeOf(Cell)); // 112
         std.debug.assert(@sizeOf(AllocatorRoom) == 5 * @sizeOf(Cell)); // 40
-        std.debug.assert(@sizeOf(GCEvent) == if (@sizeOf(Cell) == 8) 408 else 216);
+        std.debug.assert(@sizeOf(GCEvent) == if (@sizeOf(Cell) == 8) 408 else if (@alignOf(u64) == 8) 216 else 212);
     }
     op: u32,
     data_heap_before: DataHeapRoom,
@@ -249,6 +249,7 @@ pub const FactorVM = struct {
     samples_per_second: Fixnum,
     profiling_samples: std.ArrayList(safepoints.SampleRecord),
     signal_resumable: bool,
+    sparc_signal_slots: [8]@import("sparc.zig").PendingSignal = @splat(.{}),
     signal_number: Cell,
     signal_fault_addr: Cell,
     signal_fault_pc: Cell,
@@ -721,7 +722,7 @@ pub const FactorVM = struct {
                     : [quot] "r" (quot_val),
                       [func] "r" (func_addr),
                     : .{ .x0 = true, .x1 = true, .x2 = true, .x3 = true, .x4 = true, .x5 = true, .x6 = true, .x7 = true, .x8 = true, .x9 = true, .x10 = true, .x11 = true, .x12 = true, .x13 = true, .x14 = true, .x15 = true, .x16 = true, .x17 = true, .x30 = true, .memory = true });
-            } else if (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) {
+            } else if (builtin.cpu.arch == .arm or builtin.cpu.arch == .x86 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x or builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64 or builtin.cpu.arch == .powerpc or builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le) {
                 func(quot_val);
             } else {
                 @compileError("Unsupported architecture for callback");
@@ -752,7 +753,7 @@ pub const FactorVM = struct {
         );
 
         if (c_to_factor_block) |block| {
-            self.c_to_factor_func = @ptrFromInt(block.entryPoint());
+            self.c_to_factor_func = @ptrFromInt(@import("callbacks.zig").functionPointer(block));
         }
     }
 

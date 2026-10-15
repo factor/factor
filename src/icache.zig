@@ -30,10 +30,60 @@ pub fn flushICache(start: Cell, size: Cell) void {
             // No explicit flush needed
             return;
         },
+        .sparc, .sparc64 => @import("sparc.zig").flushInstructionCache(start, size),
+        .loongarch64 => asm volatile ("ibar 0" ::: .{ .memory = true }),
+        .s390x => asm volatile ("bcr 15,0" ::: .{ .memory = true }),
+        .powerpc, .powerpc64, .powerpc64le => {
+            // Smallest supported cache line is 32 bytes; visiting every 32
+            // bytes covers larger lines too. Publish data before invalidating.
+            var address = start & ~@as(Cell, 31);
+            while (address < end) : (address += 32)
+                asm volatile ("dcbst 0, %[addr]" :: [addr] "r" (address) : .{ .memory = true });
+            asm volatile ("sync" ::: .{ .memory = true });
+            address = start & ~@as(Cell, 31);
+            while (address < end) : (address += 32)
+                asm volatile ("icbi 0, %[addr]" :: [addr] "r" (address) : .{ .memory = true });
+            asm volatile ("sync\nisync" ::: .{ .memory = true });
+        },
+        .arm => {
+            if (builtin.os.tag == .openbsd) {
+                const Args = extern struct { addr: u32, len: usize };
+                const sysarch = struct {
+                    extern "c" fn sysarch(operation: c_int, args: *Args) c_int;
+                }.sysarch;
+                var args = Args{ .addr = start, .len = size };
+                if (sysarch(0, &args) != 0) @panic("OpenBSD ARM instruction cache flush failed");
+                return;
+            }
+            const clear = struct {
+                extern "c" fn __clear_cache(start: *const anyopaque, end: *const anyopaque) void;
+            }.__clear_cache;
+            clear(@ptrFromInt(start), @ptrFromInt(end));
+        },
         .aarch64 => {
             flushICacheARM64(start, end);
         },
+        .mips, .mipsel, .mips64, .mips64el => {
+            if (builtin.os.tag != .linux) @panic("MIPS instruction cache flush requires a validated OS backend");
+            // Linux MIPS cacheflush(addr, nbytes, BCACHE=3), selected per ABI.
+            if (std.os.linux.syscall3(.cacheflush, start, size, 3) != 0)
+                @panic("MIPS instruction cache flush failed");
+        },
         .riscv64, .riscv32 => {
+            if (builtin.os.tag == .openbsd) {
+                // machine/sysarch.h: RISCV_SYNC_ICACHE synchronizes all CPUs.
+                const Args = extern struct { addr: u64, len: usize };
+                const sysarch = struct {
+                    extern "c" fn sysarch(operation: c_int, args: *Args) c_int;
+                }.sysarch;
+                var args = Args{ .addr = start, .len = size };
+                if (sysarch(0, &args) != 0) @panic("OpenBSD RISC-V instruction cache flush failed");
+                return;
+            }
+            if (builtin.os.tag == .freebsd or builtin.os.tag == .netbsd) {
+                asm volatile ("fence.i" ::: .{ .memory = true });
+                return;
+            }
             const flush = struct {
                 extern "c" fn __riscv_flush_icache(start: *const anyopaque, end: *const anyopaque, flags: c_ulong) c_int;
             }.__riscv_flush_icache;

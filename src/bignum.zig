@@ -32,6 +32,8 @@ pub fn divmod128by64(hi: u64, lo: u64, divisor: u64) struct { q: u64, r: u64 } {
 pub const Digit = Cell;
 pub const SignedDigit = Fixnum;
 pub const TwoDigit = i128;
+// Division intermediates hold at most two radix digits (Cell bits minus two).
+const DoubleCell = if (@bitSizeOf(Cell) == 32) u64 else u128;
 
 // Bit width constants.
 pub const DIGIT_BITS: layouts.CellShift = @bitSizeOf(Cell) - 2;
@@ -1987,9 +1989,7 @@ fn divideBySingleDigitRemainderOnly(vm: *FactorVM, numerator_in: *const Bignum, 
         while (i > 0) {
             i -= 1;
             const digit = numerator.getDigit(i);
-            const lo: u64 = (@as(u64, rem_acc) << DIGIT_BITS) | digit;
-            const hi: u64 = @as(u64, rem_acc) >> @intCast(@as(u7, 64) - DIGIT_BITS);
-            const result = divmod128by64(hi, lo, divisor);
+            const result = divmodDigits(rem_acc, digit, divisor);
             rem_acc = @intCast(result.r);
         }
         break :blk rem_acc;
@@ -2021,17 +2021,27 @@ fn scaleDownHalfDigit(numerator: *const Bignum, q: *Bignum, n_len: Cell, divisor
     return rem_acc;
 }
 
+// rem < divisor < RADIX: the combined numerator is below RADIX squared.
+fn divmodDigits(rem: Cell, digit: Cell, divisor: Cell) struct { q: Cell, r: Cell } {
+    if (comptime @bitSizeOf(Cell) == 32) {
+        const combined: DoubleCell = (@as(DoubleCell, rem) << DIGIT_BITS) | digit;
+        return .{ .q = @intCast(combined / divisor), .r = @intCast(combined % divisor) };
+    }
+    const lo: u64 = (@as(u64, rem) << DIGIT_BITS) | digit;
+    const hi: u64 = @as(u64, rem) >> @intCast(@as(u7, 64) - DIGIT_BITS);
+    const result = divmod128by64(hi, lo, divisor);
+    return .{ .q = @intCast(result.q), .r = @intCast(result.r) };
+}
+
 // Full-precision division for large single-digit denominators (>= RADIX_ROOT).
-// Uses 128-bit arithmetic via native divq or software fallback.
+// Uses double-cell arithmetic on 32-bit cells, native divq or fallback on 64-bit cells.
 fn scaleDownFull(numerator: *const Bignum, q: *Bignum, n_len: Cell, divisor: Cell) Cell {
     var rem: Cell = 0;
     var i: Cell = n_len;
     while (i > 0) {
         i -= 1;
         const digit = numerator.getDigit(i);
-        const lo: u64 = (@as(u64, rem) << DIGIT_BITS) | digit;
-        const hi: u64 = @as(u64, rem) >> @intCast(@as(u7, 64) - DIGIT_BITS);
-        const result = divmod128by64(hi, lo, divisor);
+        const result = divmodDigits(rem, digit, divisor);
         q.setDigit(i, @intCast(result.q));
         rem = @intCast(result.r);
     }
@@ -2157,13 +2167,13 @@ fn divideKnuthCore(
         const uj1 = work_ptr.getDigit(j + d_len - 1);
 
         var qhat: Cell = undefined;
-        var rhat: u128 = undefined;
+        var rhat: DoubleCell = undefined;
 
         if (uj >= v1) {
             qhat = RADIX - 1;
-            rhat = @as(u128, uj1) + @as(u128, v1);
+            rhat = @as(DoubleCell, uj1) + @as(DoubleCell, v1);
         } else {
-            const two_digits: u128 = (@as(u128, uj) << DIGIT_BITS) | uj1;
+            const two_digits: DoubleCell = (@as(DoubleCell, uj) << DIGIT_BITS) | uj1;
             qhat = @intCast(two_digits / v1);
             rhat = two_digits % v1;
         }
@@ -2174,9 +2184,9 @@ fn divideKnuthCore(
             const uj2 = if (j + d_len >= 2) work_ptr.getDigit(j + d_len - 2) else 0;
 
             // Check: qhat * v2 > (rhat << DIGIT_BITS) + uj2
-            if (rhat < (@as(u128, 1) << DIGIT_BITS)) {
-                const prod: u128 = @as(u128, qhat) * v2;
-                const comparand: u128 = (rhat << DIGIT_BITS) + uj2;
+            if (rhat < (@as(DoubleCell, 1) << DIGIT_BITS)) {
+                const prod: DoubleCell = @as(DoubleCell, qhat) * v2;
+                const comparand: DoubleCell = (rhat << DIGIT_BITS) + uj2;
                 if (prod > comparand) {
                     qhat -= 1;
                     rhat += v1;
@@ -2190,13 +2200,13 @@ fn divideKnuthCore(
         var borrow: SignedDigit = 0;
         var k: Cell = 0;
         while (k < d_len) : (k += 1) {
-            const prod: u128 = @as(u128, qhat) * vv.getDigit(k);
-            const prod_low: SignedDigit = @as(SignedDigit, @truncate(@as(i128, @bitCast(prod)) & @as(i128, @bitCast(@as(u128, DIGIT_MASK)))));
+            const prod: DoubleCell = @as(DoubleCell, qhat) * vv.getDigit(k);
+            const prod_low: SignedDigit = @intCast(prod & DIGIT_MASK);
             const work_digit: SignedDigit = @bitCast(work_ptr.getDigit(j + k));
             const sub: SignedDigit = work_digit -% prod_low -% borrow;
 
             work_ptr.setDigit(j + k, @bitCast(sub & @as(SignedDigit, @bitCast(DIGIT_MASK))));
-            borrow = @as(SignedDigit, @truncate(@as(i128, @bitCast(prod)) >> DIGIT_BITS)) -% (sub >> DIGIT_BITS);
+            borrow = @as(SignedDigit, @intCast(prod >> DIGIT_BITS)) -% (sub >> DIGIT_BITS);
         }
 
         // Update top digit with final borrow
