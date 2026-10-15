@@ -1,4 +1,4 @@
-USING: arrays generic generic.single growable kernel math
+USING: accessors arrays generic generic.single growable kernel math
 namespaces sequences strings tools.test vectors words ;
 IN: generic.hook.tests
 
@@ -10,7 +10,12 @@ M: string my-hook "a string" ;
 
 { "an integer" } [ 3 my-var set my-hook ] unit-test
 { "a string" } [ my-hook my-var set my-hook ] unit-test
-[ 1.0 my-var set my-hook ] [ T{ no-method f 1.0 my-hook } = ] must-fail-with
+[ 1.0 my-var set my-hook ] [
+    dup no-method? [
+        [ object>> double>bits 0x3ff0000000000000 = ]
+        [ generic>> \ my-hook eq? ] bi and
+    ] [ drop f ] if
+] must-fail-with
 
 HOOK: call-next-hooker my-var ( -- x )
 

@@ -21,27 +21,27 @@ USING: arrays kernel math ranges sequences sets tools.test ;
 { { 0 1/3 2/3 1 } } [ 0 1 1/3 <range> >array ] unit-test
 { { 0 1/3 2/3 1 } } [ 1 0 -1/3 <range> >array reverse ] unit-test
 
-{ 0 } [ 0 -1 .0001 <range> length ] unit-test
-{ 0 } [ 0 -1 .5 <range> length ] unit-test
+{ 0 } [ 0 -1 .0001 <range> length ] floating-point-unit-test
+{ 0 } [ 0 -1 .5 <range> length ] floating-point-unit-test
 { 0 } [ 0 -1 1 <range> length ] unit-test
 { 0 } [ 0 -1 2 <range> length ] unit-test
 { 0 } [ 0 -1 3 <range> length ] unit-test
 { 0 } [ 0 -1 4 <range> length ] unit-test
 
-{ 0 } [ 0 -2 .0001 <range> length ] unit-test
+{ 0 } [ 0 -2 .0001 <range> length ] floating-point-unit-test
 { 0 } [ 0 -2 1 <range> length ] unit-test
 { 0 } [ 0 -2 2 <range> length ] unit-test
 { 0 } [ 0 -2 3 <range> length ] unit-test
 { 0 } [ 0 -2 4 <range> length ] unit-test
 
-{ 0 } [ -1 0 -.0001 <range> length ] unit-test
-{ 0 } [ -1 0 -.5 <range> length ] unit-test
+{ 0 } [ -1 0 -.0001 <range> length ] floating-point-unit-test
+{ 0 } [ -1 0 -.5 <range> length ] floating-point-unit-test
 { 0 } [ -1 0 -1 <range> length ] unit-test
 { 0 } [ -1 0 -2 <range> length ] unit-test
 { 0 } [ -1 0 -3 <range> length ] unit-test
 { 0 } [ -1 0 -4 <range> length ] unit-test
 
-{ 0 } [ -2 0 -.0001 <range> length ] unit-test
+{ 0 } [ -2 0 -.0001 <range> length ] floating-point-unit-test
 { 0 } [ -2 0 -1 <range> length ] unit-test
 { 0 } [ -2 0 -2 <range> length ] unit-test
 { 0 } [ -2 0 -3 <range> length ] unit-test
@@ -67,9 +67,9 @@ USING: arrays kernel math ranges sequences sets tools.test ;
 
 { f } [ 5 4 10 2 <range> in? ] unit-test
 { f } [ 3 4 10 2 <range> in? ] unit-test
-{ f } [ 4.0 4 10 2 <range> in? ] unit-test
-{ f } [ 6.0 4 10 2 <range> in? ] unit-test
-{ f } [ 10.0 4 10 2 <range> in? ] unit-test
+{ f } [ 4.0 4 10 2 <range> in? ] floating-point-unit-test
+{ f } [ 6.0 4 10 2 <range> in? ] floating-point-unit-test
+{ f } [ 10.0 4 10 2 <range> in? ] floating-point-unit-test
 
 { { } } [ 1 8 2 <range> 2 9 2 <range> intersect >array ] unit-test
 { { } } [ 1 8 2 <range> 8 1 -2 <range> intersect >array ] unit-test
@@ -81,7 +81,7 @@ USING: arrays kernel math ranges sequences sets tools.test ;
 { { 3 3+1/3 3+2/3 4 4+1/3 4+2/3 5 } } [
     2 5 1/3 <range> 3 10 1/3 <range> intersect >array ] unit-test
 { { 1.0 1.5 2.0 } } [
-    1.0 2.0 0.25 <range> 1.0 2.0 0.5 <range> intersect >array ] unit-test
+    1.0 2.0 0.25 <range> 1.0 2.0 0.5 <range> intersect >array ] floating-point-unit-test
 
 { f } [ 1 8 2 <range> 2 9 2 <range> intersects? ] unit-test
 { f } [ 1 8 2 <range> 8 1 -2 <range> intersects? ] unit-test
@@ -98,7 +98,7 @@ USING: arrays kernel math ranges sequences sets tools.test ;
 { t } [ 1 0 1 <range> 10 2 1 <range> subset? ] unit-test
 { f } [ 1 10 2 <range> 3 10 4 <range> subset? ] unit-test
 
-{ { 1.5 2.5 3.5 } } [ 1.5 3.7 [a..b) >array ] unit-test
+{ { 1.5 2.5 3.5 } } [ 1.5 3.7 [a..b) >array ] floating-point-unit-test
 { { 1+1/2 2+1/2 3+1/2 } } [ 3/2 37/10 [a..b) >array ] unit-test
 
 ! #1313: integer range membership must not enumerate the range.
@@ -112,4 +112,4 @@ USING: arrays kernel math ranges sequences sets tools.test ;
 { f } [ 0 0 -1 1 <range> member? ] unit-test
 { t } [ 5 5 100 0 range boa member? ] unit-test
 { f } [ 6 5 100 0 range boa member? ] unit-test
-{ t } [ 0.5 0.0 1.0 0.25 <range> member? ] unit-test
+{ t } [ 0.5 0.0 1.0 0.25 <range> member? ] floating-point-unit-test

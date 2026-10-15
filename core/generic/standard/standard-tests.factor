@@ -1,4 +1,4 @@
-USING: accessors arrays assocs bit-arrays bit-vectors
+USING: compiler.test.literal-metadata accessors arrays assocs bit-arrays bit-vectors
 byte-arrays classes.tuple classes.union compiler.crossref
 compiler.units definitions eval generic generic.single
 generic.standard io.streams.string kernel make math
@@ -32,7 +32,7 @@ M: rational lo-tag-test 2 - ;
 M: complex lo-tag-test sq ;
 
 { 8 } [ 5 >bignum lo-tag-test ] unit-test
-{ 0.0 } [ 4.0 lo-tag-test ] unit-test
+{ 0.0 } [ 4.0 lo-tag-test ] floating-point-unit-test
 { -1/2 } [ 1+1/2 lo-tag-test ] unit-test
 { -16 } [ C{ 0 4 } lo-tag-test ] unit-test
 
@@ -89,7 +89,7 @@ M: circle area radius>> sq pi * ;
 
 { 12 } [ 4 3 <rectangle> area ] unit-test
 { 12 } [ 4 3 2 <parallelogram> area ] unit-test
-{ t } [ 2 <circle> area 4 pi * = ] unit-test
+{ t } [ 2 <circle> area 4 pi * = ] floating-point-unit-test
 
 GENERIC: perimeter ( shape -- n )
 
@@ -109,14 +109,14 @@ M: parallelogram perimeter
 M: circle perimeter 2 * pi * ;
 
 { 14 } [ 4 3 <rectangle> perimeter ] unit-test
-{ 30.0 } [ 10 4 3 <parallelogram> perimeter ] unit-test
+{ 30.0 } [ 10 4 3 <parallelogram> perimeter ] floating-point-unit-test
 
 PREDICATE: very-funny < funnies number? ;
 
 GENERIC: gooey ( x -- y )
 M: very-funny gooey sq ;
 
-{ 0.25 } [ 0.5 gooey ] unit-test
+{ 0.25 } [ 0.5 gooey ] floating-point-unit-test
 
 GENERIC: empty-method-test ( x -- y )
 M: object empty-method-test ;
@@ -157,7 +157,7 @@ M: circle big-mix-test drop "circle" ;
 
 { "integer" } [ 3 big-mix-test ] unit-test
 { "float" } [ 5.0 big-mix-test ] unit-test
-{ "complex" } [ -1 sqrt big-mix-test ] unit-test
+{ "complex" } [ -1 sqrt big-mix-test ] floating-point-unit-test
 { "sequence" } [ B{ 1 2 3 } big-mix-test ] unit-test
 { "sequence" } [ ?{ t f t } big-mix-test ] unit-test
 { "sequence" } [ SBUF" hello world" big-mix-test ] unit-test
@@ -201,6 +201,20 @@ M: object complex-combination nip ;
 { "hi" } [ "hi" 3 complex-combination ] unit-test
 { "hi" } [ 3 "hi" complex-combination ] unit-test
 
+! Executing the generic word uses its megamorphic entry point. It must
+! dispatch on the selected argument even when the top argument has another tag.
+GENERIC#: indexed-mega-dispatch 1 ( a b -- result )
+M: float indexed-mega-dispatch 2drop "float" ;
+M: fixnum indexed-mega-dispatch 2drop "fixnum" ;
+
+: execute-indexed-generic ( a b word -- result )
+    execute( a b -- result ) ;
+<< \ execute-indexed-generic t "no-compile" set-word-prop >>
+
+{ "float" } [ 2.0 32 \ indexed-mega-dispatch execute-indexed-generic ] unit-test
+{ "fixnum" } [ 32 2.0 \ indexed-mega-dispatch execute-indexed-generic ] unit-test
+{ "float" } [ 2.0 32 \ indexed-mega-dispatch execute-indexed-generic ] unit-test
+
 ! Regression
 TUPLE: first-one ;
 TUPLE: second-one ;
@@ -226,7 +240,7 @@ M: f tag-and-f 4 ;
 
 { f 4 } [ f tag-and-f ] unit-test
 
-{ 3.4 3 } [ 3.4 tag-and-f ] unit-test
+{ 3.4 3 } [ 3.4 tag-and-f ] literal-metadata-unit-test
 
 ! Issues with forget
 GENERIC: generic-forget-test ( a -- b )

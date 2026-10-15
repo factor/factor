@@ -553,7 +553,7 @@ CONSTANT: CONTEXT-OBJ-IN-CALLBACK-P 3
 ! VM adds this to kernel errors, so that user-space can identify them.
 CONSTANT: KERNEL-ERROR 0xfac7
 
-CONSTANT: kernel-error-count 20
+CONSTANT: kernel-error-count 21
 
 CONSTANT: ERROR-EXPIRED 0
 CONSTANT: ERROR-IO      1
@@ -575,6 +575,7 @@ CONSTANT: ERROR-MEMORY 16
 CONSTANT: ERROR-FP-TRAP 17
 CONSTANT: ERROR-INTERRUPT 18
 CONSTANT: ERROR-CALLBACK-SPACE-OVERFLOW 19
+CONSTANT: ERROR-FLOAT-UNSUPPORTED 20
 
 PRIMITIVE: callstack-for ( context -- array )
 PRIMITIVE: retainstack-for ( context -- array )

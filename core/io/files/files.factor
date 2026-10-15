@@ -152,10 +152,11 @@ M: object cwd "." ;
 PRIVATE>
 
 : init-resource-path ( -- )
+    image-path absolute-path \ image-path set-global
     OBJ-ARGS special-object [
         alien>native-string "-resource-path=" ?head and*
     ] map-find drop
-    [ image-path parent-directory ] unless* "resource-path" set-global ;
+    [ image-path parent-directory ] unless* absolute-path "resource-path" set-global ;
 
 STARTUP-HOOK: [
     cwd current-directory set-global
