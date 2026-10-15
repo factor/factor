@@ -1,0 +1,53 @@
+.text
+.align 2
+.globl m88k_test_gate1
+m88k_test_gate1:
+ subu %r31,%r31,64
+ st %r1,%r31,4
+ st %r16,%r31,8
+ st %r19,%r31,12
+ st %r21,%r31,16
+ st %r25,%r31,20
+ st %r30,%r31,24
+ or %r16,%r0,%r3
+ or %r21,%r0,%r2
+ or %r2,%r0,17
+ or %r3,%r0,25
+ bsr trampoline
+ br m88k_test_restore
+.globl m88k_test_gate2
+m88k_test_gate2:
+ subu %r31,%r31,64
+ st %r1,%r31,4
+ st %r16,%r31,8
+ st %r19,%r31,12
+ st %r21,%r31,16
+ st %r25,%r31,20
+ st %r30,%r31,24
+ or %r16,%r0,%r3
+ or %r21,%r0,%r2
+ subu %r31,%r31,32
+ addu %r25,%r31,16
+ or %r2,%r0,1
+ or %r3,%r0,2
+ or %r4,%r0,3
+ or %r5,%r0,4
+ or %r6,%r0,5
+ or %r7,%r0,6
+ or %r8,%r0,7
+ or %r9,%r0,8
+ or %r10,%r0,9
+ st %r10,%r31,0
+ or %r10,%r0,10
+ st %r10,%r31,4
+ bsr trampoline2
+ addu %r31,%r31,32
+m88k_test_restore:
+ ld %r1,%r31,4
+ ld %r16,%r31,8
+ ld %r19,%r31,12
+ ld %r21,%r31,16
+ ld %r25,%r31,20
+ ld %r30,%r31,24
+ addu %r31,%r31,64
+ jmp %r1
