@@ -108,6 +108,8 @@ void start_factor(android_app* app) {
   setenv("SSL_CERT_DIR", "/system/etc/security/cacerts", 0);
 #if defined(__aarch64__)
   constexpr char image_asset[] = "factor.arm64-v8a.image";
+#elif defined(__x86_64__)
+  constexpr char image_asset[] = "factor.x86_64.image";
 #else
 #error Unsupported Factor Android ABI
 #endif

@@ -11,13 +11,14 @@ assets_dir=$script_dir/app/src/main/assets
 work_dir=${FACTOR_ANDROID_WORK_DIR:-$assets_dir}
 
 test -f "$FACTOR_VM_ROOT/arm64-v8a/factor.image"
+test -f "$FACTOR_VM_ROOT/x86_64/factor.image"
 test -d "$resource_path/core"
 test -d "$resource_path/basis"
 
 install -d "$assets_dir"
 install -d "$work_dir"
 cli_root=$work_dir/jniLibs
-for abi in arm64-v8a; do
+for abi in arm64-v8a x86_64; do
     test -x "$FACTOR_VM_ROOT/$abi/factor"
     test -f "$FACTOR_VM_ROOT/$abi/android-libs/libcrypto.so"
     test -f "$FACTOR_VM_ROOT/$abi/android-libs/libssl.so"
@@ -31,6 +32,8 @@ for abi in arm64-v8a; do
 done
 install -m 0644 "$FACTOR_VM_ROOT/arm64-v8a/factor.image" \
     "$assets_dir/factor.arm64-v8a.image"
+install -m 0644 "$FACTOR_VM_ROOT/x86_64/factor.image" \
+    "$assets_dir/factor.x86_64.image"
 resource_archive=$work_dir/factor-resources.tar
 tar -C "$resource_path" -cf "$resource_archive" \
     basis core extra LICENSE.txt README.md

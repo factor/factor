@@ -11,7 +11,7 @@ sqlite_archive=sqlite-amalgamation-$sqlite_version.zip
 sqlite_url=https://www.sqlite.org/2026/$sqlite_archive
 sqlite_sha256=68e913b0fe8ec6b4e5f391c594a28872884e80d6cd042a1e50c957be46b5aa4d
 
-: "${ANDROID_ABI:?set ANDROID_ABI to arm64-v8a}"
+: "${ANDROID_ABI:?set ANDROID_ABI to arm64-v8a or x86_64}"
 : "${ANDROID_NDK_ROOT:?set ANDROID_NDK_ROOT to Android NDK r30}"
 
 case $ANDROID_ABI in
@@ -19,6 +19,12 @@ case $ANDROID_ABI in
         openssl_target=android-arm64
         compiler=aarch64-linux-android21-clang
         openssl_extra=
+        ;;
+    x86_64)
+        openssl_target=android-x86_64
+        compiler=x86_64-linux-android21-clang
+        # NDK r30 rejects OpenSSL's GNU property assembly syntax.
+        openssl_extra=no-asm
         ;;
     *)
         echo "unsupported Android ABI: $ANDROID_ABI" >&2

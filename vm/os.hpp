@@ -133,6 +133,8 @@
       #include "os-android.hpp"
       #if defined(FACTOR_ARM64)
         #include "os-android-arm.64.hpp"
+      #elif defined(FACTOR_AMD64)
+        #include "os-android-x86.64.hpp"
       #else
         #error "Unsupported Android architecture"
       #endif

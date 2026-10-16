@@ -308,7 +308,8 @@ class HarnessTests(unittest.TestCase):
             self.assertIsNone(rendered['elapsed_timeout'])
 
     def test_android_profiles_ship_their_openssl_runtime(self):
-        for name, abi in (('android-arm-64', 'arm64-v8a'),):
+        for name, abi in (('android-arm-64', 'arm64-v8a'),
+                          ('android-x86-64', 'x86_64')):
             profile = config.load(name, self.root)
             self.assertEqual(profile['build']['env']['ANDROID_ABI'], abi)
             self.assertIn('android-runtime-libs', profile['build']['targets'])

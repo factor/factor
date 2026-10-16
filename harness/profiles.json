@@ -2934,60 +2934,21 @@
         ],
         "vnc_server": "127.0.0.1::5964",
         "vnc_actions": [
-          {
-            "pause": 3
-          },
-          {
-            "move": [
-              1210,
-              20
-            ]
-          },
-          {
-            "click": 1
-          },
-          {
-            "pause": 1
-          },
-          {
-            "move": [
-              1040,
-              227
-            ]
-          },
-          {
-            "pause": 1
-          },
-          {
-            "move": [
-              900,
-              408
-            ]
-          },
-          {
-            "key": "enter"
-          },
-          {
-            "pause": 5
-          },
-          {
-            "key": "enter"
-          },
-          {
-            "pause": 15
-          },
-          {
-            "text": "mkdir -p /tmp/m; mount /dev/disk/virtual/virtio"
-          },
-          {
-            "key": "tab"
-          },
-          {
-            "text": "/0/raw /tmp/m; exec /tmp/m/console 0.0.0.0 2222"
-          },
-          {
-            "key": "enter"
-          }
+          { "pause": 3 },
+          { "move": [1210, 20] },
+          { "click": 1 },
+          { "pause": 1 },
+          { "move": [1040, 227] },
+          { "pause": 1 },
+          { "move": [900, 408] },
+          { "key": "enter" },
+          { "pause": 5 },
+          { "key": "enter" },
+          { "pause": 15 },
+          { "text": "mkdir -p /tmp/m; mount /dev/disk/virtual/virtio" },
+          { "key": "tab" },
+          { "text": "/0/raw /tmp/m; exec /tmp/m/console 0.0.0.0 2222" },
+          { "key": "enter" }
         ],
         "setup": "mkfs -q -t bfs /dev/disk/virtual/virtio_block/2/raw FactorScratch; mkdir -p /factor /ui; mount /dev/disk/virtual/virtio_block/2/raw /factor; mount -ro /dev/disk/virtual/virtio_block/3/raw /ui; df -h /factor",
         "resume_setup": "mkdir -p /factor /ui; mount /dev/disk/virtual/virtio_block/2/raw /factor; mount -ro /dev/disk/virtual/virtio_block/3/raw /ui; df -h /factor",
@@ -3101,6 +3062,65 @@
           "${assets}/android/sdk/platform-tools/adb",
           "-s",
           "emulator-5556"
+        ]
+      },
+      "execution": {
+        "env": {
+          "SSL_CERT_DIR": "/system/etc/security/cacerts"
+        },
+        "directories": {
+          "HOME": ".home",
+          "TMPDIR": ".tmp",
+          "XDG_CACHE_HOME": ".cache",
+          "LD_LIBRARY_PATH": "android-libs"
+        }
+      },
+      "artifacts": [
+        "factor",
+        "factor.image",
+        "boot.image",
+        "libfactor.so",
+        "libfactor-ffi-test.so",
+        "android-libs/libcrypto.so",
+        "android-libs/libssl.so",
+        "android-libs/libsqlite3.so"
+      ],
+      "stall_seconds": 0,
+      "work_root": "/data/local/tmp"
+    },
+    "android-x86-64": {
+      "build": {
+        "config": "android.x86.64",
+        "host": true,
+        "make": "make",
+        "jobs": 12,
+        "targets": [
+          "factor-executable",
+          "factor-ffi-test",
+          "factor-lib",
+          "android-runtime-libs"
+        ],
+        "artifacts": [
+          "factor",
+          "libfactor.so",
+          "libfactor-ffi-test.so",
+          "android-libs"
+        ],
+        "env": {
+          "CC": "${assets}/android/android-ndk-r30/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang",
+          "CXX": "${assets}/android/android-ndk-r30/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang++",
+          "CXXFLAGS": "-static-libstdc++",
+          "ANDROID_ABI": "x86_64",
+          "ANDROID_NDK_ROOT": "${assets}/android/android-ndk-r30"
+        }
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "adb",
+        "argv": [
+          "${assets}/android/sdk/platform-tools/adb",
+          "-s",
+          "emulator-5554"
         ]
       },
       "execution": {
