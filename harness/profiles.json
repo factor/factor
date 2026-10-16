@@ -1054,6 +1054,27 @@
         ]
       }
     },
+    "linux-openrisc-32": {
+      "build": {
+        "config": "linux.openrisc.32",
+        "env": {
+          "CC": "${assets}/openrisc/assets/openrisc--glibc--stable-2025.08-1/bin/or1k-buildroot-linux-gnu-gcc",
+          "CXX": "${assets}/openrisc/assets/openrisc--glibc--stable-2025.08-1/bin/or1k-buildroot-linux-gnu-g++"
+        }
+      },
+      "seed": "unix-openrisc.32",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "runner": [
+          "${repo}/harness/qemu-user.sh",
+          "qemu-or1k",
+          "any",
+          "${assets}/openrisc-libs/runtime-root"
+        ]
+      }
+    },
     "linux-ppc-32": {
       "build": {
         "config": "linux.ppc.32"

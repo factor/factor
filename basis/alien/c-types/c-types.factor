@@ -212,7 +212,7 @@ CONSTANT: primitive-types
 <PRIVATE
 
 : 8-byte-alignment-for ( cpu os -- n )
-    swap dup vax? over sh? or [ 2drop 4 ] [
+    swap dup vax? over sh? or over openrisc.32? or [ 2drop 4 ] [
         x86.32? swap windows? not and [ 4 ] [ 8 ] if
     ] if ;
 

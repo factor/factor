@@ -68,6 +68,7 @@ STRUCT: posix_spawnattr_t
 
 cpu riscv.64? [ "unix.types.linux.riscv.64" require ] when
 cpu riscv.32? [ "unix.types.linux.riscv.32" require ] when
+cpu openrisc.32? [ "unix.types.linux.openrisc.32" require ] when
 
 cpu loongarch.64? [ "unix.types.linux.loongarch.64" require ] when
 

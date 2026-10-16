@@ -34,7 +34,7 @@ static bool variadic_callback_p(code_block* stub) {
 }
 
 VM_C_API bool arm64_variadic_callbacks_supported() {
-#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_M68K) || defined(FACTOR_SH) || defined(FACTOR_S390X)
+#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_M68K) || defined(FACTOR_SH) || defined(FACTOR_S390X)
   return true;
 #else
   return false;
@@ -68,7 +68,7 @@ void callback_heap::update(code_block* stub) {
   store_callback_operand(stub, 3, w->entry_point);
 #elif defined(FACTOR_SH)
   store_callback_operand(stub, 2, w->entry_point);
-#elif defined(FACTOR_HPPA) || defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_S390X)
+#elif defined(FACTOR_HPPA) || defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_S390X)
   store_callback_operand(stub, 6, w->entry_point);
 #elif defined(FACTOR_M88K)
   store_callback_operand(stub, 4, w->entry_point);
@@ -114,7 +114,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   // optional third element contains the corresponding variadic template.
   tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
   bool variadic = false;
-#if defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_M68K) || defined(FACTOR_SH) || defined(FACTOR_S390X)
+#if defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_M68K) || defined(FACTOR_SH) || defined(FACTOR_S390X)
   variadic = return_rewind == (cell)-1;
   if (variadic) {
     if (array_capacity(code_template.untagged()) < 3)
@@ -187,7 +187,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   store_callback_operand(stub, 3, hppa_function_field((cell)&factor::trampoline2, 0));
   store_callback_operand(stub, 4, (cell)&factor::inline_cache_miss);
   store_callback_operand(stub, 5, (cell)&parent->dispatch_stats.megamorphic_cache_hits);
-#elif defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_S390X)
+#elif defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_S390X)
   store_callback_operand(stub, 1, parent->code->safepoint_page);
   store_callback_operand(stub, 2, (cell)&factor::trampoline);
   store_callback_operand(stub, 3, (cell)&factor::trampoline2);

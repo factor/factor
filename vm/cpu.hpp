@@ -27,6 +27,8 @@
   #include "cpu-sparc.hpp"
 #elif defined(FACTOR_RISCV32)
   #include "cpu-riscv.32.hpp"
+#elif defined(FACTOR_OPENRISC32)
+  #include "cpu-openrisc.32.hpp"
 #elif defined(FACTOR_RISCV64)
   #include "cpu-riscv.64.hpp"
 #elif defined(FACTOR_LOONGARCH64)

@@ -1,0 +1,3 @@
+include vm/Config.linux
+include vm/Config.openrisc.32
+PLAF_MASTER_HEADERS += vm/os-linux-openrisc.32.hpp

@@ -42,6 +42,8 @@
 #elif defined(__riscv) && __riscv_xlen == 64
 #define FACTOR_RISCV64
 #define FACTOR_64
+#elif defined(__or1k__)
+#define FACTOR_OPENRISC32
 #elif defined(__loongarch64)
 #define FACTOR_LOONGARCH64
 #define FACTOR_64
@@ -79,6 +81,7 @@
     defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || \
     defined(FACTOR_RISCV32) || defined(FACTOR_S390X) || defined(FACTOR_MIPS) || \
     defined(FACTOR_ARM32) || defined(FACTOR_PPC) || defined(FACTOR_M88K) || \
+    defined(FACTOR_OPENRISC32) || \
     defined(FACTOR_SH)
 #define FACTOR_LINKED_FRAMES
 #endif

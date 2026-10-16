@@ -79,6 +79,7 @@ ERROR: unsupported-native-relocation class cpu-name ;
         { "loongarch.64" { f t } }
         { "hppa.32" { t t } }
         { "m88k.32" { t f } }
+        { "openrisc.32" { t f } }
     } at [ nip [ rc-native-0 - ] dip nth ]
     [ unsupported-native-relocation ] if* ;
 

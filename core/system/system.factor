@@ -9,13 +9,14 @@ PRIMITIVE: disable-ctrl-break ( -- )
 PRIMITIVE: enable-ctrl-break ( -- )
 PRIMITIVE: nano-count ( -- ns )
 
-SINGLETONS: x86.32 x86.64 arm.32 arm.64 ppc.32 ppc.64 ppc.64le riscv.32 riscv.64 sparc.32 sparc.64 mips.32 mipsel.32 mips.64 mipsel.64 m68k.32 s390x alpha.64 loongarch.64 hppa.32 m88k.32 vax.32 sh3.32 sh4.32 sh3be.32 sh4be.32 ;
+SINGLETONS: x86.32 x86.64 arm.32 arm.64 ppc.32 ppc.64 ppc.64le riscv.32 riscv.64 openrisc.32 sparc.32 sparc.64 mips.32 mipsel.32 mips.64 mipsel.64 m68k.32 s390x alpha.64 loongarch.64 hppa.32 m88k.32 vax.32 sh3.32 sh4.32 sh3be.32 sh4be.32 ;
 
 UNION: x86 x86.32 x86.64 ;
 UNION: arm arm.32 arm.64 ;
 UNION: ppc64 ppc.64 ppc.64le ;
 UNION: ppc ppc.32 ppc64 ;
 UNION: riscv riscv.32 riscv.64 ;
+UNION: openrisc openrisc.32 ;
 UNION: sparc sparc.32 sparc.64 ;
 UNION: mips32 mips.32 mipsel.32 ;
 UNION: mips64 mips.64 mipsel.64 ;
@@ -77,6 +78,7 @@ UNION: unix macos linux android bsd haiku illumos ;
         { "ppc.64le" ppc.64le }
         { "riscv.32" riscv.32 }
         { "riscv.64" riscv.64 }
+        { "openrisc.32" openrisc.32 }
         { "loongarch.64" loongarch.64 }
         { "sparc.32" sparc.32 }
         { "sparc.64" sparc.64 }

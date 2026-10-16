@@ -39,7 +39,7 @@ struct quotation_jit : public jit {
   // Allocates memory (literal(), emit())
   void word_jump(cell word_) {
     data_root<word> word(word_, parent);
-#if !defined(FACTOR_64) && !defined(FACTOR_RISCV32) && !defined(FACTOR_HPPA) && !defined(FACTOR_MIPS) && !defined(FACTOR_ARM32) && !defined(FACTOR_SPARC32) && !defined(FACTOR_PPC)
+#if !defined(FACTOR_64) && !defined(FACTOR_RISCV32) && !defined(FACTOR_OPENRISC32) && !defined(FACTOR_HPPA) && !defined(FACTOR_MIPS) && !defined(FACTOR_ARM32) && !defined(FACTOR_SPARC32) && !defined(FACTOR_PPC)
     literal(tag_fixnum(xt_tail_pic_offset));
 #endif
     literal(word.value());

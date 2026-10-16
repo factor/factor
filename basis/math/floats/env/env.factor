@@ -51,6 +51,7 @@ HOOK: fp-traps-supported? cpu ( -- ? )
 M: object fp-traps-supported? t ;
 M: riscv.64 fp-traps-supported? f ;
 M: riscv.32 fp-traps-supported? f ;
+M: openrisc.32 fp-traps-supported? f ;
 
 HOOK: rounding-mode-supported? cpu ( mode -- ? )
 M: object rounding-mode-supported? drop t ;
@@ -60,6 +61,7 @@ M: object denormal-flush-supported? t ;
 M: riscv.64 denormal-flush-supported? f ;
 M: riscv.32 denormal-flush-supported? f ;
 M: loongarch.64 denormal-flush-supported? f ;
+M: openrisc.32 denormal-flush-supported? f ;
 
 <PRIVATE
 
@@ -187,6 +189,7 @@ floating-point-supported? [
     { [ cpu riscv.32? ] [ "math.floats.env.riscv.32" require ] }
     { [ cpu riscv.64? ] [ "math.floats.env.riscv.64" require ] }
     { [ cpu loongarch.64? ] [ "math.floats.env.loongarch.64" require ] }
+    { [ cpu openrisc.32? ] [ "math.floats.env.openrisc.32" require ] }
     [ "CPU architecture unsupported by math.floats.env" throw ]
 } cond
 ] when

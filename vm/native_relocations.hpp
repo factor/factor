@@ -11,6 +11,8 @@
 #include "cpu-hppa-relocations.hpp"
 #elif defined(FACTOR_MIPS)
 #include "cpu-mips-relocations.hpp"
+#elif defined(FACTOR_OPENRISC32)
+#include "cpu-openrisc-relocations.hpp"
 #elif defined(FACTOR_PPC)
 #include "cpu-ppc-relocations.hpp"
 #elif defined(FACTOR_SPARC) || defined(FACTOR_SPARC32) || defined(FACTOR_SPARC64)

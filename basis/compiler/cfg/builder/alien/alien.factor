@@ -109,7 +109,8 @@ SYMBOL: varargs-named-count
     ] [ vregs reps f ] if ;
 
 : handle-varargs-named-count ( params -- )
-    varargs?>> os macos? cpu arm.64? and cpu riscv? cpu loongarch.64? or or cpu mips? or cpu hppa? or [ drop f ] unless
+    varargs?>> os macos? cpu arm.64? and cpu riscv? cpu loongarch.64? or or
+    cpu mips? or cpu hppa? or cpu openrisc.32? or [ drop f ] unless
     varargs-named-count set ;
 
 : start-vararg ( alignment -- )
@@ -120,10 +121,11 @@ SYMBOL: varargs-named-count
         ] when
         int-regs get empty? [ cell max '[ _ align ] stack-params swap change ] [ drop ] if
     ] [
-        ! Apple rounds the named stack area and each variadic argument to
-        ! eight-byte slots; over-aligned aggregates retain their C alignment.
+        ! Apple uses eight-byte slots; OpenRISC uses four-byte slots.
+        ! Over-aligned aggregates retain their C alignment.
         int-regs get delete-all float-regs get delete-all
-        8 max '[ _ align ] stack-params swap change
+        cpu openrisc.32? [ cell max ] [ 8 max ] if
+        '[ _ align ] stack-params swap change
     ] if ] if ;
 
 :: caller-parameter ( vreg rep -- )
@@ -197,7 +199,7 @@ SYMBOL: varargs-named-count
         dup name>> "s390x" = [
             drop dup 0 = [ 16 align 176 + ] unless
         ] [
-            dup arm.64? over arm.32? or over sh? or over riscv? or swap loongarch.64? or [ dup 0 = [ 16 align 16 + ] unless ] when
+            dup arm.64? over arm.32? or over sh? or over riscv? or over openrisc.32? or swap loongarch.64? or [ dup 0 = [ 16 align 16 + ] unless ] when
         ] if
     ] if ;
 

@@ -173,6 +173,8 @@
         #include "os-linux-sparc.hpp"
       #elif defined(FACTOR_RISCV32)
         #include "os-linux-riscv.32.hpp"
+      #elif defined(FACTOR_OPENRISC32)
+        #include "os-linux-openrisc.32.hpp"
       #elif defined(FACTOR_RISCV64)
         #include "os-linux-riscv.64.hpp"
       #elif defined(FACTOR_LOONGARCH64)

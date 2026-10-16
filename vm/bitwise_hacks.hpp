@@ -17,7 +17,7 @@ inline cell log2(cell x) {
   asm("bsr %1, %0;" : "=r"(n) : "r"(x));
 #endif
 
-#elif defined(FACTOR_ARM32) || defined(FACTOR_RISCV32) || defined(FACTOR_M68K) || defined(FACTOR_HPPA) || defined(FACTOR_MIPS32) || defined(FACTOR_SPARC32) || defined(FACTOR_M88K) || defined(FACTOR_SH)
+#elif defined(FACTOR_ARM32) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_M68K) || defined(FACTOR_HPPA) || defined(FACTOR_MIPS32) || defined(FACTOR_SPARC32) || defined(FACTOR_M88K) || defined(FACTOR_SH)
 #if defined(_MSC_VER)
   _BitScanReverse((unsigned long*)&n, x);
 #else

@@ -168,13 +168,14 @@ TYPEDEF: void* foo-func
 
 [ void resolve-typedef ] [ T{ no-c-type f void } = ] must-fail-with
 
-! Classic SuperH aligns native 64-bit scalars to four bytes.
-{ 4 4 4 4 4 4 8 8 } [
+! These 32-bit ABIs align native 64-bit scalars to four bytes.
+{ 4 4 4 4 4 4 4 8 8 } [
     sh3.32 linux 8-byte-alignment-for
     sh4.32 linux 8-byte-alignment-for
     sh3be.32 linux 8-byte-alignment-for
     sh4be.32 linux 8-byte-alignment-for
     vax.32 linux 8-byte-alignment-for
+    openrisc.32 linux 8-byte-alignment-for
     x86.32 linux 8-byte-alignment-for
     x86.32 windows 8-byte-alignment-for
     x86.64 linux 8-byte-alignment-for

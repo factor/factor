@@ -672,7 +672,7 @@ struct factor_vm {
 #ifdef FACTOR_PPC
   void dispatch_ppc_signal(cell* sp, cell* pc, cell lr, cell handler);
 #endif
-#if defined(FACTOR_X86) || defined(FACTOR_64) || defined(FACTOR_RISCV32) || defined(FACTOR_M68K) || defined(FACTOR_HPPA) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_PPC) || defined(FACTOR_SPARC) || defined(FACTOR_M88K) || defined(FACTOR_VAX) || defined(FACTOR_SH)
+#if defined(FACTOR_X86) || defined(FACTOR_64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_M68K) || defined(FACTOR_HPPA) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_PPC) || defined(FACTOR_SPARC) || defined(FACTOR_M88K) || defined(FACTOR_VAX) || defined(FACTOR_SH)
   void dispatch_non_resumable_signal(cell* sp, cell* pc,
                                      cell handler,
                                      cell limit);

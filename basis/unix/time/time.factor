@@ -12,6 +12,8 @@ STRUCT: timespec
     { sec time_t }
     { nsec long } ;
 
+os linux? cpu openrisc.32? and [ "unix.time.linux.openrisc.32" require ] when
+
 : <timeval> ( sec usec -- timeval )
     timeval new
         swap >>usec

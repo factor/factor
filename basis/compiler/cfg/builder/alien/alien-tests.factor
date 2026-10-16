@@ -19,6 +19,7 @@ QUALIFIED-WITH: cpu.arm.32.assembler ar
 QUALIFIED-WITH: cpu.arm.32.compiler-assembler av
 QUALIFIED-WITH: cpu.hppa.assembler.registers hp
 QUALIFIED-WITH: cpu.m88k.assembler.registers m8
+QUALIFIED-WITH: cpu.openrisc.32.assembler.registers or1k
 
 ! During refresh, hats can re-enter the builder before it has generated a
 ! newly added instruction helper. Reproduce that state without an old image.
@@ -201,6 +202,7 @@ ${
         { hppa.32 [ { ${ 1 int-rep hp:R28 } } { ${ 2 double-rep hp:F4 } } ] }
         { m68k.32 [ { { 1 int-rep 0 } } { { 2 double-rep 0 } } ] }
         { m88k.32 [ { ${ 1 int-rep m8:R2 } } { ${ 2 double-rep m8:R2 } } ] }
+        { openrisc.32 [ { ${ 1 int-rep or1k:R11 } } { ${ 2 double-rep or1k:F3 } } ] }
         { vax.32 [ { { 1 int-rep 0 } } { { 2 double-rep 0 } } ] }
         { sh3.32 [ { { 1 int-rep 0 } } { { 2 double-rep 0 } } ] }
         { sh3be.32 [ { { 1 int-rep 0 } } { { 2 double-rep 0 } } ] }

@@ -12,7 +12,7 @@ IN: alien.libraries.finder.linux
 CONSTANT: elf-machine-map {
     { ppc.32 20 } { ppc.64 21 } { x86.32 3 }
     { s390x 22 }
-    { x86.64 62 } { alpha.64 0x9026 } { arm.64 183 } { riscv.32 243 } { riscv.64 243 } { loongarch.64 258 }
+    { x86.64 62 } { alpha.64 0x9026 } { arm.64 183 } { riscv.32 243 } { riscv.64 243 } { openrisc.32 92 } { loongarch.64 258 }
 }
 
 CONSTANT: emulation-map {
@@ -22,6 +22,7 @@ CONSTANT: emulation-map {
     { arm.64 "aarch64linux" }
     { riscv.32 "elf32lriscv" }
     { riscv.64 "elf64lriscv" }
+    { openrisc.32 "elf32or1k" }
     { loongarch.64 "elf64loongarch" }
     { s390x "elf64_s390" }
 }
@@ -123,7 +124,7 @@ CONSTANT: emulation-map {
     ] [ { } ] if*
     {
         { x86.64 "x86_64" } { x86.32 "i386" } { arm.64 "aarch64" }
-        { riscv.32 "riscv32" } { riscv.64 "riscv64" } { loongarch.64 "loongarch64" }
+        { riscv.32 "riscv32" } { riscv.64 "riscv64" } { openrisc.32 "or1k" } { loongarch.64 "loongarch64" }
         { ppc.32 "powerpc" } { ppc.64 "powerpc64" }
         { s390x "s390x" }
     } cpu of [
@@ -136,6 +137,7 @@ CONSTANT: emulation-map {
         { alpha.64 "alpha-linux-gnu" }
         { arm.64 "aarch64-linux-gnu" }
         { riscv.32 "riscv32-linux-gnu" }
+        { openrisc.32 "or1k-linux-gnu" }
         { riscv.64 "riscv64-linux-gnu" }
         { loongarch.64 "loongarch64-linux-gnu" }
         { s390x "s390x-linux-gnu" }

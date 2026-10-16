@@ -6,6 +6,8 @@ IN: compiler.constants.tests
 { t } [ 15 "mipsel.32" rc-native-absolute? ] unit-test
 { f } [ 14 "s390x" rc-native-absolute? ] unit-test
 { t } [ 15 "s390x" rc-native-absolute? ] unit-test
+{ t } [ 14 "openrisc.32" rc-native-absolute? ] unit-test
+{ f } [ 15 "openrisc.32" rc-native-absolute? ] unit-test
 { f } [ 14 "sparc.32" rc-native-absolute? ] unit-test
 { t } [ 15 "sparc.64" rc-native-absolute? ] unit-test
 [ 14 "x86.64" rc-native-absolute? ] [ unsupported-native-relocation? ] must-fail-with

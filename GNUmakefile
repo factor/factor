@@ -222,6 +222,7 @@ help:
 	@echo "linux-sparc-32"
 	@echo "linux-sparc-64"
 	@echo "linux-riscv-32"
+	@echo "linux-openrisc-32"
 	@echo "linux-riscv-64"
 	@echo "freebsd-x86-32"
 	@echo "freebsd-x86-64"
@@ -353,6 +354,9 @@ linux-sparc-64:
 linux-riscv-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.riscv.32
 
+linux-openrisc-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.openrisc.32
+
 linux-loongarch-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.loongarch.64
 
@@ -437,7 +441,7 @@ $(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
 $(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $@
 
-$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c vm/ffi_test.h vm/ffi_test_features.h vm/ffi_test_small.h vm/ffi_test_arm64.c vm/ffi_test_arm64.h vm/tests/ffi_uint_callback.c vm/tests/ffi_array_struct.c vm/tests/ffi_fp_status.c vm/mips-soft-float.hpp vm/ffi_test_varargs.c vm/ffi_test_varargs.h vm/ffi_test_varargs_outgoing.c vm/ffi_test_varargs_promotions.c vm/ffi_test_arm64_unions.c vm/ffi_test_riscv.c | $(BUILD_DIR)
+$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c vm/ffi_test.h vm/ffi_test_features.h vm/ffi_test_small.h vm/ffi_test_arm64.c vm/ffi_test_arm64.h vm/tests/ffi_uint_callback.c vm/tests/ffi_array_struct.c vm/tests/ffi_fp_status.c vm/mips-soft-float.hpp vm/ffi_test_varargs.c vm/ffi_test_varargs.h vm/ffi_test_varargs_outgoing.c vm/ffi_test_varargs_promotions.c vm/ffi_test_arm64_unions.c vm/ffi_test_riscv.c vm/ffi_test_openrisc.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
 macos.app: $(EXECUTABLE)
@@ -497,6 +501,9 @@ test-riscv: $(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
 
 test-vm: test-riscv
 
+$(BUILD_DIR)/openrisc-tests$(EXE_EXTENSION): vm/tests/openrisc.cpp vm/openrisc.hpp | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(LIBS)
+
 .PHONY: test-openrisc
 test-openrisc: $(BUILD_DIR)/openrisc-tests$(EXE_EXTENSION)
 	$(BUILD_DIR)/openrisc-tests$(EXE_EXTENSION)
@@ -555,7 +562,7 @@ clean:
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
 .PHONY: factor-executable factor-lib factor-console factor-ffi-test test-vm tags clean help macos.app
-.PHONY: openbsd-ppc-32 freebsd-ppc-32 freebsd-ppc-64 netbsd-m68k-32 linux-m68k-32 dragonflybsd-x86-64 illumos-x86-64 linux-riscv-32 linux-riscv-64 linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 android-arm-64 android-x86-64 android-runtime-libs freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64
+.PHONY: openbsd-ppc-32 freebsd-ppc-32 freebsd-ppc-64 netbsd-m68k-32 linux-m68k-32 dragonflybsd-x86-64 illumos-x86-64 linux-openrisc-32 linux-riscv-32 linux-riscv-64 linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 android-arm-64 android-x86-64 android-runtime-libs freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64
 
 .PHONY: freebsd-arm-32 netbsd-arm-32 freebsd-arm-64 netbsd-x86-32 netbsd-x86-64 netbsd-arm-64 netbsd-riscv-64 openbsd-x86-32 openbsd-x86-64 openbsd-arm-64 openbsd-riscv-64 freebsd-riscv-64
 .PHONY: linux-sparc-32 linux-sparc-64
