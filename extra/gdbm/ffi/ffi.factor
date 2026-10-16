@@ -1,14 +1,15 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.libraries.finder
+USING: alien alien.c-types alien.libraries
 alien.syntax classes.struct combinators kernel system ;
 IN: gdbm.ffi
 
-<< "libgdbm"
-{ "gdbm" "gdbm3" "libgdbm-3" } find-library-from-list
-cdecl add-library >>
-
-LIBRARY: libgdbm
+C-LIBRARY: libgdbm {
+    { windows "libgdbm-6.dll" }
+    { macos "libgdbm.dylib" }
+    { linux "libgdbm.so.6" }
+    { unix "libgdbm.so" }
+}
 
 C-GLOBAL: c-string gdbm_version
 
