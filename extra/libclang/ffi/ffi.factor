@@ -1,32 +1,19 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.libraries.finder
-alien.syntax accessors classes.struct combinators io.directories io.files
-io.pathnames kernel regexp sequences sorting.human system vocabs words ;
+USING: alien alien.c-types alien.libraries alien.syntax accessors
+classes.struct combinators kernel sequences system vocabs words ;
 IN: libclang.ffi
+
+C-LIBRARY: clang {
+    { windows "libclang.dll" }
+    { macos "/Library/Developer/CommandLineTools/usr/lib/libclang.dylib" }
+    { linux "libclang-23.so.1" }
+    { unix "libclang.so.23.1" }
+}
 
 LIBRARY: clang
 
 ! Enum values and function signatures checked against LLVM 21 clang-c headers.
-
-<<
-: libclang-libraries ( directory -- paths )
-    "lib" append-path ?qualified-directory-files
-    [ file-name R/ libclang(-[0-9.]+)?\.so(\.[0-9.]+)?/ matches? ] filter
-    [ file-exists? ] filter human-sort reverse ;
-
-: latest-libclang ( directory -- path )
-    ?qualified-directory-files
-    [ file-name "llvm-" head? ] filter human-sort reverse
-    [ libclang-libraries ?first ] map-find drop
-    [ "clang" find-library ] unless* ;
->>
-
-<< "clang" {
-    { [ os windows? ] [ "libclang.dll" ] }
-    { [ os macos? ] [ "/Library/Developer/CommandLineTools/usr/lib/libclang.dylib" ] }
-    { [ os unix? ] [ "/usr/lib/" latest-libclang ] }
-} cond cdecl add-library >>
 
 CONSTANT: UINT_MAX 4294967295
 

@@ -1,5 +1,5 @@
 USING: accessors alien alien.accessors alien.c-types alien.data
-alien.enums alien.libraries alien.libraries.finder arrays assocs
+alien.enums alien.libraries arrays assocs
 classes.struct continuations io.backend io.directories io.pathnames
 kernel layouts libclang libclang.ffi locals math math.parser
 namespaces sequences splitting system tools.test vocabs words ;
@@ -17,25 +17,6 @@ libclang-major-version 21 >= [
         [ name>> "clang" dlsym? >boolean ] all?
     ] unit-test
 ] when
-
-{ t t t t } [
-    [
-        current-directory get latest-libclang "clang" find-library =
-        "llvm-9/lib" make-directories
-        "llvm-9/lib/libclang.so" touch-file
-        "llvm-18/lib" make-directories
-        current-directory get latest-libclang
-        "llvm-9/lib/libclang.so" absolute-path =
-        "llvm-18/lib/libclang-18.so.1" touch-file
-        current-directory get latest-libclang
-        "llvm-18/lib/libclang-18.so.1" absolute-path =
-        "llvm-19/lib" make-directories
-        "llvm-19/lib/libclang.so.1" touch-file
-        "llvm-19/lib/libclang-cpp.so.19" touch-file
-        current-directory get latest-libclang
-        "llvm-19/lib/libclang.so.1" absolute-path =
-    ] with-test-directory
-] unit-test
 
 SYMBOL: visited-fields
 

@@ -2,7 +2,7 @@
 ! Portions copyright (C) 2008 Slava Pestov
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.libraries.finder alien.parser alien.syntax classes.struct
+alien.parser alien.syntax classes.struct
 combinators kernel literals namespaces openssl.libcrypto
 sequences system words ;
 IN: openssl.libssl

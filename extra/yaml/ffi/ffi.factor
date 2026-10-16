@@ -3,8 +3,7 @@
 ! adapted from "yaml.h" libYAML 0.1.4
 ! https://pyyaml.org/wiki/LibYAML
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax classes.struct combinators literals system
-alien.libraries.finder ;
+alien.syntax classes.struct combinators literals system ;
 IN: yaml.ffi
 
 <<

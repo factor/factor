@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
-alien.libraries.finder alien.strings arrays assocs byte-arrays
+alien.strings arrays assocs byte-arrays
 classes.struct combinators combinators.short-circuit continuations destructors
 endian io io.backend io.buffers io.encodings.latin1
 io.encodings.string io.encodings.utf8 io.files io.pathnames
