@@ -2841,6 +2841,143 @@
       },
       "work_root": "/home"
     },
+    "haiku-arm-64": {
+      "build": {
+        "config": "haiku.arm.64",
+        "host": true,
+        "make": "make",
+        "jobs": 8,
+        "artifacts": [
+          "factor",
+          "libfactor-ffi-test.so"
+        ],
+        "env": {
+          "AR": "${assets}/haiku-arm64/sdk/bin/aarch64-unknown-haiku-ar",
+          "CC": "${assets}/haiku-arm64/sdk/bin/aarch64-unknown-haiku-gcc",
+          "CXX": "${assets}/haiku-arm64/sdk/bin/aarch64-unknown-haiku-g++"
+        }
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "serial",
+        "host": "127.0.0.1",
+        "port": 62464,
+        "binary_stdin": true
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-aarch64",
+          "-machine",
+          "virt",
+          "-cpu",
+          "max",
+          "-smp",
+          "2",
+          "-m",
+          "4096",
+          "-bios",
+          "/usr/lib/u-boot/qemu_arm64/u-boot.bin",
+          "-device",
+          "virtio-blk-device,drive=ui",
+          "-device",
+          "virtio-blk-device,drive=scratch",
+          "-device",
+          "virtio-blk-device,drive=system",
+          "-device",
+          "virtio-blk-device,drive=console",
+          "-device",
+          "virtio-keyboard-device",
+          "-device",
+          "virtio-tablet-device",
+          "-device",
+          "virtio-gpu-device",
+          "-device",
+          "virtio-rng-device",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:62464-:2222",
+          "-device",
+          "virtio-net-device,netdev=n",
+          "-no-reboot"
+        ],
+        "drives": [
+          {
+            "file": "${assets}/haiku-arm64/system.image",
+            "format": "raw",
+            "options": "if=none,id=system"
+          },
+          {
+            "file": "${assets}/haiku-arm64/console.iso",
+            "format": "raw",
+            "options": "if=none,id=console"
+          },
+          {
+            "file": "${assets}/haiku-arm64/runtime.iso",
+            "format": "raw",
+            "options": "if=none,id=ui"
+          }
+        ],
+        "scratch_drives": [
+          {
+            "size": "4G",
+            "options": "if=none,id=scratch"
+          }
+        ],
+        "console_steps": [
+          {
+            "expect": "runtime_loader: Cannot open file libmedia.so",
+            "send": ""
+          }
+        ],
+        "display_args": [
+          "-display",
+          "vnc=127.0.0.1:64"
+        ],
+        "vnc_server": "127.0.0.1::5964",
+        "vnc_actions": [
+          { "pause": 3 },
+          { "move": [1210, 20] },
+          { "click": 1 },
+          { "pause": 1 },
+          { "move": [1040, 227] },
+          { "pause": 1 },
+          { "move": [900, 408] },
+          { "key": "enter" },
+          { "pause": 5 },
+          { "key": "enter" },
+          { "pause": 15 },
+          { "text": "mkdir -p /tmp/m; mount /dev/disk/virtual/virtio" },
+          { "key": "tab" },
+          { "text": "/0/raw /tmp/m; exec /tmp/m/console 0.0.0.0 2222" },
+          { "key": "enter" }
+        ],
+        "setup": "mkfs -q -t bfs /dev/disk/virtual/virtio_block/2/raw FactorScratch; mkdir -p /factor /ui; mount /dev/disk/virtual/virtio_block/2/raw /factor; mount -ro /dev/disk/virtual/virtio_block/3/raw /ui; df -h /factor",
+        "resume_setup": "mkdir -p /factor /ui; mount /dev/disk/virtual/virtio_block/2/raw /factor; mount -ro /dev/disk/virtual/virtio_block/3/raw /ui; df -h /factor",
+        "set_clock": true,
+        "shutdown": "printf FACTOR_HAIKU_SHUTDOWN; sync; shutdown -r",
+        "halt_marker": "FACTOR_HAIKU_SHUTDOWN"
+      },
+      "artifacts": [
+        "factor",
+        "factor.image",
+        "boot.image",
+        "libfactor-ffi-test.so"
+      ],
+      "execution": {
+        "env": {
+          "PATH": "/ui/test-runtime/bin:/ui/bin:/boot/system/bin:/bin",
+          "LIBRARY_PATH": "/ui/test-runtime/lib:/ui/lib:/boot/system/lib",
+          "OPENSSL_CONF": "/ui/test-runtime/data/ssl/openssl.cnf",
+          "OPENSSL_MODULES": "/ui/test-runtime/lib/ossl-modules",
+          "SSL_CERT_FILE": "/ui/test-runtime/data/ssl/CARootCertificates.pem"
+        }
+      },
+      "commands": {
+        "ui": "/ui/run-with-ui ./factor -no-user-init -resource-path=\"$PWD\" -i=\"$PWD/factor.image\" -run=tools.test ui"
+      },
+      "extract_command": "PATH=/ui/bin:$PATH /ui/bin/tar --warning=no-timestamp xzof -",
+      "stall_seconds": 0,
+      "work_root": "/factor"
+    },
     "haiku-x86-64": {
       "build": {
         "config": "haiku.x86.64",

@@ -216,6 +216,7 @@ help:
 	@echo "linux-ppc-64"
 	@echo "linux-arm-32"
 	@echo "linux-arm-64"
+	@echo "haiku-arm-64"
 	@echo "linux-sparc-32"
 	@echo "linux-sparc-64"
 	@echo "linux-riscv-32"
@@ -255,6 +256,9 @@ freebsd-arm-32:
 
 freebsd-arm-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.arm.64
+
+haiku-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.haiku.arm.64
 
 dragonflybsd-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.dragonflybsd.x86.64

@@ -29,7 +29,7 @@ HELP: with-va-scope
 { $description "Compiler support for callback lifetime management. Executes a callback's parameter boxing, body, and return conversion within one variable argument lifetime, then expires every cursor created in that lifetime. The cleanup runs on exceptional exits as well." } ;
 
 ARTICLE: "alien.varargs" "ARM64 variable argument lists"
-"The " { $vocab-link "alien.varargs" } " vocabulary reads and forwards variable arguments received from C. It supports macOS, Linux, and Windows ARM64 argument-list layouts."
+"The " { $vocab-link "alien.varargs" } " vocabulary reads and forwards variable arguments received from C. It supports macOS, Linux, BSD, Haiku, and Windows ARM64 argument-list layouts."
 { $subsections va-cursor va-arg va-copy va_list }
 "The argument cursor contains a position, not a description of the remaining arguments. Use the C API's declared protocol to choose each type and determine when to stop." ;
 

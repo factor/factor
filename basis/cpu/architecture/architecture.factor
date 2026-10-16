@@ -594,7 +594,7 @@ M: object return-regs-for-type drop return-regs ;
 
 ! Native va_list layouts on these systems use AAPCS64 register save areas.
 : aapcs64-va-list-platform? ( platform -- ? )
-    { linux freebsd netbsd openbsd } member? ; foldable
+    { linux freebsd netbsd openbsd haiku } member? ; foldable
 
 HOOK: param-regs cpu ( abi -- regs )
 

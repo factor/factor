@@ -28,15 +28,15 @@ IN: bootstrap.ui.platform.tests
     windows x86.64 default-ui-backend
 ] unit-test
 
-{ "ui.backend.gtk3" } [
-    haiku x86.64 default-ui-backend
+{ { "ui.backend.gtk3" "ui.backend.gtk3" } } [
+    { x86.64 arm.64 } [ haiku swap default-ui-backend ] map
 ] unit-test
 
 ! Regression: choosing a GTK vocab is insufficient unless its native backend
 ! registration covers that target. These are the exact predicates used by the
 ! GTK2/GTK3 registration sites, including the formerly omitted systems.
 { { t t t t t t } } [
-    { { haiku x86.64 } { freebsd ppc.64 } { netbsd x86.64 }
+    { { haiku arm.64 } { freebsd ppc.64 } { netbsd x86.64 }
       { openbsd arm.64 } { dragonflybsd x86.64 } { linux x86.32 } }
     [
         dup first swap first2 default-ui-backend

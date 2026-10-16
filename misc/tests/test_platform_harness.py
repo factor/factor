@@ -279,6 +279,25 @@ class HarnessTests(unittest.TestCase):
             thread.join()
         self.assertEqual(replies, [b'one\r', b'two\r'])
 
+    def test_vnc_actions_cover_first_boot_pointer_and_keyboard_input(self):
+        from harness.transport import vnc_actions
+        from unittest.mock import Mock
+        client = Mock()
+        connection = Mock()
+        connection.__enter__ = Mock(return_value=client)
+        connection.__exit__ = Mock(return_value=False)
+        actions = [{'move': [12, 34]}, {'click': 1}, {'key': 'tab'},
+                   {'text': 'ok\n'}, {'pause': .01}]
+        with patch('vncdotool.api.connect', return_value=connection), \
+                patch('vncdotool.api.shutdown') as shutdown, patch('time.sleep') as sleep:
+            vnc_actions('127.0.0.1::5900', actions)
+        client.mouseMove.assert_called_once_with(12, 34)
+        client.mousePress.assert_called_once_with(1)
+        self.assertEqual([call.args[0] for call in client.keyPress.call_args_list],
+                         ['tab', 'o', 'k', 'enter'])
+        sleep.assert_called_once_with(.01)
+        shutdown.assert_called_once_with()
+
     def test_all_profiles_render_without_external_assets_or_jobs(self):
         names = config.profiles()
         self.assertGreaterEqual(len(names), 47)

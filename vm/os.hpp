@@ -123,6 +123,8 @@
       #include "os-haiku.hpp"
       #if defined(FACTOR_AMD64)
         #include "os-haiku-x86.64.hpp"
+      #elif defined(FACTOR_ARM64)
+        #include "os-haiku-arm.64.hpp"
       #else
         #error "Unsupported Haiku architecture"
       #endif

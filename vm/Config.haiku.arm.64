@@ -1,0 +1,7 @@
+include vm/Config.haiku
+include vm/Config.arm.64
+PLAF_MASTER_HEADERS += vm/os-haiku-arm.64.hpp
+
+# The ARM64 buildtools otherwise select their static unwinder, which cannot
+# unwind through Haiku's runtime loader. Keep C++ exceptions on libgcc_s.
+LIBS += -Wl,--no-as-needed -lgcc_s -Wl,--as-needed

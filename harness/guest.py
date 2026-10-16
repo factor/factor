@@ -77,9 +77,9 @@ class Guest(AbstractContextManager):
             birth = (Path('/proc') / str(self.child.pid) / 'stat').read_text().rsplit(')', 1)[1].split()[19]
             process.write_json(self.directory / 'guest-command.json',
                                {'argv': argv, 'pid': self.child.pid, 'birth': birth})
+            self.boot_console()
             if self.config.get('vnc_actions'):
                 vnc_actions(self.config['vnc_server'], self.config['vnc_actions'])
-            self.boot_console()
             self.wait_ready()
             self.ready = True
             setup_record = self.directory / 'setup.json'

@@ -150,13 +150,22 @@ class Transport:
 def vnc_actions(server, actions):
     """Optional first-boot input, separate from readiness and test execution."""
     from vncdotool import api
-    with api.connect(server) as client:
-        client.factory.force_caps = True
-        for action in actions:
-            if 'key' in action:
-                client.keyPress(action['key'])
-            elif 'text' in action:
-                for character in action['text']:
-                    client.keyPress('enter' if character == '\n' else character)
-            else:
-                raise ValueError('VNC action needs key or text')
+    try:
+        with api.connect(server) as client:
+            client.factory.force_caps = True
+            for action in actions:
+                if 'key' in action:
+                    client.keyPress(action['key'])
+                elif 'text' in action:
+                    for character in action['text']:
+                        client.keyPress('enter' if character == '\n' else character)
+                elif 'move' in action:
+                    client.mouseMove(*action['move'])
+                elif 'click' in action:
+                    client.mousePress(action['click'])
+                elif 'pause' in action:
+                    time.sleep(action['pause'])
+                else:
+                    raise ValueError('VNC action needs key, text, move, click, or pause')
+    finally:
+        api.shutdown()
