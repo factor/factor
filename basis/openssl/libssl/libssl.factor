@@ -16,6 +16,7 @@ C-LIBRARY: libssl {
         } case "libssl-3" ".dll" surround
     ] }
     { macos "libssl.35.dylib" }
+    { linux "libssl.so.3" }
     { unix "libssl.so" }
 }
 
