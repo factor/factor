@@ -8,7 +8,7 @@ CONSTANT: signal-names $[
     os haiku? [
         { "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGCHLD" "SIGABRT" "SIGPIPE" "SIGFPE" "SIGKILL" "SIGSTOP" "SIGSEGV" "SIGCONT" "SIGTSTP" "SIGALRM" "SIGTERM" "SIGTTIN" "SIGTTOU" "SIGUSR1" "SIGUSR2" "SIGWINCH" "SIGKILLTHR" "SIGTRAP" "SIGPOLL" "SIGPROF" "SIGSYS" "SIGURG" "SIGVTALRM" "SIGXCPU" "SIGXFSZ" "SIGBUS" "SIGRESERVED1" "SIGRESERVED2" }
     ] [
-    os linux? cpu alpha.64? not and [
+    os linux-kernel? cpu alpha.64? not and [
         cpu mips? [
             {
                 "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGTRAP" "SIGABRT"

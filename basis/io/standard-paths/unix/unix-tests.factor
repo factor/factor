@@ -1,29 +1,35 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations destructors environment hashtables io io.directories io.encodings.utf8 io.files
+USING: accessors assocs combinators continuations destructors environment hashtables io io.directories io.encodings.utf8 io.files
 io.files.info.unix io.files.links io.pathnames io.standard-paths
 io.standard-paths.unix io.encodings.binary io.encodings.string io.launcher io.launcher.private io.streams.duplex kernel libc locals namespaces sequences splitting
-system tools.test unix.users ;
+system tools.test tools.test.unix unix.users ;
 IN: io.standard-paths.unix.tests
 
-! Haiku's package filesystem exposes ordinary commands in its native bin.
+! Haiku exposes commands in its package filesystem; Android uses /system/bin.
 ! Retain the POSIX compatibility locations and every other platform case.
 : expected-ls-paths ( -- paths )
-    os haiku?
-    [ { "/bin/ls" "/usr/bin/ls" "/boot/system/bin/ls" } ]
-    [ { "/bin/ls" "/usr/bin/ls" } ] if ;
+    {
+        { [ os haiku? ]
+          [ { "/bin/ls" "/usr/bin/ls" "/boot/system/bin/ls" } ] }
+        { [ os android? ] [ { "/system/bin/ls" } ] }
+        [ { "/bin/ls" "/usr/bin/ls" } ]
+    } cond ;
 
 : expected-ps-paths ( -- paths )
-    os haiku?
-    [ { "/bin/ps" "/sbin/ps" "/usr/bin/ps" "/boot/system/bin/ps" } ]
-    [ { "/bin/ps" "/sbin/ps" "/usr/bin/ps" } ] if ;
+    {
+        { [ os haiku? ]
+          [ { "/bin/ps" "/sbin/ps" "/usr/bin/ps" "/boot/system/bin/ps" } ] }
+        { [ os android? ] [ { "/system/bin/ps" } ] }
+        [ { "/bin/ps" "/sbin/ps" "/usr/bin/ps" } ]
+    } cond ;
 
 : path-fixture ( -- )
     { "blocked" "directory" "valid" } [ make-directory ] each
     "not executable" "blocked/probe" utf8 set-file-contents
     "blocked/probe" 0o644 set-file-permissions
     "directory/probe" make-directory
-    "#!/bin/sh\nexit 0\n" "valid/probe" utf8 set-file-contents
+    "exit 0\n" test-script "valid/probe" utf8 set-file-contents
     "valid/probe" 0o755 set-file-permissions ;
 
 { t } [
@@ -59,7 +65,7 @@ IN: io.standard-paths.unix.tests
 
 { t } [
     [
-        "#!/bin/sh\nexit 0\n" "probe" utf8 set-file-contents
+        "exit 0\n" test-script "probe" utf8 set-file-contents
         "probe" 0o755 set-file-permissions
         "" "PATH" [ "probe" find-in-path "probe" = ] with-os-env
     ] with-test-directory
@@ -99,7 +105,8 @@ IN: io.standard-paths.unix.tests
 ! A completed login shell supplies its PATH even when the inherited PATH differs.
 { { "/login-only" } } [
     [
-        "#!/bin/sh\nPATH=/login-only; export PATH\nexec /bin/sh\n" shell-fixture
+        "PATH=/login-only; export PATH\nexec " test-shell append "\n" append
+        test-script shell-fixture
         [ "/inherited-only" "PATH" [ standard-login-paths ] with-os-env ]
         with-passwd-fixture
     ] with-test-directory
@@ -108,7 +115,7 @@ IN: io.standard-paths.unix.tests
 ! Startup can terminate before the shell reads our PATH command.
 { { "/inherited-only" } } [
     [
-        "#!/bin/sh\nexit 0\n" shell-fixture
+        "exit 0\n" test-script shell-fixture
         [ "/inherited-only" "PATH" [ standard-login-paths ] with-os-env ]
         with-passwd-fixture
     ] with-test-directory
@@ -128,7 +135,7 @@ IN: io.standard-paths.unix.tests
 ! Force the real write/flush/disposal EPIPE path: the exact child has exited
 ! before the probe is sent, rather than relying on scheduler timing.
 { } [
-    { "/bin/sh" "-c" "exit 0" } binary (process-stream)
+    { "-c" "exit 0" } test-shell prefix binary (process-stream)
     wait-for-process 0 assert=
     [ write-login-command ] with-disposal
 ] unit-test
@@ -136,7 +143,7 @@ IN: io.standard-paths.unix.tests
 ! A shell can emit a valid marked PATH and exit without reading stdin.
 { { "/fast-shell" } } [
     [
-        "#!/bin/sh\nprintf '__FACTOR_LOGIN_PATH__/fast-shell\\n'\nexit 0\n" shell-fixture
+        "printf '__FACTOR_LOGIN_PATH__/fast-shell\\n'\nexit 0\n" test-script shell-fixture
         shell>> shell-login-paths
     ] with-test-directory
 ] unit-test
@@ -151,7 +158,7 @@ IN: io.standard-paths.unix.tests
 
 ! Closing the probe output must not suppress errors from reading stdout.
 :: read-closed-login-output ( -- )
-    { "/bin/sh" "-c" "exit 0" } binary (process-stream)
+    { "-c" "exit 0" } test-shell prefix binary (process-stream)
     wait-for-process 0 assert= :> stream
     [
         stream write-login-command

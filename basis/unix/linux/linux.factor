@@ -3,4 +3,4 @@
 USING: system unix unix.ffi unix.ffi.linux ;
 IN: unix.linux
 
-M: linux open-file [ open64 ] unix-system-call ;
+M: linux-kernel open-file [ open64 ] unix-system-call ;

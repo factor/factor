@@ -1,15 +1,15 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax
-continuations io.encodings.string io.encodings.utf8 kernel
+continuations io.encodings.string io.encodings.utf8 kernel literals
 sequences system unix.ffi vocabs ;
 IN: unix.utmpx
 
 CONSTANT: EMPTY 0
 CONSTANT: RUN_LVL 1
 CONSTANT: BOOT_TIME 2
-CONSTANT: OLD_TIME 3
-CONSTANT: NEW_TIME 4
+CONSTANT: OLD_TIME $[ os android? 4 3 ? ]
+CONSTANT: NEW_TIME $[ os android? 3 4 ? ]
 CONSTANT: INIT_PROCESS 5
 CONSTANT: LOGIN_PROCESS 6
 CONSTANT: USER_PROCESS 7

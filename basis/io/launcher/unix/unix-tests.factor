@@ -4,14 +4,15 @@ io.backend.unix io.directories io.encodings.ascii
 io.encodings.binary io.encodings.utf8 io.files io.files.info.unix
 io.launcher io.launcher.unix io.pathnames
 io.streams.duplex io.timeouts kernel libc locals math namespaces
-sequences sets threads tools.test unix.process unix.signals unix.types ;
+sequences sets system threads tools.test tools.test.unix unix.process unix.signals unix.types ;
 IN: io.launcher.unix.tests
 
 ! PATH is resolved against Factor's child directory and read afresh each time.
 [
     "first" make-directory "second" make-directory
-    "#!/bin/sh\necho first" "first/launcher-path-test" utf8 set-file-contents
-    "#!/bin/sh\necho second" "second/launcher-path-test" utf8 set-file-contents
+    "" test-script
+    [ "echo first" append "first/launcher-path-test" utf8 set-file-contents ]
+    [ "echo second" append "second/launcher-path-test" utf8 set-file-contents ] bi
     "first/launcher-path-test" 0o755 set-file-permissions
     "second/launcher-path-test" 0o755 set-file-permissions
 
@@ -302,7 +303,7 @@ QUALIFIED: unix.ffi
 ! Test priority
 { 0 } [
     <process>
-        { "/bin/sh" "-c" "sleep 2&" } >>command
+        { "-c" "sleep 2&" } test-shell prefix >>command
         +low-priority+ >>priority
     run-process status>>
 ] unit-test
@@ -310,7 +311,7 @@ QUALIFIED: unix.ffi
 ! Check that processes launched with the group option kill their children (or not)
 ! This test should leave two sleeps running for 30 seconds.
 [
-    <process> { "/bin/sh" "-c" "sleep 30& sleep 30" } >>command
+    <process> { "-c" "sleep 30& sleep 30" } test-shell prefix >>command
         +same-group+ >>group
         500 milliseconds >>timeout
     run-process
@@ -318,7 +319,7 @@ QUALIFIED: unix.ffi
 
 ! This test should kill the sleep after 500ms.
 [
-    <process> { "/bin/sh" "-c" "sleep 30& sleep 30" } >>command
+    <process> { "-c" "sleep 30& sleep 30" } test-shell prefix >>command
         +new-group+ >>group
         500 milliseconds >>timeout
     run-process
@@ -326,7 +327,7 @@ QUALIFIED: unix.ffi
 
 ! This test should kill the sleep after 500ms.
 [
-    <process> { "/bin/sh" "-c" "sleep 30& sleep 30" } >>command
+    <process> { "-c" "sleep 30& sleep 30" } test-shell prefix >>command
         +new-session+ >>group
         500 milliseconds >>timeout
     run-process

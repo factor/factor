@@ -307,6 +307,18 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual(set(rendered['stages']), set(stages.STAGES))
             self.assertIsNone(rendered['elapsed_timeout'])
 
+    def test_android_profiles_ship_their_openssl_runtime(self):
+        for name, abi in (('android-arm-64', 'arm64-v8a'),):
+            profile = config.load(name, self.root)
+            self.assertEqual(profile['build']['env']['ANDROID_ABI'], abi)
+            self.assertIn('android-runtime-libs', profile['build']['targets'])
+            self.assertIn('android-libs', profile['build']['artifacts'])
+            self.assertIn('android-libs/libcrypto.so', profile['artifacts'])
+            self.assertIn('android-libs/libssl.so', profile['artifacts'])
+            self.assertIn('android-libs/libsqlite3.so', profile['artifacts'])
+            self.assertEqual(profile['execution']['directories']['LD_LIBRARY_PATH'],
+                             'android-libs')
+
     def test_nested_closure_requires_both_layers(self):
         good = dict(forced=False, error=None, shutdown_exit=0, emulator_exit=0)
         self.assertTrue(runner.closure_passed(good, {}))

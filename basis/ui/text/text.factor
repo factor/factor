@@ -141,5 +141,6 @@ M: array draw-text
 {
     { [ os macos? ] [ "ui.text.core-text" ] }
     { [ os windows? ] [ "ui.text.directwrite" ] }
+    { [ os android? ] [ "ui.text.android" ] }
     { [ os unix? ] [ "ui.text.pango" ] }
 } cond require

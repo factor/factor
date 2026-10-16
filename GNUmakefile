@@ -216,6 +216,7 @@ help:
 	@echo "linux-ppc-64"
 	@echo "linux-arm-32"
 	@echo "linux-arm-64"
+	@echo "android-arm-64"
 	@echo "haiku-arm-64"
 	@echo "linux-sparc-32"
 	@echo "linux-sparc-64"
@@ -325,6 +326,12 @@ linux-arm-32:
 
 linux-arm-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
+
+android-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.android.arm.64
+
+android-runtime-libs:
+	misc/android/build-runtime-libs.sh
 
 linux-s390x:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.s390x
@@ -540,7 +547,7 @@ clean:
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
 .PHONY: factor-executable factor-lib factor-console factor-ffi-test test-vm tags clean help macos.app
-.PHONY: openbsd-ppc-32 freebsd-ppc-32 freebsd-ppc-64 netbsd-m68k-32 linux-m68k-32 dragonflybsd-x86-64 linux-riscv-32 linux-riscv-64 linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64
+.PHONY: openbsd-ppc-32 freebsd-ppc-32 freebsd-ppc-64 netbsd-m68k-32 linux-m68k-32 dragonflybsd-x86-64 linux-riscv-32 linux-riscv-64 linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 android-arm-64 android-runtime-libs freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64
 
 .PHONY: freebsd-arm-32 netbsd-arm-32 freebsd-arm-64 netbsd-x86-32 netbsd-x86-64 netbsd-arm-64 netbsd-riscv-64 openbsd-x86-32 openbsd-x86-64 openbsd-arm-64 openbsd-riscv-64 freebsd-riscv-64
 .PHONY: linux-sparc-32 linux-sparc-64

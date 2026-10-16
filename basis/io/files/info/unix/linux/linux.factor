@@ -11,12 +11,12 @@ IN: io.files.info.unix.linux
 TUPLE: linux-file-system-info < unix-file-system-info
 namelen ;
 
-M: linux new-file-system-info linux-file-system-info new ;
+M: linux-kernel new-file-system-info linux-file-system-info new ;
 
-M: linux file-system-statfs
+M: linux-kernel file-system-statfs
     \ statfs64 new [ statfs64 io-error ] keep ;
 
-M: linux statfs>file-system-info
+M: linux-kernel statfs>file-system-info
     {
         [ f_type>> >>type ]
         [ f_bsize>> >>block-size ]
@@ -31,10 +31,10 @@ M: linux statfs>file-system-info
         ! [ statfs64-f_spare >>spare ]
     } cleave ;
 
-M: linux file-system-statvfs
+M: linux-kernel file-system-statvfs
     \ statvfs64 new [ statvfs64 io-error ] keep ;
 
-M: linux statvfs>file-system-info
+M: linux-kernel statvfs>file-system-info
     {
         [ f_flag>> >>flags ]
         [ f_namemax>> >>name-max ]
@@ -42,6 +42,10 @@ M: linux statvfs>file-system-info
 
 TUPLE: mtab-entry file-system-name mount-point type options
 frequency pass-number ;
+
+HOOK: mount-table-path os ( -- path )
+
+M: linux-kernel mount-table-path "/etc/mtab" ;
 
 ! octal escape sequences, e.g. "/media/erg/4TB\\040E"
 : decode-mount-point ( string -- string' )
@@ -65,7 +69,7 @@ frequency pass-number ;
     } cleave ;
 
 : parse-mtab ( -- array )
-    CHAR: \s [ "/etc/mtab" utf8 file>csv ] with-delimiter
+    CHAR: \s [ mount-table-path utf8 file>csv ] with-delimiter
     [ mtab-csv>mtab-entry ] map ;
 
 : fill-file-system-info ( file-system-info path -- file-system-info )
@@ -90,13 +94,13 @@ frequency pass-number ;
         } cleave
     ] [ { [ libc-error? ] [ errno>> EACCES = ] } 1&& ] ignore-error/f ;
 
-M: linux mount-points
+M: linux-kernel mount-points
     parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc ;
 
-M: linux file-systems
+M: linux-kernel file-systems
     parse-mtab [ mtab-entry>file-system-info ] map sift ;
 
-M: linux file-system-info
+M: linux-kernel file-system-info
     normalize-path
     [ file-system-info-ignore-errors ] [ find-mount-point ] bi
     {

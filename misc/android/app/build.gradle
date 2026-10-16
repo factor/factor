@@ -1,0 +1,48 @@
+plugins { id "com.android.application" }
+
+layout.buildDirectory = file(System.getenv("FACTOR_ANDROID_BUILD_DIR") ?: "build")
+
+android {
+    namespace "org.factorcode.factor"
+    compileSdk 35
+    ndkVersion "30.0.14262924"
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    defaultConfig {
+        applicationId "org.factorcode.factor"
+        minSdk 21
+        targetSdk 35
+        versionCode 1
+        versionName "0.1"
+        testInstrumentationRunner "org.factorcode.factor.FactorTextTest"
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17", "-Wall", "-Wextra", "-Werror"
+                arguments "-DANDROID_STL=c++_shared",
+                          "-DFACTOR_VM_ROOT=${project.findProperty('factorVmRoot') ?: ''}"
+            }
+        }
+        ndk { abiFilters "arm64-v8a" }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.22.1"
+            def staging = System.getenv("FACTOR_ANDROID_CXX_DIR")
+            if (staging) buildStagingDirectory staging
+        }
+    }
+
+    packaging { jniLibs { useLegacyPackaging = true } }
+    androidResources { noCompress "tar", "image" }
+
+    def engines = project.findProperty("factorVmRoot")
+    if (engines) sourceSets.main.jniLibs.srcDir engines
+    def cli = project.findProperty("factorCliRoot")
+    if (cli) sourceSets.main.jniLibs.srcDir cli
+    sourceSets.androidTest.java.srcDir "../tests"
+}

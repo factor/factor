@@ -62,10 +62,10 @@ FUNCTION: int sigfillset ( sigset_t* set )
 FUNCTION: int sigismember ( sigset_t* set, int signo )
 FUNCTION: int pthread_sigmask ( int how, sigset_t* set, sigset_t* oldset )
 
-CONSTANT: SIG_BLOCK $[ os linux? cpu mips? cpu alpha.64? or cpu sparc? or not and 0 1 ? ]
+CONSTANT: SIG_BLOCK $[ os linux-kernel? cpu mips? cpu alpha.64? or cpu sparc? or not and 0 1 ? ]
 CONSTANT: SIG_SETMASK $[
-    os linux? cpu sparc? and [ 4 ]
-    [ os linux? cpu mips? cpu alpha.64? or not and 2 3 ? ] if
+    os linux-kernel? cpu sparc? and [ 4 ]
+    [ os linux-kernel? cpu mips? cpu alpha.64? or not and 2 3 ? ] if
 ]
 
 ! Not on macOS
@@ -88,7 +88,7 @@ CONSTANT: POSIX_SPAWN_SETSCHEDULER $[ os netbsd? os haiku? or 0x0008 0x0020 ? ]
 ! Darwin-specific flags
 CONSTANT: POSIX_SPAWN_SETEXEC             0x0040
 CONSTANT: POSIX_SPAWN_START_SUSPENDED     0x0080
-CONSTANT: POSIX_SPAWN_SETSID $[ os haiku? [ 0x0040 ] [ os linux? 0x0080 0x0400 ? ] if ]
+CONSTANT: POSIX_SPAWN_SETSID $[ os haiku? [ 0x0040 ] [ os linux-kernel? 0x0080 0x0400 ? ] if ]
 CONSTANT: POSIX_SPAWN_CLOEXEC_DEFAULT     0x4000
 
 CONSTANT: POSIX_SPAWN_PCONTROL_NONE       0x0000

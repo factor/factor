@@ -13,7 +13,7 @@ sequences strings system threads tools.test ;
             ] with-stream
         ] with-disposal
 
-        "socket-server" delete-file
+        os android? [ ] [ "socket-server" delete-file ] if
     ] "Test" spawn drop
 
     yield
@@ -54,7 +54,7 @@ sequences strings system threads tools.test ;
 
             "Done" print
 
-            "datagram-server" delete-file
+            os android? [ ] [ "datagram-server" delete-file ] if
         ] with-variable
     ] "Test" spawn drop
 
@@ -90,7 +90,7 @@ sequences strings system threads tools.test ;
 
     ! Test error behavior
 
-    "datagram-client" delete-file
+    os android? [ ] [ "datagram-client" delete-file ] if
 
     { } [ "datagram-client" <local> <datagram> "d" set ] unit-test
 

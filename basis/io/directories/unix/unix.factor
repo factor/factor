@@ -82,4 +82,4 @@ M: unix (directory-entries)
         '[ _ _ next-dirent ] [ >directory-entry ] produce nip
     ] with-unix-directory ;
 
-os linux? [ "io.directories.unix.linux" require ] when
+os linux-kernel? [ "io.directories.unix.linux" require ] when

@@ -6,6 +6,7 @@ IN: bootstrap.ui.platform
 
 :: default-ui-backend ( target-os target-cpu -- vocab )
     {
+        { [ target-os android? ] [ "ui.backend.android" ] }
         { [ target-os macos? ] [ "ui.backend.cocoa" ] }
         { [ target-os windows? ] [ "ui.backend.windows" ] }
         { [ target-os haiku? ] [ "ui.backend.gtk3" ] }

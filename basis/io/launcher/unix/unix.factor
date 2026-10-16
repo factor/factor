@@ -271,11 +271,17 @@ M: unix (process-notifications?)
     ] [ SIG_SETMASK old-mask f pthread_sigmask check-posix ] finally ;
 
 :: use-posix-spawn? ( process -- ? )
-    os linux? os haiku? or os macos? cpu arm.64? and or
-    ! NetBSD spawns in the kernel without copying the Factor heap.
-    ! Its spawn API has no setsid flag, so session creation still uses fork.
-    os netbsd? cpu alpha.64? not and
-    process group>> +new-session+ eq? not and or ;
+    os android? [
+        ! Bionic did not provide posix_spawn until API 28, and its chdir
+        ! file action did not arrive until API 34.
+        f
+    ] [
+        os linux-kernel? os haiku? or os macos? cpu arm.64? and or
+        ! NetBSD spawns in the kernel without copying the Factor heap.
+        ! Its spawn API has no setsid flag, so session creation still uses fork.
+        os netbsd? cpu alpha.64? not and
+        process group>> +new-session+ eq? not and or
+    ] if ;
 
 M: unix (run-process)
     dup use-posix-spawn?

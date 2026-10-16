@@ -57,7 +57,7 @@ GENERIC: image>stream ( image extension class -- )
     binary [ image>stream ] with-file-writer ;
 
 : pure-image-loaders? ( os -- ? )
-    { freebsd netbsd openbsd } member? ;
+    { android freebsd netbsd openbsd } member? ;
 
 {
     { [ os macos? ] [ "images.loader.cocoa" require ] }

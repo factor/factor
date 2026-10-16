@@ -1,0 +1,12 @@
+include vm/Config.unix
+DLL_EXTENSION := .so
+PLAF_DLL_OBJS += $(BUILD_DIR)/os-genunix.o $(BUILD_DIR)/os-android.o \
+  $(BUILD_DIR)/android-entry.o $(BUILD_DIR)/mvm-unix.o
+PLAF_MASTER_HEADERS += vm/os-genunix.hpp vm/os-android.hpp
+LIBS := -static-libstdc++ -ldl -lm -pthread -Wl,--export-dynamic
+
+FFI_TEST_CFLAGS := -fPIC
+CFLAGS += -fPIC
+CXXFLAGS += -fPIC
+SITE_COMMON_FLAGS += -DFACTOR_NO_PTHREAD_CANCEL
+SITE_COMMON_LINKER_FLAGS += -Wl,-soname,libfactor.so

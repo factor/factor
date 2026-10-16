@@ -89,3 +89,7 @@
 #elif defined(WIN32)
 #define WINDOWS
 #endif
+
+#if defined(__ANDROID__)
+#define FACTOR_ANDROID
+#endif

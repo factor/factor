@@ -376,7 +376,7 @@ M: output-process-error error.
     0 = [ 2drop ] [ output-process-error ] if ;
 
 {
-    { [ os linux? ] [ "io.launcher.unix.linux" require ] }
+    { [ os linux-kernel? ] [ "io.launcher.unix.linux" require ] }
     { [ os unix? ] [ "io.launcher.unix" require ] }
     { [ os windows? ] [ "io.launcher.windows" require ] }
 } cond

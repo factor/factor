@@ -30,10 +30,11 @@ UNION: sh sh3 sh4 ;
 
 : cpu ( -- class ) \ cpu get-global ; foldable
 
-SINGLETONS: windows macos linux freebsd netbsd openbsd dragonflybsd haiku ;
+SINGLETONS: windows macos linux android freebsd netbsd openbsd dragonflybsd haiku ;
 
 UNION: bsd freebsd netbsd openbsd dragonflybsd ;
-UNION: unix macos linux bsd haiku ;
+UNION: linux-kernel linux android ;
+UNION: unix macos linux android bsd haiku ;
 
 : os ( -- class ) \ os get-global ; foldable
 
@@ -105,6 +106,7 @@ UNION: unix macos linux bsd haiku ;
         { "dragonflybsd" dragonflybsd }
         { "dragonfly" dragonflybsd }
         { "linux" linux }
+        { "android" android }
         { "haiku" haiku }
     } at ;
 

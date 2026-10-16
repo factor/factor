@@ -1,3 +1,4 @@
 linux
+android
 bsd
 macos

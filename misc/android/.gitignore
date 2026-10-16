@@ -1,0 +1,5 @@
+.gradle/
+app/.cxx/
+app/build/
+app/src/main/assets/factor.*.image
+app/src/main/assets/factor-resources.tar

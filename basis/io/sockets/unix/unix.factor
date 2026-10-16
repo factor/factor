@@ -192,5 +192,6 @@ M: unix host-name
     256 [ <byte-array> dup ] keep gethostname io-error
     ascii alien>string ;
 
-os linux? [ "io.sockets.unix.linux" require ] when
+os linux-kernel? [ "io.sockets.unix.linux" require ] when
+os android? [ "io.sockets.unix.android" require ] when
 os haiku? [ "io.sockets.unix.haiku" require ] when

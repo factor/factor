@@ -18,7 +18,7 @@ M: process-pidfd dispose*
     [ EPOLLIN do-epoll-del ]
     [ drop close-file ] 2tri ;
 
-M:: linux (monitor-process) ( process -- monitor/f )
+M:: linux-kernel (monitor-process) ( process -- monitor/f )
     mx get-global :> multiplexer
     multiplexer epoll-mx? [
         process handle>> 0 pidfd_open dup io-error :> fd
@@ -30,6 +30,6 @@ M:: linux (monitor-process) ( process -- monitor/f )
         process-pidfd new-disposable fd >>fd multiplexer >>mx
     ] [ f ] if ;
 
-M: linux (process-notifications?)
+M: linux-kernel (process-notifications?)
     "pidfd_open" "libc" dlsym?
     [ process-monitors? ] [ f ] if ;

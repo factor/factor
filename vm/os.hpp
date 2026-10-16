@@ -128,6 +128,14 @@
       #else
         #error "Unsupported Haiku architecture"
       #endif
+    #elif defined(__ANDROID__)
+      #define FACTOR_OS_STRING "android"
+      #include "os-android.hpp"
+      #if defined(FACTOR_ARM64)
+        #include "os-android-arm.64.hpp"
+      #else
+        #error "Unsupported Android architecture"
+      #endif
     #elif defined(__linux__)
       #define FACTOR_OS_STRING "linux"
       #include "os-linux.hpp"

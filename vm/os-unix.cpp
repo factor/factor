@@ -1,6 +1,6 @@
 #include "master.hpp"
 #include "os-unix-signals.hpp"
-#if defined(FACTOR_LOONGARCH64)
+#if defined(FACTOR_LOONGARCH64) || defined(FACTOR_NO_PTHREAD_CANCEL)
 #include <poll.h>
 #endif
 #include "../src/netbsd-riscv-fma.h"
@@ -28,6 +28,9 @@ THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
 }
 
 static void* null_dll;
+#ifdef FACTOR_ANDROID
+static void* android_runtime_dll;
+#endif
 
 void sleep_nanos(uint64_t nsec) {
   timespec ts;
@@ -62,14 +65,29 @@ void native_dlclose(void* handle) {
   dlclose(handle);
 }
 
-void factor_vm::init_ffi() { null_dll = dlopen(NULL, RTLD_LAZY); }
+void factor_vm::init_ffi() {
+  null_dll = dlopen(NULL, RTLD_LAZY);
+#ifdef FACTOR_ANDROID
+  if (android_embedded_runtime_p()) {
+    Dl_info runtime;
+    if (!dladdr(reinterpret_cast<void*>(&native_dlopen), &runtime) ||
+        !(android_runtime_dll = dlopen(runtime.dli_fname, RTLD_LAZY)))
+      fatal_error("Cannot open embedded Android runtime symbols", 0);
+  }
+#endif
+}
 
 void factor_vm::ffi_dlopen(dll* dll) {
   dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY | RTLD_GLOBAL);
 }
 
 cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
-  return (cell)native_dlsym(dll ? dll->handle : null_dll, symbol);
+  cell result = (cell)native_dlsym(dll ? dll->handle : null_dll, symbol);
+#ifdef FACTOR_ANDROID
+  if (!dll && !result && android_runtime_dll)
+    result = (cell)native_dlsym(android_runtime_dll, symbol);
+#endif
+  return result;
 }
 
 void factor_vm::ffi_dlclose(dll* dll) {
@@ -202,6 +220,35 @@ static char* append_signal_hex(char* destination, cell value) {
   _exit(1);
 }
 
+#ifdef FACTOR_ANDROID
+// ART uses synchronous faults on Java-created threads. Factor has no VM
+// context on those threads, so let the handler which was installed before
+// the embedded runtime started deal with the fault.
+static struct sigaction android_saved_sigbus;
+static struct sigaction android_saved_sigsegv;
+static struct sigaction android_saved_sigtrap;
+
+static void dispatch_android_foreign_memory_signal(int signal,
+                                                   siginfo_t* siginfo,
+                                                   void* uap) {
+  struct sigaction* saved =
+      signal == SIGBUS ? &android_saved_sigbus
+                       : signal == SIGSEGV ? &android_saved_sigsegv
+                                           : &android_saved_sigtrap;
+  if (saved->sa_handler == SIG_IGN)
+    return;
+  if (saved->sa_handler == SIG_DFL) {
+    sigaction(signal, saved, NULL);
+    kill(getpid(), signal);
+    return;
+  }
+  if (saved->sa_flags & SA_SIGINFO)
+    saved->sa_sigaction(signal, siginfo, uap);
+  else
+    saved->sa_handler(signal);
+}
+#endif
+
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {
   platform::dispatch_signal(*this, uap, handler);
 }
@@ -211,8 +258,14 @@ void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   cell fault_addr = (cell)siginfo->si_addr;
   cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
   factor_vm* vm = current_vm_p();
-  if (!vm)
+  if (!vm) {
+#ifdef FACTOR_ANDROID
+    dispatch_android_foreign_memory_signal(signal, siginfo, uap);
+    return;
+#else
     fatal_signal_without_vm(signal, fault_pc);
+#endif
+  }
   vm->set_memory_protection_error(fault_addr, fault_pc);
   vm->dispatch_signal(uap, factor::memory_signal_handler_impl);
 }
@@ -413,9 +466,15 @@ void factor_vm::unix_init_signals() {
   {
     struct sigaction memory_sigaction;
     init_sigaction_with_handler(&memory_sigaction, memory_signal_handler);
+#ifdef FACTOR_ANDROID
+    sigaction_safe(SIGBUS, &memory_sigaction, &android_saved_sigbus);
+    sigaction_safe(SIGSEGV, &memory_sigaction, &android_saved_sigsegv);
+    sigaction_safe(SIGTRAP, &memory_sigaction, &android_saved_sigtrap);
+#else
     sigaction_safe(SIGBUS, &memory_sigaction, NULL);
     sigaction_safe(SIGSEGV, &memory_sigaction, NULL);
     sigaction_safe(SIGTRAP, &memory_sigaction, NULL);
+#endif
   }
 
   {
@@ -526,7 +585,7 @@ bool safe_read(int fd, void* data, ssize_t size) {
     return (bytes == size);
 }
 
-#if defined(FACTOR_LOONGARCH64)
+#if defined(FACTOR_LOONGARCH64) || defined(FACTOR_NO_PTHREAD_CANCEL)
 // A closed control writer wakes both an idle worker and a worker waiting for
 // stdin. It also lets shutdown complete when the debugger holds stdin_mutex.
 // Avoid cancellation unwinding through a native signal frame on LoongArch.
@@ -573,7 +632,7 @@ void* stdin_loop(void* arg) {
   sigdelset(&mask, SIGQUIT);
   pthread_sigmask(SIG_SETMASK, &mask, NULL);
 
-#if !defined(FACTOR_LOONGARCH64)
+#if !defined(FACTOR_LOONGARCH64) && !defined(FACTOR_NO_PTHREAD_CANCEL)
   int unused;
   pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &unused);
   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &unused);
@@ -589,7 +648,7 @@ void* stdin_loop(void* arg) {
     for (;;) {
       // If we fep, the parent thread will grab stdin_mutex and send us
       // SIGUSR2 to interrupt the read() call.
-#if defined(FACTOR_LOONGARCH64)
+#if defined(FACTOR_LOONGARCH64) || defined(FACTOR_NO_PTHREAD_CANCEL)
       if (!wait_console_input()) {
         loop_running = false;
         break;
@@ -599,7 +658,7 @@ void* stdin_loop(void* arg) {
       pthread_mutex_unlock(&stdin_mutex);
 #endif
       ssize_t bytes = read(0, buf, sizeof(buf));
-#if defined(FACTOR_LOONGARCH64)
+#if defined(FACTOR_LOONGARCH64) || defined(FACTOR_NO_PTHREAD_CANCEL)
       pthread_mutex_unlock(&stdin_mutex);
 #endif
       if (bytes < 0) {
@@ -640,13 +699,13 @@ void open_console() {
 //   http://www.nvnews.net/vbulletin/showthread.php?t=164619
 void close_console() {
   if (stdin_thread_initialized_p) {
-#if defined(FACTOR_LOONGARCH64)
+#if defined(FACTOR_LOONGARCH64) || defined(FACTOR_NO_PTHREAD_CANCEL)
     safe_close(control_write);
 #else
     pthread_cancel(stdin_thread);
 #endif
     pthread_join(stdin_thread, 0);
-#if defined(FACTOR_LOONGARCH64)
+#if defined(FACTOR_LOONGARCH64) || defined(FACTOR_NO_PTHREAD_CANCEL)
     stdin_thread_initialized_p = false;
 #endif
   }

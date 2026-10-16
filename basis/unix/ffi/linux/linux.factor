@@ -141,12 +141,14 @@ STRUCT: exit_status
     { e_exit short } ;
 
 ! x86 and MIPS glibc share the on-disk format between 32- and 64-bit
-! processes. AArch64 uses the native long/timeval layout instead.
+! processes. Bionic and AArch64 glibc use the native long/timeval layout.
 C-TYPE: utmpx-session
 C-TYPE: utmpx-seconds
 <<
-cpu x86? cpu mips? or int long ? \ utmpx-session typedef
-cpu mips? [ int ] [ cpu x86? uint long ? ] if \ utmpx-seconds typedef
+os android? [ long ] [ cpu x86? cpu mips? or int long ? ] if
+\ utmpx-session typedef
+os android? [ long ] [ cpu mips? [ int ] [ cpu x86? uint long ? ] if ] if
+\ utmpx-seconds typedef
 >>
 STRUCT: utmpx-timeval
     { sec utmpx-seconds }

@@ -153,15 +153,26 @@ M: failing-datagram-address (get-local-address)
 ] unit-test
 
 ! sockaddr-un has a fixed-size byte array, including the terminating NUL.
-{ t t } [
-    "/factor-socket" <local> make-sockaddr path>>
-    [ length max-un-path = ]
-    [ utf8 alien>string "/factor-socket" = ] bi
-] unit-test
+os android? [
+    { t } [
+        "/factor-socket" <local>
+        [ dup make-sockaddr ] keep parse-sockaddr =
+    ] unit-test
+] [
+    { t t } [
+        "/factor-socket" <local> make-sockaddr path>>
+        [ length max-un-path = ]
+        [ utf8 alien>string "/factor-socket" = ] bi
+    ] unit-test
+] if
 
 { t } [
     max-un-path 2 - CHAR: a <string> "/" prepend
-    dup <local> make-sockaddr path>> utf8 alien>string =
+    os android? [
+        <local> [ dup make-sockaddr ] keep parse-sockaddr =
+    ] [
+        dup <local> make-sockaddr path>> utf8 alien>string =
+    ] if
 ] unit-test
 
 [

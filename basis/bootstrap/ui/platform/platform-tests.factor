@@ -32,6 +32,10 @@ IN: bootstrap.ui.platform.tests
     { x86.64 arm.64 } [ haiku swap default-ui-backend ] map
 ] unit-test
 
+{ { "ui.backend.android" "ui.backend.android" } } [
+    { arm.64 x86.64 } [ android swap default-ui-backend ] map
+] unit-test
+
 ! Regression: choosing a GTK vocab is insufficient unless its native backend
 ! registration covers that target. These are the exact predicates used by the
 ! GTK2/GTK3 registration sites, including the formerly omitted systems.
