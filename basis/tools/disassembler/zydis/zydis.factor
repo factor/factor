@@ -1,7 +1,6 @@
 ! Copyright (C) 2026 John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.libraries
-alien.libraries.finder
 alien.strings alien.syntax arrays classes.struct combinators
 hex-strings io.files kernel layouts locals make math math.bitwise namespaces
 sequences system tools.disassembler.private tools.memory ;
@@ -13,20 +12,6 @@ C-LIBRARY: libzydis {
     { linux "libZydis.so.4.1" }
     { unix "libZydis.so" }
 }
-
-<<
-"libzydis" "Zydis" cdecl ?update-library
-
-! Also support Homebrew and MacPorts without requiring DYLD_LIBRARY_PATH.
-os macos? "libzydis" lookup-library dll>> dll-valid? not and [
-    {
-        "/opt/homebrew/lib/libZydis.dylib"
-        "/usr/local/lib/libZydis.dylib"
-        "/opt/local/lib/libZydis.dylib"
-    } [ file-exists? ] find nip
-    [ "libzydis" swap cdecl update-library ] when*
-] when
->>
 
 LIBRARY: libzydis
 
