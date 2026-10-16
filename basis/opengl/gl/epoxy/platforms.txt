@@ -4,3 +4,4 @@ netbsd
 openbsd
 dragonflybsd
 haiku
+illumos

@@ -11,6 +11,7 @@ IN: bootstrap.ui.platform
         { [ target-os windows? ] [ "ui.backend.windows" ] }
         { [ target-os haiku? ] [ "ui.backend.gtk3" ] }
         { [ target-os freebsd? ] [ "ui.backend.gtk3" ] }
+        { [ target-os illumos? ] [ "ui.backend.gtk2" ] }
         { [ target-os linux? ] [
             "ui.backend.gtk4" vocab-architectures
             [ target-cpu swap class<= ] any?
@@ -22,7 +23,7 @@ IN: bootstrap.ui.platform
 ! The selected backend must install its hook on every supported target OS.
 ! Linux/FreeBSD retain both historical GTK2 and GTK3 registration paths.
 : gtk2-backend-platform? ( target-os -- ? )
-    { linux freebsd netbsd openbsd dragonflybsd } member? ;
+    { linux freebsd netbsd openbsd dragonflybsd illumos } member? ;
 
 : gtk3-backend-platform? ( target-os -- ? )
     { linux freebsd haiku } member? ;

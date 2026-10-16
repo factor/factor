@@ -63,7 +63,11 @@ M: unix copy-file
 ! An easy way to return +unknown+ is to mount a .iso on macOS and
 ! call directory-entries on the mount point.
 
-<< os haiku? "io.directories.unix.haiku" "io.directories.unix.typed" ? require >>
+<< os {
+    { [ dup haiku? ] [ drop "io.directories.unix.haiku" ] }
+    { [ dup illumos? ] [ drop "io.directories.unix.illumos" ] }
+    [ drop "io.directories.unix.typed" ]
+} cond require >>
 
 : next-dirent ( DIR* dirent* -- dirent* ? )
     f void* <ref> [

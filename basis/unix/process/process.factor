@@ -190,13 +190,13 @@ FUNCTION: int setpriority ( int which, id_t who, int prio )
 
 ! Flags for waitpid
 
-CONSTANT: WNOHANG   1
-CONSTANT: WUNTRACED 2
+CONSTANT: WNOHANG   $[ os illumos? 0x40 1 ? ]
+CONSTANT: WUNTRACED $[ os illumos? 0x4 2 ? ]
 
-CONSTANT: WSTOPPED   2
-CONSTANT: WEXITED    4
-CONSTANT: WCONTINUED 8
-CONSTANT: WNOWAIT    0x1000000
+CONSTANT: WSTOPPED   $[ os illumos? 0x4 2 ? ]
+CONSTANT: WEXITED    $[ os illumos? 0x1 4 ? ]
+CONSTANT: WCONTINUED 0x8
+CONSTANT: WNOWAIT    $[ os illumos? 0x80 0x1000000 ? ]
 
 ! Examining status
 

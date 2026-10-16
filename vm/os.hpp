@@ -34,7 +34,15 @@
     #endif
   #else
     #include "os-genunix.hpp"
-    #if defined(__DragonFly__)
+    #if defined(__sun) && defined(__SVR4)
+      #define FACTOR_OS_STRING "illumos"
+      #include "os-illumos.hpp"
+      #if defined(FACTOR_AMD64)
+        #include "os-illumos-x86.64.hpp"
+      #else
+        #error "Unsupported illumos architecture"
+      #endif
+    #elif defined(__DragonFly__)
       #define FACTOR_OS_STRING "dragonflybsd"
       #include "os-freebsd.hpp"
       #if defined(FACTOR_AMD64)

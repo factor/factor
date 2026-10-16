@@ -1423,6 +1423,78 @@
         ]
       }
     },
+    "illumos-x86-64": {
+      "build": {
+        "config": "illumos.x86.64",
+        "make": "gmake",
+        "jobs": 4
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/illumos-x86-64/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34222",
+          "factor@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {
+          "DISPLAY": ":99"
+        }
+      },
+      "extract_command": "gzip -dc | pax -r",
+      "guest": {
+        "argv": [
+          "qemu-system-x86_64",
+          "-machine",
+          "q35,accel=kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "4096",
+          "-smp",
+          "4",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34222-:22",
+          "-device",
+          "e1000,netdev=n",
+          "-no-reboot"
+        ],
+        "drives": [
+          {
+            "file": "${assets}/illumos-x86-64/system.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "display_args": [
+          "-display",
+          "vnc=127.0.0.1:42"
+        ],
+        "setup": "test -S /tmp/.X11-unix/X99 || (nohup Xvfb :99 -screen 0 1280x1024x24 >/tmp/factor-xvfb.log 2>&1 &)",
+        "shutdown": "sync; pfexec /usr/sbin/shutdown -y -g 0 -i 5"
+      },
+      "stall_seconds": 0,
+      "work_root": "/export/home/factor"
+    },
     "linux-x86-32": {
       "build": {
         "config": "linux.x86.32"
