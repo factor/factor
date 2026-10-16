@@ -258,7 +258,7 @@ cpu riscv.32? [
             T{ ##convert-integer { dst 5 } { src 4 } { c-type $[ int base-type ] } }
         }
     }
-] [ cpu { x86.32 arm.32 ppc.32 sparc.32 } member? cpu sh? or
+] [ cell 4 =
 {
     { 2 4 }
     { { int-rep f f $[ cell ] } { int-rep f f 4 } }

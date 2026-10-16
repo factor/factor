@@ -88,6 +88,40 @@ static void test_jit_template_parameters(bool third_field, cell pairs, bool coll
   jit_parameter_visitor visitor{vm};
   block->each_instruction_operand(visitor);
   check(visitor.seen == 3 + pairs, "Relocation visitor omitted template operands");
+  cell first_relocation = 0;
+  cell second_relocation = 0;
+  auto first_two_dlsyms = [&](instruction_operand op) {
+    if (op.rel.type() != RT_DLSYM)
+      return;
+    if (!first_relocation)
+      first_relocation = op.pointer;
+    else if (!second_relocation)
+      second_relocation = op.pointer;
+  };
+  block->each_instruction_operand(first_two_dlsyms);
+  check(first_relocation && second_relocation &&
+            first_relocation < second_relocation,
+        "Fixture did not produce ordered dlsym relocations");
+  check(block->dlsym_parameter_index_at_or_before(first_relocation - 1) ==
+            cell(-1),
+        "Dlsym lookup selected a future relocation");
+  check(block->dlsym_parameter_index_at_or_before(first_relocation) == 0,
+        "Dlsym lookup missed a relocation at the return boundary");
+  check(block->dlsym_parameter_index_at_or_before(second_relocation - 1) == 0,
+        "Dlsym lookup did not retain the preceding relocation");
+  check(block->dlsym_parameter_index_at_or_before(second_relocation) == 2,
+        "Dlsym lookup did not advance at the next relocation");
+
+  std::set<cell> saved_blocks = vm.code->all_blocks;
+  code_block* boundary_caller = reinterpret_cast<code_block*>(0x1000);
+  code_block* following = reinterpret_cast<code_block*>(0x1100);
+  vm.code->all_blocks.clear();
+  vm.code->all_blocks.insert((cell)boundary_caller);
+  vm.code->all_blocks.insert((cell)following);
+  check(vm.code->code_block_for_address((cell)following - 1) ==
+            boundary_caller,
+        "Byte before allocation boundary did not select the calling block");
+  vm.code->all_blocks = std::move(saved_blocks);
   std::cout << "JIT template parameters: fields=" << (third_field ? 3 : 2)
             << " static-pairs=" << pairs << " collect=" << collect << " passed\n";
 }

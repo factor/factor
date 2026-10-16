@@ -1,4 +1,4 @@
-"""The same shell commands run locally, over SSH, or on an owned serial socket."""
+"""The same shell commands run locally, over SSH/ADB, or on a serial socket."""
 import base64
 from pathlib import Path
 import shlex
@@ -20,8 +20,13 @@ class Transport:
         kind = self.config['kind']
         if kind == 'serial':
             return self.serial(command, log, stdin)
-        argv = (self.config['argv'] + ['sh -c ' + shlex.quote(command)]
-                if kind == 'ssh' else ['sh', '-c', command])
+        if kind in ('ssh', 'adb'):
+            # ADB shell v2 carries the remote exit status. Avoid a PTY so
+            # source archives and seed images retain their exact bytes.
+            prefix = ['shell', '-T'] if kind == 'adb' else []
+            argv = self.config['argv'] + prefix + ['sh -c ' + shlex.quote(command)]
+        else:
+            argv = ['sh', '-c', command]
         return process.run(argv, log, cwd=self.cwd, stdin=stdin,
                            stall_seconds=self.stall_seconds, progress=self.progress)
 
@@ -78,6 +83,26 @@ class Transport:
                 elif self.stall_seconds and time.monotonic() - last_progress >= self.stall_seconds:
                     raise RuntimeError('serial console stopped making progress')
 
+    def receive_to_eof(self, connection, output):
+        connection.settimeout(1)
+        previous = None
+        last_progress = time.monotonic()
+        while True:
+            try:
+                data = connection.recv(65536)
+                if not data:
+                    return
+                output.write(data)
+                output.flush()
+                last_progress = time.monotonic()
+            except socket.timeout:
+                sample = self.progress() if self.progress else None
+                if sample != previous:
+                    previous = sample
+                    last_progress = time.monotonic()
+                elif self.stall_seconds and time.monotonic() - last_progress >= self.stall_seconds:
+                    raise RuntimeError('serial upload stopped making progress')
+
     def login(self, steps, log):
         with self.connect() as connection, Path(log).open('ab') as output:
             for step in steps:
@@ -88,10 +113,25 @@ class Transport:
     def serial(self, command, log, stdin):
         token = uuid.uuid4().hex
         marker = ('\nFACTOR_EXIT_' + token + ' ').encode()
+        temporary = '/tmp/factor-input-' + token
+        if stdin is not None and self.config.get('binary_stdin'):
+            # The owned TCP shell is binary clean. End its input half after a
+            # raw transfer, then run the command through a fresh connection.
+            with self.connect() as connection, Path(log).open('ab') as output:
+                ready = ('FACTOR_UPLOAD_' + token + '\n').encode()
+                self.send(connection, ("printf '" + ready.decode() + "'; exec cat > " +
+                                       shlex.quote(temporary) + '\n').encode())
+                self.receive_until(connection, ready, output)
+                while chunk := stdin.read(65536):
+                    self.send(connection, chunk)
+                connection.shutdown(socket.SHUT_WR)
+                self.receive_to_eof(connection, output)
+            command = (f'sh -c {shlex.quote(command)} < {temporary}; ' +
+                       f'code=$?; rm -f {temporary}; exit "$code"')
+            stdin = None
         with self.connect() as connection, Path(log).open('ab') as output:
             if stdin is not None:
                 # Fixed-size base64 lines fit old UARTs; the guest spool is private.
-                temporary = '/tmp/factor-input-' + token
                 self.send(connection, ('stty -echo; cat > ' + temporary + ".b64 <<'FACTOR_EOF'\n").encode())
                 while chunk := stdin.read(384):
                     self.send(connection, base64.b64encode(chunk) + b'\n')

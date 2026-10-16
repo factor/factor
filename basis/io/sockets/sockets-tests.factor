@@ -173,7 +173,8 @@ os unix? [
 { 80 } [ "http" lookup-protocol-port ] unit-test
 { f } [ f lookup-protocol-port ] unit-test
 
-{ t } [ 80 port-protocol { "http" "www" } member? ] unit-test
+! Reverse service databases are optional; any returned name must roundtrip.
+{ t } [ 80 port-protocol [ lookup-protocol-port 80 = ] [ t ] if* ] unit-test
 { f } [ f port-protocol ] unit-test
 
 [ "you-cant-resolve-me!" resolve-host ] [ addrinfo-error? ] must-fail-with

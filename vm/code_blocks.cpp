@@ -5,6 +5,16 @@
 
 namespace factor {
 
+cell code_block::dlsym_parameter_index_at_or_before(cell address) {
+  cell result = static_cast<cell>(-1);
+  auto visitor = [&](instruction_operand op) {
+    if (op.rel.type() == RT_DLSYM && op.pointer <= address)
+      result = op.index;
+  };
+  each_instruction_operand(visitor);
+  return result;
+}
+
 static cell code_block_owner(code_block* compiled) {
   cell owner = compiled->owner;
 
@@ -265,7 +275,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
       return hppa_function_field((cell)&factor::trampoline, 0);
     case RT_TRAMPOLINE2:
       return hppa_function_field((cell)&factor::trampoline2, 0);
-#elif defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_S390X) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_SPARC) || defined(FACTOR_SH) || defined(FACTOR_M88K)
+#elif defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_S390X) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_SPARC) || defined(FACTOR_SH) || defined(FACTOR_M88K)
     case RT_TRAMPOLINE:
       return (cell)&factor::trampoline;
     case RT_TRAMPOLINE2:
@@ -331,10 +341,18 @@ struct initial_code_block_visitor {
         return next_literal();
       case RT_ENTRY_POINT:
         return compute_entry_point_address(next_literal());
-      case RT_ENTRY_POINT_PIC:
-        return parent->compute_entry_point_pic_address(next_literal());
-      case RT_ENTRY_POINT_PIC_TAIL:
-        return parent->compute_entry_point_pic_tail_address(next_literal());
+      case RT_ENTRY_POINT_PIC: {
+        cell owner = next_literal();
+        return TAG(owner) == WORD_TYPE
+          ? parent->compute_entry_point_pic_address(owner)
+          : op.compiled->entry_point();
+      }
+      case RT_ENTRY_POINT_PIC_TAIL: {
+        cell owner = next_literal();
+        return TAG(owner) == WORD_TYPE
+          ? parent->compute_entry_point_pic_tail_address(owner)
+          : op.compiled->entry_point();
+      }
       case RT_HERE:
         return compute_here_address(next_literal(), op.rel.offset(), op.compiled);
       case RT_UNTAGGED:
@@ -463,41 +481,38 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
 
 // References to undefined symbols are patched up to call this function on
 // image load. It finds the symbol and library, and throws an error.
-void factor_vm::undefined_symbol() {
-  cell frame = ctx->callstack_top;
-#ifdef FACTOR_SPARC
-  cell return_address = sparc_frame_return_address(frame);
-#else
-  cell return_address = *(cell*)(frame + FRAME_RETURN_ADDRESS);
-#endif
-  code_block* compiled = code->code_block_for_address(return_address);
+void factor_vm::undefined_symbol(cell return_address) {
+  // A call may be the final instruction in a block. Its return address then
+  // equals the next allocation boundary, so classify the byte preceding it.
+  code_block* compiled = code->code_block_for_address(return_address - 1);
 
-  // Find the RT_DLSYM relocation nearest to the given return address.
-  cell symbol = false_object;
-  cell library = false_object;
-
-  auto find_symbol_at_address_visitor = [&](instruction_operand op) {
+  // Find the final RT_DLSYM relocation reached by this call sequence.
+  cell relocation_address = return_address;
 #if defined(FACTOR_ARM64)
-    static const cell offset = 0xc;
-#else
-    static const cell offset = 0;
+  // The ARM64 call sequence stores its dlsym literal after the return PC.
+  relocation_address += 0xc;
 #endif
-    if (op.rel.type() == RT_DLSYM && op.pointer <= return_address + offset) {
-      array* parameters = untag<array>(compiled->parameters);
-      cell index = op.index;
-      symbol = array_nth(parameters, index);
-      library = array_nth(parameters, index + 1);
-    }
-  };
-  compiled->each_instruction_operand(find_symbol_at_address_visitor);
+  cell index = compiled->dlsym_parameter_index_at_or_before(relocation_address);
 
-  if (!to_boolean(symbol))
+  if (index == static_cast<cell>(-1))
     critical_error("Can't find RT_DLSYM at return address", return_address);
-  else
-    general_error(ERROR_UNDEFINED_SYMBOL, symbol, library);
+
+  array* parameters = untag<array>(compiled->parameters);
+  general_error(ERROR_UNDEFINED_SYMBOL, array_nth(parameters, index),
+                array_nth(parameters, index + 1));
 }
 
 void undefined_symbol() {
-  return current_vm()->undefined_symbol();
+  factor_vm* vm = current_vm();
+#ifdef FACTOR_SPARC
+  cell return_address = sparc_frame_return_address(vm->ctx->callstack_top);
+#else
+  cell return_address =
+      *(cell*)(vm->ctx->callstack_top + FRAME_RETURN_ADDRESS);
+#endif
+  // Native calls enter through a trampoline. Its C call to this function
+  // makes the compiler return address point into the trampoline, while the
+  // linked frame contains the return PC of the Factor call site.
+  return vm->undefined_symbol(return_address);
 }
 }

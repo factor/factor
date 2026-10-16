@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit kernel
-linked-assocs namespaces sequences ui.commands words ;
+USING: accessors arrays assocs combinators.short-circuit help.markup kernel
+linked-assocs namespaces quotations sequences ui.commands ui.gestures words ;
 IN: ui.operations
 
 SYMBOL: +keyboard+
@@ -86,6 +86,14 @@ operations [ <linked-hash> ] initialize
 
 : define-operation-map ( class group blurb object translator -- )
     operations>commands define-command-map ;
+
+: $operations ( element -- )
+    >quotation call( -- obj )
+    f operations>commands
+    command-map. ;
+
+: $operation ( element -- )
+    first +keyboard+ word-prop gesture>string $snippet ;
 
 : operation-quot ( target operation -- quot )
     [ translator>> ] [ command>> ] bi '[ _ @ _ execute ] ;

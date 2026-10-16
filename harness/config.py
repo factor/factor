@@ -16,7 +16,10 @@ def digest(value):
 def merge(base, changes):
     result = deepcopy(base)
     for key, value in changes.items():
-        result[key] = merge(result[key], value) if isinstance(value, dict) and isinstance(result.get(key), dict) else deepcopy(value)
+        if isinstance(value, dict) and isinstance(result.get(key), dict):
+            result[key] = merge(result[key], value)
+        else:
+            result[key] = deepcopy(value)
     return result
 
 
@@ -55,19 +58,43 @@ def load(name, assets, site=None, path=PROFILES):
     return profile
 
 
+def is_relative_path(value):
+    """A lexical path below the run directory, without parent traversal."""
+    return (isinstance(value, str) and bool(value) and value != '.' and
+            not Path(value).is_absolute() and '..' not in Path(value).parts)
+
+
 def validate(profile):
     if not re.fullmatch(r'[a-z0-9][a-z0-9-]*', profile['id']):
         raise ValueError('profile ID must be a simple filename')
-    if profile['transport']['kind'] not in ('local', 'ssh', 'serial'):
-        raise ValueError('transport must be local, ssh, or serial')
+    if profile['transport']['kind'] not in ('local', 'ssh', 'adb', 'serial'):
+        raise ValueError('transport must be local, ssh, adb, or serial')
+    if profile['transport']['kind'] == 'adb':
+        argv = profile['transport'].get('argv', [])
+        serial_index = argv.index('-s') + 1 if '-s' in argv else len(argv)
+        if serial_index >= len(argv) or not argv[serial_index]:
+            raise ValueError('ADB transport requires an explicit -s device serial')
     if not (ROOT / 'vm' / ('Config.' + profile['build']['config'])).is_file():
         raise ValueError('missing VM build configuration')
-    if not isinstance(profile.get('stall_seconds', 0), (int, float)) or profile.get('stall_seconds', 0) < 0:
+    stall_seconds = profile.get('stall_seconds', 0)
+    if not isinstance(stall_seconds, (int, float)) or stall_seconds < 0:
         raise ValueError('stall_seconds must be nonnegative; zero disables it')
     for section in ('build', 'execution'):
         for key, value in profile.get(section, {}).get('env', {}).items():
-            if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', key) or not isinstance(value, str):
+            if (not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', key) or
+                    not isinstance(value, str)):
                 raise ValueError(f'invalid {section} environment entry: {key}')
+    for key, value in profile.get('execution', {}).get('directories', {}).items():
+        if (not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', key) or
+                not is_relative_path(value)):
+            raise ValueError('execution directories must be relative paths inside the run directory')
+    if profile['build'].get('host'):
+        artifacts = profile['build'].get('artifacts')
+        if not isinstance(artifacts, list) or not artifacts:
+            raise ValueError('host builds must list the artifacts to upload')
+        for name in artifacts:
+            if not is_relative_path(name):
+                raise ValueError('build artifacts must be relative paths inside the build directory')
     validate_guest(profile.get('guest'))
     for arg in profile.get('heap', []):
         if not re.fullmatch(r'-(young|aging|tenured)=\d+', arg):
@@ -79,11 +106,14 @@ def validate_guest(guest):
         return
     if guest.get('kind', 'qemu') not in ('qemu', 'command'):
         raise ValueError('guest kind must be qemu or command')
-    if not isinstance(guest.get('argv'), list) or not guest['argv'] or not all(isinstance(arg, str) for arg in guest['argv']):
+    argv = guest.get('argv')
+    if (not isinstance(argv, list) or not argv or
+            not all(isinstance(arg, str) for arg in argv)):
         raise ValueError('guest argv must be a nonempty list of strings')
     for drive in guest.get('drives', []) + guest.get('scratch_drives', []):
         options = drive.get('options', '')
-        if any(part.split('=')[0] in ('file', 'format') or part.startswith('file.') for part in options.split(',')):
+        if any(part.split('=')[0] in ('file', 'format') or part.startswith('file.')
+               for part in options.split(',')):
             raise ValueError('drive options cannot override the private file or format')
         if 'file' in drive and drive.get('format') not in ('raw', 'qcow2'):
             raise ValueError('backing drive format must be raw or qcow2')

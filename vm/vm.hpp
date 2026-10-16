@@ -603,7 +603,7 @@ struct factor_vm {
   void update_word_references(code_block* compiled, bool reset_inline_caches,
                               const std::set<cell>* redefined_words);
   bool pic_references_words(code_block* compiled, const std::set<cell>& words);
-  void undefined_symbol();
+  void undefined_symbol(cell return_address);
   cell compute_dlsym_address(array* literals, cell index, bool toc);
   cell lookup_external_address(relocation_type rel_type,
                                code_block* compiled,

@@ -667,7 +667,7 @@ void unlock_console() {
 }
 
 void ignore_ctrl_c() {
-  sig_t ret;
+  void (*ret)(int);
   do {
     ret = signal(SIGINT, SIG_DFL);
   } while (ret == SIG_ERR && errno == EINTR);
@@ -688,7 +688,7 @@ void factor_vm::primitive_enable_ctrl_break() {
 }
 
 void abort() {
-  sig_t ret;
+  void (*ret)(int);
   do {
     ret = signal(SIGABRT, SIG_DFL);
   } while (ret == SIG_ERR && errno == EINTR);

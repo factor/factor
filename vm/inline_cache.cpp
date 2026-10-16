@@ -198,7 +198,7 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
                << (tail_call_site ? "tail" : "non-tail")
                << " call site 0x" << std::hex << return_address.value
                << std::dec);
-  print_callstack();
+  print_callstack(std::cout);
 #endif
 
   data_root<array> cache_entries(ctx->pop(), this);
@@ -244,7 +244,7 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
     FACTOR_PRINT("Updated " << (tail_call_site ? "tail" : "non-tail")
                  << " call site 0x" << std::hex << return_address.value << std::dec
                  << " with 0x" << std::hex << (cell)xt << std::dec);
-    print_callstack();
+    print_callstack(std::cout);
 #endif
   }
 

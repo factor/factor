@@ -62,7 +62,7 @@ class Guest(AbstractContextManager):
                 if self.config.get('qmp', True):
                     self.qmp_path = self.directory / 'qmp.sock'
                     argv += ['-qmp', f'unix:{self.qmp_path},server=on,wait=off']
-                if self.transport.config['kind'] == 'serial':
+                if self.transport.config['kind'] == 'serial' and 'socket' in self.transport.config:
                     argv += ['-serial', 'unix:' + self.transport.config['socket'] + ',server=on,wait=off']
                 elif self.config.get('console_steps'):
                     self.console_path = self.directory / 'console.sock'
@@ -86,6 +86,8 @@ class Guest(AbstractContextManager):
             command = self.config.get('setup')
             if setup_record.exists():
                 command = self.config.get('resume_setup', command)
+            if self.config.get('set_clock'):
+                command = f'date -s @{int(time.time())}; ' + (command or 'true')
             if command:
                 code = self.transport.run('set -eu; ' + command, self.directory / 'setup.log')
                 if code:

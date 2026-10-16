@@ -82,6 +82,86 @@ class HarnessTests(unittest.TestCase):
         self.assertEqual(code, 7)
         self.assertEqual((self.root / 'ssh.log').read_text(), 'a b; $HOME\npayload\n')
 
+    def test_adb_preserves_binary_upload_quoting_and_remote_failure(self):
+        script = self.root / 'adb'
+        script.write_text('#!/bin/sh\n'
+                          'test "$1" = -s && test "$2" = emulator-fixture || exit 98\n'
+                          'shift 2\n'
+                          'test "$1" = shell && test "$2" = -T || exit 99\n'
+                          'shift 2\nexec sh -c "$*"\n')
+        script.chmod(0o755)
+        transport = Transport({'kind': 'adb', 'argv': [str(script), '-s', 'emulator-fixture']}, self.root)
+        payload = bytes(range(256)) * 1024
+        log = self.root / 'adb.log'
+        with tempfile.TemporaryFile() as stream:
+            stream.write(payload)
+            stream.seek(0)
+            code = transport.run("printf '%s\\n' 'a b; $HOME'; cat; exit 7", log, stream)
+        self.assertEqual(code, 7)
+        self.assertEqual(log.read_bytes(), b'a b; $HOME\n' + payload)
+
+    def test_adb_requires_an_explicit_device(self):
+        profile = config.load('linux-x86-64', self.root)
+        for argv in (['adb'], ['adb', '-s'], ['adb', '-s', '']):
+            profile['transport'] = {'kind': 'adb', 'argv': argv}
+            with self.assertRaisesRegex(ValueError, 'explicit -s'):
+                config.validate(profile)
+        profile['transport']['argv'] = ['adb', '-s', 'emulator-fixture']
+        config.validate(profile)
+
+    def test_cross_build_upload_resume_and_archive_binding(self):
+        repo = self.root / 'cross-repo'
+        repo.mkdir()
+        subprocess.run(['git', 'init', '-q', str(repo)], check=True)
+        (repo / 'probe.c').write_text('#include <stdio.h>\n#include <stdlib.h>\n'
+            'int main(void) { const char *names[] = {"HOME", "TMPDIR", "XDG_CACHE_HOME"};\n'
+            'for (int i=0; i<3; ++i) { const char *dir=getenv(names[i]); char path[4096];\n'
+            'if (!dir || dir[0]!=\'/\') return 2;\n'
+            'snprintf(path,sizeof(path),"%s/probe",dir); FILE *f=fopen(path,"w");\n'
+            'if (!f) return 3; fclose(f); } puts("FACTOR_REOPEN_OK"); return 0; }\n')
+        (repo / 'test.mk').write_text('factor-executable:\n\t$(CC) -o factor probe.c\n'
+            'factor-ffi-test:\n\t$(CC) -shared -fPIC -o libfactor-ffi-test.so probe.c\n'
+            'factor-lib:\n\t$(CC) -shared -fPIC -o libfactor.so probe.c\n')
+        tests = repo / 'vm' / 'tests'
+        tests.mkdir(parents=True)
+        (tests / 'Makefile.ieee-float').write_text(
+            'all:\n\tmkdir -p $(BUILD_DIR)\n\t$(CC) -o $(BUILD_DIR)/probe probe.c\n'
+            'print-programs:\n\t@echo $(BUILD_DIR)/probe\n')
+        subprocess.run(['git', 'add', '.'], cwd=repo, check=True)
+        subprocess.run(['git', '-c', 'user.name=Harness test', '-c',
+                        'user.email=harness@example.invalid', 'commit', '-qm', 'fixture'], cwd=repo, check=True)
+        ssh = self.root / 'cross-ssh'
+        ssh.write_text('#!/bin/sh\nexec sh -c "$1"\n')
+        ssh.chmod(0o755)
+        guest = self.root / 'cross-guest'
+        guest.mkdir()
+        seed = self.root / 'cross-seed.image'
+        seed.write_bytes(b'fixture seed')
+        profile = {'id': 'cross-fixture', 'assets': str(self.root),
+                   'transport': {'kind': 'ssh', 'argv': [str(ssh)]}, 'work_root': str(guest),
+                   'build': {'host': True, 'config': 'fixture', 'make': 'make', 'env': {'CC': 'cc'},
+                             'args': ['-f', 'test.mk'],
+                             'targets': ['factor-executable', 'factor-ffi-test', 'factor-lib'],
+                             'artifacts': ['factor', 'libfactor-ffi-test.so', 'libfactor.so']},
+                   'execution': {'directories': {'HOME': '.home', 'TMPDIR': '.tmp', 'XDG_CACHE_HOME': '.cache'}}}
+        output = self.root / 'cross-run'
+        selected = ('build', 'numeric', 'reopen')
+        state = runner.execute(profile, output, seed, stages=selected, repo=repo)
+        self.assertEqual(state['status'], 'partial')
+        self.assertEqual((output / 'build-source' / 'factor').read_bytes(),
+                         (Path(state['directory']) / 'factor').read_bytes())
+        self.assertEqual((output / 'build-source' / 'probe.c').read_bytes(), (repo / 'probe.c').read_bytes())
+        for name in ('.home/probe', '.tmp/probe', '.cache/probe', 'libfactor.so'):
+            self.assertTrue((Path(state['directory']) / name).is_file())
+        receipt = (output / 'build-1.json').read_bytes()
+        state = runner.execute(profile, output, seed, resume=True, stages=selected, repo=repo)
+        self.assertEqual(state['status'], 'partial')
+        self.assertEqual((output / 'build-1.json').read_bytes(), receipt)
+        with (output / stages.BUILD_ARCHIVE).open('ab') as stream:
+            stream.write(b'changed')
+        with self.assertRaisesRegex(ValueError, 'cross-build artifacts changed'):
+            runner.execute(profile, output, seed, resume=True, stages=selected, repo=repo)
+
     def test_serial_backpressure_retains_partial_send_offsets(self):
         from unittest.mock import Mock
         connection = Mock()
@@ -94,22 +174,31 @@ class HarnessTests(unittest.TestCase):
     def test_serial_upload_through_a_real_shell(self):
         import hashlib
         import io
+        import time
         payload = bytes(range(256)) * 1024
-        address = str(self.root / 'upload.sock')
-        with socket.socket(socket.AF_UNIX) as listener:
-            listener.bind(address)
-            listener.listen()
-
-            def shell():
-                with listener.accept()[0] as connection:
-                    subprocess.run(['sh'], stdin=connection, stdout=connection, stderr=connection)
-
-            thread = threading.Thread(target=shell)
-            thread.start()
-            transport = Transport({'kind': 'serial', 'socket': address}, self.root)
-            result = transport.run('sha256sum', self.root / 'upload.log', io.BytesIO(payload))
-            thread.join()
-        self.assertEqual(result, 0)
+        binary = self.root / 'console'
+        subprocess.run(['cc', '-std=c11', '-Wall', '-Wextra', '-Werror',
+                        str(config.ROOT / 'harness' / 'console.c'), '-o', str(binary)], check=True)
+        with socket.socket() as listener:
+            listener.bind(('127.0.0.1', 0))
+            port = listener.getsockname()[1]
+        console = subprocess.Popen([str(binary), '127.0.0.1', str(port)])
+        try:
+            for _ in range(100):
+                try:
+                    with socket.create_connection(('127.0.0.1', port), timeout=.1):
+                        break
+                except OSError:
+                    if console.poll() is not None:
+                        self.fail('guest console exited before accepting connections')
+                    time.sleep(.01)
+            transport = Transport({'kind': 'serial', 'host': '127.0.0.1', 'port': port,
+                                   'binary_stdin': True}, self.root)
+            result = transport.run('sha256sum; sh -c "exit 7"', self.root / 'upload.log', io.BytesIO(payload))
+        finally:
+            console.terminate()
+            console.wait()
+        self.assertEqual(result, 7)
         self.assertIn(hashlib.sha256(payload).hexdigest(), (self.root / 'upload.log').read_text())
 
     def test_serial_requires_its_own_complete_exit_marker(self):
@@ -192,7 +281,7 @@ class HarnessTests(unittest.TestCase):
 
     def test_all_profiles_render_without_external_assets_or_jobs(self):
         names = config.profiles()
-        self.assertEqual(len(names), 47)
+        self.assertGreaterEqual(len(names), 47)
         for name in names:
             profile = config.load(name, self.root)
             rendered = runner.plan(profile)

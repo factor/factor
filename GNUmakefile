@@ -7,22 +7,24 @@ endif
 
 ifdef CONFIG
 	VERSION := 0.103
-	GIT_LABEL := $(shell echo $(shell git describe --all)-$(shell git rev-parse HEAD))
+	GIT_DESCRIBE := $(shell git describe --all 2>/dev/null || echo unknown)
+	GIT_REVISION := $(shell git rev-parse HEAD 2>/dev/null || echo unknown)
+	GIT_LABEL := $(GIT_DESCRIBE)-$(GIT_REVISION)
 	BUNDLE := Factor.app
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
 
-	SHELL_CC := $(shell printenv CC)
+	SHELL_CC := $(shell env | sed -n 's/^CC=//p')
 	ifeq ($(SHELL_CC),)
-		CC := $(shell which clang cc 2>/dev/null | head -n 1)
+		CC := $(shell command -v clang 2>/dev/null || command -v cc 2>/dev/null || command -v gcc 2>/dev/null)
 	else
 		CC := $(SHELL_CC)
 	endif
 
 	# gmake's default CXX is g++, we prefer c++
-	SHELL_CXX := $(shell printenv CXX)
+	SHELL_CXX := $(shell env | sed -n 's/^CXX=//p')
 	ifeq ($(SHELL_CXX),)
-		CXX := $(shell which clang++ c++ 2>/dev/null | head -n 1)
+		CXX := $(shell command -v clang++ 2>/dev/null || command -v c++ 2>/dev/null || command -v g++ 2>/dev/null)
 	else
 		CXX := $(SHELL_CXX)
 	endif
@@ -475,6 +477,10 @@ test-riscv: $(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
 	$(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
 
 test-vm: test-riscv
+
+.PHONY: test-openrisc
+test-openrisc: $(BUILD_DIR)/openrisc-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/openrisc-tests$(EXE_EXTENSION)
 
 ifneq ($(filter $(BUILD_DIR)/os-unix.o,$(DLL_OBJS)),)
 $(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION): vm/tests/unix_signals.cpp $(DLL_OBJS)

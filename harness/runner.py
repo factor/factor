@@ -13,7 +13,7 @@ import uuid
 from .config import ROOT, digest
 from .guest import Guest
 from .process import write_json
-from .stages import STAGES, commands, passed
+from .stages import BUILD_ARCHIVE, STAGES, commands, passed
 from .transport import Transport
 
 
@@ -45,7 +45,11 @@ def lock(path, *, wait=False):
 
 
 def plan(profile, directory='/tmp/factor-validation'):
+    build_transport = profile['transport']
+    if profile['build'].get('host'):
+        build_transport = {'kind': 'local'}
     return {'profile': profile['id'], 'transport': profile['transport'],
+            'build_transport': build_transport,
             'guest': profile.get('guest'), 'seed': profile['seed'],
             'stages': commands(profile, directory), 'elapsed_timeout': None,
             'stall_seconds': profile.get('stall_seconds', 0)}
@@ -63,10 +67,12 @@ def attempt(output, name, command, transport, binding, stdin=None):
     try:
         code = transport.run(command, log, stdin)
         raw = log.read_bytes()
-        receipt.update(exit_code=code, background_cleanup=b'HARNESS_CLEANUP_BACKGROUND_GROUP' in raw,
+        receipt.update(exit_code=code,
+                       background_cleanup=b'HARNESS_CLEANUP_BACKGROUND_GROUP' in raw,
                        status='pass' if passed(name, code, raw) else 'fail')
     except BaseException as error:
-        receipt.update(status='interrupted' if isinstance(error, KeyboardInterrupt) else 'fail', error=str(error))
+        receipt.update(status='interrupted' if isinstance(error, KeyboardInterrupt) else 'fail',
+                       error=str(error))
         raise
     finally:
         receipt.update(ended_at=now(), log_sha256=sha(log) if log.exists() else None)
@@ -82,56 +88,78 @@ def reusable(output, record, binding):
         raise ValueError(f'changed receipt: {path}')
     receipt = json.loads(path.read_text())
     log = output / receipt['log']
-    if receipt['binding'] != binding or receipt['status'] != 'pass' or sha(log) != receipt['log_sha256']:
+    if (receipt['binding'] != binding or receipt['status'] != 'pass'
+            or sha(log) != receipt['log_sha256']):
         raise ValueError(f'cannot resume changed evidence: {path}')
     return True
+
+
+def run_directory(profile, output, run_id):
+    if profile['transport']['kind'] == 'local':
+        return str(output / 'source')
+    root = profile.get('work_root', '/tmp').rstrip('/')
+    return root + '/fc-' + run_id[:12]
+
+
+def prepare_run(profile, output, binding, *, resume, repo):
+    """Create a source snapshot or verify it before resuming, under the profile lock."""
+    if resume:
+        state = json.loads((output / 'run.json').read_text())
+        if state['binding'] != binding:
+            raise ValueError('resume requires the same source, profile, and seed')
+        if sha(output / 'source.tar.gz') != state['source_archive_sha256']:
+            raise ValueError('source archive changed')
+    else:
+        output.mkdir(parents=True, exist_ok=False)
+        archive = output / 'source.tar.gz'
+        with archive.open('xb') as stream:
+            subprocess.run(['git', 'archive', '--format=tar.gz', binding['source']['revision']],
+                           cwd=repo, stdout=stream, check=True)
+        run_id = uuid.uuid4().hex
+        state = dict(profile=profile['id'], binding=binding,
+                     directory=run_directory(profile, output, run_id), run_id=run_id,
+                     started_at=now(), status='running', stages={},
+                     source_archive_sha256=sha(archive))
+    if state['directory'] != run_directory(profile, output, state['run_id']):
+        raise ValueError('run directory does not match its recorded identity')
+    state.pop('error', None)
+    state.pop('ended_at', None)
+    state['status'] = 'running'
+    write_json(output / 'run.json', state)
+    return state
 
 
 def execute(profile, output, seed, *, resume=False, stages=STAGES, repo=ROOT):
     output = Path(output).resolve()
     seed = Path(seed).resolve(strict=True)
-    binding = {'source': source_identity(repo), 'profile_sha256': digest(profile), 'seed_sha256': sha(seed)}
+    binding = {'source': source_identity(repo), 'profile_sha256': digest(profile),
+               'seed_sha256': sha(seed)}
     # One lock across output directories prevents duplicate guests on a profile's ports.
     with lock(Path(profile['assets']) / '.locks' / (profile['id'] + '.lock')):
-        if resume:
-            state = json.loads((output / 'run.json').read_text())
-            if state['binding'] != binding:
-                raise ValueError('resume requires the same source, profile, and seed')
-            if sha(output / 'source.tar.gz') != state['source_archive_sha256']:
-                raise ValueError('source archive changed')
-        else:
-            output.mkdir(parents=True, exist_ok=False)
-            archive = output / 'source.tar.gz'
-            with archive.open('xb') as stream:
-                subprocess.run(['git', 'archive', '--format=tar.gz', binding['source']['revision']],
-                               cwd=repo, stdout=stream, check=True)
-            local = profile['transport']['kind'] == 'local'
-            run_id = uuid.uuid4().hex
-            directory = str(output / 'source') if local else profile.get('work_root', '/tmp').rstrip('/') + '/fc-' + run_id[:12]
-            state = dict(profile=profile['id'], binding=binding, directory=directory, run_id=run_id,
-                         started_at=now(), status='running', stages={},
-                         source_archive_sha256=sha(archive))
-        expected_directory = str(output / 'source') if profile['transport']['kind'] == 'local' else profile.get('work_root', '/tmp').rstrip('/') + '/fc-' + state['run_id'][:12]
-        if state['directory'] != expected_directory:
-            raise ValueError('run directory does not match its recorded identity')
-        state.pop('error', None)
-        state.pop('ended_at', None)
-        state['status'] = 'running'
-        write_json(output / 'run.json', state)
+        state = prepare_run(profile, output, binding, resume=resume, repo=repo)
         transport = Transport(profile['transport'], repo, profile.get('stall_seconds', 0))
+        host_build = profile.get('build', {}).get('host', False)
+        build_directory = str(output / 'build-source')
+        local = Transport({'kind': 'local'}, repo, profile.get('stall_seconds', 0))
         guest = Guest(profile.get('guest'), output, transport)
         transport.progress = guest.activity
         try:
             with guest:
                 directory = state['directory']
                 quote = shlex.quote
+                extract = profile.get('extract_command', 'tar xzof -')
                 setup = state.setdefault('setup', {})
+                # A reconnect may find an existing directory. Its ownership marker
+                # must match this run before we extract or overwrite anything.
+                marker = quote(directory + '/.factor-run')
+                owned_directory = (
+                    'set -eu; if test -d ' + quote(directory) +
+                    '; then test "$(cat ' + marker + ')" = ' + quote(state['run_id']) +
+                    '; else mkdir ' + quote(directory) + '; printf %s ' + quote(state['run_id']) +
+                    ' > ' + marker + '; fi')
                 for name, command, input_path in [
-                        ('directory', 'set -eu; if test -d ' + quote(directory) +
-                         '; then test "$(cat ' + quote(directory + '/.factor-run') + ')" = ' + quote(state['run_id']) +
-                         '; else mkdir ' + quote(directory) + '; printf %s ' + quote(state['run_id']) +
-                         ' > ' + quote(directory + '/.factor-run') + '; fi', None),
-                        ('source', 'set -eu; cd ' + quote(directory) + '; tar xzf -', output / 'source.tar.gz'),
+                        ('directory', owned_directory, None),
+                        ('source', 'set -eu; cd ' + quote(directory) + '; ' + extract, output / 'source.tar.gz'),
                         ('seed', 'cat > ' + quote(directory + '/boot.image'), seed)]:
                     if name in setup and reusable(output, setup[name], binding):
                         continue
@@ -139,22 +167,52 @@ def execute(profile, output, seed, *, resume=False, stages=STAGES, repo=ROOT):
                     with context as stream:
                         setup[name] = attempt(output, name, command, transport, binding, stream)
                     write_json(output / 'run.json', state)
+                if host_build and 'build-source' not in setup:
+                    with (output / 'source.tar.gz').open('rb') as stream:
+                        setup['build-source'] = attempt(output, 'build-source',
+                            'set -eu; mkdir -p ' + quote(build_directory) + '; cd ' +
+                            quote(build_directory) + '; tar xzf -', local, binding, stream)
+                    write_json(output / 'run.json', state)
+                elif host_build:
+                    reusable(output, setup['build-source'], binding)
                 if state.get('artifacts'):
                     check_artifacts(profile, directory, output, transport, binding, state)
-                for name, command in commands(profile, directory).items():
+                if host_build:
+                    stage_commands = commands(profile, directory, build_directory)
+                else:
+                    stage_commands = commands(profile, directory)
+                for name, command in stage_commands.items():
                     if name not in stages:
                         continue
-                    if name in state['stages'] and reusable(output, state['stages'][name], binding):
+                    reuse = name in state['stages'] and reusable(output, state['stages'][name], binding)
+                    if reuse and not (host_build and name == 'build'):
                         continue
                     shared_io = name in ('io', 'ui')
                     if shared_io:
                         state['waiting_for'] = 'shared IO lock'
                         write_json(output / 'run.json', state)
-                    context = lock(Path(profile['assets']) / '.locks' / 'io.lock', wait=True) if shared_io else nullcontext()
+                    context = nullcontext()
+                    if shared_io:
+                        context = lock(Path(profile['assets']) / '.locks' / 'io.lock', wait=True)
                     with context:
                         state.pop('waiting_for', None)
                         write_json(output / 'run.json', state)
-                        state['stages'][name] = attempt(output, name, command, transport, binding)
+                        if not reuse:
+                            selected = local if host_build and name == 'build' else transport
+                            state['stages'][name] = attempt(output, name, command, selected, binding)
+                    if host_build and name == 'build':
+                        archive = output / BUILD_ARCHIVE
+                        current = sha(archive)
+                        if state.get('build_archive_sha256', current) != current:
+                            raise ValueError('cross-build artifacts changed')
+                        state['build_archive_sha256'] = current
+                        if 'build-upload' in setup:
+                            reusable(output, setup['build-upload'], binding)
+                        else:
+                            with archive.open('rb') as stream:
+                                setup['build-upload'] = attempt(output, 'build-upload',
+                                    'set -eu; cd ' + quote(directory) + '; ' + extract,
+                                    transport, binding, stream)
                     if name == 'bootstrap':
                         check_artifacts(profile, directory, output, transport, binding, state)
                     write_json(output / 'run.json', state)
@@ -162,9 +220,15 @@ def execute(profile, output, seed, *, resume=False, stages=STAGES, repo=ROOT):
                     check_artifacts(profile, directory, output, transport, binding, state)
             complete = all(name in state['stages'] for name in STAGES)
             closed = closure_passed(guest.closed, profile.get('guest', {}))
-            state['status'] = 'pass' if complete and closed else 'partial' if closed else 'fail'
+            if not closed:
+                state['status'] = 'fail'
+            elif complete:
+                state['status'] = 'pass'
+            else:
+                state['status'] = 'partial'
         except BaseException as error:
-            state.update(status='interrupted' if isinstance(error, KeyboardInterrupt) else 'fail', error=str(error))
+            state.update(status='interrupted' if isinstance(error, KeyboardInterrupt) else 'fail',
+                         error=str(error))
             raise
         finally:
             state.update(ended_at=now(), closure=guest.closed)
@@ -182,10 +246,13 @@ def closure_passed(closure, config):
 
 
 def check_artifacts(profile, directory, output, transport, binding, state):
-    names = ['factor', 'factor.image', 'boot.image', 'libfactor-ffi-test.so']
+    names = profile.get('artifacts', ['factor', 'factor.image', 'boot.image', 'libfactor-ffi-test.so'])
+    joined = shlex.join(names)
     command = ('set -eu; cd ' + shlex.quote(directory) +
-               '; if command -v sha256sum >/dev/null; then sha256sum ' +
-               shlex.join(names) + '; else sha256 ' + shlex.join(names) + '; fi')
+               '; if command -v sha256sum >/dev/null; then sha256sum ' + joined +
+               '; elif command -v sha256 >/dev/null; then sha256 ' + joined +
+               '; else for path in ' + joined +
+               '; do printf "%s  %s\\n" "$(digest -a sha256 "$path")" "$path"; done; fi')
     record = attempt(output, 'artifacts', command, transport, binding)
     receipt = json.loads((output / record['receipt']).read_text())
     hashes = {}

@@ -1,4 +1,4 @@
-USING: accessors alien.c-types arrays byte-arrays calendar concurrency.promises
+USING: accessors alien.c-types alien.libraries arrays byte-arrays calendar concurrency.promises
 continuations destructors environment io
 io.backend.unix io.directories io.encodings.ascii
 io.encodings.binary io.encodings.utf8 io.files io.files.info.unix
@@ -275,25 +275,28 @@ QUALIFIED: unix.ffi
 
 ! Check the disposition before exec, which would reset a bogus handler.
 :: test-reset-sigpipe ( -- default? )
-    SIGPIPE unix.ffi:SIG_IGN unix.ffi:signal :> previous
+    SIGPIPE unix.ffi:SIG_IGN unix.ffi:signal drop
     [
         reset-ignored-signals
         SIGPIPE unix.ffi:SIG_IGN unix.ffi:signal unix.ffi:SIG_DFL =
-    ] [ SIGPIPE previous unix.ffi:signal drop ] finally ;
+    ] [ SIGPIPE unix.ffi:SIG_IGN unix.ffi:signal drop ] finally ;
 
 { t } [ test-reset-sigpipe ] unit-test
 
 ! A sigset_t is opaque; shifting by the signal number also selected SIGALRM.
-{ 1 0 } [
-    posix-spawnattr-init [
-        [
-            reset-ignored-signals*
-            sigset_t heap-size <byte-array>
-            [ posix_spawnattr_getsigdefault check-posix ] keep
-            [ SIGPIPE sigismember ] [ SIGALRM sigismember ] bi
-        ] keep
-    ] [ posix-spawnattr-destroy ] finally
-] unit-test
+! Older Bionic uses fork and does not expose POSIX spawn attributes.
+"posix_spawnattr_getsigdefault" f dlsym? [
+    { 1 0 } [
+        posix-spawnattr-init [
+            [
+                reset-ignored-signals*
+                sigset_t heap-size <byte-array>
+                [ posix_spawnattr_getsigdefault check-posix ] keep
+                [ SIGPIPE sigismember ] [ SIGALRM sigismember ] bi
+            ] keep
+        ] [ posix-spawnattr-destroy ] finally
+    ] unit-test
+] when
 
 ! Use the base system shell for the priority and process-group tests.
 ! Test priority

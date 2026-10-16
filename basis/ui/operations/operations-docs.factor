@@ -3,14 +3,6 @@ kernel hashtables strings classes quotations sequences
 ui.gestures ;
 IN: ui.operations
 
-: $operations ( element -- )
-    >quotation call( -- obj )
-    f operations>commands
-    command-map. ;
-
-: $operation ( element -- )
-    first +keyboard+ word-prop gesture>string $snippet ;
-
 HELP: +keyboard+
 { $description "A key which may be set in the hashtable passed to " { $link define-operation } ". The value is a gesture." } ;
 
