@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.syntax classes.struct combinators kernel literals
-sequences system ;
+openssl.libraries sequences system ;
 
 IN: openssl.libcrypto
 
@@ -15,7 +15,7 @@ C-LIBRARY: libcrypto {
         } case "libcrypto-3" ".dll" surround
     ] }
     { macos "libcrypto.35.dylib" }
-    { linux "libcrypto.so.3" }
+    { linux $[ "libcrypto" linux-openssl-library ] }
     { unix "libcrypto.so" }
 }
 
