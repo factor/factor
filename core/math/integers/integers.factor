@@ -65,16 +65,10 @@ M: fixnum bitnot fixnum-bitnot ; inline
     { fixnum fixnum } declare
     dup 0 >= [ neg shift even? not ] [ drop 0 < ] if ;
 
-: bignum-bit-count ( n -- n' )
-    most-negative-fixnum max most-positive-fixnum min integer>fixnum-strict ;
-
-: bit-count ( n -- n' )
-    dup fixnum? [ bignum-bit-count ] unless ; inline
-
 ! The machine bit-test instruction wraps counts at the cell width.
 ! Outside the fixnum's bits, the result is its sign extension.
 M: fixnum bit?
-    bit-count dup 0 fixnum-bits between?
+    integer>fixnum-strict dup 0 fixnum-bits between?
     [ fixnum-bit? ] [ drop 0 < ] if ; inline
 
 : fixnum-log2 ( x -- n )
@@ -125,7 +119,7 @@ M: bignum shift shift-count bignum-shift ; inline
 M: bignum abs dup 0 < [ neg ] [ >integer ] if ; inline
 
 M: bignum bitnot bignum-bitnot ; inline
-M: bignum bit? bit-count bignum-bit? ; inline
+M: bignum bit? integer>fixnum-strict bignum-bit? ; inline
 M: bignum (log2) bignum-log2 ; inline
 
 ! Converting ratios to floats. Based on FLOAT-RATIO from

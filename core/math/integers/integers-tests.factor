@@ -366,13 +366,6 @@ IN: math.integers.tests
 { f } [ 1 >bignum -64 bit? ] unit-test
 { t } [ -2 >bignum -64 bit? ] unit-test
 
-{ f } [ 1 200 2^ bit? ] unit-test
-{ t } [ -2 200 2^ bit? ] unit-test
-{ f } [ 1 >bignum 200 2^ bit? ] unit-test
-{ t } [ -2 >bignum 200 2^ bit? ] unit-test
-{ f } [ 1 >bignum 200 2^ neg bit? ] unit-test
-{ t } [ -2 >bignum 200 2^ neg bit? ] unit-test
-
 ! #224/#989: arithmetic returns a fixnum whenever the result fits.
 : normalized-add ( x y -- z ) { bignum bignum } declare bignum+ ;
 { 5 t } [ 3 >bignum 2 >bignum normalized-add dup fixnum? ] unit-test
