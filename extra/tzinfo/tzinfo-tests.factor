@@ -1,4 +1,4 @@
-USING: calendar formatting kernel tools.test tzinfo ;
+USING: calendar environment formatting io.pathnames kernel tools.test tzinfo ;
 
 {
     "Sun Oct 27 01:00:00 2002"
@@ -11,4 +11,12 @@ USING: calendar formatting kernel tools.test tzinfo ;
         "vocab:tzinfo/tests/US-Pacific" file>tzinfo normalize
         "%c" strftime
     ] bi
+] unit-test
+
+! Nix and Guix expose the timezone database through TZDIR.
+{ t } [
+    "vocab:tzinfo/tests" absolute-path "TZDIR" [
+        "US-Pacific" load-tzinfo
+        "vocab:tzinfo/tests/US-Pacific" file>tzinfo =
+    ] with-os-env
 ] unit-test

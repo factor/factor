@@ -1,5 +1,6 @@
 USING: alien.libraries.finder alien.libraries.finder.linux.private
-environment io.directories io.pathnames kernel sequences tools.test ;
+arrays environment io.directories io.encodings.utf8 io.files
+io.pathnames kernel sequences tools.test ;
 IN: alien.libraries.finder.linux.tests
 
 ! Versioned basenames from #1099, without depending on SDL being installed.
@@ -30,7 +31,8 @@ IN: alien.libraries.finder.linux.tests
         file-name "libfactor-finder-version-1.2.so.0" =
         "factor-finder-version-1.2" find-library*
         file-name "libfactor-finder-version-1.2.so.0" =
-        "m" find-library "libfactor-finder-version.so.0" copy-file
+        "libfactor-finder-version-1.2.so.0"
+        "libfactor-finder-version.so.0" copy-file
         "libfactor-finder-version" find-in-library-directories
         file-name "libfactor-finder-version.so.0" =
     ] with-os-env
@@ -55,3 +57,23 @@ IN: alien.libraries.finder.linux.tests
 
 { t } [ "m" find-library "libm.so" subseq-of? ] unit-test
 { t } [ "c" find-library "libc.so" subseq-of? ] unit-test
+
+! A wrapper-provided text cache works without ldconfig. Architecture labels
+! are only hints: validate the actual ELF, including for ARM64 and RISC-V.
+{ t } [ [
+    "m" find-library "libfactor-nix-cache.so.1" copy-file
+    "libfactor-nix-cache.so.1" absolute-path
+    " libfactor-nix-cache.so.1 (libc6,x86-64) => " prepend
+    "a wrapper cache header\n" prepend
+    "cache.txt" utf8 set-file-contents
+    "cache.txt" absolute-path "FACTOR_LD_SO_CACHE" [
+        "factor-nix-cache" find-library file-name
+        "libfactor-nix-cache.so.1" =
+    ] with-os-env
+] with-test-directory ] unit-test
+
+{ { } } [ [
+    "an empty cache\n" "cache.txt" utf8 set-file-contents
+    "cache.txt" absolute-path "FACTOR_LD_SO_CACHE"
+    [ load-ldconfig-cache ] with-os-env
+] with-test-directory ] unit-test

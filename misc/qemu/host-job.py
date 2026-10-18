@@ -12,7 +12,7 @@ import tempfile
 import time
 
 BASE = Path('/home/sheeple/factor/work/qemu-matrix/host-resources')
-PROFILES = {'vm': ('6G', '8G'), 'controller': ('3G', '4G'),
+PROFILES = {'vm': ('6G', '8G'), 'large-vm': ('8G', '10G'), 'controller': ('3G', '4G'),
             'large-controller': ('6G', '8G'), 'guest-controller': ('256M', '512M'),
             'guest-watch': ('96M', '128M'), 'probe': ('768M', '1G'), 'build': ('10G', '12G'),
             'fixture': ('64M', '64M')}
@@ -187,7 +187,7 @@ def main():
         '-p', 'MemoryHigh', '-p', 'MemoryMax', '-p', 'CPUQuotaPerSecUSec'], text=True)
     if not all(value in limits.splitlines() for value in
                ('MemoryHigh=77309411328', 'MemoryMax=90194313216', 'CPUQuotaPerSecUSec=24s')):
-        parser.error('install/start misc/qemu/factor-ports.slice first (see HOST-JOBS.md)')
+        parser.error('install/start misc/qemu/factor-ports.slice first')
     BASE.mkdir(parents=True, exist_ok=True)
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S')
     unit = f'factor-port-{args.name}-{stamp}-{os.getpid()}.service'

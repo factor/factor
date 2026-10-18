@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.libraries alien.syntax environment io
-io.pathnames kernel math math.floats.env namespaces prettyprint sequences tools.test ;
+io.pathnames kernel math math.floats.env memory namespaces prettyprint sequences tools.test ;
 IN: compiler.tests.alien-linux-runtime
 << "linux-runtime" "FACTOR_REPRO_LIBRARY" os-env [ ] [
     "resource:libfactor-ffi-test.so" absolute-path
@@ -23,6 +23,8 @@ floating-point-supported? [
     [ { +fp-zero-divide+ } [ 1.0 0.0 ffi_fp_divide drop ] with-fp-traps ]
     [ +fp-zero-divide+ vm-error-exception-flag? ] floating-point-must-fail-with
     { 2.0 } [ 4.0 2.0 ffi_fp_divide fp-status-case ] floating-point-unit-test
+    ! Exception recovery must leave only Factor frames in captured callstacks.
+    { } [ compact-gc ] unit-test
     floating-point-supported?
     [ "FFI-COVERAGE native-fp-trap executed=1" ]
     [ "FFI-COVERAGE native-fp-trap executed=0" ] if print

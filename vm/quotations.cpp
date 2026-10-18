@@ -380,9 +380,24 @@ cell factor_vm::lazy_jit_compile(cell quot_) {
 }
 
 // Allocates memory
+#if defined(__linux__) && defined(FACTOR_PPC) && defined(FACTOR_64) && \
+    defined(_CALL_ELF) && _CALL_ELF == 2
+// The Linux ELFv2 assembly entry keeps its native linkage below the published
+// Factor frame. Root its saved Factor return PC while compilation may compact
+// the code heap, then return the relocated PC to the assembly slot.
+VM_C_API cell factor_lazy_jit_compile_impl(cell quot, factor_vm* parent,
+                                            cell* return_address_slot) {
+  code_root return_address(*return_address_slot, parent);
+  cell result = parent->lazy_jit_compile(quot);
+  FACTOR_ASSERT(return_address.valid);
+  *return_address_slot = return_address.value;
+  return result;
+}
+#else
 VM_C_API cell lazy_jit_compile(cell quot, factor_vm* parent) {
   return parent->lazy_jit_compile(quot);
 }
+#endif
 
 bool factor_vm::quotation_compiled_p(quotation* quot) {
   return quot->entry_point != 0 &&

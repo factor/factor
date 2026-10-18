@@ -63,4 +63,31 @@ loop2:
 #else
     .size flush_icache,.-flush_icache
 #endif
+
+#if defined(__linux__) && defined(_ARCH_PPC64) && defined(_CALL_ELF) && _CALL_ELF == 2
+    # The generated Factor lazy stub calls this symbol with its Factor R1
+    # already published in ctx->callstack_top. Keep all native linkage below
+    # that boundary; the C++ helper roots and relocates the saved Factor LR.
+    .align 2
+    .globl lazy_jit_compile
+    .type lazy_jit_compile, @function
+lazy_jit_compile:
+    addis 2,12,.TOC.-lazy_jit_compile@ha
+    addi 2,2,.TOC.-lazy_jit_compile@l
+    .localentry lazy_jit_compile,.-lazy_jit_compile
+    mflr 0
+    stdu 1,-128(1)
+    std 2,24(1)
+    std 0,112(1)
+    addi 5,1,112
+    bl factor_lazy_jit_compile_impl
+    nop
+    ld 2,24(1)
+    ld 0,112(1)
+    addi 1,1,128
+    mtlr 0
+    blr
+    .size lazy_jit_compile,.-lazy_jit_compile
+#endif
+
     .section .note.GNU-stack,"",@progbits

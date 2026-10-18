@@ -1,0 +1,59 @@
+{
+  "guix-x86_64": {
+    "profile": "guix-x86-64",
+    "release": "1.5.0",
+    "url": "https://ftp.gnu.org/gnu/guix/guix-system-vm-image-1.5.0.x86_64-linux.qcow2",
+    "sha256": "3f4ee9039d0c72a360d2fa3e936cb0230155cfb8ed30b3656782d18aebeb7fea",
+    "kernel": "/gnu/store/pbpfl2ll5qz36bqfnl3g3vvag764714h-linux-libre-6.17.12/bzImage",
+    "initrd": "/gnu/store/py7wvw1qf0091hj7vlf6n9kxc4vrc7pq-raw-initrd/initrd.cpio.gz",
+    "append": "root=38af4c98-f6b1-2062-a75a-14c038af4c98 gnu.system=/gnu/store/3clkkwp48fi3i6iybh4sgylqf7yhkg77-system gnu.load=/gnu/store/3clkkwp48fi3i6iybh4sgylqf7yhkg77-system/boot modprobe.blacklist=usbmouse,usbkbd console=ttyS0,115200",
+    "kernel_sha256": "eba328fc22572bf8f6523fdec52e1f1ceeb8817f2d7caea3b312067f831f6e48",
+    "initrd_sha256": "0555a040241a207eeb016606eb024882b40da47d8d1700d638819623d4a977bb"
+  },
+  "guix-aarch64": {
+    "profile": "guix-arm-64",
+    "release": "1.5.0",
+    "url": "https://ftp.gnu.org/gnu/guix/guix-system-vm-image-1.5.0.aarch64-linux.qcow2",
+    "sha256": "5af764b7f5e60ab3c51d760c91ae981e08613b33b59697725ba9284b446c9bf4",
+    "kernel": "/gnu/store/dxpqhwgfblphhs051p4c6xk8szs50b21-linux-libre-6.17.12/Image",
+    "initrd": "/gnu/store/ngy4j00igm8qwplhfcg6x1sz0a4n5ffq-raw-initrd/initrd.cpio.gz",
+    "append": "root=38af4c98-f6b1-2062-a75a-14c038af4c98 gnu.system=/gnu/store/qhs3vndah8z1lpg60xpcg33x5h1z5rmf-system gnu.load=/gnu/store/qhs3vndah8z1lpg60xpcg33x5h1z5rmf-system/boot modprobe.blacklist=usbmouse,usbkbd console=ttyAMA0,115200",
+    "kernel_sha256": "4146c94a8e2e1db623168f03dfcfc3779d3c4ce63d247962aa1aa4d8d0a455b4",
+    "initrd_sha256": "21194e212ac28ae444a4f005123be7a32152694e84a57ec19eae038ecf37b825"
+  },
+  "guix-i686": {
+    "profile": "guix-x86-32",
+    "release": "1.5.0",
+    "url": "https://ftp.gnu.org/gnu/guix/guix-system-install-1.5.0.i686-linux.iso",
+    "sha256": "54b15ecacdcba79eae4d1b60636fe247dbcc45988ef1e2caed6e1e6687b38867",
+    "source_format": "iso",
+    "kernel": "/gnu/store/x6wks913f216dhn5l9zd7cag0655x9gq-linux-libre-6.17.12/bzImage",
+    "initrd": "/gnu/store/dw0i9nysl3a8ndcz2s2qwblv5030lp0q-raw-initrd/initrd.cpio.gz",
+    "init": "gnu/store/s41x2x5hcar9d34c61zq7cpq2gmlikf5-init",
+    "append": "root=/dev/vda gnu.system=/gnu/store/j2ivpzi3lqsia30529yyf47g86sf3q3l-system gnu.load=/gnu/store/j2ivpzi3lqsia30529yyf47g86sf3q3l-system/boot modprobe.blacklist=usbmouse,usbkbd console=ttyS0,115200",
+    "kernel_sha256": "e6fa0bb2ff9cae79913b8eb6faf2c7a4bc35e84c7337e957c71b048fa7f2903b",
+    "initrd_sha256": "554804695464c4fbb83d0f7d9df2425be62be44ad7a9be8275ec21a423d4984d"
+  },
+  "nixos-x86_64": {
+    "profile": "nixos-x86-64",
+    "release": "26.11pre1092090.55bfb4d7437b",
+    "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1092090.55bfb4d7437b/nixos-minimal-26.11pre1092090.55bfb4d7437b-x86_64-linux.iso",
+    "sha256": "b53ebf3db5ad851091b22b3880ec88eb14b5c157419c90310d5dd883a748ad07",
+    "kernel": "/boot/nix/store/nh11qhhmdywbiqycrrzx3ag6wbq505pq-linux-6.18.56/bzImage",
+    "initrd": "/boot/nix/store/icdfrjlv343nigy8jlsmg144r0wn4slk-initrd-linux-6.18.56/initrd",
+    "append": "init=/nix/store/h452l54hc3k0xq4g9j9rmp4ski1hfskh-nixos-system-nixos-26.11pre1092090.55bfb4d7437b/init nohibernate root=fstab loglevel=4 lsm=landlock,yama,bpf  console=ttyS0,115200",
+    "kernel_sha256": "010c9bc6efa79cdc0e41c158c9b8d88608efc178be3aca968ffaea7eb988517c",
+    "initrd_sha256": "6ae96684dddf43ed821e0327e9e34d4d70faab39631d0213892c4c27ed9c3216"
+  },
+  "nixos-aarch64": {
+    "profile": "nixos-arm-64",
+    "release": "26.11pre1092090.55bfb4d7437b",
+    "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1092090.55bfb4d7437b/nixos-minimal-26.11pre1092090.55bfb4d7437b-aarch64-linux.iso",
+    "sha256": "0ec6a808542f7d01aa4c5b43cd360b30b742ed4e93bebded39cf0e919b8dd4cf",
+    "kernel": "/boot/nix/store/7qa9jz616h6hsrpg1irsvzb3ps1h39rs-linux-6.18.56/Image",
+    "initrd": "/boot/nix/store/rlz2kfkzw4zcv2nh9i6a5skixpyq82l4-initrd-linux-6.18.56/initrd",
+    "append": "init=/nix/store/99qmdnwjj2h5vk1l01lpq57v90z6r9hr-nixos-system-nixos-26.11pre1092090.55bfb4d7437b/init nohibernate root=fstab loglevel=4 lsm=landlock,yama,bpf  console=ttyAMA0,115200",
+    "kernel_sha256": "04b87016ae9d774afbd7f0877952330d32f4f9373f1a90acee41bfcc4cfff180",
+    "initrd_sha256": "4258fc5529bc789debc25e2d87a6b551ef799f3acc980346a3f00f71192d926c"
+  }
+}

@@ -403,7 +403,7 @@ M: gtk4-ui-backend ui-backend-available?
     "DISPLAY" os-env empty? and not ;
 
 os { linux freebsd } member? [
-    gtk4-ui-backend ui-backend set-global
+    gtk4-ui-backend register-ui-backend
 ] when
 
 { "ui.backend.gtk4" "ui.gadgets.editors" }

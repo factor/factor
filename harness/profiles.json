@@ -2257,13 +2257,13 @@
         "argv": [
           "/usr/bin/qemu-system-sparc",
           "-machine",
-          "SS-10,graphics=off",
+          "SS-20,graphics=off",
           "-cpu",
-          "TI-SuperSparc-II",
+          "TI-SuperSparc-50",
           "-smp",
           "1",
           "-m",
-          "1024",
+          "2047",
           "-boot",
           "c",
           "-nic",
@@ -2338,7 +2338,7 @@
           "-machine",
           "sun4u",
           "-m",
-          "1024",
+          "3072",
           "-nic",
           "user,model=sunhme,hostfwd=tcp:127.0.0.1:34121-:22",
           "-display",
@@ -3027,21 +3027,60 @@
         ],
         "vnc_server": "127.0.0.1::5964",
         "vnc_actions": [
-          { "pause": 3 },
-          { "move": [1210, 20] },
-          { "click": 1 },
-          { "pause": 1 },
-          { "move": [1040, 227] },
-          { "pause": 1 },
-          { "move": [900, 408] },
-          { "key": "enter" },
-          { "pause": 5 },
-          { "key": "enter" },
-          { "pause": 15 },
-          { "text": "mkdir -p /tmp/m; mount /dev/disk/virtual/virtio" },
-          { "key": "tab" },
-          { "text": "/0/raw /tmp/m; exec /tmp/m/console 0.0.0.0 2222" },
-          { "key": "enter" }
+          {
+            "pause": 3
+          },
+          {
+            "move": [
+              1210,
+              20
+            ]
+          },
+          {
+            "click": 1
+          },
+          {
+            "pause": 1
+          },
+          {
+            "move": [
+              1040,
+              227
+            ]
+          },
+          {
+            "pause": 1
+          },
+          {
+            "move": [
+              900,
+              408
+            ]
+          },
+          {
+            "key": "enter"
+          },
+          {
+            "pause": 5
+          },
+          {
+            "key": "enter"
+          },
+          {
+            "pause": 15
+          },
+          {
+            "text": "mkdir -p /tmp/m; mount /dev/disk/virtual/virtio"
+          },
+          {
+            "key": "tab"
+          },
+          {
+            "text": "/0/raw /tmp/m; exec /tmp/m/console 0.0.0.0 2222"
+          },
+          {
+            "key": "enter"
+          }
         ],
         "setup": "mkfs -q -t bfs /dev/disk/virtual/virtio_block/2/raw FactorScratch; mkdir -p /factor /ui; mount /dev/disk/virtual/virtio_block/2/raw /factor; mount -ro /dev/disk/virtual/virtio_block/3/raw /ui; df -h /factor",
         "resume_setup": "mkdir -p /factor /ui; mount /dev/disk/virtual/virtio_block/2/raw /factor; mount -ro /dev/disk/virtual/virtio_block/3/raw /ui; df -h /factor",
@@ -3239,6 +3278,749 @@
       ],
       "stall_seconds": 0,
       "work_root": "/data/local/tmp"
+    },
+    "guix-x86-64": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.x86.64",
+        "make": "make",
+        "jobs": 4
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35220",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix make CONFIG=vm/Config.linux.x86.64 BUILD_DIR=build-validation -j4 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk4.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'"
+      }
+    },
+    "guix-arm-64": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.arm.64",
+        "make": "make",
+        "jobs": 4
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35221",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix make CONFIG=vm/Config.linux.arm.64 BUILD_DIR=build-validation -j4 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk4.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'"
+      }
+    },
+    "nixos-x86-64": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.x86.64",
+        "make": "make",
+        "jobs": 4
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35222",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix make CONFIG=vm/Config.linux.x86.64 BUILD_DIR=build-validation -j4 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk4.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'"
+      }
+    },
+    "nixos-arm-64": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.arm.64",
+        "make": "make",
+        "jobs": 4
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35223",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix make CONFIG=vm/Config.linux.arm.64 BUILD_DIR=build-validation -j4 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk4.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'"
+      }
+    },
+    "guix-x86-32": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.x86.32",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-x86.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35320",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix",
+          "--system=i686-linux"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix --system=i686-linux make CONFIG=vm/Config.linux.x86.32 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix --system=i686-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix --system=i686-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env guix --system=i686-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "kernel_architecture": "i686",
+      "package_system": "i686-linux"
+    },
+    "guix-arm-32": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.arm.32",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-arm.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35221",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix",
+          "--system=armhf-linux"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix --system=armhf-linux make CONFIG=vm/Config.linux.arm.32 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix --system=armhf-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix --system=armhf-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env guix --system=armhf-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "kernel_architecture": "aarch64",
+      "package_system": "armhf-linux"
+    },
+    "nixos-x86-32": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.x86.32",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-x86.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35222",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=i686-linux"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=i686-linux make CONFIG=vm/Config.linux.x86.32 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=i686-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=i686-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=i686-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "kernel_architecture": "x86_64",
+      "package_system": "i686-linux"
+    },
+    "nixos-arm-32": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.arm.32",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-arm.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35230",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=armv7l-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=armv7l-linux make CONFIG=vm/Config.linux.arm.32 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=armv7l-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=armv7l-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=armv7l-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "armv7l-linux",
+      "runtime_scope": "package-environment"
+    },
+    "nixos-riscv-64": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.riscv.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-riscv.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35231",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=riscv64-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=riscv64-linux make CONFIG=vm/Config.linux.riscv.64 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=riscv64-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=riscv64-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=riscv64-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "riscv64-linux",
+      "runtime_scope": "package-environment"
+    },
+    "nixos-ppc-64-be": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.ppc.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "linux-ppc.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35232",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=powerpc64-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=powerpc64-linux make CONFIG=vm/Config.linux.ppc.64 SITE_CXXFLAGS=-DFACTOR_NO_PTHREAD_CANCEL BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=powerpc64-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=powerpc64-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=powerpc64-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "powerpc64-linux",
+      "runtime_scope": "package-environment"
+    },
+    "nixos-ppc-64-le": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.ppc.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "linux-ppc.64le",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35233",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=powerpc64le-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=powerpc64le-linux make CONFIG=vm/Config.linux.ppc.64 BUILD_DIR=build-validation SITE_CXXFLAGS=-DFACTOR_NO_PTHREAD_CANCEL -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=powerpc64le-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=powerpc64le-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=powerpc64le-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "powerpc64le-linux",
+      "runtime_scope": "package-environment"
+    },
+    "nixos-s390x-64": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.s390x",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "linux-s390x",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35234",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=s390x-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=s390x-linux make CONFIG=vm/Config.linux.s390x BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=s390x-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=s390x-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=s390x-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "s390x-linux",
+      "runtime_scope": "package-environment"
+    },
+    "nixos-loongarch-64": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.loongarch.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-loongarch.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35235",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=loongarch64-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=loongarch64-linux make CONFIG=vm/Config.linux.loongarch.64 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=loongarch64-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=loongarch64-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=loongarch64-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "loongarch64-linux",
+      "runtime_scope": "package-environment"
+    },
+    "guix-riscv-64": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.riscv.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-riscv.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35236",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix",
+          "--system=riscv64-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix --system=riscv64-linux make CONFIG=vm/Config.linux.riscv.64 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix --system=riscv64-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix --system=riscv64-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env guix --system=riscv64-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "riscv64-linux",
+      "runtime_scope": "package-environment"
+    },
+    "guix-ppc-64-le": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.ppc.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "linux-ppc.64le",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35237",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix",
+          "--system=powerpc64le-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix --system=powerpc64le-linux make CONFIG=vm/Config.linux.ppc.64 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix --system=powerpc64le-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix --system=powerpc64le-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env guix --system=powerpc64le-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "powerpc64le-linux",
+      "runtime_scope": "package-environment"
     }
   }
 }

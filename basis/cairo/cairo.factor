@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types colors images images.memory
+USING: accessors alien alien.c-types alien.data colors images images.memory
 kernel math math.rectangles sequences ;
 USE: cairo.ffi
 IN: cairo
@@ -31,7 +31,7 @@ ERROR: cairo-error n message ;
         <cairo> &cairo_destroy
         @
     ] make-memory-bitmap
-    BGRA >>component-order
+    little-endian? BGRA ARGB ? >>component-order
     ubyte-components >>component-type ; inline
 
 : dummy-cairo ( -- cr )

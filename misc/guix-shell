@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Run inside `guix shell -m manifest.scm -- bash misc/guix-shell [COMMAND...]`.
+set -euo pipefail
+: "${GUIX_ENVIRONMENT:?Run this script inside guix shell -m manifest.scm}"
+
+# Guix sets LIBRARY_PATH for the compiler. Factor's FFI also needs a runtime
+# search path for libraries opened by soname, outside the FHS directories.
+export LD_LIBRARY_PATH="$GUIX_ENVIRONMENT/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export TZDIR="${TZDIR:-$GUIX_ENVIRONMENT/share/zoneinfo}"
+if [ -z "${FACTOR_UI_BACKEND:-}" ]; then
+    if [ -e "$GUIX_ENVIRONMENT/lib/libgtk-3.so.0" ] &&
+       ! [ -e "$GUIX_ENVIRONMENT/lib/libgtk-4.so.1" ]; then
+        FACTOR_UI_BACKEND=gtk3
+    else
+        FACTOR_UI_BACKEND=gtk4
+    fi
+fi
+export FACTOR_UI_BACKEND
+
+if [ "$#" -eq 0 ]; then
+    exec bash --norc
+fi
+exec "$@"

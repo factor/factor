@@ -1,28 +1,15 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators continuations destructors environment hashtables io io.directories io.encodings.utf8 io.files
-io.files.info.unix io.files.links io.pathnames io.standard-paths
+io.files.info io.files.info.unix io.files.links io.pathnames io.standard-paths
 io.standard-paths.unix io.encodings.binary io.encodings.string io.launcher io.launcher.private io.streams.duplex kernel libc locals namespaces sequences splitting
 system tools.test tools.test.unix unix.users ;
 IN: io.standard-paths.unix.tests
 
-! Haiku exposes commands in its package filesystem; Android uses /system/bin.
-! Retain the POSIX compatibility locations and every other platform case.
-: expected-ls-paths ( -- paths )
-    {
-        { [ os haiku? ]
-          [ { "/bin/ls" "/usr/bin/ls" "/boot/system/bin/ls" } ] }
-        { [ os android? ] [ { "/system/bin/ls" } ] }
-        [ { "/bin/ls" "/usr/bin/ls" } ]
-    } cond ;
-
-: expected-ps-paths ( -- paths )
-    {
-        { [ os haiku? ]
-          [ { "/bin/ps" "/sbin/ps" "/usr/bin/ps" "/boot/system/bin/ps" } ] }
-        { [ os android? ] [ { "/system/bin/ps" } ] }
-        [ { "/bin/ps" "/sbin/ps" "/usr/bin/ps" } ]
-    } cond ;
+! Installed commands may live in a Nix/Guix store or a system profile. The
+! fixtures below verify search order; these checks verify real executables.
+:: executable-named? ( path name -- ? )
+    path [ path file-name name = path file-executable? and ] [ f ] if ;
 
 : path-fixture ( -- )
     { "blocked" "directory" "valid" } [ make-directory ] each
@@ -74,15 +61,19 @@ IN: io.standard-paths.unix.tests
 { f } [ f "PATH" [ "ls" find-in-path ] with-os-env ] unit-test
 
 { f } [ "" find-in-path ] unit-test
-{ t } [ "ls" find-in-path >boolean ] unit-test
+{ t } [
+    "ls" find-in-path "ls" executable-named?
+] unit-test
 
 { t } [
-    "/sbin:" "PATH" os-env append "PATH" [
-        "ps" find-in-path >boolean
+    "/factor-nonexistent-path:" "PATH" os-env append "PATH" [
+        "ps" find-in-path "ps" executable-named?
     ] with-os-env
 ] unit-test
 
-{ t } [ "ls" find-in-standard-login-path >boolean ] unit-test
+{ t } [
+    "ls" find-in-standard-login-path "ls" executable-named?
+] unit-test
 
 ! Shell startup output must not become part of the search directories.
 { { "/bin" "/usr/bin" } } [

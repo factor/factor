@@ -532,7 +532,7 @@ M: gtk3-ui-backend stop-event-loop
     gtk_main_quit ;
 
 os gtk3-backend-platform? [
-    gtk3-ui-backend ui-backend set-global
+    gtk3-ui-backend register-ui-backend
 ] when
 
 ! Haiku uses its native display session. This predicate also runs before CLI

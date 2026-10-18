@@ -700,7 +700,10 @@ void open_console() {
 void close_console() {
   if (stdin_thread_initialized_p) {
 #if defined(FACTOR_LOONGARCH64) || defined(FACTOR_NO_PTHREAD_CANCEL)
-    safe_close(control_write);
+    // Disposing Factor's input stream may have already closed this writer.
+    // Either close wakes the worker; still report other descriptor errors.
+    if (close(control_write) < 0 && errno != EBADF)
+      fatal_error("error closing fd", errno);
 #else
     pthread_cancel(stdin_thread);
 #endif

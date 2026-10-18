@@ -17,7 +17,7 @@ void fep_signal_handler(int, siginfo_t*, void*);
 void sample_signal_handler(int, siginfo_t*, void*);
 VM_C_API void factor_begin_ignore_console_signals();
 VM_C_API void factor_end_ignore_console_signals();
-#if defined(FACTOR_LOONGARCH64)
+#if defined(FACTOR_LOONGARCH64) || defined(FACTOR_NO_PTHREAD_CANCEL)
 extern "C" {
 extern int control_read, control_write, stdin_read, size_read;
 extern bool stdin_thread_initialized_p;
@@ -380,13 +380,27 @@ static bool run_test(const char* name, void (*test)()) {
   return passed;
 }
 
-#if defined(FACTOR_LOONGARCH64)
+#if defined(FACTOR_LOONGARCH64) || defined(FACTOR_NO_PTHREAD_CANCEL)
 static void test_console_idle_shutdown() {
   // Bound a hung join independently of the suite's external deadline.
   alarm(10);
   open_console();
   close_console();
   check(!stdin_thread_initialized_p, "idle console worker did not stop");
+  close_console();
+  alarm(0);
+}
+
+static void test_console_disposed_input_shutdown() {
+  alarm(10);
+  open_console();
+  // Factor's input stream owns these three descriptors and may dispose them
+  // before the VM shuts down its console worker.
+  check(close(stdin_read) == 0, "stdin reader close failed");
+  check(close(size_read) == 0, "stdin size reader close failed");
+  check(close(control_write) == 0, "stdin control writer close failed");
+  close_console();
+  check(!stdin_thread_initialized_p, "disposed console worker did not stop");
   close_console();
   alarm(0);
 }
@@ -460,8 +474,9 @@ int main(int argc, char** argv) {
   passed &= run_test("fault on a foreign thread without a VM", test_foreign_fault_without_vm);
   passed &= run_test("fatal error while fatal erroring", test_fatal_error_reentry);
   passed &= run_test("signal stack with a small callstack", test_small_callstack_signal_stack);
-#if defined(FACTOR_LOONGARCH64)
+#if defined(FACTOR_LOONGARCH64) || defined(FACTOR_NO_PTHREAD_CANCEL)
   passed &= run_test("idle console shutdown", test_console_idle_shutdown);
+  passed &= run_test("disposed stdin console shutdown", test_console_disposed_input_shutdown);
   passed &= run_test("console input preserves blocking stdin", test_console_input);
   passed &= run_test("stdin reader shutdown", []() { test_console_reader_shutdown(false); });
   passed &= run_test("debugger console shutdown", []() { test_console_reader_shutdown(true); });

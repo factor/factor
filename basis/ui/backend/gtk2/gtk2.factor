@@ -498,7 +498,7 @@ M: gtk2-ui-backend stop-event-loop
     gtk_main_quit ;
 
 os gtk2-backend-platform? [
-    gtk2-ui-backend ui-backend set-global
+    gtk2-ui-backend register-ui-backend
 ] when
 
 { "ui.backend.gtk2" "ui.gadgets.editors" }

@@ -10,9 +10,9 @@ IN: alien.libraries.finder.linux
 <PRIVATE
 
 CONSTANT: elf-machine-map {
-    { ppc.32 20 } { ppc.64 21 } { x86.32 3 }
+    { ppc.32 20 } { ppc.64 21 } { ppc.64le 21 } { x86.32 3 }
     { s390x 22 }
-    { x86.64 62 } { alpha.64 0x9026 } { arm.64 183 } { riscv.32 243 } { riscv.64 243 } { openrisc.32 92 } { loongarch.64 258 }
+    { x86.64 62 } { alpha.64 0x9026 } { arm.32 40 } { arm.64 183 } { riscv.32 243 } { riscv.64 243 } { openrisc.32 92 } { loongarch.64 258 }
 }
 
 CONSTANT: emulation-map {
@@ -37,17 +37,25 @@ CONSTANT: emulation-map {
         ] dip 3array
     ] map ;
 
-: load-ldconfig-cache ( -- seq )
+: system-ldconfig-cache ( -- seq )
     "ldconfig" find-in-path [
         { "/usr/sbin/ldconfig" "/sbin/ldconfig" }
         [ dup file-exists? [ file-executable? ] [ drop f ] if ] find nip
     ] unless*
     [
         "-p" 2array <process> swap >>command +closed+ >>stderr
-        utf8 [ read-lines ] with-process-reader* nip 0 = [
-            [ "=>" swap subseq? ] filter parse-ldconfig-lines
-        ] [ drop { } ] if
+        utf8 [ read-lines ] with-process-reader* nip 0 =
+        [ ] [ drop { } ] if
     ] [ { } ] if* ;
+
+! Nixpkgs wrappers already provide a textual `ldconfig -p` listing through
+! this variable. Keep that interface without requiring an FHS cache or
+! trusting its architecture labels; candidates are checked as ELF below.
+: load-ldconfig-cache ( -- seq )
+    "FACTOR_LD_SO_CACHE" os-env [
+        utf8 file-lines
+    ] [ system-ldconfig-cache ] if*
+    [ "=>" swap subseq? ] filter parse-ldconfig-lines ;
 
 ! Inspect, do not dlopen, discovery candidates: loading would execute their
 ! constructors. Also reject linker scripts and foreign-architecture DSOs.

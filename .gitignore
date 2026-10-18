@@ -53,3 +53,12 @@ zig-out
 
 /factor-rv32-cpp
 /build-riscv32-zig
+
+# Local builds and validation outputs.
+/build/
+__pycache__/
+*.py[cod]
+/result
+/result-*
+/=
+/codex-sandboxed

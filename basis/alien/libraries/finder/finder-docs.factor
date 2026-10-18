@@ -21,4 +21,11 @@ HELP: find-library
     "<< \"sqlite\" \"sqlite3\" find-library cdecl add-library >>"
   }
   "Note the parse time evaluation with " { $link POSTPONE: << } "."
+  $nl
+  "On Linux, libraries are searched in " { $snippet "LD_LIBRARY_PATH" }
+  " before the system directories and linker cache. Nix and Guix development environments can expose their runtime libraries this way."
+  $nl
+  "A wrapper may set " { $snippet "FACTOR_LD_SO_CACHE" }
+  " to a UTF-8 file containing an " { $snippet "ldconfig -p" }
+  " listing. This replaces the system cache lookup. Each candidate is checked for a native shared-library ELF header; the listing's architecture labels are not used to select the CPU."
 } ;
