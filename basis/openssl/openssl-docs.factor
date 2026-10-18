@@ -17,6 +17,6 @@ HELP: ssl-native-identity-checks?
 ARTICLE: "openssl" "OpenSSL Binding"
 "The " { $vocab-link "openssl" } " vocab and its subvocabs implements bindings for the libssl and libcrypto SSL libraries. Variables:"
 { $subsections ssl-initialized? ssl-new-api? ssl-native-identity-checks? }
-"Linux library version selection is described in " { $vocab-link "openssl.libraries" } "." ;
+"On Linux, the bindings use OpenSSL 1.1 on 32-bit systems and OpenSSL 3 otherwise." ;
 
 ABOUT: "openssl"
