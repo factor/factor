@@ -4,21 +4,45 @@ set -eu
 assets=${M88K_ASSETS:-"$PWD/work/qemu-matrix/m88k"}
 revision=736e78ed53b1f57eb1b5d125119cb9ea3ac9978d
 mkdir -p "$assets"
-if test ! -d "$assets/llvm-m88k/.git"; then
+checkout_revision() {
+    if ! git -C "$1" cat-file -e "$revision^{commit}" 2>/dev/null; then
+        git -C "$1" fetch --depth 1 origin "$revision"
+    fi
+    git -C "$1" checkout --detach "$revision"
+}
+if test ! -e "$assets/llvm-m88k/.git"; then
     git clone --depth 1 --single-branch --branch main-m88k \
         https://github.com/redstar/llvm-m88k.git "$assets/llvm-m88k"
-fi
-if test "$(git -C "$assets/llvm-m88k" rev-parse HEAD)" != "$revision"; then
-    git -C "$assets/llvm-m88k" fetch --depth 1 origin "$revision"
-    git -C "$assets/llvm-m88k" checkout --detach "$revision"
+    checkout_revision "$assets/llvm-m88k"
 fi
 patches=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 patch_file="$patches/clang-factor.patch"
-if git -C "$assets/llvm-m88k" apply --reverse --check "$patch_file" >/dev/null 2>&1; then
+head=$(git -C "$assets/llvm-m88k" rev-parse HEAD)
+if test "$head" = "$revision" && \
+        git -C "$assets/llvm-m88k" apply --reverse --check "$patch_file" >/dev/null 2>&1; then
     : # Already applied.
-else
-    git -C "$assets/llvm-m88k" apply --check "$patch_file"
+elif test "$head" = "$revision" && \
+        git -C "$assets/llvm-m88k" apply --check "$patch_file" >/dev/null 2>&1; then
     git -C "$assets/llvm-m88k" apply "$patch_file"
+else
+    # Old patch-series prefixes cannot be checked against the combined diff.
+    # Prepare a clean replacement before moving either the source or its cache.
+    prepared=$(mktemp -d "$assets/llvm-m88k.prepare.XXXXXX")
+    trap 'rm -rf "$prepared"' EXIT HUP INT TERM
+    git clone --no-checkout --dissociate "$assets/llvm-m88k" "$prepared"
+    git -C "$prepared" remote set-url origin \
+        "$(git -C "$assets/llvm-m88k" remote get-url origin)"
+    checkout_revision "$prepared"
+    git -C "$prepared" apply --check "$patch_file"
+    git -C "$prepared" apply "$patch_file"
+    backup=$(mktemp -d "$assets/llvm-m88k.backup.XXXXXX")
+    mv "$assets/llvm-m88k" "$backup/source"
+    if test -e "$assets/llvm-build"; then
+        mv "$assets/llvm-build" "$backup/build"
+    fi
+    mv "$prepared" "$assets/llvm-m88k"
+    trap - EXIT HUP INT TERM
+    echo "Preserved previous compiler source and build cache in $backup"
 fi
 cmake -S "$assets/llvm-m88k/llvm" -B "$assets/llvm-build" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
