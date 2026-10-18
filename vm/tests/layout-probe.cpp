@@ -1,4 +1,4 @@
-#include "../../master.hpp"
+#include "../master.hpp"
 #include <cstddef>
 #include <cassert>
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"

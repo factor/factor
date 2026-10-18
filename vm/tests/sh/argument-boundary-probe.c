@@ -1,4 +1,5 @@
 /* Execute the full generated indirect hook, including native linked gates. */
+/* Link with indirect-call-probe.S, shared with the indirect-call controls. */
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

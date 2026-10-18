@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Freeze the unchanged production frame visitor and GC-info source for a gate."""
+"""Extract the production frame visitor for a gate with mocked dependencies."""
 import hashlib
 from pathlib import Path
 import sys
@@ -10,7 +10,6 @@ start = text.index("template <typename Fixup> struct call_frame_slot_visitor")
 end = text.index("\ntemplate <typename Fixup>\nvoid slot_visitor", start)
 visitor = text[start:end]
 output.mkdir(parents=True, exist_ok=True)
-for name, data in (("production-frame-visitor.hpp", visitor),
-                   ("production-gc-info.hpp", (source / "gc_info.hpp").read_text())):
-    (output / name).write_text(data)
-    print(name, hashlib.sha256(data.encode()).hexdigest())
+name = "production-frame-visitor.hpp"
+(output / name).write_text(visitor)
+print(name, hashlib.sha256(visitor.encode()).hexdigest())

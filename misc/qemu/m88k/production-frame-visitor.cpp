@@ -12,7 +12,7 @@ extern "C" void* memcpy(void*, const void*, unsigned long);
 #define FACTOR_GC_ROOTS_AT_PREDECESSOR_SP 1
 #endif
 namespace factor { typedef unsigned int cell; }
-#include "production-gc-info.hpp"
+#include "../../../vm/gc_info.hpp"
 namespace factor {
 static bool bitmap_p(uint8_t* bitmap, cell index) {
  return (bitmap[index / 8] & (1u << (index % 8))) != 0;

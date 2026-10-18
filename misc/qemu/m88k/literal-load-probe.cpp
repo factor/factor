@@ -3,7 +3,7 @@ typedef unsigned int uint32_t;
 typedef int int32_t;
 extern "C" void abort();
 #define FACTOR_ASSERT(x) do { if (!(x)) abort(); } while (0)
-#include "evidence/production-m88k-literal.hpp"
+#include "../../../vm/m88k.hpp"
 #ifndef PROBE_FUNCTION
 #define PROBE_FUNCTION literal_load_o2
 #endif

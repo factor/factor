@@ -8,5 +8,5 @@ trap 'rm -rf -- "$probe_dir"' EXIT
   -o "$probe_dir/native-probe"
 "${SH_QEMU:-qemu-sh4}" -L "${SH_SYSROOT:-/usr/sh4-linux-gnu}" "$probe_dir/native-probe"
 "${SH_CXX:-sh4-linux-gnu-g++}" -std=c++17 -O2 -m4 -Wa,--isa=sh4 \
-  "$repo/vm/tests/sh/layout-probe.cpp" -o "$probe_dir/layout-probe"
+  "$repo/vm/tests/layout-probe.cpp" -o "$probe_dir/layout-probe"
 "${SH_QEMU:-qemu-sh4}" -L "${SH_SYSROOT:-/usr/sh4-linux-gnu}" "$probe_dir/layout-probe"

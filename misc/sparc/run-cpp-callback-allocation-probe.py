@@ -23,7 +23,7 @@ flags = ['-m32', '-mcpu=v9', '-ffixed-g2', '-ffixed-g3', '-ffixed-g4', '-ffixed-
 objects = []
 for name, compiler, extra in [
         ('cpp-callback-allocation-probe.cpp', 'sparc64-linux-gnu-g++', ['-std=c++17']),
-        ('cpp-callback-allocation-entry.S', 'sparc64-linux-gnu-gcc', [])]:
+        ('backend-callback-entry.S', 'sparc64-linux-gnu-gcc', [])]:
     obj = output / (name + '.o')
     subprocess.run([compiler, '-O2', *flags, *extra, '-I', str(root / 'vm'),
                     '-c', str(root / 'misc/sparc' / name), '-o', str(obj)], check=True)

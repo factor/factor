@@ -14,7 +14,7 @@ ln -s busybox "$probe_dir/root/bin/sh"
   "$repo/vm/tests/sh/native-probe.cpp" "$repo/vm/tests/sh/native-bridge.S" \
   -o "$probe_dir/root/bin/native-probe"
 "${SH_CXX:-sh4-linux-gnu-g++}" -std=c++17 -O2 -m4 -Wa,--isa=sh4 -static \
-  "$repo/vm/tests/sh/layout-probe.cpp" -o "$probe_dir/root/bin/layout-probe"
+  "$repo/vm/tests/layout-probe.cpp" -o "$probe_dir/root/bin/layout-probe"
 cat > "$probe_dir/root/init" <<'INIT'
 #!/bin/sh
 /bin/busybox mount -t proc proc /proc
