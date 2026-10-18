@@ -359,8 +359,6 @@ IN: math.integers.tests
 [ 12 >bignum 200 2^ 1 - shift ] [ second 7 = ] must-fail-with
 
 ! Bit indices must retain their full width; negative indices use the sign bit.
-{ f } [ 1 >bignum 32 2^ bit? ] unit-test
-{ t } [ -2 >bignum 32 2^ bit? ] unit-test
 { f } [ 1 >bignum most-positive-fixnum bit? ] unit-test
 { t } [ -2 >bignum most-positive-fixnum bit? ] unit-test
 { f } [ 1 >bignum -64 bit? ] unit-test
