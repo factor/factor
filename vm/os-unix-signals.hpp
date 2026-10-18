@@ -24,8 +24,8 @@ struct signal_fpu_scope {
 #endif
 
 inline unsigned int signal_fpu_status(void* uap, siginfo_t* info) {
-#if defined(FACTOR_LOONGARCH64) || \
-    (defined(__linux__) && (defined(FACTOR_HPPA) || defined(FACTOR_SPARC)))
+#if defined(FACTOR_LOONGARCH64) || (defined(__linux__) && \
+    (defined(FACTOR_ARM64) || defined(FACTOR_HPPA) || defined(FACTOR_SPARC)))
   return factor::signal_fpu_status(uap_fpu_status(uap), info->si_code);
 #elif defined(__NetBSD__) && defined(FACTOR_MIPS)
   return factor::signal_fpu_status(uap_fpu_status(uap), info->si_trap);

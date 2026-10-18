@@ -34,20 +34,10 @@ inline static unsigned int fpu_status(unsigned int status) {
   if (status & 0x010000) r |= FP_TRAP_INEXACT;
   return r;
 }
-inline static unsigned int signal_fpu_status(unsigned int status, int code) {
-  unsigned int traps = fpu_status(status);
-  // Linux clears FCSR exception causes before copying the signal context.
-  switch (code) {
-    case FPE_FLTINV: return traps | FP_TRAP_INVALID_OPERATION;
-    case FPE_FLTDIV: return traps | FP_TRAP_ZERO_DIVIDE;
-    case FPE_FLTOVF: return traps | FP_TRAP_OVERFLOW;
-    case FPE_FLTUND: return traps | FP_TRAP_UNDERFLOW;
-    case FPE_FLTRES: return traps | FP_TRAP_INEXACT;
-    default: return traps;
-  }
-}
 #define CODE_TO_FUNCTION_POINTER(code) (void)0
 #define CODE_TO_FUNCTION_POINTER_CALLBACK(vm, code) (void)0
 #define FUNCTION_CODE_POINTER(ptr) ptr
 #define FUNCTION_TOC_POINTER(ptr) ptr
 }
+
+#include "os-linux-fpu.hpp"
