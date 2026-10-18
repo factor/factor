@@ -13,15 +13,13 @@ if test "$(git -C "$assets/llvm-m88k" rev-parse HEAD)" != "$revision"; then
     git -C "$assets/llvm-m88k" checkout --detach "$revision"
 fi
 patches=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
-for patch_name in clang-builtin-shards.patch clang-publication.patch clang-trunc.patch clang-extend.patch clang-small-values.patch clang-sjlj.patch clang-remainder.patch clang-fcmp.patch clang-clz.patch clang-commute.patch clang-publication-marker.patch clang-fence.patch clang-reserved-pairs.patch clang-implicit-def.patch clang-hoist-shift.patch clang-vm-legalization.patch clang-runtime-atomics.patch clang-runtime-arithmetic.patch clang-openbsd-tcb.patch clang-sjlj-landingpad-label.patch clang-three-way.patch clang-big-endian-load-mask.patch clang-compare-immediate.patch clang-varargs.patch; do
-    patch_file="$patches/$patch_name"
-    if git -C "$assets/llvm-m88k" apply --reverse --check "$patch_file" >/dev/null 2>&1; then
-        : # Already applied.
-    else
-        git -C "$assets/llvm-m88k" apply --check "$patch_file"
-        git -C "$assets/llvm-m88k" apply "$patch_file"
-    fi
-done
+patch_file="$patches/clang-factor.patch"
+if git -C "$assets/llvm-m88k" apply --reverse --check "$patch_file" >/dev/null 2>&1; then
+    : # Already applied.
+else
+    git -C "$assets/llvm-m88k" apply --check "$patch_file"
+    git -C "$assets/llvm-m88k" apply "$patch_file"
+fi
 cmake -S "$assets/llvm-m88k/llvm" -B "$assets/llvm-build" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER="${HOST_CC:-clang-21}" \

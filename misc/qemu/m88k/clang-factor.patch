@@ -1,0 +1,1186 @@
+diff --git a/clang/include/clang/Basic/TargetBuiltins.h b/clang/include/clang/Basic/TargetBuiltins.h
+index 10a5774..eb96bdd 100644
+--- a/clang/include/clang/Basic/TargetBuiltins.h
++++ b/clang/include/clang/Basic/TargetBuiltins.h
+@@ -114,8 +114,9 @@ namespace clang {
+   namespace M88k {
+   enum {
+     LastTIBuiltin = clang::Builtin::FirstTSBuiltin - 1,
+-  #define BUILTIN(ID, TYPE, ATTRS) BI##ID,
++  #define GET_BUILTIN_ENUMERATORS
+   #include "clang/Basic/BuiltinsM88k.inc"
++  #undef GET_BUILTIN_ENUMERATORS
+     LastTSBuiltin
+   };
+   }
+diff --git a/clang/lib/Basic/Targets/M88k.cpp b/clang/lib/Basic/Targets/M88k.cpp
+index 43ca2fa..30a58f8 100644
+--- a/clang/lib/Basic/Targets/M88k.cpp
++++ b/clang/lib/Basic/Targets/M88k.cpp
+@@ -23,11 +23,17 @@
+ using namespace clang;
+ using namespace clang::targets;
+ 
+-static constexpr Builtin::Info BuiltinInfo[] = {
+-#define BUILTIN(ID, TYPE, ATTRS)                                               \
+-  {#ID, TYPE, ATTRS, nullptr, HeaderDesc::NO_HEADER, ALL_LANGUAGES},
++#define GET_BUILTIN_STR_TABLE
+ #include "clang/Basic/BuiltinsM88k.inc"
++#undef GET_BUILTIN_STR_TABLE
++
++static constexpr Builtin::Info BuiltinInfos[] = {
++#define GET_BUILTIN_INFOS
++#include "clang/Basic/BuiltinsM88k.inc"
++#undef GET_BUILTIN_INFOS
+ };
++static_assert(std::size(BuiltinInfos) ==
++              clang::M88k::LastTSBuiltin - Builtin::FirstTSBuiltin);
+ 
+ M88kTargetInfo::M88kTargetInfo(const llvm::Triple &Triple,
+                                const TargetOptions &)
+@@ -65,6 +71,9 @@ M88kTargetInfo::M88kTargetInfo(const llvm::Triple &Triple,
+   SizeType = UnsignedLong;
+   PtrDiffType = SignedInt;
+   IntPtrType = SignedInt;
++
++  // GlobalISel does not yet lower m88k TLS address instructions.
++  TLSSupported = false;
+ }
+ 
+ bool M88kTargetInfo::setCPU(const std::string &Name) {
+@@ -97,6 +106,9 @@ void M88kTargetInfo::getTargetDefines(const LangOptions &Opts,
+   if (getTriple().isOSOpenBSD()) {
+     Builder.defineMacro("__m88k__");
+     Builder.defineMacro("__m88k");
++    // This fork lowers aligned QI/SI atomic load/store with user TB1 barriers.
++    // It deliberately makes no CAS or arithmetic-RMW capability claim.
++    Builder.defineMacro("__M88K_OPENBSD_ATOMIC_PUBLICATION__");
+ 
+     // For sub-architecture
+     switch (CPU) {
+@@ -121,9 +133,9 @@ void M88kTargetInfo::getTargetDefines(const LangOptions &Opts,
+   }
+ }
+ 
+-ArrayRef<Builtin::Info> M88kTargetInfo::getTargetBuiltins() const {
+-  return llvm::ArrayRef(BuiltinInfo,
+-                        clang::M88k::LastTSBuiltin - Builtin::FirstTSBuiltin);
++llvm::SmallVector<Builtin::InfosShard>
++M88kTargetInfo::getTargetBuiltins() const {
++  return {{&BuiltinStrings, BuiltinInfos}};
+ }
+ 
+ bool M88kTargetInfo::hasFeature(StringRef Feature) const {
+diff --git a/clang/lib/Basic/Targets/M88k.h b/clang/lib/Basic/Targets/M88k.h
+index 7430fe0..9b59e81 100644
+--- a/clang/lib/Basic/Targets/M88k.h
++++ b/clang/lib/Basic/Targets/M88k.h
+@@ -32,7 +32,7 @@ public:
+ 
+   void getTargetDefines(const LangOptions &Opts,
+                         MacroBuilder &Builder) const override;
+-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
++  llvm::SmallVector<Builtin::InfosShard> getTargetBuiltins() const override;
+   bool hasFeature(StringRef Feature) const override;
+   ArrayRef<const char *> getGCCRegNames() const override;
+   ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
+diff --git a/clang/lib/CodeGen/Targets/M88k.cpp b/clang/lib/CodeGen/Targets/M88k.cpp
+index 7eace63..ce360ac 100644
+--- a/clang/lib/CodeGen/Targets/M88k.cpp
++++ b/clang/lib/CodeGen/Targets/M88k.cpp
+@@ -100,70 +100,56 @@ void M88kABIInfo::computeInfo(CGFunctionInfo &FI) const {
+ RValue M88kABIInfo::EmitVAArg(CodeGen::CodeGenFunction &CGF,
+                               CodeGen::Address VAListAddr, QualType Ty,
+                               AggValueSlot Slot) const {
+-  // Assume that va_list type is correct; should be pointer to LLVM type:
+-  // struct {
+-  //    int __va_arg;
+-  //    int *__va_stk;
+-  //    int *__va_reg;
+-  // };
+-
+-  // How are structures handled?
+-
+-  // Align the argument
+-  CharUnits PtrAlign = CharUnits::fromQuantity(4);
+-  CharUnits DirectAlign = CharUnits::fromQuantity(8);
+-  CharUnits SlotSize = CharUnits::fromQuantity(4);
+-
++  // GNU va_list contains a register word index, stack cursor and register base.
+   Ty = getContext().getCanonicalType(Ty);
+-  auto TyInfo = getContext().getTypeInfoInChars(Ty);
+-  CharUnits DirectSize = TyInfo.Width;
+-  TypeInfoChars TypeInfo(DirectSize, DirectAlign, AlignRequirementKind::None);
+-
+-  // Decide which pointer to use: __va_arg < 8 ? __va_reg : __va_stk.
+-  Address VaArgPtr =
+-      CGF.Builder.CreateStructGEP(VAListAddr, 0, "__va_arg.addr");
+-  llvm::Value *VaArg = CGF.Builder.CreateLoad(VaArgPtr, "__va_arg");
+-  llvm::Value *MaxRegs = llvm::ConstantInt::get(CGF.Int32Ty, 8);
+-  llvm::Value *InRegs =
+-      CGF.Builder.CreateICmpULT(VaArg, MaxRegs, "fits_in_regs");
+-
+-  llvm::BasicBlock *InRegBlock = CGF.createBasicBlock("vaarg.in_reg");
+-  llvm::BasicBlock *InStkBlock = CGF.createBasicBlock("vaarg.in_stk");
+-  llvm::BasicBlock *ContBlock = CGF.createBasicBlock("vaarg.end");
+-  CGF.Builder.CreateCondBr(InRegs, InRegBlock, InStkBlock);
+-
+-  // Value comes from register.
+-  CGF.EmitBlock(InRegBlock);
+-  Address VaRegPtr =
+-      CGF.Builder.CreateStructGEP(VAListAddr, 2, "__va_reg.addr");
+-  Address VaReg = Address(CGF.Builder.CreateLoad(VaRegPtr, "__va_reg"),
+-                          CGF.Int8Ty, PtrAlign);
+-  CGF.Builder.CreateBr(ContBlock);
+-
+-  // Value comes from stack.
+-  CGF.EmitBlock(InStkBlock);
+-  Address VaStkPtr =
+-      CGF.Builder.CreateStructGEP(VAListAddr, 1, "__va_stk.addr");
+-  Address VaStk = Address(CGF.Builder.CreateLoad(VaStkPtr, "__va_stk"),
+-                          CGF.Int8Ty, PtrAlign);
+-  CGF.Builder.CreateBr(ContBlock);
+-
+-  CGF.EmitBlock(ContBlock);
+-  Address VaAddr =
+-      emitMergePHI(CGF, VaReg, InRegBlock, VaStk, InStkBlock, "va_arg.addr");
+-
+-  // Load value and increment pointer.
+-  RValue ResAddr =
+-      emitVoidPtrVAArg(CGF, VaAddr, Ty, /*Indirect*/ false, TypeInfo, SlotSize,
+-                       /*AllowHigher*/ true, Slot,
+-                       /*ForceRightAdjust*/ true);
+-
+-  // Increment and store __va_arg.
+-  llvm::Value *One = llvm::ConstantInt::get(CGF.Int32Ty, 1);
+-  llvm::Value *NewVaArg = CGF.Builder.CreateAdd(VaArg, One, "__va_arg.inc");
+-  CGF.Builder.CreateStore(NewVaArg, VaArgPtr);
+-
+-  return ResAddr;
++  CharUnits Size = getContext().getTypeSizeInChars(Ty);
++  CharUnits Align = CharUnits::fromQuantity(Size.getQuantity() > 4 ? 8 : 4);
++  unsigned Words = (Size.getQuantity() + 3) / 4;
++  Address IndexAddr = CGF.Builder.CreateStructGEP(VAListAddr, 0);
++  llvm::Value *Index = CGF.Builder.CreateLoad(IndexAddr);
++  if (Align.getQuantity() == 8) {
++    Index = CGF.Builder.CreateAdd(Index, CGF.Builder.getInt32(1));
++    Index = CGF.Builder.CreateAnd(Index, CGF.Builder.getInt32(~1u));
++  }
++  llvm::Value *Fits = CGF.Builder.CreateICmpULE(
++      Index, CGF.Builder.getInt32(Words <= 8 ? 8 - Words : 0));
++  if (Words > 8)
++    Fits = CGF.Builder.getFalse();
++
++  llvm::BasicBlock *RegBlock = CGF.createBasicBlock("vaarg.reg");
++  llvm::BasicBlock *StackBlock = CGF.createBasicBlock("vaarg.stack");
++  llvm::BasicBlock *EndBlock = CGF.createBasicBlock("vaarg.end");
++  CGF.Builder.CreateCondBr(Fits, RegBlock, StackBlock);
++
++  CGF.EmitBlock(RegBlock);
++  Address RegAddr = CGF.Builder.CreateStructGEP(VAListAddr, 2);
++  llvm::Value *Base = CGF.Builder.CreateLoad(RegAddr);
++  llvm::Value *Offset = CGF.Builder.CreateMul(Index, CGF.Builder.getInt32(4));
++  llvm::Value *RegPtr = CGF.Builder.CreateGEP(CGF.Int8Ty, Base, Offset);
++  CGF.Builder.CreateStore(
++      CGF.Builder.CreateAdd(Index, CGF.Builder.getInt32(Words)), IndexAddr);
++  CGF.Builder.CreateBr(EndBlock);
++
++  CGF.EmitBlock(StackBlock);
++  Address StackAddr = CGF.Builder.CreateStructGEP(VAListAddr, 1);
++  llvm::Value *StackPtr = CGF.Builder.CreateLoad(StackAddr);
++  if (Align.getQuantity() > 4)
++    StackPtr = emitRoundPointerUpToAlignment(CGF, StackPtr, Align);
++  llvm::Value *Next = CGF.Builder.CreateConstGEP1_32(
++      CGF.Int8Ty, StackPtr, Words * 4);
++  CGF.Builder.CreateStore(Next, StackAddr);
++  // A later scalar may still consume an odd saved-register slot.
++  CGF.Builder.CreateBr(EndBlock);
++
++  CGF.EmitBlock(EndBlock);
++  Address Result = emitMergePHI(CGF, Address(RegPtr, CGF.Int8Ty, Align),
++                                RegBlock, Address(StackPtr, CGF.Int8Ty, Align),
++                                StackBlock, "vaarg.addr");
++  if (Size.getQuantity() < 4)
++    Result = CGF.Builder.CreateConstInBoundsByteGEP(
++        Result, CharUnits::fromQuantity(4) - Size);
++  Result = Result.withElementType(CGF.ConvertTypeForMem(Ty));
++  return CGF.EmitLoadOfAnyValue(CGF.MakeAddrLValue(Result, Ty), Slot);
+ }
+ 
+ std::unique_ptr<TargetCodeGenInfo>
+diff --git a/clang/lib/Driver/ToolChain.cpp b/clang/lib/Driver/ToolChain.cpp
+index 56bc500..f2d0265 100644
+--- a/clang/lib/Driver/ToolChain.cpp
++++ b/clang/lib/Driver/ToolChain.cpp
+@@ -1083,6 +1083,8 @@ ObjCRuntime ToolChain::getDefaultObjCRuntime(bool isNonFragile) const {
+ 
+ llvm::ExceptionHandling
+ ToolChain::GetExceptionModel(const llvm::opt::ArgList &Args) const {
++  if (getTriple().getArch() == llvm::Triple::m88k)
++    return llvm::ExceptionHandling::SjLj;
+   return llvm::ExceptionHandling::None;
+ }
+ 
+diff --git a/llvm/lib/Target/M88k/CMakeLists.txt b/llvm/lib/Target/M88k/CMakeLists.txt
+index b2a06fc..1e5aa78 100644
+--- a/llvm/lib/Target/M88k/CMakeLists.txt
++++ b/llvm/lib/Target/M88k/CMakeLists.txt
+@@ -36,6 +36,7 @@ add_llvm_target(M88kCodeGen
+   M88kAsmPrinter.cpp
+   M88kCallingConv.cpp
+   M88kDelaySlotFiller.cpp
++  M88kSjLjEH.cpp
+   M88kFFS.cpp
+   M88kFrameLowering.cpp
+   M88kISelLowering.cpp
+diff --git a/llvm/lib/Target/M88k/GISel/M88kCallLowering.cpp b/llvm/lib/Target/M88k/GISel/M88kCallLowering.cpp
+index 6d4b976..379f2ce 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kCallLowering.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kCallLowering.cpp
+@@ -347,56 +347,39 @@ bool M88kCallLowering::lowerFormalArguments(MachineIRBuilder &MIRBuilder,
+     MachineFrameInfo &MFI = MF.getFrameInfo();
+ 
+     unsigned FirstVariadicReg = CCInfo.getFirstUnallocated(ArgRegs);
+-    unsigned GPRSaveSize = 4 * (ArgRegsSize - FirstVariadicReg);
+-    if (GPRSaveSize != 0) {
+-      const LLT P0 = LLT::pointer(0, 32);
+-      const LLT S32 = LLT::scalar(32);
+-      const LLT S64 = LLT::scalar(64);
+-
+-      // Align the size of the save area to 8. The first slot will be empty if
+-      // an odd number of registers need to be saved.
+-      unsigned GPRIdx =
+-          MFI.CreateStackObject(alignTo(GPRSaveSize, 8), Align(8), false);
+-      auto FIN = MIRBuilder.buildFrameIndex(P0, GPRIdx);
+-      auto Offset =
+-          MIRBuilder.buildConstant(MRI.createGenericVirtualRegister(S32), 8);
+-
+-      // Assign the registers. The first register requires special handling if
+-      // it has a odd number, because st.d cannot be used in this case.
+-      unsigned OddRegNo = FirstVariadicReg & 0x1;
+-      unsigned FirstVariadicPairReg = (FirstVariadicReg + OddRegNo) >> 1;
+-      if (OddRegNo) {
+-        auto Offset =
+-            MIRBuilder.buildConstant(MRI.createGenericVirtualRegister(S32), 4);
+-        Register Val = MRI.createGenericVirtualRegister(S32);
+-        ArgHandler.assignValueToReg(
+-            Val, ArgRegs[I],
+-            CCValAssign::getReg(I + MF.getFunction().getNumOperands(), MVT::i32,
+-                                ArgRegs[I], MVT::i32, CCValAssign::Full));
+-        auto MPO = MachinePointerInfo::getFixedStack(MF, GPRIdx, 4);
+-        FIN = MIRBuilder.buildPtrAdd(MRI.createGenericVirtualRegister(P0),
+-                                     FIN.getReg(0), Offset);
+-        MIRBuilder.buildStore(Val, FIN, MPO, inferAlignFromPtrInfo(MF, MPO));
+-        FIN = MIRBuilder.buildPtrAdd(MRI.createGenericVirtualRegister(P0),
+-                                     FIN.getReg(0), Offset);
+-      }
+-      for (unsigned I = FirstVariadicPairReg, E = ArgPairRegsSize; I < E;
+-           ++I) {
+-        Register Val = MRI.createGenericVirtualRegister(S64);
+-        ArgHandler.assignValueToReg(
+-            Val, ArgPairRegs[I],
+-            CCValAssign::getReg(I + MF.getFunction().getNumOperands(), MVT::i64,
+-                                ArgPairRegs[I], MVT::i64, CCValAssign::Full));
+-        auto MPO = MachinePointerInfo::getFixedStack(MF, GPRIdx, I * 8);
+-        MIRBuilder.buildStore(Val, FIN, MPO, inferAlignFromPtrInfo(MF, MPO));
+-
+-        FIN = MIRBuilder.buildPtrAdd(MRI.createGenericVirtualRegister(P0),
+-                                     FIN.getReg(0), Offset);
+-      }
+-
+-      FuncInfo->setVarArgsFirstReg(FirstVariadicReg);
+-      FuncInfo->setVarArgsRegIndex(GPRIdx);
++    const LLT P0 = LLT::pointer(0, 32);
++    const LLT S32 = LLT::scalar(32);
++    const LLT S64 = LLT::scalar(64);
++
++    // va_list indexes this area by the original argument register number.
++    int GPRIdx = MFI.CreateStackObject(ArgRegsSize * 4, Align(8), false);
++    auto Base = MIRBuilder.buildFrameIndex(P0, GPRIdx);
++    if (FirstVariadicReg & 1) {
++      Register Val = MRI.createGenericVirtualRegister(S32);
++      ArgHandler.assignValueToReg(
++          Val, ArgRegs[FirstVariadicReg],
++          CCValAssign::getReg(FirstVariadicReg, MVT::i32,
++                              ArgRegs[FirstVariadicReg], MVT::i32,
++                              CCValAssign::Full));
++      auto Offset = MIRBuilder.buildConstant(S32, FirstVariadicReg * 4);
++      auto Addr = MIRBuilder.buildPtrAdd(P0, Base, Offset);
++      auto MPO = MachinePointerInfo::getStack(MF, FirstVariadicReg * 4);
++      MIRBuilder.buildStore(Val, Addr, MPO, Align(4));
+     }
++    for (unsigned Reg = (FirstVariadicReg + 1) / 2;
++         Reg < ArgPairRegsSize; ++Reg) {
++      Register Val = MRI.createGenericVirtualRegister(S64);
++      ArgHandler.assignValueToReg(
++          Val, ArgPairRegs[Reg],
++          CCValAssign::getReg(Reg, MVT::i64, ArgPairRegs[Reg], MVT::i64,
++                              CCValAssign::Full));
++      auto Offset = MIRBuilder.buildConstant(S32, Reg * 8);
++      auto Addr = MIRBuilder.buildPtrAdd(P0, Base, Offset);
++      auto MPO = MachinePointerInfo::getStack(MF, Reg * 8);
++      MIRBuilder.buildStore(Val, Addr, MPO, Align(8));
++    }
++    FuncInfo->setVarArgsFirstReg(FirstVariadicReg);
++    FuncInfo->setVarArgsRegIndex(GPRIdx);
+ 
+     // Create frame index of first var arg stack parameter.
+     FuncInfo->setStackIndex(
+diff --git a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+index 912c73f..f26c22e 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kInstructionSelector.cpp
+@@ -97,6 +97,8 @@ private:
+                          MachineRegisterInfo &MRI) const;
+   bool selectSExtInreg(MachineInstr &I, MachineBasicBlock &MBB,
+                        MachineRegisterInfo &MRI) const;
++  bool selectFCmp(MachineInstr &I, MachineBasicBlock &MBB,
++                  MachineRegisterInfo &MRI) const;
+   bool selectICmp(MachineInstr &I, MachineBasicBlock &MBB,
+                   MachineRegisterInfo &MRI) const;
+   bool selectBrCond(MachineInstr &I, MachineBasicBlock &MBB,
+@@ -416,7 +418,7 @@ bool M88kInstructionSelector::selectVaStart(MachineInstr &I,
+ 
+   // Store the number of the first var arg register.
+   Register Temp = MRI.createVirtualRegister(&M88k::GPRRegClass);
+-  MachineInstr *MI = BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::ORriu))
++  MachineInstr *MI = BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::ORri))
+                          .addReg(Temp, RegState::Define)
+                          .addReg(M88k::R0)
+                          .addImm(FuncInfo->getVarArgsFirstReg());
+@@ -498,7 +500,7 @@ bool M88kInstructionSelector::selectSExtInreg(MachineInstr &I,
+ 
+   // For G_SEXT_INREG, the width is the immediate in operand 2. The offset is
+   // always 0.
+-  Width = I.getOperand(2).getImm() + 1;
++  Width = I.getOperand(2).getImm();
+   assert(Width < 32 && "Can't sign-extend 32bit value");
+ 
+   I.setDesc(TII.get(M88k::EXTrwo));
+@@ -579,6 +581,51 @@ static CC0 getCCforBCOND(CmpInst::Predicate Pred) {
+   }
+ }
+ 
++bool M88kInstructionSelector::selectFCmp(MachineInstr &I,
++                                        MachineBasicBlock &MBB,
++                                        MachineRegisterInfo &MRI) const {
++  unsigned Bit;
++  bool Invert = false;
++  switch (I.getOperand(1).getPredicate()) {
++  case CmpInst::FCMP_UNO: Bit = 0; break;
++  case CmpInst::FCMP_ORD: Bit = 1; break;
++  case CmpInst::FCMP_OEQ: Bit = 2; break;
++  case CmpInst::FCMP_ONE: Bit = 3; break;
++  case CmpInst::FCMP_OGT: Bit = 4; break;
++  case CmpInst::FCMP_OLE: Bit = 5; break;
++  case CmpInst::FCMP_OLT: Bit = 6; break;
++  case CmpInst::FCMP_OGE: Bit = 7; break;
++  case CmpInst::FCMP_UEQ: Bit = 3; Invert = true; break;
++  case CmpInst::FCMP_UNE: Bit = 2; Invert = true; break;
++  case CmpInst::FCMP_UGT: Bit = 5; Invert = true; break;
++  case CmpInst::FCMP_UGE: Bit = 6; Invert = true; break;
++  case CmpInst::FCMP_ULT: Bit = 7; Invert = true; break;
++  case CmpInst::FCMP_ULE: Bit = 4; Invert = true; break;
++  default: return false;
++  }
++  Register Dst = I.getOperand(0).getReg();
++  Register LHS = I.getOperand(2).getReg();
++  Register RHS = I.getOperand(3).getReg();
++  unsigned Bits = MRI.getType(LHS).getSizeInBits();
++  if (Bits != 32 && Bits != 64) return false;
++  Register Flags = MRI.createVirtualRegister(&M88k::GPRRegClass);
++  auto Compare = BuildMI(MBB, I, I.getDebugLoc(),
++                         TII.get(Bits == 64 ? M88k::FCMPgsdd : M88k::FCMPgsss), Flags)
++                     .addReg(LHS).addReg(RHS);
++  if (!constrainSelectedInstRegOperands(*Compare, MRI, TII, TRI, RBI)) return false;
++  Register Result = Invert ? MRI.createVirtualRegister(&M88k::GPRRegClass) : Dst;
++  auto Extract = BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::EXTUrwo), Result)
++                     .addReg(Flags).addImm(1).addImm(Bit);
++  if (!constrainSelectedInstRegOperands(*Extract, MRI, TII, TRI, RBI)) return false;
++  if (Invert) {
++    auto Flip = BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::XORri), Dst)
++                    .addReg(Result).addImm(1);
++    if (!constrainSelectedInstRegOperands(*Flip, MRI, TII, TRI, RBI)) return false;
++  }
++  I.eraseFromParent();
++  return true;
++}
++
+ bool M88kInstructionSelector::selectICmp(MachineInstr &I,
+                                          MachineBasicBlock &MBB,
+                                          MachineRegisterInfo &MRI) const {
+@@ -944,7 +991,7 @@ bool M88kInstructionSelector::selectExt(MachineInstr &I, MachineBasicBlock &MBB,
+   int64_t SImm16;
+   if (mi_match(SrcReg, MRI,
+                m_GICmp(m_Pred(Pred), m_Reg(LHS), m_ICst(SImm16))) &&
+-      isInt<16>(SImm16)) {
++      isUInt<16>(SImm16)) {
+     Register Temp = MRI.createVirtualRegister(&M88k::GPRRegClass);
+     ICC CCCode = getCCforICMP(Pred);
+     MI = BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::CMPri))
+@@ -971,8 +1018,18 @@ bool M88kInstructionSelector::selectExt(MachineInstr &I, MachineBasicBlock &MBB,
+              .addReg(Temp, RegState::Kill)
+              .addImm(1)
+              .addImm(int64_t(CCCode));
+-  } else
+-    return false;
++  } else {
++    unsigned SrcBits = MRI.getType(SrcReg).getSizeInBits();
++    if (MRI.getType(DstReg).getSizeInBits() != 32 ||
++        (SrcBits != 1 && SrcBits != 8 && SrcBits != 16))
++      return false;
++    // Any extension may choose zero extension. Extract the declared low bits
++    // rather than relying on an i1/i8/i16 register's unspecified upper bits.
++    MI = BuildMI(MBB, I, I.getDebugLoc(), TII.get(NewOpc), DstReg)
++             .addReg(SrcReg)
++             .addImm(SrcBits)
++             .addImm(0);
++  }
+ 
+   I.eraseFromParent();
+   return constrainSelectedInstRegOperands(*MI, MRI, TII, TRI, RBI);
+@@ -1164,9 +1221,43 @@ bool M88kInstructionSelector::earlySelect(MachineInstr &I) {
+ 
+   auto &MBB = *I.getParent();
+   auto &MF = *MBB.getParent();
+-  [[maybe_unused]] auto &MRI = MF.getRegInfo();
++  auto &MRI = MF.getRegInfo();
+ 
+   switch (I.getOpcode()) {
++  case TargetOpcode::G_FENCE:
++    if (!TM.getTargetTriple().isOSOpenBSD())
++      return false;
++    // OpenBSD user TB1 is a full barrier; stronger ordering is intentional.
++    BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::MEMBAR));
++    I.eraseFromParent();
++    return true;
++  case TargetOpcode::G_LOAD:
++  case TargetOpcode::G_ZEXTLOAD:
++  case TargetOpcode::G_STORE: {
++    if (!TM.getTargetTriple().isOSOpenBSD() || I.memoperands_empty())
++      return false;
++    MachineMemOperand *MMO = *I.memoperands_begin();
++    if (!MMO->isAtomic())
++      return false;
++    unsigned Bits = MMO->getMemoryType().getSizeInBits();
++    if ((Bits != 8 && Bits != 32) || MMO->getAlign().value() < Bits / 8)
++      return false;
++    Register Value = I.getOperand(0).getReg();
++    Register Address = I.getOperand(1).getReg();
++    if (!RBI.constrainGenericRegister(Value, M88k::GPRRegClass, MRI) ||
++        !RBI.constrainGenericRegister(Address, M88k::GPRRegClass, MRI))
++      return false;
++    bool Load = I.getOpcode() != TargetOpcode::G_STORE;
++    unsigned Opcode = Load ? (Bits == 8 ? M88k::LDurib : M88k::LDriw)
++                           : (Bits == 8 ? M88k::STrib : M88k::STriw);
++    BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::MEMBAR));
++    auto Access = BuildMI(MBB, I, I.getDebugLoc(), TII.get(Opcode));
++    Access.addReg(Value, Load ? RegState::Define : 0)
++        .addReg(Address).addImm(0).cloneMemRefs(I);
++    BuildMI(MBB, I, I.getDebugLoc(), TII.get(M88k::MEMBAR));
++    I.eraseFromParent();
++    return true;
++  }
+   default:
+     return false;
+   }
+@@ -1213,10 +1304,48 @@ bool M88kInstructionSelector::select(MachineInstr &I) {
+     return true;
+ 
+   switch (I.getOpcode()) {
++  case TargetOpcode::G_STACKSAVE: {
++    Register Dst = I.getOperand(0).getReg();
++    if (!RBI.constrainGenericRegister(Dst, M88k::GPRRegClass, MRI))
++      return false;
++    BuildMI(MBB, I, I.getDebugLoc(), TII.get(TargetOpcode::COPY), Dst)
++        .addReg(M88k::R31);
++    I.eraseFromParent();
++    return true;
++  }
++  case TargetOpcode::G_STACKRESTORE: {
++    Register Src = I.getOperand(0).getReg();
++    if (!RBI.constrainGenericRegister(Src, M88k::GPRRegClass, MRI))
++      return false;
++    BuildMI(MBB, I, I.getDebugLoc(), TII.get(TargetOpcode::COPY), M88k::R31)
++        .addReg(Src);
++    I.eraseFromParent();
++    return true;
++  }
+   case TargetOpcode::G_INTTOPTR:
+   case TargetOpcode::G_PTRTOINT:
+   case TargetOpcode::G_FREEZE:
+     return selectCopy(I, TII, MRI, TRI, RBI);
++  case TargetOpcode::G_TRUNC: {
++    Register Dst = I.getOperand(0).getReg();
++    Register Src = I.getOperand(1).getReg();
++    unsigned Bits = MRI.getType(Dst).getSizeInBits();
++    unsigned SrcBits = MRI.getType(Src).getSizeInBits();
++    if ((Bits != 1 && Bits != 8 && Bits != 16 && Bits != 32) ||
++        (SrcBits != 32 && SrcBits != 64))
++      return false;
++    if (!RBI.constrainGenericRegister(Dst, M88k::GPRRegClass, MRI) ||
++        !RBI.constrainGenericRegister(Src, SrcBits == 64 ? M88k::GPR64RegClass
++                                                      : M88k::GPRRegClass, MRI))
++      return false;
++    auto Trunc = BuildMI(MBB, I, I.getDebugLoc(),
++                         TII.get(Bits == 32 ? TargetOpcode::COPY : M88k::MASKri), Dst);
++    Trunc.addReg(Src, 0, SrcBits == 64 ? M88k::sub_lo : 0);
++    if (Bits != 32)
++      Trunc.addImm((1u << Bits) - 1);
++    I.eraseFromParent();
++    return true;
++  }
+   case TargetOpcode::G_INTRINSIC:
+     return selectIntrinsic(I, MBB, MRI);
+   case TargetOpcode::G_GLOBAL_VALUE:
+@@ -1227,6 +1356,8 @@ bool M88kInstructionSelector::select(MachineInstr &I) {
+     return selectVaStart(I, MBB, MRI);
+   case TargetOpcode::G_SEXT_INREG:
+     return selectSExtInreg(I, MBB, MRI);
++  case TargetOpcode::G_FCMP:
++    return selectFCmp(I, MBB, MRI);
+   case TargetOpcode::G_ICMP:
+     return selectICmp(I, MBB, MRI);
+   case TargetOpcode::G_BRCOND:
+@@ -1251,8 +1382,10 @@ bool M88kInstructionSelector::select(MachineInstr &I) {
+   case TargetOpcode::G_MERGE_VALUES:
+   case TargetOpcode::G_UNMERGE_VALUES:
+     return selectMergeUnmerge(I, MBB, MRI);
++  case TargetOpcode::G_IMPLICIT_DEF:
+   case TargetOpcode::G_PHI: {
+-    I.setDesc(TII.get(TargetOpcode::PHI));
++    I.setDesc(TII.get(I.getOpcode() == TargetOpcode::G_PHI
++                          ? TargetOpcode::PHI : TargetOpcode::IMPLICIT_DEF));
+ 
+     Register DstReg = I.getOperand(0).getReg();
+     const TargetRegisterClass *RC = guessRegClass(DstReg, MRI, TRI, RBI);
+diff --git a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+index 550a6d4..b9be25b 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kLegalizerInfo.cpp
+@@ -64,13 +64,13 @@ M88kLegalizerInfo::M88kLegalizerInfo(const M88kSubtarget &ST) {
+   auto IsMC88110 = LegalityPredicate(
+       [=, &ST](const LegalityQuery &Query) { return ST.isMC88110(); });
+ 
+-  getActionDefinitionsBuilder(G_PHI).legalFor({S64, S32, P0});
++  getActionDefinitionsBuilder(G_PHI).legalFor({S64, S32, P0}).minScalar(0, S32);
+   getActionDefinitionsBuilder(G_SELECT).lower();
+   getActionDefinitionsBuilder({G_IMPLICIT_DEF, G_FREEZE})
+       .legalFor({S32, P0})
+       .clampScalar(0, S32, S32);
+-  getActionDefinitionsBuilder(G_MERGE_VALUES).legalFor({{S64, S32}});
+-  getActionDefinitionsBuilder(G_UNMERGE_VALUES).legalFor({{S32, S64}});
++  getActionDefinitionsBuilder(G_MERGE_VALUES).legalFor({{S64, S32}}).lower();
++  getActionDefinitionsBuilder(G_UNMERGE_VALUES).legalFor({{S32, S64}}).lower();
+   getActionDefinitionsBuilder(G_CONSTANT)
+       .legalFor({S32, P0})
+       .clampScalar(0, S32, S32);
+@@ -80,6 +80,7 @@ M88kLegalizerInfo::M88kLegalizerInfo(const M88kSubtarget &ST) {
+   getActionDefinitionsBuilder(G_PTRTOINT)
+       .legalFor({{S32, P0}})
+       .minScalar(0, S32);
++  getActionDefinitionsBuilder({G_STACKSAVE, G_STACKRESTORE}).legalFor({P0});
+   getActionDefinitionsBuilder(G_PTRMASK)
+       .legalFor({{P0, S32}})
+       .clampScalar(1, S32, S32);
+@@ -88,8 +89,24 @@ M88kLegalizerInfo::M88kLegalizerInfo(const M88kSubtarget &ST) {
+       .legalFor({{S32, S16}, {S32, S8}, {S32, S1}})
+       .clampScalar(0, S32, S32)
+       .widenScalarToNextPow2(1, 32);
+-  getActionDefinitionsBuilder(G_SEXT_INREG).legalForTypeWithAnyImm({S32});
++  getActionDefinitionsBuilder(G_SEXT_INREG)
++      .legalForTypeWithAnyImm({S32})
++      .clampScalar(0, S32, S32);
+   getActionDefinitionsBuilder(G_TRUNC).alwaysLegal();
++  getActionDefinitionsBuilder(G_FENCE).alwaysLegal();
++  // Ordinary C++ runtime atomics use locked helpers, never signal-safe RMW.
++  getActionDefinitionsBuilder({G_ATOMICRMW_XCHG, G_ATOMICRMW_ADD,
++                               G_ATOMICRMW_SUB, G_ATOMICRMW_AND,
++                               G_ATOMICRMW_OR, G_ATOMICRMW_XOR,
++                               G_ATOMIC_CMPXCHG})
++      .libcallFor({S32});
++  getActionDefinitionsBuilder(G_ATOMIC_CMPXCHG_WITH_SUCCESS).lower();
++  getActionDefinitionsBuilder(G_ABS).lower();
++  getActionDefinitionsBuilder(G_IS_FPCLASS).lower();
++  getActionDefinitionsBuilder({G_FCEIL, G_FFLOOR, G_FRINT, G_FNEARBYINT,
++                               G_INTRINSIC_TRUNC, G_INTRINSIC_ROUND,
++                               G_INTRINSIC_ROUNDEVEN})
++      .libcallFor({S32, S64});
+   getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD})
+       .legalForTypesWithMemDesc({{S32, P0, S8, 8}, {S32, P0, S16, 16}})
+       .customIf(typePairAndMemDescInSet(/*TypeIdx0*/ 0, /*TypeIdx1*/ 1,
+@@ -161,13 +178,16 @@ M88kLegalizerInfo::M88kLegalizerInfo(const M88kSubtarget &ST) {
+       .clampScalar(0, S32, S64);
+   getActionDefinitionsBuilder({G_SREM, G_UREM})
+       .lowerFor({S32})
+-      .libcallFor({S64});
+-  getActionDefinitionsBuilder({G_UMULH, G_SMULH}).lower();
++      .libcallFor({S64})
++      .clampScalar(0, S32, S64);
++  getActionDefinitionsBuilder({G_UMULH, G_SMULH, G_UMULO, G_SMULO}).lower();
+   getActionDefinitionsBuilder({G_AND, G_OR, G_XOR})
+       .legalFor({S32})
+       .clampScalar(0, S32, S32);
+   getActionDefinitionsBuilder({G_SBFX, G_UBFX})
++      .customFor({{S64, S64}, {S64, S32}})
+       .legalFor({{S32, S32}})
++      .clampScalar(1, S32, S32)
+       .clampScalar(0, S32, S32);
+   getActionDefinitionsBuilder({G_SHL, G_LSHR, G_ASHR})
+       .legalFor({{S32, S32}})
+@@ -175,10 +195,8 @@ M88kLegalizerInfo::M88kLegalizerInfo(const M88kSubtarget &ST) {
+       .clampScalar(1, S32, S32);
+   getActionDefinitionsBuilder(G_ROTR).legalFor({{S32}, {S32}});
+   getActionDefinitionsBuilder({G_ROTL, G_FSHL, G_FSHR}).lower();
+-  getActionDefinitionsBuilder(G_CTLZ)
+-    .customFor({{S32}, {S32}});
+-  getActionDefinitionsBuilder(G_CTLZ_ZERO_UNDEF)
+-      .legalFor({{S32}, {S32}});
++  getActionDefinitionsBuilder({G_CTLZ, G_CTLZ_ZERO_UNDEF})
++      .customFor({{S32, S32}, {S64, S64}});
+   getActionDefinitionsBuilder({G_CTTZ, G_CTTZ_ZERO_UNDEF, G_CTPOP}).lower();
+   getActionDefinitionsBuilder({G_SMAX, G_UMAX, G_SMIN, G_UMIN}).lower();
+ 
+@@ -187,6 +205,9 @@ M88kLegalizerInfo::M88kLegalizerInfo(const M88kSubtarget &ST) {
+   getActionDefinitionsBuilder(G_ICMP)
+       .legalForCartesianProduct({S1}, {S32, P0})
+       .clampScalar(1, S32, S32);
++  getActionDefinitionsBuilder({G_UCMP, G_SCMP}).lower();
++  getActionDefinitionsBuilder(G_FCMP)
++      .legalForCartesianProduct({S1}, {S32, S64});
+   getActionDefinitionsBuilder(G_BRCOND).legalFor({S1});
+   getActionDefinitionsBuilder(G_BRJT).legalFor({{P0, S32}});
+   getActionDefinitionsBuilder(G_BRINDIRECT).legalFor({P0});
+@@ -250,6 +271,28 @@ bool M88kLegalizerInfo::legalizeCustom(
+   const LLT P0 = LLT::pointer(0, 32);
+ 
+   switch (MI.getOpcode()) {
++  case G_SBFX:
++  case G_UBFX: {
++    Register Dst = MI.getOperand(0).getReg();
++    Register Src = MI.getOperand(1).getReg();
++    auto Lsb = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
++    auto Width = getIConstantVRegValWithLookThrough(MI.getOperand(3).getReg(), MRI);
++    if (!Lsb || !Width)
++      return false;
++    uint64_t Offset = Lsb->Value.getZExtValue();
++    uint64_t Bits = Width->Value.getZExtValue();
++    if (Bits == 0 || Bits > 64 || Offset > 64 - Bits)
++      return false;
++    auto Left = MIRBuilder.buildConstant(S64, 64 - Offset - Bits);
++    auto Right = MIRBuilder.buildConstant(S64, 64 - Bits);
++    auto Shifted = MIRBuilder.buildShl(S64, Src, Left);
++    if (MI.getOpcode() == G_SBFX)
++      MIRBuilder.buildAShr(Dst, Shifted, Right);
++    else
++      MIRBuilder.buildLShr(Dst, Shifted, Right);
++    MI.eraseFromParent();
++    break;
++  }
+   case G_SEXTLOAD:
+   case G_ZEXTLOAD:
+   case G_LOAD: {
+@@ -459,29 +502,29 @@ bool M88kLegalizerInfo::legalizeCustom(
+     MI.eraseFromParent();
+     break;
+   }
+-  case G_CTLZ: {
+-    // The instruction
+-    //   %7:_(s32) = G_CTLZ %0(s32)
+-    // is lowered to:
+-    //   %1:_(s32) = G_INTRINSIC intrinsic(@llvm.m88k.ff1), %0(s32)
+-    //   %2:_(s32) = G_CONSTANT i32 31
+-    //   %3:_(s32) = G_CONSTANT i32 0
+-    //   %4:_(s32), %3:_(s32) = G_USUBO %2, %1
+-    //   %5:_(s32) = G_AND %2, %4
+-    //   %6:_(s32), %3:_(s32) = G_UADDE %5, %3, %4
++  case G_CTLZ:
++  case G_CTLZ_ZERO_UNDEF: {
+     Register Dst = MI.getOperand(0).getReg();
+-
+-    auto FF1 =
+-        MIRBuilder.buildIntrinsic(Intrinsic::m88k_ff1, {S32}, false, false);
+-    FF1.addUse(MI.getOperand(1).getReg());
+-    Register USub = MRI.createGenericVirtualRegister(S32);
+-    Register Carry = MRI.createGenericVirtualRegister(S32);
+-    Register Dead = MRI.createGenericVirtualRegister(S32);
+-    auto Const31 = MIRBuilder.buildConstant(S32, 31);
+-    auto Const0 = MIRBuilder.buildConstant(S32, 0);
+-    MIRBuilder.buildUSubo(USub, Carry, Const31, FF1);
+-    auto And = MIRBuilder.buildAnd(S32, USub, Const31);
+-    MIRBuilder.buildUAdde(Dst, Dead, And, Const0, Carry);
++    Register Src = MI.getOperand(1).getReg();
++    auto Zero = MIRBuilder.buildConstant(S32, 0);
++    auto ThirtyTwo = MIRBuilder.buildConstant(S32, 32);
++    if (MRI.getType(Dst) == S64) {
++      auto Parts = MIRBuilder.buildUnmerge(S32, Src);
++      auto LowCount = MIRBuilder.buildCTLZ(S32, Parts.getReg(0));
++      auto HighCount = MIRBuilder.buildCTLZ(S32, Parts.getReg(1));
++      auto LowPlus32 = MIRBuilder.buildAdd(S32, LowCount, ThirtyTwo);
++      auto HighZero = MIRBuilder.buildICmp(CmpInst::ICMP_EQ, LLT::scalar(1),
++                                           Parts.getReg(1), Zero);
++      auto Count = MIRBuilder.buildSelect(S32, HighZero, LowPlus32, HighCount);
++      MIRBuilder.buildMergeValues(Dst, {Count.getReg(0), Zero.getReg(0)});
++    } else {
++      auto FF1 = MIRBuilder.buildIntrinsic(Intrinsic::m88k_ff1, {S32}, false, false);
++      FF1.addUse(Src);
++      auto ThirtyOne = MIRBuilder.buildConstant(S32, 31);
++      auto NonzeroCount = MIRBuilder.buildSub(S32, ThirtyOne, FF1);
++      auto IsZero = MIRBuilder.buildICmp(CmpInst::ICMP_EQ, LLT::scalar(1), Src, Zero);
++      MIRBuilder.buildSelect(Dst, IsZero, ThirtyTwo, NonzeroCount);
++    }
+     MI.eraseFromParent();
+     break;
+   }
+@@ -490,4 +533,4 @@ bool M88kLegalizerInfo::legalizeCustom(
+   }
+ 
+   return true;
+-}
+\ No newline at end of file
++}
+diff --git a/llvm/lib/Target/M88k/GISel/M88kPostLegalizerLowering.cpp b/llvm/lib/Target/M88k/GISel/M88kPostLegalizerLowering.cpp
+index bddc007..22e5d91 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kPostLegalizerLowering.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kPostLegalizerLowering.cpp
+@@ -493,6 +493,7 @@ M88kPostLegalizerLoweringImpl::M88kPostLegalizerLoweringImpl(
+ }
+ 
+ bool M88kPostLegalizerLoweringImpl::tryCombineAll(MachineInstr &MI) const {
++  bool Changed = false;
+   // If the instruction is commutable and the first operand is a constant, then
+   // swap the operands. The matcher generated from the SDAG patterns expects the
+   // constant always as the second operand, otherwise operand is not matched as
+@@ -507,15 +508,23 @@ bool M88kPostLegalizerLoweringImpl::tryCombineAll(MachineInstr &MI) const {
+     unsigned SrcOpc =
+         getDefIgnoringCopies(MI.getOperand(SrcIdx).getReg(), *B.getMRI())
+             ->getOpcode();
+-    if (SrcOpc == TargetOpcode::G_CONSTANT ||
+-        SrcOpc == TargetOpcode::G_FCONSTANT) {
++    unsigned OtherSrcOpc =
++        getDefIgnoringCopies(MI.getOperand(SrcIdx + 1).getReg(), *B.getMRI())
++            ->getOpcode();
++    // Swapping two constants requeues the instruction and swaps them back on
++    // the next visit. Only move a constant past a nonconstant operand.
++    if ((SrcOpc == TargetOpcode::G_CONSTANT ||
++         SrcOpc == TargetOpcode::G_FCONSTANT) &&
++        OtherSrcOpc != TargetOpcode::G_CONSTANT &&
++        OtherSrcOpc != TargetOpcode::G_FCONSTANT) {
+       Observer.changingInstr(MI);
+       B.getTII().commuteInstruction(MI, false, SrcIdx, SrcIdx + 1);
+       Observer.changedInstr(MI);
++      Changed = true;
+     }
+   }
+ 
+-  return tryCombineAllImpl(MI);
++  return tryCombineAllImpl(MI) || Changed;
+ }
+ 
+ class M88kPostLegalizerLowering : public MachineFunctionPass {
+diff --git a/llvm/lib/Target/M88k/GISel/M88kPreLegalizerCombiner.cpp b/llvm/lib/Target/M88k/GISel/M88kPreLegalizerCombiner.cpp
+index 4d368e5..0e3747e 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kPreLegalizerCombiner.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kPreLegalizerCombiner.cpp
+@@ -77,6 +77,8 @@ public:
+   bool tryCombineAll(MachineInstr &I) const override;
+ 
+ private:
++  bool matchM88kHoistLogic(MachineInstr &MI, InstructionStepsMatchInfo &Info) const;
++
+   bool matchBitfieldExtractFromAndAShr(
+       MachineInstr &MI, MachineRegisterInfo &MRI,
+       std::function<void(MachineIRBuilder &)> &MatchInfo) const;
+@@ -87,6 +89,21 @@ private:
+ };
+ } // namespace
+ 
++bool M88kPreLegalizerCombinerImpl::matchM88kHoistLogic(
++    MachineInstr &MI, InstructionStepsMatchInfo &Info) const {
++  // commute_shift distributes (x | C1) << C2 into two shifts. Let the
++  // constant shift fold before hoisting; otherwise these rules undo each
++  // other indefinitely as each rewrite creates fresh virtual registers.
++  for (unsigned Op : {1u, 2u}) {
++    MachineInstr *Hand = getDefIgnoringCopies(MI.getOperand(Op).getReg(), MRI);
++    if (Hand && Hand->getOpcode() == TargetOpcode::G_SHL &&
++        getIConstantVRegValWithLookThrough(Hand->getOperand(1).getReg(), MRI) &&
++        getIConstantVRegValWithLookThrough(Hand->getOperand(2).getReg(), MRI))
++      return false;
++  }
++  return Helper.matchHoistLogicOpWithSameOpcodeHands(MI, Info);
++}
++
+ /// Form a G_UBFX from "(a sra b) & mask", where b and mask are constants.
+ /// This is similar to CombinerHelper::matchBitfieldExtractFromAnd(), but
+ /// matches an arithmetic shift right instructions (instead of locigal shift
+@@ -188,6 +205,8 @@ void M88kPreLegalizerCombiner::getAnalysisUsage(AnalysisUsage &AU) const {
+ 
+ M88kPreLegalizerCombiner::M88kPreLegalizerCombiner() : MachineFunctionPass(ID) {
+   initializeM88kPreLegalizerCombinerPass(*PassRegistry::getPassRegistry());
++  if (!RuleConfig.parseCommandLineOption())
++    report_fatal_error("Invalid M88k prelegalizer combiner rule identifier");
+ }
+ 
+ bool M88kPreLegalizerCombiner::runOnMachineFunction(MachineFunction &MF) {
+diff --git a/llvm/lib/Target/M88k/GISel/M88kRegisterBankInfo.cpp b/llvm/lib/Target/M88k/GISel/M88kRegisterBankInfo.cpp
+index d6e65a2..fbae5e8 100644
+--- a/llvm/lib/Target/M88k/GISel/M88kRegisterBankInfo.cpp
++++ b/llvm/lib/Target/M88k/GISel/M88kRegisterBankInfo.cpp
+@@ -107,6 +107,15 @@ M88kRegisterBankInfo::getInstrMapping(const MachineInstr &MI) const {
+     OperandsMapping = getOperandsMapping({getValueMapping(RBIdx), nullptr});
+     break;
+   }
++  case TargetOpcode::G_FCMP: {
++    LLT Ty = MRI.getType(MI.getOperand(2).getReg());
++    if (Ty.getSizeInBits() != 32 && Ty.getSizeInBits() != 64)
++      return getInvalidInstructionMapping();
++    PartialMappingIdx RBIdx = Ty.getSizeInBits() == 64 ? PMI_GR64 : PMI_GR32;
++    OperandsMapping = getOperandsMapping({getValueMapping(PMI_GR32), nullptr,
++                                         getValueMapping(RBIdx), getValueMapping(RBIdx)});
++    break;
++  }
+   case TargetOpcode::G_FPTOSI:
+   case TargetOpcode::G_FPTOUI: {
+     LLT Ty = MRI.getType(MI.getOperand(1).getReg());
+diff --git a/llvm/lib/Target/M88k/M88k.h b/llvm/lib/Target/M88k/M88k.h
+index b0c4f83..2ec7feb 100644
+--- a/llvm/lib/Target/M88k/M88k.h
++++ b/llvm/lib/Target/M88k/M88k.h
+@@ -37,6 +37,7 @@ FunctionPass *createM88kPostLegalizerCombiner(bool IsOptNone);
+ FunctionPass *createM88kPostLegalizerLowering(bool IsOptNone);
+ FunctionPass *createM88kDelaySlotFiller();
+ FunctionPass *createM88kFFS();
++FunctionPass *createM88kSjLjEH();
+ 
+ void initializeM88kPreLegalizerCombinerPass(PassRegistry &Registry);
+ void initializeM88kPostLegalizerCombinerPass(PassRegistry &Registry);
+diff --git a/llvm/lib/Target/M88k/M88kCombine.td b/llvm/lib/Target/M88k/M88kCombine.td
+index 7e03a78..8f36630 100644
+--- a/llvm/lib/Target/M88k/M88kCombine.td
++++ b/llvm/lib/Target/M88k/M88kCombine.td
+@@ -23,14 +23,23 @@ def bitfield_extract_from_and_ashr : GICombineRule<
+                                                    ${matchinfo}); }]),
+   (apply [{ Helper.applyBuildFn(*${root}, ${matchinfo}); }])>;
+ 
++def m88k_hoist_logic_op_with_same_opcode_hands: GICombineRule <
++  (defs root:$root, instruction_steps_matchdata:$info),
++  (match (wip_match_opcode G_AND, G_OR, G_XOR):$root,
++    [{ return matchM88kHoistLogic(*${root}, ${info}); }]),
++  (apply [{ Helper.applyBuildInstructionSteps(*${root}, ${info}); }])>;
++
+ // Like all_combines, but removed vector, fma and funnel shift combines.
+ // intdiv_combines and mulh_combines result in worse code generation because
+ // G_UMULH is mapped to a library call, and G_CTTZ results in a lengthy
+ // instruction sequence.
+ def m88k_combines : GICombineGroup<[integer_reassoc_combines, trivial_combines,
+-    freeze_combines, cast_combines, combines_for_extload,
++    // Generic load_and_mask narrows at the original address, which selects
++    // the high bytes on this big-endian target. Retain extending loads;
++    // leave mask narrowing disabled until its pointer offset is corrected.
++    freeze_combines, cast_combines, extending_loads,
+     undef_combines, identity_combines, phi_combines,
+-    simplify_add_to_sub, hoist_logic_op_with_same_opcode_hands, shifts_too_big,
++    simplify_add_to_sub, m88k_hoist_logic_op_with_same_opcode_hands, shifts_too_big,
+     reassocs, ptr_add_immed_chain,
+     shl_ashr_to_sext_inreg, sext_inreg_of_load,
+     width_reduction_combines, select_combines,
+diff --git a/llvm/lib/Target/M88k/M88kISelLowering.cpp b/llvm/lib/Target/M88k/M88kISelLowering.cpp
+index 0efae2a..35ea4aa 100644
+--- a/llvm/lib/Target/M88k/M88kISelLowering.cpp
++++ b/llvm/lib/Target/M88k/M88kISelLowering.cpp
+@@ -42,6 +42,33 @@ M88kTargetLowering::M88kTargetLowering(const TargetMachine &TM,
+ 
+   // Set up special registers.
+   setStackPointerRegisterToSaveRestore(M88k::R31);
++  setLibcallName(RTLIB::UNWIND_RESUME, "_Unwind_SjLj_Resume");
++  // Pthread-locked runtime helpers provide all four memory order variants.
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDADD4_RELAX, "__m88k_locked_add4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDADD4_ACQ, "__m88k_locked_add4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDADD4_REL, "__m88k_locked_add4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDADD4_ACQ_REL, "__m88k_locked_add4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_SWP4_RELAX, "__m88k_locked_exchange4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_SWP4_ACQ, "__m88k_locked_exchange4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_SWP4_REL, "__m88k_locked_exchange4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_SWP4_ACQ_REL, "__m88k_locked_exchange4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDCLR4_RELAX, "__m88k_locked_clear4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDCLR4_ACQ, "__m88k_locked_clear4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDCLR4_REL, "__m88k_locked_clear4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDCLR4_ACQ_REL, "__m88k_locked_clear4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDSET4_RELAX, "__m88k_locked_or4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDSET4_ACQ, "__m88k_locked_or4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDSET4_REL, "__m88k_locked_or4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDSET4_ACQ_REL, "__m88k_locked_or4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDEOR4_RELAX, "__m88k_locked_xor4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDEOR4_ACQ, "__m88k_locked_xor4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDEOR4_REL, "__m88k_locked_xor4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_LDEOR4_ACQ_REL, "__m88k_locked_xor4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_CAS4_RELAX, "__m88k_locked_cas4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_CAS4_ACQ, "__m88k_locked_cas4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_CAS4_REL, "__m88k_locked_cas4");
++  setLibcallName(RTLIB::OUTLINE_ATOMIC_CAS4_ACQ_REL, "__m88k_locked_cas4");
++
+ 
+   // How we extend i1 boolean values.
+   setBooleanContents(ZeroOrOneBooleanContent);
+diff --git a/llvm/lib/Target/M88k/M88kInstrInfo.td b/llvm/lib/Target/M88k/M88kInstrInfo.td
+index f90cf4b..52211c6 100644
+--- a/llvm/lib/Target/M88k/M88kInstrInfo.td
++++ b/llvm/lib/Target/M88k/M88kInstrInfo.td
+@@ -938,6 +938,16 @@ let isBranch = 1, isTerminator = 1 in {
+   }
+ }
+ 
++// OpenBSD userland full pipeline/memory barrier. Not a control-flow barrier:
++// bit zero of r0 is clear, so this instruction cannot take its trap.
++def MEMBAR : InstM88k<(outs), (ins), "tb1", "0, %r0, 128"> {
++  let Inst = 0xf000d880;
++  let isCodeGenOnly = 1;
++  let hasSideEffects = 1;
++  let mayLoad = 1;
++  let mayStore = 1;
++}
++
+ let isTrap = 1, isBarrier = 1 in {
+   def TB0 : F_TB<0b1101000, (outs), (ins imm32zx5:$b5, GPROpnd:$rs1, Vec9:$vec9),
+                  "tb0">;
+diff --git a/llvm/lib/Target/M88k/M88kMCInstLower.cpp b/llvm/lib/Target/M88k/M88kMCInstLower.cpp
+index f6073cf..bebbfa0 100644
+--- a/llvm/lib/Target/M88k/M88kMCInstLower.cpp
++++ b/llvm/lib/Target/M88k/M88kMCInstLower.cpp
+@@ -50,6 +50,10 @@ MCOperand M88kMCInstLower::lowerSymbolOperand(const MachineOperand &MO) const {
+     HasOffset = false;
+     break;
+ 
++  case MachineOperand::MO_MCSymbol:
++    Symbol = MO.getMCSymbol();
++    break;
++
+   case MachineOperand::MO_GlobalAddress:
+     Symbol = Printer.getSymbol(MO.getGlobal());
+     break;
+diff --git a/llvm/lib/Target/M88k/M88kRegisterInfo.cpp b/llvm/lib/Target/M88k/M88kRegisterInfo.cpp
+index fd820fd..ec342a1 100644
+--- a/llvm/lib/Target/M88k/M88kRegisterInfo.cpp
++++ b/llvm/lib/Target/M88k/M88kRegisterInfo.cpp
+@@ -38,6 +38,20 @@ using namespace llvm;
+ 
+ M88kRegisterInfo::M88kRegisterInfo() : M88kGenRegisterInfo(M88k::R1) {}
+ 
++const uint32_t *M88kRegisterInfo::getCustomEHPadPreservedMask(
++    const MachineFunction &MF) const {
++  // GNU builtin_longjmp restores FP/SP/PC only. The exceptional edge must
++  // clobber registers at block entry, before an allocator can spill them.
++  static const std::vector<uint32_t> Mask = [] {
++    std::vector<uint32_t> Result(MachineOperand::getRegMaskSize(M88k::NUM_TARGET_REGS), 0);
++    for (unsigned R : {M88k::R0, M88k::R28, M88k::R29, M88k::R30, M88k::R31, M88k::X0})
++      Result[R / 32] |= 1u << (R % 32);
++    return Result;
++  }();
++  return Mask.data();
++}
++
++
+ bool M88kRegisterInfo::isArgumentRegister(const MachineFunction &MF,
+                                           MCRegister Reg) const {
+   CallingConv::ID CC = MF.getFunction().getCallingConv();
+@@ -72,6 +86,11 @@ BitVector M88kRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
+   if (MF.getSubtarget<M88kSubtarget>().isMC88110())
+     Reserved.set(M88k::X0);
+ 
++  // OpenBSD libc reads the live thread-control-block pointer from r27.
++  // Preserving it only at function return is insufficient across libc calls.
++  if (MF.getTarget().getTargetTriple().isOSOpenBSD())
++    Reserved.set(M88k::R27);
++
+   // R28 and R29 are always reserved according to SYS-V ABI.
+   Reserved.set(M88k::R28);
+   Reserved.set(M88k::R29);
+@@ -89,6 +108,11 @@ BitVector M88kRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
+     Reserved.set(M88k::X31);
+   }
+ 
++  // A register pair containing an ABI-reserved half must also be reserved.
++  for (unsigned Reg = 0; Reg < getNumRegs(); ++Reg)
++    if (Reserved.test(Reg))
++      markSuperRegs(Reserved, Reg);
++
+   return Reserved;
+ }
+ 
+diff --git a/llvm/lib/Target/M88k/M88kRegisterInfo.h b/llvm/lib/Target/M88k/M88kRegisterInfo.h
+index d50d55d..d3249e5 100644
+--- a/llvm/lib/Target/M88k/M88kRegisterInfo.h
++++ b/llvm/lib/Target/M88k/M88kRegisterInfo.h
+@@ -28,6 +28,8 @@ namespace llvm {
+ struct M88kRegisterInfo : public M88kGenRegisterInfo {
+   M88kRegisterInfo();
+ 
++  const uint32_t *getCustomEHPadPreservedMask(const MachineFunction &MF) const override;
++
+   bool isArgumentRegister(const MachineFunction &MF,
+                           MCRegister Reg) const override;
+ 
+diff --git a/llvm/lib/Target/M88k/M88kSjLjEH.cpp b/llvm/lib/Target/M88k/M88kSjLjEH.cpp
+new file mode 100644
+index 0000000..ccaa311
+--- /dev/null
++++ b/llvm/lib/Target/M88k/M88kSjLjEH.cpp
+@@ -0,0 +1,146 @@
++//===-- M88kSjLjEH.cpp - GlobalISel SjLj lowering ------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++// GNU builtin-setjmp SjLj context ABI: prefix32, then saved FP/PC/SP words.
++#include "M88k.h"
++#include "M88kSubtarget.h"
++#include "MCTargetDesc/M88kBaseInfo.h"
++#include "llvm/CodeGen/GlobalISel/GenericMachineInstrs.h"
++#include "llvm/CodeGen/MachineFrameInfo.h"
++#include "llvm/CodeGen/MachineFunctionPass.h"
++#include "llvm/CodeGen/MachineInstrBuilder.h"
++#include "llvm/CodeGen/MachineRegisterInfo.h"
++#include "llvm/IR/Instructions.h"
++#include "llvm/IR/Intrinsics.h"
++#include "llvm/MC/MCContext.h"
++using namespace llvm;
++namespace {
++class M88kSjLjEH : public MachineFunctionPass {
++public:
++  static char ID;
++  M88kSjLjEH() : MachineFunctionPass(ID) {}
++  StringRef getPassName() const override { return "M88k SjLj lowering"; }
++  bool runOnMachineFunction(MachineFunction &MF) override {
++    auto &MRI = MF.getRegInfo();
++    auto &MFI = MF.getFrameInfo();
++    const auto &TII = *MF.getSubtarget<M88kSubtarget>().getInstrInfo();
++    MachineInstr *Setup = nullptr;
++    int FI = 0;
++    SmallVector<MachineInstr *, 8> Erase;
++    SmallVector<MachineInstr *, 4> LSDAs;
++    for (auto &BB : MF) for (auto &MI : BB) {
++      if (MI.getOpcode() != TargetOpcode::G_INTRINSIC &&
++          MI.getOpcode() != TargetOpcode::G_INTRINSIC_W_SIDE_EFFECTS) continue;
++      switch (cast<GIntrinsic>(MI).getIntrinsicID()) {
++      case Intrinsic::eh_sjlj_setup_dispatch: Setup = &MI; Erase.push_back(&MI); break;
++      case Intrinsic::eh_sjlj_functioncontext: {
++        auto *Def = MRI.getVRegDef(MI.getOperand(1).getReg());
++        if (!Def || Def->getOpcode() != TargetOpcode::G_FRAME_INDEX)
++          report_fatal_error("SjLj function context must be a static alloca");
++        FI = Def->getOperand(1).getIndex();
++        MFI.setFunctionContextIndex(FI);
++        Erase.push_back(&MI); break;
++      }
++      case Intrinsic::eh_sjlj_callsite: Erase.push_back(&MI); break;
++      case Intrinsic::eh_sjlj_lsda: LSDAs.push_back(&MI); break;
++      default: break;
++      }
++    }
++    if (!Setup) return false;
++    auto NewReg = [&]() { return MRI.createVirtualRegister(&M88k::GPRRegClass); };
++    auto Address = [&](MachineBasicBlock &BB, MachineBasicBlock::iterator Pos,
++                       Register Dest, const MachineOperand &Sym) {
++      auto Hi = NewReg();
++      auto H = BuildMI(BB, Pos, DebugLoc(), TII.get(M88k::ORriu), Hi).addReg(M88k::R0);
++      auto L = BuildMI(BB, Pos, DebugLoc(), TII.get(M88k::ORri), Dest).addReg(Hi);
++      MachineOperand HSym = Sym, LSym = Sym;
++      HSym.setTargetFlags(M88kII::MO_ABS_HI);
++      LSym.setTargetFlags(M88kII::MO_ABS_LO);
++      H.add(HSym); L.add(LSym);
++    };
++    for (auto *MI : LSDAs) {
++      Register Dst = MI->getOperand(0).getReg();
++      MRI.setRegClass(Dst, &M88k::GPRRegClass);
++      auto *Sym = MF.getContext().getOrCreateSymbol(Twine("GCC_except_table") + Twine(MF.getFunctionNumber()));
++      Address(*MI->getParent(), MI->getIterator(), Dst, MachineOperand::CreateMCSymbol(Sym));
++      Erase.push_back(MI);
++    }
++    // SjLjEHPrepare numbers invokes in IR block order, starting at one.
++    SmallVector<MachineBasicBlock *, 8> Pads;
++    unsigned Site = 0;
++    for (auto &BB : MF.getFunction()) {
++      auto *Invoke = dyn_cast<InvokeInst>(BB.getTerminator());
++      if (!Invoke) continue;
++      ++Site;
++      MachineBasicBlock *InvokeBB = nullptr, *Pad = nullptr;
++      for (auto &MBB : MF) {
++        if (MBB.getBasicBlock() == &BB) InvokeBB = &MBB;
++        if (MBB.getBasicBlock() == Invoke->getUnwindDest()) Pad = &MBB;
++      }
++      if (!InvokeBB || !Pad) report_fatal_error("Missing SjLj invoke blocks");
++      // An invoke inside the landing pad has its own EH_LABEL. Only the
++      // landing-pad metadata identifies the label at exceptional block entry.
++      MCSymbol *PadSym = MF.getOrCreateLandingPadInfo(Pad).LandingPadLabel;
++      if (!PadSym) {
++        PadSym = MF.addLandingPad(Pad);
++        BuildMI(*Pad, Pad->begin(), DebugLoc(), TII.get(TargetOpcode::EH_LABEL)).addSym(PadSym);
++      }
++      MF.setCallSiteLandingPad(PadSym, {Site});
++      bool Region = false;
++      for (auto &MI : *InvokeBB) {
++        if (MI.getOpcode() == TargetOpcode::G_INVOKE_REGION_START) Region = true;
++        else if (Region && MI.isEHLabel()) {
++          MF.setCallSiteBeginLabel(MI.getOperand(0).getMCSymbol(), Site);
++          break;
++        }
++      }
++      Pads.push_back(Pad);
++    }
++    SmallVector<MachineBasicBlock *, 32> OriginalBlocks;
++    for (auto &BB : MF) OriginalBlocks.push_back(&BB);
++    auto *Dispatch = MF.CreateMachineBasicBlock();
++    MF.push_back(Dispatch);
++    Dispatch->setIsEHPad();
++    Dispatch->setMachineBlockAddressTaken();
++    auto Addr = NewReg();
++    Address(*Setup->getParent(), Setup->getIterator(), Addr, MachineOperand::CreateMBB(Dispatch));
++    BuildMI(*Setup->getParent(), *Setup, DebugLoc(), TII.get(M88k::STriw))
++      .addReg(Addr).addFrameIndex(FI).addImm(36);
++    // Register the exceptional-edge clobbers for callee-save accounting.
++    const auto &TRI = *MF.getSubtarget().getRegisterInfo();
++    MRI.addPhysRegsUsedFromRegMask(TRI.getCustomEHPadPreservedMask(MF));
++    auto CallSite = NewReg();
++    BuildMI(*Dispatch, Dispatch->end(), DebugLoc(), TII.get(M88k::LDriw), CallSite).addFrameIndex(FI).addImm(4);
++    auto *Test = Dispatch;
++    for (unsigned I = 0; I < Pads.size(); ++I) {
++      auto *Next = MF.CreateMachineBasicBlock();
++      MF.push_back(Next);
++      auto Cmp = NewReg();
++      BuildMI(*Test, Test->end(), DebugLoc(), TII.get(M88k::CMPri), Cmp).addReg(CallSite).addImm(I);
++      BuildMI(*Test, Test->end(), DebugLoc(), TII.get(M88k::BB1)).addImm(2).addReg(Cmp).addMBB(Pads[I]);
++      BuildMI(*Test, Test->end(), DebugLoc(), TII.get(M88k::BR)).addMBB(Next);
++      Test->addSuccessor(Pads[I]);
++      Test->addSuccessor(Next);
++      Test = Next;
++    }
++    BuildMI(*Test, Test->end(), DebugLoc(), TII.get(M88k::BR)).addMBB(Test);
++    Test->addSuccessor(Test);
++    // Preserve exceptional CFG reachability but route every invoke to dispatch.
++    for (auto *BB : OriginalBlocks) {
++      SmallVector<MachineBasicBlock *, 4> Old;
++      for (auto *Succ : BB->successors()) if (Succ->isEHPad()) Old.push_back(Succ);
++      if (Old.empty()) continue;
++      for (auto *Succ : Old) BB->removeSuccessor(Succ);
++      BB->addSuccessor(Dispatch);
++    }
++    for (auto *MI : Erase) MI->eraseFromParent();
++    return true;
++  }
++};
++char M88kSjLjEH::ID;
++}
++FunctionPass *llvm::createM88kSjLjEH() { return new M88kSjLjEH(); }
+diff --git a/llvm/lib/Target/M88k/M88kTargetMachine.cpp b/llvm/lib/Target/M88k/M88kTargetMachine.cpp
+index 53a7ef5..9b2d5b3 100644
+--- a/llvm/lib/Target/M88k/M88kTargetMachine.cpp
++++ b/llvm/lib/Target/M88k/M88kTargetMachine.cpp
+@@ -231,6 +231,7 @@ bool M88kPassConfig::addIRTranslator() {
+ }
+ 
+ void M88kPassConfig::addPreLegalizeMachineIR() {
++  addPass(createM88kSjLjEH());
+   if (PreLegalizer)
+     addPass(createM88kPreLegalizerCombiner());
+   addPass(new Localizer());
