@@ -264,6 +264,9 @@ freebsd-arm-64:
 haiku-arm-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.haiku.arm.64
 
+haiku-x86-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.haiku.x86.64
+
 dragonflybsd-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.dragonflybsd.x86.64
 
@@ -295,6 +298,9 @@ openbsd-x86-64:
 openbsd-arm-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.arm.64
 
+openbsd-arm-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.arm.32
+
 openbsd-riscv-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.riscv.64
 
@@ -318,6 +324,16 @@ netbsd-m68k-32:
 
 linux-hppa-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.hppa.32
+
+netbsd-hppa-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.hppa.32
+
+linux-mips-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.mips.32
+
+linux-mips-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.mips.64
+
 netbsd-sh3-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.sh3.32
 
@@ -585,3 +601,4 @@ netbsd-sparc-64:
 
 .PHONY: linux-hppa-32
 .PHONY: linux-sh4-32 netbsd-sh3-32
+.PHONY: linux-mips-32 linux-mips-64 netbsd-hppa-32 openbsd-arm-32 haiku-x86-64

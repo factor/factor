@@ -1,7 +1,22 @@
-USING: arrays assocs bootstrap.image.private compiler.codegen.relocation endian fry grouping io
-io.encodings.binary io.streams.byte-array kernel layouts math
-math.bitwise namespaces sequences tools.test vectors ;
+USING: arrays assocs bootstrap.image bootstrap.image.private
+compiler.codegen.relocation endian fry grouping io
+io.encodings.binary io.encodings.utf8 io.files io.streams.byte-array
+json kernel layouts math math.bitwise namespaces sequences
+system tools.test vectors ;
+FROM: sets => all-unique? subset? ;
 IN: bootstrap.image.tests
+
+{ t } [
+    "resource:harness/profiles.json" utf8 file-contents json>
+    "targets" of values [ "seed" of ] map image-names subset?
+] unit-test
+
+{ t } [ image-names all-unique? ] unit-test
+
+{ "linux-s390x" } [ linux s390x arch-name ] unit-test
+{ "linux-ppc.64le" } [ linux ppc.64le arch-name ] unit-test
+{ "freebsd-ppc.64" } [ freebsd ppc.64 arch-name ] unit-test
+{ "unix-mipsel.64" } [ linux mipsel.64 arch-name ] unit-test
 
 ! Existing special templates keep their two-field layout. Static parameters
 ! follow the prefix supplied by the VM, including the empty-tail case.

@@ -14,7 +14,7 @@ vocabs words ;
 IN: bootstrap.image
 
 : arch-name ( os cpu -- arch )
-    [ [ windows? ] [ ppc? ] bi* or ] 2check
+    [ [ windows? ] [ [ ppc? ] [ s390x? ] bi or ] bi* or ] 2check
     [ [ drop unix ] dip ] unless
     [ name>> ] bi@ "-" glue ;
 
@@ -31,10 +31,14 @@ CONSTANT: image-names
     {
         "windows-x86.32" "unix-x86.32"
         "windows-x86.64" "unix-x86.64"
-        "windows-arm.64" "unix-arm.64"
+        "windows-arm.64" "unix-arm.64" "unix-arm.32"
         "unix-riscv.32" "unix-riscv.64" "unix-openrisc.32" "unix-loongarch.64"
         "unix-sparc.32" "unix-sparc.64"
         "linux-s390x" "unix-alpha.64"
+        "unix-hppa.32" "unix-sh4.32"
+        "unix-mips.32" "unix-mips.64" "unix-mipsel.32" "unix-mipsel.64"
+        "linux-ppc.32" "linux-ppc.64" "linux-ppc.64le"
+        "freebsd-ppc.32" "freebsd-ppc.64" "freebsd-ppc.64le" "netbsd-ppc.32"
     }
 
 <PRIVATE

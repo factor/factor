@@ -336,6 +336,7 @@ find_os() {
         OpenBSD) OS=openbsd ;;
         DragonFly) OS=dragonflybsd ;;
         Haiku) OS=haiku ;;
+        SunOS) OS=illumos ;;
     esac
 }
 
@@ -349,16 +350,21 @@ find_architecture() {
        i686) ARCH=x86 ;;
        i86pc) ARCH=x86 ;;
        amd64) ARCH=x86 ;;
-       ppc64|powerpc64) ARCH=ppc ;;
-       macppc) ARCH=ppc ;;
+       ppc|ppc64|ppc64le|powerpc|powerpc64|powerpc64le|macppc) ARCH=ppc ;;
        *86) ARCH=x86 ;;
        *86_64) ARCH=x86 ;;
        aarch64) ARCH=arm ;;
        arm64) ARCH=arm ;;
-       arm|armv[5-8]*|earm*) ARCH=arm ;;
-       riscv64|riscv32) ARCH=riscv ;;
+       arm|armv[5-8]*|earm*|evbarm) ARCH=arm ;;
+       riscv|riscv64|riscv32) ARCH=riscv ;;
        loongarch64) ARCH=loongarch ;;
        s390x) ARCH=s390x ;;
+       alpha) ARCH=alpha ;;
+       hppa*|parisc*) ARCH=hppa ;;
+       mips*|evbmips|sgimips) ARCH=mips ;;
+       sparc*|sun4m|sun4u|sun4v) ARCH=sparc ;;
+       sh4*|landisk) ARCH=sh4 ;;
+       or1k|openrisc) ARCH=openrisc ;;
        m68k|amiga|atari|cesfic|hb68k|hp300|luna68k|mac68k|mvme68k|news68k|next68k|sun3|virt68k|x68k) ARCH=m68k ;;
        iPhone5*[3-9]) ARCH=arm ;;
        iPhone[6-9]*) ARCH=arm ;;
@@ -386,13 +392,49 @@ find_num_cores() {
 find_word_size() {
     if [[ -n $WORD ]] ; then return; fi
     $ECHO "Finding WORD..."
-    WORD=$(getconf LONG_BIT 2>/dev/null || find_word_size_cpp || find_word_size_c)
+    WORD=$(getconf LONG_BIT 2>/dev/null) || WORD=
+    case $WORD in
+        32|64) ;;
+        *) WORD=$(find_word_size_cpp || find_word_size_c) ;;
+    esac
 }
 
 find_word_size_cpp() {
-    SIXTY_FOUR='defined(__loongarch64) || defined(__s390x__) || defined(__aarch64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(__PPC64__) || defined(__64BIT__) || (defined(__riscv) && __riscv_xlen == 64)'
-    THIRTY_TWO='defined(__arm__) || defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86) || (defined(__riscv) && __riscv_xlen == 32)'
-    $CC -E -xc <(echo -e "#if ${SIXTY_FOUR}\n64\n#elif ${THIRTY_TWO}\n32\n#endif") | tail -1
+    local word
+    word=$($CC -E -P -xc - <<'EOF'
+#if defined(__SIZEOF_POINTER__)
+#if __SIZEOF_POINTER__ == 8
+64
+#elif __SIZEOF_POINTER__ == 4
+32
+#endif
+#endif
+EOF
+    ) || return 1
+    case $word in
+        32|64) echo "$word" ;;
+        *) return 1 ;;
+    esac
+}
+
+find_byte_order() {
+    local order
+    order=$($CC -E -P -xc - <<'EOF' | tail -1
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+little
+#elif defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+big
+#elif defined(__MIPSEL__) || defined(__LITTLE_ENDIAN__)
+little
+#elif defined(__MIPSEB__) || defined(__BIG_ENDIAN__)
+big
+#endif
+EOF
+    )
+    case $order in
+        little|big) echo "$order" ;;
+        *) echo "Unable to determine target byte order with $CC" >&2; return 1 ;;
+    esac
 }
 
 find_word_size_c() {
@@ -485,8 +527,22 @@ set_build_info() {
         MAKE_IMAGE_TARGET=unix-$ARCH.$WORD
         MAKE_TARGET=$OS-$ARCH-$WORD
     fi
+    if [[ $ARCH == ppc ]] ; then
+        MAKE_IMAGE_TARGET=$OS-ppc.$WORD
+    fi
+    if [[ $ARCH == mips || ( $ARCH == ppc && $WORD == 64 ) ]] ; then
+        local order
+        order=$(find_byte_order) || exit_script 5
+        if [[ $order == little ]] ; then
+            if [[ $ARCH == mips ]] ; then
+                MAKE_IMAGE_TARGET=unix-mipsel.$WORD
+            else
+                MAKE_IMAGE_TARGET=$OS-ppc.64le
+            fi
+        fi
+    fi
     if [[ $ARCH == s390x ]] ; then
-        MAKE_IMAGE_TARGET=unix-s390x
+        MAKE_IMAGE_TARGET=linux-s390x
         MAKE_TARGET=$OS-s390x
     fi
     BOOT_IMAGE=boot.$MAKE_IMAGE_TARGET.image
@@ -499,9 +555,7 @@ parse_build_info() {
     ARCH=$(echo "$1" | cut -d '-' -f 2)
     WORD=$(echo "$1" | cut -d '-' -f 3)
 
-    if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
-    if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
-    if [[ $OS == macos && $ARCH == ppc ]] ; then WORD=32; fi
+    if [[ -z $WORD && ( $ARCH == ppc || $ARCH == arm ) ]] ; then WORD=32; fi
 
     $ECHO "OS=$OS"
     $ECHO "ARCH=$ARCH"
