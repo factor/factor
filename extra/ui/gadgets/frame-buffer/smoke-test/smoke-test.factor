@@ -10,7 +10,7 @@ IN: ui.gadgets.frame-buffer.smoke-test
 
 TUPLE: test-frame-buffer < frame-buffer paint? ;
 
-ERROR: resize-timeout window-dim gadget-dim expected-dim ;
+ERROR: resize-timeout window-dim gadget-dim previous-dim ;
 
 M: test-frame-buffer pref-dim* drop { 128 96 } ;
 
@@ -30,14 +30,17 @@ M: test-frame-buffer update-frame-buffer
         framebuffer-ready? and
     ] [ drop f ] if ;
 
-:: await-window-size ( window gadget dim -- )
+:: await-window-layout ( window gadget previous-dim/f -- )
+    ! Window managers can include decorations in the requested size. Check
+    ! the actual content allocation and the gadget's resulting layout.
     250 [
         drop
-        window readback-ready? window dim>> dim [ number= ] 2all? and
-        gadget dim>> dim { 10 18 } v- [ number= ] 2all? and
+        window readback-ready?
+        previous-dim/f [ window dim>> [ number= ] 2all? not ] [ t ] if* and
+        gadget dim>> window dim>> { 10 18 } v- [ number= ] 2all? and
         [ t ] [ 20 milliseconds sleep f ] if
     ] find-integer [ drop ] [
-        window dim>> gadget dim>> dim resize-timeout
+        window dim>> gadget dim>> previous-dim/f resize-timeout
     ] if* ;
 
 :: saved-frame ( window gadget -- pixels )
@@ -73,8 +76,9 @@ M: test-frame-buffer update-frame-buffer
 :: check-resize ( window gadget dim -- )
     gadget pixels>> clone :> before
     gadget pixel-dim>> :> old-dim
+    window dim>> :> previous-dim
     window dim resize-window
-    window gadget dim await-window-size
+    window gadget previous-dim await-window-layout
     window set-gl-context
     before old-dim gadget frame-buffer-dim resized-pixels :> expected
     window gadget expected check-saved-frames ;
@@ -97,7 +101,7 @@ M: test-frame-buffer update-frame-buffer
     [ a2 63 64 between? t assert= ] [ a2 255 assert= ] if ;
 
 :: check-frame-buffer ( window gadget -- )
-    window gadget { 138 114 } await-window-size
+    window gadget f await-window-layout
     gadget t >>paint? drop
     window gadget saved-frame :> painted
     gadget check-paint
@@ -133,7 +137,7 @@ M: test-frame-buffer update-frame-buffer
     gadget pixel-dim>> :> dim
     gadget detach-test-gadget
     gadget legacy? open-test-window :> destination
-    destination gadget { 138 114 } await-window-size
+    destination gadget f await-window-layout
     destination set-gl-context
     pixels dim gadget frame-buffer-dim resized-pixels :> expected
     destination gadget expected check-saved-frames
@@ -154,7 +158,7 @@ M: test-frame-buffer update-frame-buffer
     gadget pixel-dim>> :> dim
     gadget detach-test-gadget
     gadget legacy? open-test-window :> window
-    window gadget { 138 114 } await-window-size
+    window gadget f await-window-layout
     window set-gl-context
     pixels dim gadget frame-buffer-dim resized-pixels :> expected
     window gadget expected check-saved-frames

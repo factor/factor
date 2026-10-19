@@ -44,6 +44,8 @@ jobs:
       run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.backend.gtk3.smoke-test
     - name: Linux text tests
       run: ./factor -run=tools.test ui.text.pango ui.text.index-maps ui.gadgets.panes
+    - name: UI layout tests
+      run: ./factor -no-user-init -run=tools.test ui.gadgets ui.gadgets.incremental ui.gadgets.worlds
     - name: Linux game input tests
       run: ./factor -no-user-init -run=tools.test game.input.gtk game.input.linux
     - name: Pango long-row smoke test
@@ -86,7 +88,9 @@ jobs:
     - name: load-all
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
-      run: './factor -run=tools.test resource:core unix.time unix.types.macos'
+      run: './factor -run=tools.test resource:core unix.time unix.types.macos ui.gadgets ui.gadgets.incremental ui.gadgets.worlds'
+    - name: Cocoa paint ordering smoke test
+      run: ./factor -no-user-init -run=ui.backend.cocoa.smoke-test
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
@@ -99,7 +103,9 @@ jobs:
     - name: load-all
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
-      run: './factor -run=tools.test resource:core unix.time unix.types.macos'
+      run: './factor -run=tools.test resource:core unix.time unix.types.macos ui.gadgets ui.gadgets.incremental ui.gadgets.worlds'
+    - name: Cocoa paint ordering smoke test
+      run: ./factor -no-user-init -run=ui.backend.cocoa.smoke-test
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 

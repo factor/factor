@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: opengl opengl.gl combinators continuations kernel
+USING: opengl opengl.gl combinators continuations kernel locals
 alien.c-types alien.data ;
 IN: opengl.framebuffers
 
@@ -35,18 +35,20 @@ IN: opengl.framebuffers
 : check-framebuffer ( -- )
     framebuffer-incomplete? [ framebuffer-error ] when* ;
 
-: with-framebuffer ( id quot -- )
-    [ GL_DRAW_FRAMEBUFFER swap glBindFramebuffer ] dip
-    [ GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer ] finally ; inline
+:: with-framebuffer ( id quot -- )
+    GL_DRAW_FRAMEBUFFER_BINDING { int } [ glGetIntegerv ] with-out-parameters :> previous
+    GL_DRAW_FRAMEBUFFER id glBindFramebuffer
+    quot [ GL_DRAW_FRAMEBUFFER previous glBindFramebuffer ] finally ; inline
 
-: with-draw-read-framebuffers ( draw-id read-id quot -- )
+:: with-draw-read-framebuffers ( draw-id read-id quot -- )
+    GL_DRAW_FRAMEBUFFER_BINDING { int } [ glGetIntegerv ] with-out-parameters :> previous-draw
+    GL_READ_FRAMEBUFFER_BINDING { int } [ glGetIntegerv ] with-out-parameters :> previous-read
+    GL_DRAW_FRAMEBUFFER draw-id glBindFramebuffer
+    GL_READ_FRAMEBUFFER read-id glBindFramebuffer
+    quot
     [
-        [ GL_DRAW_FRAMEBUFFER swap glBindFramebuffer ]
-        [ GL_READ_FRAMEBUFFER swap glBindFramebuffer ] bi*
-    ] dip
-    [
-        GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer
-        GL_READ_FRAMEBUFFER 0 glBindFramebuffer
+        GL_DRAW_FRAMEBUFFER previous-draw glBindFramebuffer
+        GL_READ_FRAMEBUFFER previous-read glBindFramebuffer
     ] finally ; inline
 
 : framebuffer-attachment ( attachment -- id )

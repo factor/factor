@@ -53,7 +53,7 @@ M: incremental dim-changed drop ;
     not-in-layout
     dup scroll-children
     2dup (add-gadget)
-    t in-layout? [
+    [
         {
             [ drop prefer-incremental ]
             [ drop layout-later ]
@@ -62,7 +62,8 @@ M: incremental dim-changed drop ;
             [ nip prefer-incremental ]
             [ nip parent>> [ invalidate* ] when* ]
         } 2cleave
-    ] with-variable ;
+    ] with-layout
+    ?yield-layout ;
 
 : clear-incremental ( incremental -- )
     not-in-layout

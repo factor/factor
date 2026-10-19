@@ -5,7 +5,7 @@ USING: accessors alien.c-types alien.data arrays byte-arrays calendar
 colors combinators continuations debugger destructors gdk4.ffi
 gobject.ffi gsk4.ffi gtk4.ffi io kernel locals math namespaces opengl
 opengl.gl sequences system threads ui ui.backend ui.backend.gtk4
-ui.clipboards ui.gadgets ui.gadgets.labels ui.gadgets.worlds ;
+ui.backend.gl-area.smoke-test ui.clipboards ui.gadgets ui.gadgets.labels ui.gadgets.worlds ;
 IN: ui.backend.gtk4.smoke-test
 
 : smoke-error ( error -- )
@@ -119,6 +119,7 @@ ERROR: gtk4-smoke-check-failed check actual expected ;
     500 milliseconds sleep
     first-world draw-world
     check-repaint-buffers
+    [ handle>> drawable>> f f on-render drop ] check-paint-order
     close-all-windows ;
 
 : gtk4-smoke-test ( -- )

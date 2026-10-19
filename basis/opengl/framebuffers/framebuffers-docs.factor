@@ -29,6 +29,10 @@ HELP: check-framebuffer
 
 HELP: with-framebuffer
 { $values { "id" "The id of a framebuffer object." } { "quot" quotation } }
-{ $description "Binds framebuffer " { $snippet "id" } " for drawing in the dynamic extent of " { $snippet "quot" } ", restoring the window framebuffer when finished." } ;
+{ $description "Binds framebuffer " { $snippet "id" } " for drawing in the dynamic extent of " { $snippet "quot" } ", restoring the previous draw framebuffer when finished, including when the quotation throws an error." } ;
+
+HELP: with-draw-read-framebuffers
+{ $values { "draw-id" "The id of a draw framebuffer." } { "read-id" "The id of a read framebuffer." } { "quot" quotation } }
+{ $description "Binds the draw and read framebuffers for the dynamic extent of " { $snippet "quot" } ", restoring both previous bindings when finished, including when the quotation throws an error." } ;
 
 ABOUT: "gl-utilities"

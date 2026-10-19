@@ -126,20 +126,8 @@ M: world ungraft*
         dup handle>> [ set-gl-context ] [ drop ] if
     ] when* ;
 
-: layout-resized-world ( world -- )
-    ! GTK emits resize immediately before paint, without yielding to the UI.
-    ! Finish this world's layout before returning to the native paint cycle.
-    dup relayout
-    dup gl-render-state>> [
-        [
-            dup select-layout-context
-            t in-layout? [ layout ] with-variable
-        ] [ nip ui-error ] recover
-    ] [ drop ] if ;
-
 : layout-queued ( -- seq )
     layout-queue [
-        in-layout? on
         [
             dup select-layout-context
             dup layout find-world [ , ] when*

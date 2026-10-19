@@ -4,7 +4,7 @@
 USING: accessors alien.c-types alien.data calendar continuations debugger
 io kernel locals math namespaces opengl opengl.capabilities opengl.gl
 sequences system threads ui ui.backend ui.backend.gtk3 ui.clipboards
-ui.gadgets.labels ui.gadgets.worlds ui.pixel-formats ;
+ui.backend.gl-area.smoke-test ui.gadgets.labels ui.gadgets.worlds ui.pixel-formats ;
 IN: ui.backend.gtk3.smoke-test
 
 : smoke-error ( error -- ) print-error nl flush 1 exit ;
@@ -39,6 +39,7 @@ IN: ui.backend.gtk3.smoke-test
     500 milliseconds sleep
     first-world check-framebuffer
     first-world draw-world
+    [ handle>> drawable>> f f on-render drop ] check-paint-order
     close-all-windows ;
 
 : gtk3-smoke-test ( -- )
