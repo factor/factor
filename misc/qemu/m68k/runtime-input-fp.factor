@@ -1,0 +1,1 @@
+USING: io math math.parser math.libm prettyprint ; "RUNTIME_FP_SUM" print readln string>number >float readln string>number >float + . "RUNTIME_FP_DIVISION" print readln string>number >float readln string>number >float / . "RUNTIME_LIBM_SQRT" print readln string>number >float fsqrt . "RUNTIME_FACTOR_FP_ENABLED" print

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings assocs
-classes.struct continuations fry io.backend io.backend.unix
+classes.struct combinators continuations fry io.backend io.backend.unix
 io.directories io.files io.files.info io.files.info.unix
 io.files.types kernel libc literals math sequences system unix
 unix.ffi vocabs ;
@@ -63,6 +63,12 @@ M: unix copy-file
 ! An easy way to return +unknown+ is to mount a .iso on macOS and
 ! call directory-entries on the mount point.
 
+<< os {
+    { [ dup haiku? ] [ drop "io.directories.unix.haiku" ] }
+    { [ dup illumos? ] [ drop "io.directories.unix.illumos" ] }
+    [ drop "io.directories.unix.typed" ]
+} cond require >>
+
 : next-dirent ( DIR* dirent* -- dirent* ? )
     f void* <ref> [
         readdir_r [ (throw-errno) ] unless-zero
@@ -70,8 +76,8 @@ M: unix copy-file
 
 : >directory-entry ( dirent* -- directory-entry )
     [ d_name>> alien>native-string ]
-    [ d_type>> dirent-type>file-type ] bi
-    dup +unknown+ = [ drop dup file-info type>> ] when
+    [ dirent-file-type ] bi
+    dup +unknown+ = [ drop dup link-info type>> ] when
     <directory-entry> ; inline
 
 M: unix (directory-entries)
@@ -80,4 +86,4 @@ M: unix (directory-entries)
         '[ _ _ next-dirent ] [ >directory-entry ] produce nip
     ] with-unix-directory ;
 
-os linux? [ "io.directories.unix.linux" require ] when
+os linux-kernel? [ "io.directories.unix.linux" require ] when

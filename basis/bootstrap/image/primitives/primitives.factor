@@ -383,6 +383,7 @@ CONSTANT: all-primitives {
     {
         "math"
         {
+            { "floating-point-supported?" ( -- ? ) "floating_point_supported" { } { object } f }
             {
                 "bits>double" ( n -- x ) "bits_double"
                 { integer } { float } make-foldable

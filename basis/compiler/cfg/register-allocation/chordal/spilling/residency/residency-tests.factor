@@ -18,6 +18,13 @@ IN: compiler.cfg.register-allocation.chordal.spilling.residency.tests
 [ { 1 } { 1 2 3 } H{ } 2 pressure-victims ]
 [ impossible-register-pressure? ] must-fail-with
 
+! Loop-distance penalties can exceed the machine's fixnum range. An absent
+! next use still sorts after every reachable one.
+{ { 1 } } [
+    { 1 2 } { } H{ { 1 0x100000000000000000000 } } 1
+    select-entry-residents
+] unit-test
+
 ! Preserve the complete original selection as a differential oracle. The
 ! zero-pressure shortcut must leave positive-pressure ordering unchanged.
 :: original-pressure-victims ( residents demanded distances capacity -- victims )

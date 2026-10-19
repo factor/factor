@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors colors colors.private literals tools.test ;
+USING: accessors colors colors.private literals math tools.test ;
 
 { t } [ COLOR: light-green value>> rgba? ] unit-test
 
@@ -23,3 +23,13 @@ ${ "11223344" hex>rgba } [ COLOR: #11223344 value>> ] unit-test
 { "#cafebabe" } [ COLOR: #cafebabe color>hex ] unit-test
 { "#112233" } [ COLOR: #112233 color>hex ] unit-test
 { "#11223344" } [ COLOR: #11223344 color>hex ] unit-test
+
+! Channel payload checks do not require floating-point arithmetic or comparisons.
+{ 0x3fe0101010101010 }
+[ 128 255 color-component-ratio double>bits ] unit-test
+{ 0x3fb1111111111111 }
+[ 1 15 color-component-ratio double>bits ] unit-test
+{ 0x3fe0101010101010 }
+[ "808080" hex>rgba red>> double>bits ] unit-test
+{ 0x3fb1111111111111 }
+[ "1234" hex>rgba red>> double>bits ] unit-test

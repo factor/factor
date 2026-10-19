@@ -4,6 +4,11 @@
 // gc.zig and diverged on callstack spill promotion — removed.)
 
 const std = @import("std");
+const builtin = @import("builtin");
+
+extern fn factor_sparc_visit_saved_code(saved: *anyopaque,
+    visit: *const fn (?*anyopaque, *usize, c_uint) callconv(.c) void,
+    user_data: ?*anyopaque) void;
 
 const code_blocks = @import("code_blocks.zig");
 const contexts = @import("contexts.zig");
@@ -109,6 +114,29 @@ pub fn fullMarkAllRoots(gc: *GC, ctx: *FullMarkContext) void {
 
     // Contexts and stacks
     fullMarkContexts(gc, ctx);
+    if (comptime builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64) {
+        const Visit = struct {
+            fn code(user_data: ?*anyopaque, raw: *usize, bias: c_uint) callconv(.c) void {
+                const collector: *GC = @ptrCast(@alignCast(user_data.?));
+                const heap = collector.vm.code orelse return;
+                const address = raw.* +% bias;
+                if (address < heap.code_start or address >= heap.code_start + heap.code_size) return;
+                if (heap.codeBlockForAddress(address)) |block| markCodeBlockIfNeeded(collector, block);
+            }
+        };
+        for (&gc.vm.sparc_signal_slots) |*pending| {
+            if (!pending.active) continue;
+            var alive = pending.owner == @as(?*anyopaque, @ptrCast(gc.vm.vm_asm.ctx));
+            for (gc.vm.active_contexts.items) |owner| {
+                if (pending.owner == @as(?*anyopaque, @ptrCast(owner))) alive = true;
+            }
+            if (!alive) {
+                pending.active = false;
+                continue;
+            }
+            factor_sparc_visit_saved_code(@ptrCast(&pending.saved), Visit.code, gc);
+        }
+    }
 
     // Data roots
     for (gc.vm.data_roots.items) |root_ptr| {

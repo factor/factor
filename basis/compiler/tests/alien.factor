@@ -54,10 +54,10 @@ FUNCTION: int ffi_test_3 ( int x, int y, int z, int t )
 { 25 } [ 2 3 4 5 ffi_test_3 ] unit-test
 
 FUNCTION: float ffi_test_4 ( )
-{ 1.5 } [ ffi_test_4 ] unit-test
+{ 1.5 } [ ffi_test_4 ] floating-point-unit-test
 
 FUNCTION: double ffi_test_5 ( )
-{ 1.5 } [ ffi_test_5 ] unit-test
+{ 1.5 } [ ffi_test_5 ] floating-point-unit-test
 
 FUNCTION: int ffi_test_9 ( int a, int b, int c, int d, int e, int f, int g )
 { 28 } [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
@@ -158,23 +158,23 @@ FUNCTION: TINY ffi_test_17 ( int x )
 { 25 85 } [ 2 3 4 5 6 7 8 9 multi_ffi_test_18 ] unit-test
 
 FUNCTION: double ffi_test_6 ( float x, float y )
-{ 6.0 } [ 3.0 2.0 ffi_test_6 ] unit-test
+{ 6.0 } [ 3.0 2.0 ffi_test_6 ] floating-point-unit-test
 [ "a" "b" ffi_test_6 ] must-fail
 
 FUNCTION: double ffi_test_7 ( double x, double y )
-{ 6.0 } [ 3.0 2.0 ffi_test_7 ] unit-test
+{ 6.0 } [ 3.0 2.0 ffi_test_7 ] floating-point-unit-test
 
 FUNCTION: double ffi_test_8 ( double x, float y, double z, float t, int w )
-{ 19.0 } [ 3.0 2.0 1.0 6.0 7 ffi_test_8 ] unit-test
+{ 19.0 } [ 3.0 2.0 1.0 6.0 7 ffi_test_8 ] floating-point-unit-test
 
 FUNCTION: int ffi_test_10 ( int a, int b, double c, int d, float e, int f, int g, int h )
-{ -34 } [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] unit-test
+{ -34 } [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] floating-point-unit-test
 
 FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
     double y1, double y2, double y3,
     double z1, double z2, double z3 )
 
-{ } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
+{ } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] floating-point-unit-test
 
 
     ! Make sure XT doesn't get clobbered in stack frame
@@ -193,7 +193,7 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
         { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float } f
         alien-invoke ;
 
-    { 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
+    { 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] floating-point-unit-test
 
 
 FUNCTION: longlong ffi_test_21 ( long x, long y )
@@ -219,7 +219,7 @@ STRUCT: RECT
 
 FUNCTION: int ffi_test_12 ( int a, int b, RECT c, int d, int e, int f )
 
-{ 45 } [ 1 2 3.0 4.0 5.0 6.0 <RECT> 7 8 9 ffi_test_12 ] unit-test
+{ 45 } [ 1 2 3.0 4.0 5.0 6.0 <RECT> 7 8 9 ffi_test_12 ] floating-point-unit-test
 
 [ 1 2 { 1 2 3 } 7 8 9 ffi_test_12 ] must-fail
 
@@ -229,7 +229,7 @@ FUNCTION: float ffi_test_23 ( float[3] x, float[3] y )
     { 1.0 2.0 3.0 } float >c-array
     { 4.0 5.0 6.0 } float >c-array
     ffi_test_23
-] unit-test
+] floating-point-unit-test
 
 ! Test odd-size structs
 STRUCT: test-struct-1 { x char[1] } ;
@@ -283,7 +283,7 @@ FUNCTION: double ffi_test_32 ( test-struct-8 x, int y )
     1.0 >>x
     2.0 >>y
     3 ffi_test_32
-] unit-test
+] floating-point-unit-test
 
 STRUCT: test-struct-9 { x float } { y float } ;
 
@@ -294,7 +294,7 @@ FUNCTION: double ffi_test_33 ( test-struct-9 x, int y )
     1.0 >>x
     2.0 >>y
     3 ffi_test_33
-] unit-test
+] floating-point-unit-test
 
 STRUCT: test-struct-10 { x float } { y int } ;
 
@@ -305,7 +305,7 @@ FUNCTION: double ffi_test_34 ( test-struct-10 x, int y )
     1.0 >>x
     2 >>y
     3 ffi_test_34
-] unit-test
+] floating-point-unit-test
 
 STRUCT: test-struct-11 { x int } { y int } ;
 
@@ -316,7 +316,7 @@ FUNCTION: double ffi_test_35 ( test-struct-11 x, int y )
     1 >>x
     2 >>y
     3 ffi_test_35
-] unit-test
+] floating-point-unit-test
 
 STRUCT: test-struct-12 { a int } { x double } ;
 
@@ -326,7 +326,7 @@ STRUCT: test-struct-12 { a int } { x double } ;
 
 FUNCTION: double ffi_test_36 ( test-struct-12 x )
 
-{ 1.23456 } [ 1.23456 make-struct-12 ffi_test_36 ] unit-test
+{ 1.23456 } [ 1.23456 make-struct-12 ffi_test_36 ] floating-point-unit-test
 
 FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y )
 
@@ -432,7 +432,7 @@ STRUCT: test_struct_13
 
 FUNCTION: int ffi_test_39 ( long a, long b, test_struct_13 s )
 
-{ 21 } [ 12347 12347 make-test-struct-13 ffi_test_39 ] unit-test
+{ 21 } [ 12347 12347 make-test-struct-13 ffi_test_39 ] floating-point-unit-test
 
 ! Joe Groff found this problem
 STRUCT: double-rect
@@ -471,7 +471,7 @@ STRUCT: double-rect
         double-rect-test
         [ >c-ptr class-of ] [ >double-rect< ] bi
     ] with-callback
-] unit-test
+] floating-point-unit-test
 
 STRUCT: test_struct_14
     { x1 double }
@@ -481,7 +481,7 @@ FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 )
 
 { 1.0 2.0 } [
     1.0 2.0 ffi_test_40 [ x1>> ] [ x2>> ] bi
-] unit-test
+] floating-point-unit-test
 
 : callback-10 ( -- callback )
     test_struct_14 { double double } cdecl
@@ -498,14 +498,14 @@ FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 )
     1.0 2.0 callback-10 [
         callback-10-test [ x1>> ] [ x2>> ] bi
     ] with-callback
-] unit-test
+] floating-point-unit-test
 
 FUNCTION: test-struct-12 ffi_test_41 ( int a, double x )
 
 { 1 2.0 } [
     1 2.0 ffi_test_41
     [ a>> ] [ x>> ] bi
-] unit-test
+] floating-point-unit-test
 
 : callback-11 ( -- callback )
     test-struct-12 { int double } cdecl
@@ -522,7 +522,7 @@ FUNCTION: test-struct-12 ffi_test_41 ( int a, double x )
     1 2.0 callback-11 [
         callback-11-test [ a>> ] [ x>> ] bi
     ] with-callback
-] unit-test
+] floating-point-unit-test
 
 STRUCT: test_struct_15
     { x float }
@@ -530,7 +530,7 @@ STRUCT: test_struct_15
 
 FUNCTION: test_struct_15 ffi_test_42 ( float x, float y )
 
-{ 1.0 2.0 } [ 1.0 2.0 ffi_test_42 [ x>> ] [ y>> ] bi ] unit-test
+{ 1.0 2.0 } [ 1.0 2.0 ffi_test_42 [ x>> ] [ y>> ] bi ] floating-point-unit-test
 
 : callback-12 ( -- callback )
     test_struct_15 { float float } cdecl
@@ -547,7 +547,7 @@ FUNCTION: test_struct_15 ffi_test_42 ( float x, float y )
     1.0 2.0 callback-12 [
         callback-12-test [ x>> ] [ y>> ] bi
     ] with-callback
-] unit-test
+] floating-point-unit-test
 
 STRUCT: test_struct_16
     { x float }
@@ -555,7 +555,7 @@ STRUCT: test_struct_16
 
 FUNCTION: test_struct_16 ffi_test_43 ( float x, int a )
 
-{ 1.0 2 } [ 1.0 2 ffi_test_43 [ x>> ] [ a>> ] bi ] unit-test
+{ 1.0 2 } [ 1.0 2 ffi_test_43 [ x>> ] [ a>> ] bi ] floating-point-unit-test
 
 : callback-13 ( -- callback )
     test_struct_16 { float int } cdecl
@@ -572,33 +572,50 @@ FUNCTION: test_struct_16 ffi_test_43 ( float x, int a )
     1.0 2 callback-13 [
         callback-13-test [ x>> ] [ a>> ] bi
     ] with-callback
-] unit-test
+] floating-point-unit-test
 
 FUNCTION: test_struct_14 ffi_test_44 ( ) inline
 
-{ 1.0 2.0 } [ ffi_test_44 [ x1>> ] [ x2>> ] bi ] unit-test
+{ 1.0 2.0 } [ ffi_test_44 [ x1>> ] [ x2>> ] bi ] floating-point-unit-test
 
 : stack-frame-bustage ( -- a b ) ffi_test_44 gc 3 ;
 
-[ stack-frame-bustage ] must-not-fail
+[ stack-frame-bustage ] floating-point-must-not-fail
 
 ! C99 tests
 os windows? [
 
     FUNCTION: complex-float ffi_test_45 ( int x )
 
-    { C{ 3.0 0.0 } } [ 3 ffi_test_45 ] unit-test
+    { C{ 3.0 0.0 } } [ 3 ffi_test_45 ] floating-point-unit-test
 
     FUNCTION: complex-double ffi_test_46 ( int x )
 
-    { C{ 3.0 0.0 } } [ 3 ffi_test_46 ] unit-test
+    { C{ 3.0 0.0 } } [ 3 ffi_test_46 ] floating-point-unit-test
+
+    FUNCTION: float ffi_test_complex_float_callback ( void* callback )
+    FUNCTION: double ffi_test_complex_double_callback ( void* callback )
+
+    : complex-float-callback ( -- callback )
+        complex-float { int } cdecl [ 1.0 * 2.0 rect> ] alien-callback ;
+
+    : complex-double-callback ( -- callback )
+        complex-double { int } cdecl [ 1.0 * 2.0 rect> ] alien-callback ;
+
+    ! The native caller must resume at call+8 and consume both FP results.
+    { 6.0 } [
+        complex-float-callback [ ffi_test_complex_float_callback ] with-callback
+    ] floating-point-unit-test
+    { 6.0 } [
+        complex-double-callback [ ffi_test_complex_double_callback ] with-callback
+    ] floating-point-unit-test
 
     FUNCTION: complex-float ffi_test_47 ( complex-float x, complex-double y )
 
     { C{ 4.0 4.0 } } [
         C{ 1.0 2.0 }
         C{ 1.5 1.0 } ffi_test_47
-    ] unit-test
+    ] floating-point-unit-test
 
     ! Reported by jedahu
     STRUCT: bool-field-test
@@ -693,9 +710,9 @@ FUNCTION: ulonglong ffi_test_60 ( ulonglong x )
 
 ! GCC bugs
 mingw? [
-    { 13 } [ 3 4.0 5 ffi_test_52 ] unit-test
+    { 13 } [ 3 4.0 5 ffi_test_52 ] floating-point-unit-test
 
-    { 19 } [ 3 4.0 5 6 ffi_test_53 ] unit-test
+    { 19 } [ 3 4.0 5 6 ffi_test_53 ] floating-point-unit-test
 ] unless
 
 { S{ test-struct-11 f 7 -1 } } [ 3 4 ffi_test_57 ] unit-test
@@ -731,11 +748,11 @@ mingw? [
 mingw? [
     { 13 } [
         3 4.0 5 &: ffi_test_52 fastcall-ifi-indirect
-    ] unit-test
+    ] floating-point-unit-test
 
     { 19 } [
         3 4.0 5 6 &: ffi_test_53 fastcall-ifii-indirect
-    ] unit-test
+    ] floating-point-unit-test
 ] unless
 
 { S{ test-struct-11 f 7 -1 } } [
@@ -778,11 +795,11 @@ mingw? [
 
 { 13 } [
     3 4.0 5 fastcall-ifi-callback [ fastcall-ifi-indirect ] with-callback
-] unit-test
+] floating-point-unit-test
 
 { 19 } [
     3 4.0 5 6 fastcall-ifii-callback [ fastcall-ifii-indirect ] with-callback
-] unit-test
+] floating-point-unit-test
 
 { S{ test-struct-11 f 7 -1 } } [
     3 4 fastcall-struct-return-ii-callback [
@@ -811,7 +828,7 @@ mingw? [
     1.5 >>x 2.0 >>y [ x>> ] [ y>> ] bi * >fixnum
 ] with-scoped-allocation ;
 
-{ 3 } [ blah ] unit-test
+{ 3 } [ blah ] floating-point-unit-test
 
 : out-param-test-1 ( -- b )
     { int } [ [ 12 ] dip 0 int set-alien-value ] with-out-parameters ;
@@ -824,11 +841,13 @@ mingw? [
 { 12 } [ out-param-test-2 ] unit-test
 
 : out-param-test-3 ( -- x y )
-    { { RECT initial: S{ RECT { x 3 } { y 4 } } } } [ drop ]
+    { { RECT initial: S{ RECT { x 3.0 } { y 4.0 } } } } [ drop ]
     with-out-parameters
     [ x>> ] [ y>> ] bi ;
 
-{ 3.0 4.0 } [ out-param-test-3 ] unit-test
+{ 0x4008000000000000 0x4010000000000000 } [
+    out-param-test-3 [ double>bits ] bi@
+] unit-test
 
 : out-param-callback ( -- a )
     void { int pointer: int } cdecl
@@ -860,7 +879,7 @@ TUPLE: some-tuple x ;
             aa-indirect-1
         ] with-callback >>x
     ] compile-call
-] unit-test
+] floating-point-unit-test
 
 ! GC maps regression
 : anton's-regression ( -- )
@@ -952,7 +971,7 @@ FUNCTION: void* bug1021_test_1 ( void* s, int x )
         { 27.0 22.0 } [
             2 7 20 do-sum-doubles2
             3 5 10 7 do-sum-doubles3
-        ] unit-test
+        ] floating-point-unit-test
     ] unless
 
 
@@ -1040,7 +1059,7 @@ FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 
 
 { 55 } [
     1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_69 f 6.0 7 8 } S{ test_struct_66 f 9 10 } ffi_test_69
-] unit-test
+] floating-point-unit-test
 
 : callback-17 ( -- callback )
     ulong { ulong ulong ulong test_struct_66 test_struct_69 test_struct_66 } cdecl
@@ -1058,7 +1077,7 @@ FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 
     1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_69 f 6.0 7 8 } S{ test_struct_66 f 9 10 } callback-17 [
         callback-17-test
     ] with-callback
-] unit-test
+] floating-point-unit-test
 
 { 36 } [
     S{ test_struct_68 f 1 2 3 } S{ test_struct_68 f 4 5 6 } S{ test_struct_66 f 7 8 } ffi_test_70

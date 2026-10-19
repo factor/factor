@@ -1,4 +1,4 @@
-USING: accessors alien alien.c-types alien.data arrays assocs
+USING: literals accessors alien alien.c-types alien.data arrays assocs
 combinators combinators.short-circuit compiler.tree
 compiler.tree.builder compiler.tree.checker compiler.tree.cleanup
 compiler.tree.combinators compiler.tree.debugger
@@ -520,7 +520,7 @@ M: float detect-float ;
     \ + inlined?
 ] unit-test
 
-{ f } [
+$[ floating-point-supported? not 1array ] [
     [ double { double double } cdecl [ + ] alien-callback ]
     \ float+ inlined?
 ] unit-test

@@ -1,5 +1,5 @@
-USING: accessors continuations destructors io.backend.unix
-io.encodings.ascii io.files io.mmap kernel libc locals math
+USING: accessors alien combinators.short-circuit continuations destructors io.backend.unix
+io.encodings.ascii io.files io.mmap kernel layouts libc locals math
 namespaces sets tools.test unix unix.ffi ;
 
 ! mmap on a directory fails after opening it. Both registrations and the
@@ -7,13 +7,15 @@ namespaces sets tools.test unix unix.ffi ;
 { t } [
     [
         disposables get cardinality
-        [ "." <mapped-file-reader> dispose ] [ libc-error? ] must-fail-with
+        [ "." <mapped-file-reader> dispose ] [ { [ libc-error? ] [ bad-mmap-size? ] } 1|| ] must-fail-with
         disposables get cardinality =
     ] with-test-directory
 ] unit-test
 
 ! Even when unmapping fails, dispose must close the file descriptor.
-! Preserve the real address/length so the test can release the mapping.
+! Use an address outside user space. Some kernels accept zero-length or
+! overflowing unmaps and round unaligned addresses. Keep the real mapping
+! unchanged so the test can release it after checking descriptor cleanup.
 { t } [
     [| path |
         "mapped" path ascii set-file-contents
@@ -22,7 +24,7 @@ namespaces sets tools.test unix unix.ffi ;
         mapped length>> :> size
         mapped handle>> dup fd? [ handle-fd ] when :> raw-fd
         [
-            [ mapped 0 >>length dispose ]
+            [ mapped cell-bits 2^ 1 - <alien> >>address dispose ]
             [ dup libc-error? [ errno>> EINVAL = ] [ drop f ] if ] must-fail-with
             raw-fd F_GETFL 0 fcntl -1 =
         ] [

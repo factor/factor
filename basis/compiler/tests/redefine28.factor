@@ -31,13 +31,13 @@ TUPLE: checked-holder { value maybe{ changing-member } } ;
 [ 3.0 store-holder ] [ bad-slot-value? ] must-fail-with
 
 { } [ [ float changing-member add-mixin-instance ] with-compilation-unit ] unit-test
-{ 3.0 } [ 3.0 construct-holder value>> ] unit-test
+{ 0x4008000000000000 } [ 3.0 construct-holder value>> double>bits ] unit-test
 { t } [ 3.0 checked-member? ] unit-test
 
 { } [ [ fixnum changing-member remove-mixin-instance ] with-compilation-unit ] unit-test
 
 { f } [ f construct-holder value>> ] unit-test
-{ 3.0 } [ 3.0 construct-holder value>> ] unit-test
+{ 0x4008000000000000 } [ 3.0 construct-holder value>> double>bits ] unit-test
 { t f f t } [ f checked-member? 3 checked-member? literal-member? 3.0 checked-member? ] unit-test
 [ 3 construct-holder ] [ bad-slot-value? ] must-fail-with
 [ 3 store-holder ] [ bad-slot-value? ] must-fail-with

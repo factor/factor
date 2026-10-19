@@ -14,6 +14,7 @@ LIBRARY: pango.cairo
 C-LIBRARY: pango.cairo {
     { windows "libpangocairo-1.0-0.dll" }
     { macos "libpangocairo-1.0.dylib" }
+    { haiku "libpangocairo-1.0.so.0" }
     { linux "libpangocairo-1.0.so.0" }
     { unix "libpangocairo-1.0.so" }
 }

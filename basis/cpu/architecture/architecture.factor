@@ -251,6 +251,10 @@ HOOK: %replace-imm cpu ( src loc -- )
 HOOK: %clear cpu ( loc -- )
 HOOK: %inc cpu ( loc -- )
 
+! Register-window backends must isolate even leaf temporaries from their caller.
+HOOK: register-window-frame-required? cpu ( -- ? )
+M: object register-window-frame-required? f ;
+
 HOOK: stack-frame-size cpu ( stack-frame -- n )
 HOOK: %call cpu ( word -- )
 HOOK: %jump cpu ( word -- )
@@ -316,6 +320,11 @@ HOOK: %sqrt cpu ( dst src -- )
 
 HOOK: %single>double-float cpu ( dst src -- )
 HOOK: %double>single-float cpu ( dst src -- )
+
+! Scratch and native-call storage needed by scalar FP arithmetic, including
+! rounding to the declared representation on FPUs with excess range.
+HOOK: float-arithmetic-stack-space cpu ( -- n )
+M: object float-arithmetic-stack-space 0 ;
 
 HOOK: integer-float-needs-stack-frame? cpu ( -- ? )
 
@@ -522,7 +531,18 @@ HOOK: %call-gc cpu ( gc-map -- )
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
 
+! Register-window targets need the callee frame before an entry poll can fault.
+HOOK: entry-safepoint-after-prologue? cpu ( -- ? )
+M: object entry-safepoint-after-prologue? f ;
+
+HOOK: safepoint-gc-map-offset cpu ( -- n )
+M: object safepoint-gc-map-offset 0 ;
+
 HOOK: %safepoint cpu ( -- )
+
+! A signal resume record can move the interrupted frame's spill base.
+HOOK: safepoint-gc-map cpu ( gc-map -- gc-map' )
+M: object safepoint-gc-map ;
 
 HOOK: test-instruction? cpu ( -- ? )
 
@@ -568,6 +588,14 @@ M: object immediate-comparand?
 
 HOOK: return-regs cpu ( -- regs )
 
+! ABIs may distinguish pointer results from integer results of equal width.
+HOOK: return-regs-for-type cpu ( c-type -- regs )
+M: object return-regs-for-type drop return-regs ;
+
+! Native va_list layouts on these systems use AAPCS64 register save areas.
+: aapcs64-va-list-platform? ( platform -- ? )
+    { linux android freebsd netbsd openbsd haiku } member? ; foldable
+
 HOOK: param-regs cpu ( abi -- regs )
 
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
@@ -590,6 +618,10 @@ HOOK: long-long-on-stack? cpu ( -- ? )
 ! (r3, r5, etc) register.
 HOOK: long-long-odd-register? cpu ( -- ? )
 
+! AAPCS32 requires double-word values to begin in an even core register.
+HOOK: long-long-even-register? cpu ( -- ? )
+M: object long-long-even-register? f ;
+
 ! If t, put floats in the second word of a double word on the stack
 HOOK: float-right-align-on-stack? cpu ( -- ? )
 
@@ -599,6 +631,11 @@ HOOK: struct-return-on-stack? cpu ( -- ? )
 ! A dedicated indirect-result register, or f to use the normal parameters.
 HOOK: struct-return-register cpu ( -- reg/f )
 M: object struct-return-register f ;
+
+! An ABI result pointer in a fixed stack slot does not consume an ordinary
+! parameter position. The offset uses the backend's parameter-area origin.
+HOOK: struct-return-stack-offset cpu ( -- offset/f )
+M: object struct-return-stack-offset f ;
 
 ! Some ABIs also return the hidden result pointer in the integer return register.
 HOOK: return-struct-pointer? cpu ( -- ? )
@@ -673,3 +710,21 @@ M: object %mul-wide-vector-reps { } ;
 HOOK: %blend-vector cpu ( dst mask yes no rep -- )
 HOOK: %blend-vector-reps cpu ( -- reps )
 M: object %blend-vector-reps { } ;
+
+! ABI integer chunks follow the target CPU's data byte order. Bootstrap
+! compilation can run on a host whose native byte order is different.
+: cpu-name-big-endian? ( cpu-name -- ? )
+    {
+        "ppc.32" "ppc.64" "mips.32" "mips.64"
+        "sparc.32" "sparc.64" "m68k.32" "s390x" "hppa.32" "m88k.32"
+    } member? ;
+
+HOOK: big-endian-cpu? cpu ( -- ? )
+M: object big-endian-cpu? \ cpu get name>> cpu-name-big-endian? ;
+
+! Lower hidden native calls before GC maps, liveness and allocation.
+HOOK: lower-native-helpers cpu ( cfg -- )
+M: object lower-native-helpers drop ;
+HOOK: %native-helper cpu ( dst src helper rep src-rep vm? gc-map -- )
+HOOK: %native-helper-long-long cpu ( dst1 dst2 src helper gc-map -- )
+HOOK: %mapped-callback-inputs cpu ( reg-outputs stack-outputs gc-map -- )

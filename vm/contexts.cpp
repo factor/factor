@@ -29,6 +29,9 @@ void context::reset_retainstack() {
 
 void context::reset_callstack() {
   callstack_top = callstack_bottom = CALLSTACK_BOTTOM(this);
+#ifdef FACTOR_SPARC
+  memset((void*)callstack_bottom, 0, 16 * sizeof(cell));
+#endif
 }
 
 void context::reset_context_objects() {
@@ -117,6 +120,9 @@ VM_C_API context* new_context(factor_vm* parent) {
 }
 
 void factor_vm::delete_context() {
+#if defined(FACTOR_SPARC) && defined(__OpenBSD__)
+  abandon_sparc_signals(ctx, 0);
+#endif
   unused_contexts.push_back(ctx);
   active_contexts.erase(ctx);
 
@@ -141,6 +147,9 @@ VM_C_API void reset_context(factor_vm* parent) {
   context* ctx = parent->ctx;
   data_root<object> arg1(ctx->pop(), parent);
   data_root<object> arg2(ctx->pop(), parent);
+#if defined(FACTOR_SPARC) && defined(__OpenBSD__)
+  parent->abandon_sparc_signals(ctx, 0);
+#endif
   ctx->reset();
   parent->init_context(ctx);
   ctx->push(arg2.value());
@@ -151,7 +160,50 @@ VM_C_API void reset_context(factor_vm* parent) {
 cell factor_vm::begin_callback(cell quot_) {
   data_root<object> quot(quot_, this);
 
+#if defined(FACTOR_SPARC)
+  // Keep the pinned callback return window as the physical anchor. Its PC
+  // belongs to this process's callback heap and cannot be saved in an image.
+  cell frame = ctx->callstack_top;
+  while (frame < ctx->callstack_bottom) {
+    cell next = sparc_frame_predecessor(frame);
+    if (next <= frame || next > ctx->callstack_bottom)
+      critical_error("Invalid SPARC callback frame link", frame);
+    if (next == ctx->callstack_bottom &&
+        callbacks->seg->in_segment_p(sparc_frame_return_address(frame))) {
+      ctx->callstack_bottom = frame;
+      break;
+    }
+    frame = next;
+  }
+#endif
+
+#if defined(FACTOR_HPPA)
+  // The outer entry frame returns to the pinned native callback stub. Keep
+  // it on the live stack, outside the logical Factor stack, so capture and
+  // restore preserve the current callback rather than serializing its PC.
+  cell frame = ctx->callstack_top;
+  while (frame < ctx->callstack_bottom) {
+    cell next = *(cell*)frame;
+    if (next <= frame || next > ctx->callstack_bottom)
+      critical_error("Invalid HPPA callback frame link", frame);
+    if (next == ctx->callstack_bottom &&
+        callbacks->seg->in_segment_p(*(cell*)(frame + FRAME_RETURN_ADDRESS))) {
+      ctx->callstack_bottom = frame;
+      break;
+    }
+    frame = next;
+  }
+#endif
+
+#if defined(FACTOR_SPARC) || defined(FACTOR_HPPA) || defined(FACTOR_M88K) || defined(FACTOR_VAX)
+  // The native gate has published the active frame chain. Keep it rooted
+  // while allocating callback state, so moving GC can repair its return PCs.
+  ctx->reset_datastack();
+  ctx->reset_retainstack();
+  ctx->reset_context_objects();
+#else
   ctx->reset();
+#endif
   spare_ctx = new_context();
   callback_ids.push_back(callback_id++);
 

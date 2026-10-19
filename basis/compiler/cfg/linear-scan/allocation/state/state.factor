@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.ranges compiler.cfg.registers
-cpu.architecture heaps kernel math math.order namespaces
+compiler.utilities cpu.architecture heaps kernel math math.order namespaces
 sequences ;
 IN: compiler.cfg.linear-scan.allocation.state
 
@@ -17,13 +17,15 @@ SYMBOL: progress
 
 SYMBOL: unhandled-min-heap
 
+: allocation-infinity ( -- n ) compiler-position-infinity ;
+
 GENERIC: interval/sync-point-key ( interval/sync-point -- key )
 
 M: live-interval-state interval/sync-point-key
     [ ranges>> ranges-endpoints ] [ vreg>> ] bi 3array ;
 
 M: sync-point interval/sync-point-key
-    n>> 1/0. 1/0. 3array ;
+    n>> allocation-infinity dup 3array ;
 
 : >unhandled-min-heap ( intervals/sync-points -- min-heap )
     [ [ interval/sync-point-key ] keep 2array ] map >min-heap ;

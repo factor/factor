@@ -52,3 +52,16 @@ CONSTANT: SO_SNDTIMEO 0x1005
 CONSTANT: SO_RCVTIMEO 0x1006
 CONSTANT: SO_ERROR 0x1007
 CONSTANT: SO_TYPE 0x1008
+
+STRUCT: passwd
+    { pw_name c-string }
+    { pw_passwd c-string }
+    { pw_uid uid_t }
+    { pw_gid gid_t }
+    { pw_change time_t }
+    { pw_class c-string }
+    { pw_gecos c-string }
+    { pw_dir c-string }
+    { pw_shell c-string }
+    { pw_expire time_t }
+    { pw_fields int } ;

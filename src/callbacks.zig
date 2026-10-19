@@ -10,9 +10,16 @@ const objects = @import("objects.zig");
 const segments = @import("segments.zig");
 
 const Cell = layouts.Cell;
+pub const usesFunctionDescriptors = builtin.cpu.arch == .powerpc64 and builtin.abi.isGnu();
+pub fn functionEntry(pointer: Cell) Cell {
+    return if (usesFunctionDescriptors) @as(*const Cell, @ptrFromInt(pointer)).* else pointer;
+}
+pub fn functionPointer(stub: *const code_blocks.CodeBlock) Cell {
+    return if (usesFunctionDescriptors) stub.entryPoint() + stub.codeSize() - 3 * @sizeOf(Cell) else stub.entryPoint();
+}
 
 pub export fn arm64_variadic_callbacks_supported() callconv(.c) bool {
-    return (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32);
+    return (builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x);
 }
 
 fn returnTakesParam() bool {
@@ -104,7 +111,7 @@ pub const CallbackHeap = struct {
         var stub_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(callback_stub));
         std.debug.assert(layouts.untagFixnumUnsigned(stub_array.capacity) >= 2);
 
-        const variadic = (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32) and return_rewind == std.math.maxInt(Cell);
+        const variadic = (builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x) and return_rewind == std.math.maxInt(Cell);
         if (variadic) {
             if (layouts.untagFixnumUnsigned(stub_array.capacity) < 3) {
                 @constCast(vm).generalError(.ffi, layouts.false_object, layouts.false_object);
@@ -117,7 +124,17 @@ pub const CallbackHeap = struct {
         const insns: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(insns_cell));
         const code_size = layouts.untagFixnumUnsigned(insns.capacity);
 
-        const total_size = layouts.alignCell(@sizeOf(code_blocks.CodeBlock) + code_size, layouts.data_alignment);
+        const sparc32_has_rewind = if (builtin.cpu.arch == .sparc) blk: {
+            const relocations: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(stub_array.data()[0]));
+            const has_rewind = layouts.untagFixnumUnsigned(relocations.capacity) >= 3 * @sizeOf(code_blocks.RelocationEntry);
+            if (!has_rewind and return_rewind != 0) {
+                @constCast(vm).generalError(.ffi, layouts.false_object, layouts.false_object);
+            }
+            break :blk has_rewind;
+        } else false;
+
+        const descriptor_size: Cell = if (usesFunctionDescriptors) 3 * @sizeOf(Cell) else 0;
+        const total_size = layouts.alignCell(@sizeOf(code_blocks.CodeBlock) + code_size + descriptor_size, layouts.data_alignment);
         const addr = self.allocateStub(total_size) orelse return null;
         const stub: *code_blocks.CodeBlock = @ptrFromInt(addr);
 
@@ -134,7 +151,7 @@ pub const CallbackHeap = struct {
 
         storeCallbackOperand(stub, special_objects, 0, vm_ptr);
 
-        if ((builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)) {
+        if ((builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x)) {
             const trampolines = @import("trampolines.zig");
             const c_api = @import("c_api.zig");
             if (vm.code) |code| {
@@ -144,12 +161,20 @@ pub const CallbackHeap = struct {
             storeCallbackOperand(stub, special_objects, 3, @intFromPtr(&trampolines.trampoline2));
             storeCallbackOperand(stub, special_objects, 4, @intFromPtr(&c_api.inline_cache_miss));
             storeCallbackOperand(stub, special_objects, 5, @intFromPtr(&vm.dispatch_stats.megamorphic_cache_hits));
-        } else {
+        } else if (builtin.cpu.arch == .sparc) {
+            // GCC struct-return callers place an UNIMP word after the delay slot.
+            if (sparc32_has_rewind) storeCallbackOperand(stub, special_objects, 2, return_rewind);
+        } else if (builtin.cpu.arch != .sparc64) {
             storeCallbackOperand(stub, special_objects, 2, vm_ptr);
         }
 
         if (returnTakesParam()) {
             storeCallbackOperand(stub, special_objects, 3, return_rewind);
+        }
+
+        if (usesFunctionDescriptors) {
+            const descriptor: *[3]Cell = @ptrFromInt(functionPointer(stub));
+            descriptor.* = .{ stub.entryPoint(), 0, 0 };
         }
 
         self.update(stub, vm);
@@ -167,7 +192,7 @@ pub const CallbackHeap = struct {
         const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(stub.owner));
         const special_objects = &vm.vm_asm.special_objects;
 
-        if ((builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)) {
+        if ((builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or @import("contexts.zig").mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x)) {
             storeCallbackOperand(stub, special_objects, 6, word.entry_point);
         } else {
             storeCallbackOperand(stub, special_objects, 1, word.entry_point);
@@ -393,4 +418,22 @@ test "callback heap alternates template sizes without moving live stubs" {
     }
     heap.free(pinned);
     try std.testing.expectEqual(@as(Cell, 16 * 1024), heap.room().total_free);
+}
+
+test "PowerPC generated callbacks use the native function pointer ABI" {
+    if (builtin.cpu.arch != .powerpc and builtin.cpu.arch != .powerpc64 and builtin.cpu.arch != .powerpc64le) return error.SkipZigTest;
+    var segment = try segments.Segment.init(std.heap.page_size_min, true);
+    defer segment.deinit();
+    const stub: *code_blocks.CodeBlock = @ptrFromInt(segment.start);
+    stub.header = 256;
+    const insns: *[2]u32 = @ptrFromInt(stub.entryPoint());
+    insns.* = .{ 0x3860002a, 0x4e800020 }; // li r3,42; blr
+    if (usesFunctionDescriptors) {
+        const descriptor: *[3]Cell = @ptrFromInt(functionPointer(stub));
+        descriptor.* = .{ stub.entryPoint(), 0, 0 };
+    }
+    icache.flushICache(stub.entryPoint(), 8);
+    const callback: *const fn () callconv(.c) Cell = @ptrFromInt(functionPointer(stub));
+    try std.testing.expectEqual(@as(Cell, 42), callback());
+    try std.testing.expectEqual(stub.entryPoint(), functionEntry(functionPointer(stub)));
 }

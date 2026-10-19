@@ -1,0 +1,10 @@
+--- a/target/alpha/translate.c
++++ b/target/alpha/translate.c
+@@ -2845 +2845,6 @@
+-        ret = gen_excp(ctx, EXCP_FEN, 0);
++        /* FEN faults must retry the floating-point instruction after PAL and
++         * the guest kernel enable the FPU. Other traps retain their existing
++         * following-PC contract. */
++        gen_pc_disp(ctx, cpu_pc, -4);
++        gen_excp_1(EXCP_FEN, 0);
++        ret = DISAS_NORETURN;

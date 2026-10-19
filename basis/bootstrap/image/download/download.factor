@@ -7,9 +7,12 @@ IN: bootstrap.image.download
 
 CONSTANT: download-url URL" https://downloads.factorcode.org/images/master/"
 
-: download-checksums ( -- alist )
-    download-url "checksums.txt" >url derive-url http-get nip
+: download-checksums-from ( base-url -- alist )
+    "checksums.txt" >url derive-url http-get nip
     split-lines [ " " split1 ] map>alist ;
+
+: download-checksums ( -- alist )
+    download-url download-checksums-from ;
 
 : file-checksum ( image -- checksum )
     md5 checksum-file bytes>hex-string ;

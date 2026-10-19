@@ -1,0 +1,11 @@
+include vm/Config.freebsd
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-ppc.linux.o $(BUILD_DIR)/cpu-ppc.o
+PLAF_MASTER_HEADERS += vm/os-freebsd-ppc.hpp vm/cpu-ppc.hpp vm/powerpc.hpp
+ARCHITECTURE_FLAG := -m64
+
+# FreeBSD's big-endian ELFv2 exception path can lose nonvolatile CR fields
+# held live by Clang across a collector retry. Keep those conditions in GPRs;
+# the complete image-less GC suite covers the throw/rethrow retry path.
+ifeq ($(IS_CLANG),1)
+CXXFLAGS += -mllvm -ppc-disable-non-volatile-cr
+endif

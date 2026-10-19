@@ -205,7 +205,11 @@ static VARARGS_NOINLINE _Float16 va_control_small_return(int count,...) {
     va_start(args,count);
     h=va_arg(args,_Float16); b=va_arg(args,__bf16);
     va_end(args);
-    return (_Float16)(h+b);
+    /* Retain double arithmetic through optimization: direct BF16-to-half
+     * conversion is unsupported by some compiler backends. All genuine
+     * variadic input types and the half result ABI remain unchanged. */
+    volatile double sum=(double)h+(double)b;
+    return (_Float16)sum;
 }
 VARARGS_EXPORT int va_small_controls(void) {
     return va_call_small(va_control_small)==384.5 &&

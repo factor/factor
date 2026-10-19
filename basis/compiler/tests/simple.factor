@@ -1,4 +1,4 @@
-USING: compiler.test compiler.units tools.test kernel kernel.private
+USING: literals compiler.test compiler.units tools.test kernel kernel.private
 sequences.private math.private math combinators strings alien
 arrays memory vocabs parser eval quotations compiler.errors
 definitions generic.single ;
@@ -110,7 +110,7 @@ IN: compiler.tests.simple
         dead-code-rec
     ] if ;
 
-{ 3.2 } [ dead-code-rec ] unit-test
+{ $[ 3.2 double>bits ] } [ dead-code-rec double>bits ] unit-test
 
 : one-rec ( ? -- obj ) [ f one-rec ] [ "hi" ] if ;
 

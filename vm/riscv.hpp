@@ -1,3 +1,5 @@
+#pragma once
+
 // RISC-V instruction fields shared by relocations and inline-cache patching.
 namespace factor {
 

@@ -65,7 +65,7 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     backtracking-allocator register-allocator [
         1.5 2.0 3.0 [ * + ] compile-call
     ] with-variable
-] unit-test
+] floating-point-unit-test
 
 { { 1 2 3 } } [
     backtracking-allocator register-allocator [
@@ -268,15 +268,33 @@ IN: compiler.cfg.register-allocation.backtracking.tests
         2.5 t backtracking-phi-pressure compile-call
         2.5 f backtracking-phi-pressure compile-call
     ] with-variable
+] floating-point-unit-test
+
+! Exercise affinities with operations every optimizing backend lowers in
+! the caller. Floating-point primitives may remain calls with ABI clobbers.
+:: backtracking-integer-phi-pressure ( -- quot )
+    40 <iota> [ 1 + '[ _ fixnum+fast ] ] map :> positive
+    40 <iota> [ 1 + '[ _ fixnum-fast ] ] map :> negative
+    '[ positive cleave ] :> positive-branch
+    '[ negative cleave ] :> negative-branch
+    39 [ \ fixnum+fast ] replicate >quotation :> reduction
+    '[ [ { fixnum } declare ] dip
+        positive-branch negative-branch if reduction call ] ;
+
+{ 900 -740 } [
+    backtracking-allocator register-allocator [
+        2 t backtracking-integer-phi-pressure compile-call
+        2 f backtracking-integer-phi-pressure compile-call
+    ] with-variable
 ] unit-test
 
 { t } [
     backtracking-allocator register-allocator [
-        backtracking-phi-pressure measure-compilation
+        backtracking-integer-phi-pressure measure-compilation
         "procedures" of first "allocation" of
         "bundle-merges" of 0 >
     ] with-variable
-] unit-test
+] floating-point-unit-test
 
 
 ! A canonical no-use spill bundle gets one non-evicting second chance.

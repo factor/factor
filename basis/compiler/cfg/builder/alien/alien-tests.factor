@@ -1,4 +1,4 @@
-USING: accessors alien alien.c-types alien.strings assocs classes.struct
+USING: accessors alien alien.c-types alien.strings arrays assocs classes.struct
 combinators compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.builder.alien.params
 compiler.cfg.builder.blocks compiler.cfg.instructions
@@ -6,11 +6,20 @@ compiler.cfg.registers compiler.cfg.stacks compiler.errors
 compiler.test compiler.tree.builder compiler.tree.optimizer compiler.units
 continuations definitions
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
-cpu.arm.64.assembler.registers kernel layouts literals make namespaces
+cpu.arm.64.assembler.registers kernel layouts literals locals make namespaces
 sequences stack-checker.alien system tools.test vocabs.loader words ;
 IN: compiler.cfg.builder.alien.tests
 QUALIFIED-WITH: cpu.riscv.64.assembler.registers rv
 QUALIFIED-WITH: cpu.riscv.32.assembler.registers rv32
+QUALIFIED-WITH: cpu.loongarch.64.assembler.registers la
+QUALIFIED-WITH: cpu.mips.assembler.registers mi
+QUALIFIED-WITH: cpu.s390x.assembler.registers z
+QUALIFIED-WITH: cpu.alpha.64.assembler.registers al
+QUALIFIED-WITH: cpu.arm.32.assembler ar
+QUALIFIED-WITH: cpu.arm.32.compiler-assembler av
+QUALIFIED-WITH: cpu.hppa.assembler.registers hp
+QUALIFIED-WITH: cpu.m88k.assembler.registers m8
+QUALIFIED-WITH: cpu.openrisc.32.assembler.registers or1k
 
 ! During refresh, hats can re-enter the builder before it has generated a
 ! newly added instruction helper. Reproduce that state without an old image.
@@ -27,8 +36,12 @@ QUALIFIED-WITH: cpu.riscv.32.assembler.registers rv32
 
 : dummy-assembly ( -- ass )
     int { } cdecl [
-        EAX 33 MOV
+        int return-regs-for-type int-regs of first 33 %load-immediate
     ] alien-assembly ;
+
+! Inline assembly must use the target ISA and its native result register.
+! An x86 MOV leaves following fixed-width target instructions unaligned.
+{ 33 } [ dummy-assembly ] unit-test
 
 { t } [
     <basic-block> dup set-basic-block dup
@@ -126,6 +139,28 @@ STRUCT: indirect-result { a longlong } { b longlong } { c longlong } ;
     ] with-variable
 ] cfg-unit-test
 
+! A fixed ABI result slot leaves normal argument positions untouched.
+SINGLETON: fixed-stack-struct-result-cpu
+M: fixed-stack-struct-result-cpu return-struct-in-registers? drop f ;
+M: fixed-stack-struct-result-cpu struct-return-stack-offset -4 ;
+
+{ { 42 } { { double-rep f f } } 1 { { 1 int-rep -4 } } 0 } [
+    fixed-stack-struct-result-cpu \ cpu [
+        V{ } clone stack-values set 0 stack-params set
+        [ { 42 } { { double-rep f f } } indirect-result
+          prepare-struct-caller ] V{ } make drop
+        stack-values get [ first3 3array ] map >array stack-params get
+    ] with-variable
+] cfg-unit-test
+
+{ 1 { { 1 int-rep -4 } } 0 } [
+    fixed-stack-struct-result-cpu \ cpu [
+        V{ } clone stack-values set 0 stack-params set
+        indirect-result prepare-struct-callee
+        stack-values get [ first3 3array ] map >array stack-params get
+    ] with-variable
+] cfg-unit-test
+
 ! caller-stack-cleanup
 { 0 } [
     alien-node-params new long >>return cdecl >>abi 25
@@ -141,10 +176,38 @@ STRUCT: indirect-result { a longlong } { b longlong } { c longlong } ;
 ${
     cpu {
         { x86.32 [ { { 1 int-rep EAX } } { { 2 double-rep ST0 } } ] }
+        { ppc.32 [ { { 1 int-rep 3 } } { { 2 double-rep 1 } } ] }
+        { ppc.64 [ { { 1 int-rep 3 } } { { 2 double-rep 1 } } ] }
+        { ppc.64le [ { { 1 int-rep 3 } } { { 2 double-rep 1 } } ] }
+        { mips.32 [ { ${ 1 int-rep mi:V0 } } { ${ 2 double-rep mi:F0 } } ] }
+        { mipsel.32 [ { ${ 1 int-rep mi:V0 } } { ${ 2 double-rep mi:F0 } } ] }
+        { mips.64 [ { ${ 1 int-rep mi:V0 } } { ${ 2 double-rep mi:F0 } } ] }
+        { mipsel.64 [ { ${ 1 int-rep mi:V0 } } { ${ 2 double-rep mi:F0 } } ] }
         { x86.64 [ { { 1 int-rep RAX } } { { 2 double-rep XMM0 } } ] }
         { arm.64 [ { ${ 1 int-rep X0 } } { ${ 2 double-rep V0 } } ] }
         { riscv.64 [ { ${ 1 int-rep rv:A0 } } { ${ 2 double-rep rv:FA0 } } ] }
+        { loongarch.64 [ { ${ 1 int-rep la:A0 } } { ${ 2 double-rep la:FA0 } } ] }
         { riscv.32 [ { ${ 1 int-rep rv32:A0 } } { ${ 2 double-rep rv32:FA0 } } ] }
+        { s390x [ { ${ 1 int-rep z:R2 } } { ${ 2 double-rep z:F0 } } ] }
+        { alpha.64 [ { ${ 1 int-rep al:R0 } } { ${ 2 double-rep al:F0 } } ] }
+        { arm.32 [
+            { ${ 1 int-rep ar:R0 } }
+            ! OpenBSD uses the base AAPCS double result in r0:r1.
+            os openbsd?
+            [ { ${ 2 int-rep ar:R0 } ${ 3 int-rep ar:R1 } } ]
+            [ { ${ 2 double-rep av:S0 } } ] if
+        ] }
+        { sparc.32 [ { { 1 int-rep 8 } } { { 2 double-rep 0 } } ] }
+        { sparc.64 [ { { 1 int-rep 8 } } { { 2 double-rep 0 } } ] }
+        { hppa.32 [ { ${ 1 int-rep hp:R28 } } { ${ 2 double-rep hp:F4 } } ] }
+        { m68k.32 [ { { 1 int-rep 0 } } { { 2 double-rep 0 } } ] }
+        { m88k.32 [ { ${ 1 int-rep m8:R2 } } { ${ 2 double-rep m8:R2 } } ] }
+        { openrisc.32 [ { ${ 1 int-rep or1k:R11 } } { ${ 2 double-rep or1k:F3 } } ] }
+        { vax.32 [ { { 1 int-rep 0 } } { { 2 double-rep 0 } } ] }
+        { sh3.32 [ { { 1 int-rep 0 } } { { 2 double-rep 0 } } ] }
+        { sh3be.32 [ { { 1 int-rep 0 } } { { 2 double-rep 0 } } ] }
+        { sh4.32 [ { { 1 int-rep 0 } } { { 2 double-rep 0 } } ] }
+        { sh4be.32 [ { { 1 int-rep 0 } } { { 2 double-rep 0 } } ] }
     } case
 } [
     T{ alien-invoke-params { return int } } prepare-caller-return
@@ -153,6 +216,28 @@ ${
 
 ! unbox-parameters
 
+! MIPS and HPPA metadata records natural size and group alignment.
+cpu mips? cpu hppa.32? or [
+    cpu mips32? cpu hppa.32? or [
+        {
+            { 2 4 }
+            { { int-rep f f 4 0 4 } { int-rep f f 4 0 4 } }
+            V{
+                T{ ##unbox-any-c-ptr { dst 2 } { src 1 } }
+                T{ ##unbox { dst 4 } { src 3 } { unboxer "to_signed_4" } { rep int-rep } }
+            }
+        }
+    ] [
+        {
+            { 2 4 }
+            { { int-rep f f 8 0 8 } { int-rep f f 4 0 4 } }
+            V{
+                T{ ##unbox-any-c-ptr { dst 2 } { src 1 } }
+                T{ ##convert-integer { dst 4 } { src 3 } { c-type $[ int base-type ] } }
+            }
+        }
+    ] if
+] [
 ! RV32 converts integer and pointer parameters to their full ABI width.
 cpu riscv.32? [
     {
@@ -165,7 +250,7 @@ cpu riscv.32? [
             T{ ##convert-integer { dst 6 } { src 5 } { c-type $[ int base-type ] } }
         }
     }
-] [ cpu riscv.64? [
+] [ cpu riscv.64? cpu loongarch.64? or [
     {
         { 2 5 }
         { { int-rep f f $[ cell ] } { int-rep f f 4 } }
@@ -175,7 +260,7 @@ cpu riscv.32? [
             T{ ##convert-integer { dst 5 } { src 4 } { c-type $[ int base-type ] } }
         }
     }
-] [ cpu x86.32?
+] [ cell 4 =
 {
     { 2 4 }
     { { int-rep f f $[ cell ] } { int-rep f f 4 } }
@@ -193,7 +278,7 @@ cpu riscv.32? [
     { 2 3 }
     { { int-rep f f $[ cell ] } { int-rep f f 4 } }
     V{ T{ ##unbox-any-c-ptr { dst 2 } { src 1 } } }
-} ? ] if ] if [
+} ? ] if ] if ] if [
     [ { c-string int } unbox-parameters ] V{ } make
 ] cfg-unit-test
 
@@ -237,4 +322,45 @@ cpu arm.64? [
         double base-type flatten-windows-vararg-type
         half base-type flatten-windows-vararg-type
     ] cfg-unit-test
+] when
+
+{ t 42 40 } [
+    [ 42 8 emit-hppa-va-stack drop ] V{ } make first
+    [ ##sub-imm? ] [ src1>> ] [ src2>> ] tri
+] cfg-unit-test
+
+! GNU MIPS uses positional FP slots in N64 and a mandatory O32 home area.
+:: mips-scalar-layout ( types variadic? -- regs stack homes )
+    cdecl [
+        variadic? varargs-named-count set
+        types [ base-type flatten-scalar-parameter ] map concat
+        [ dup prepare-parameter-group
+          0 swap [ first3 ] [ param-natural-size ] bi next-parameter ] each
+    ] with-param-regs [ [ rest ] map ] bi@ stack-params get ;
+
+cpu mips? [
+    cpu mips32? [
+        { V{ { int-rep $[ mi:A0 ] } { int-rep $[ mi:A2 ] } { int-rep $[ mi:A3 ] } }
+          V{ { int-rep 16 4 } { int-rep 24 4 } { int-rep 28 4 } } 32 } [
+            { int double int double } f mips-scalar-layout
+        ] cfg-unit-test
+        { V{ { double-rep $[ mi:F12 ] } { double-rep $[ mi:F14 ] } } V{ } 16 } [
+            { double double } f mips-scalar-layout
+        ] cfg-unit-test
+        { V{ { int-rep $[ mi:A0 ] } { int-rep $[ mi:A2 ] } { int-rep $[ mi:A3 ] } }
+          V{ { int-rep 16 4 } { int-rep 20 4 } } 24 } [
+            { int double double } t mips-scalar-layout
+        ] cfg-unit-test
+    ] [
+        { V{ { int-rep $[ mi:A0 ] } { double-rep $[ mi:F13 ] }
+             { int-rep $[ mi:A2 ] } { double-rep $[ mi:F15 ] } } V{ } 0 } [
+            { int double int double } f mips-scalar-layout
+        ] cfg-unit-test
+        { V{ { double-rep $[ mi:F12 ] } { double-rep $[ mi:F13 ] } } V{ } 0 } [
+            { double double } f mips-scalar-layout
+        ] cfg-unit-test
+        { V{ { int-rep $[ mi:A0 ] } { int-rep $[ mi:A1 ] } { int-rep $[ mi:A2 ] } } V{ } 0 } [
+            { int double double } t mips-scalar-layout
+        ] cfg-unit-test
+    ] if
 ] when

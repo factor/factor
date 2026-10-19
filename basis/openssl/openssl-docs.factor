@@ -9,7 +9,7 @@ HELP: ssl-initialized?
 { $var-description "Boolean that is " { $link t } " after ssl has been initialized." } ;
 
 HELP: ssl-new-api?
-{ $var-description "Boolean that is " { $link t } " if the detected libssl version is 1.1.0 or greater." } ;
+{ $var-description "Boolean that is " { $link t } " when the SSL library provides the OpenSSL 1.1.0 stack API. Initialization is detected separately because LibreSSL provides the modern initializer with the legacy stack API." } ;
 
 HELP: ssl-native-identity-checks?
 { $var-description "Boolean that is " { $link t } " when the initialized SSL library provides both native certificate hostname and IP address checks." } ;

@@ -2,7 +2,7 @@ USING: accessors alien.strings calendar continuations destructors
 io.backend io.backend.unix io.encodings io.encodings.binary
 io.encodings.utf8 io.files io.files.unix io.pathnames io.ports
 io.sockets io.sockets.private io.timeouts kernel libc locals math
-namespaces sequences sets strings tools.annotations tools.test unix.ffi ;
+namespaces sequences sets strings system tools.annotations tools.test unix.ffi ;
 FROM: io.sockets => accept ;
 IN: io.sockets.unix
 
@@ -153,15 +153,26 @@ M: failing-datagram-address (get-local-address)
 ] unit-test
 
 ! sockaddr-un has a fixed-size byte array, including the terminating NUL.
-{ t t } [
-    "/factor-socket" <local> make-sockaddr path>>
-    [ length max-un-path = ]
-    [ utf8 alien>string "/factor-socket" = ] bi
-] unit-test
+os android? [
+    { t } [
+        "/factor-socket" <local>
+        [ dup make-sockaddr ] keep parse-sockaddr =
+    ] unit-test
+] [
+    { t t } [
+        "/factor-socket" <local> make-sockaddr path>>
+        [ length max-un-path = ]
+        [ utf8 alien>string "/factor-socket" = ] bi
+    ] unit-test
+] if
 
 { t } [
     max-un-path 2 - CHAR: a <string> "/" prepend
-    dup <local> make-sockaddr path>> utf8 alien>string =
+    os android? [
+        <local> [ dup make-sockaddr ] keep parse-sockaddr =
+    ] [
+        dup <local> make-sockaddr path>> utf8 alien>string =
+    ] if
 ] unit-test
 
 [
@@ -177,11 +188,23 @@ M: failing-datagram-address (get-local-address)
 ] [ "Path too long" = ] must-fail-with
 
 [
-    ! Ask the OS for an ephemeral port, then close the listener before
-    ! connecting. A fixed port could already have a service listening.
-    "127.0.0.1" 0 <inet4> binary <server>
-    [ addr>> ] with-disposal
-    binary [ ] with-client
+    os [ openbsd? ] [ netbsd? ] [ macos? ] tri or or [
+        ! These kernels may drop TCP SYNs to a bound non-listening socket.
+        ! A private local socket gives a deterministic refusal without port reuse.
+        [
+            [
+                "refused.sock" absolute-path <local> dup SOCK_STREAM server-socket-fd
+                [ drop binary [ ] with-client ] with-disposal
+            ] with-destructors
+        ] with-test-directory
+    ] [
+        ! Reserve an ephemeral TCP port without listening. Keep it bound
+        ! during the connection attempt so another listener cannot claim it.
+        [
+            "127.0.0.1" 0 <inet4> dup SOCK_STREAM server-socket-fd
+            [ swap get-local-address binary [ ] with-client ] with-disposal
+        ] with-destructors
+    ] if
 ] [
     message>> "Connection refused" =
 ] must-fail-with

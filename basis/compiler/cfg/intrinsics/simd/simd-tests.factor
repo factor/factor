@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs biassocs byte-arrays classes
+USING: accessors alien.data arrays assocs biassocs byte-arrays classes
 compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.intrinsics.simd compiler.cfg.intrinsics.simd.backend
 compiler.cfg.stacks.local compiler.test compiler.tree
-compiler.tree.propagation.info cpu.architecture fry kernel locals make
+compiler.tree.propagation.info cpu.architecture fry grouping kernel locals make
 namespaces sequences system tools.test words ;
 IN: compiler.cfg.intrinsics.simd.tests
 
@@ -521,6 +521,16 @@ unit-test
 [ shuffle-imm-cpu 1 float-4-rep [ emit-simd-select ] test-emit-literal ]
 unit-test
 
+! Compare independent little-endian wire fixtures after reversing each
+! native scalar lane on big-endian hosts; lane order stays unchanged.
+: canonical-lane-bytes ( bytes width -- bytes' )
+    little-endian? [ drop ] [ group [ reverse ] map concat >byte-array ] if ;
+
+:: canonical-vector-literals ( insns widths -- insns )
+    insns widths [| insn width |
+        insn obj>> width canonical-lane-bytes insn obj<<
+    ] 2each insns ;
+
 ! ^load-neg-zero-vector
 {
     V{
@@ -536,7 +546,7 @@ unit-test
 } [
     [
         { float-4-rep double-2-rep } [ ^load-neg-zero-vector drop ] each
-    ] V{ } make
+    ] V{ } make { 4 8 } canonical-vector-literals
 ] cfg-unit-test
 
 ! ^load-add-sub-vector
@@ -585,7 +595,7 @@ unit-test
             int-4-rep
             longlong-2-rep
         } [ ^load-add-sub-vector drop ] each
-    ] V{ } make
+    ] V{ } make { 4 8 1 2 4 8 } canonical-vector-literals
 ] cfg-unit-test
 
 ! ^load-half-vector
@@ -603,7 +613,7 @@ unit-test
 } [
     [
         { float-4-rep double-2-rep } [ ^load-half-vector drop ] each
-    ] V{ } make
+    ] V{ } make { 4 8 } canonical-vector-literals
 ] cfg-unit-test
 
 ! sign-bit-mask
@@ -616,6 +626,7 @@ unit-test
     }
 } [
     { char-16-rep short-8-rep int-4-rep longlong-2-rep } [ sign-bit-mask ] map
+    { 1 2 4 8 } [ canonical-lane-bytes ] 2map
 ] unit-test
 
 

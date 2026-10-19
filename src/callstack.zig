@@ -22,29 +22,36 @@ pub fn iterateCallstackObject(vm: *FactorVM, cs_cell: *Cell, comptime Iterator: 
     const code = vm.code orelse return;
     // Length is an immutable fixnum, so reading it once (as a number) is safe
     // even though the object may move.
-    const frame_length = layouts.untagFixnum(@as(*const layouts.Callstack, @ptrFromInt(layouts.UNTAG(cs_cell.*))).length);
+    const frame_length = if (comptime contexts.powerpc_frames)
+        @as(Cell, @intCast(layouts.untagFixnum(@as(*const layouts.Callstack, @ptrFromInt(layouts.UNTAG(cs_cell.*))).length)))
+    else
+        layouts.untagFixnum(@as(*const layouts.Callstack, @ptrFromInt(layouts.UNTAG(cs_cell.*))).length);
     var frame_offset: Cell = 0;
 
-    if ((builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)) {
+    if ((builtin.cpu.arch == .arm or builtin.cpu.arch == .powerpc or builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or contexts.mips_frames or builtin.cpu.arch == .s390x or builtin.cpu.arch == .riscv32 or contexts.sparc_frames)) {
         while (frame_offset < frame_length) {
             const callstack: *const layouts.Callstack = @ptrFromInt(layouts.UNTAG(cs_cell.*));
             const frame_top = callstack.frameTopAt(frame_offset);
-            const frame_size = @as(*const Cell, @ptrFromInt(frame_top)).*;
+            const frame_size = contexts.capturedFrameSize(frame_top);
 
             if (frame_size == 0 or frame_offset + frame_size > frame_length) break;
 
-            const ret_addr = @as(*const Cell, @ptrFromInt(frame_top + FRAME_RETURN_ADDRESS)).*;
+            const ret_addr = contexts.frameReturnAddress(frame_top);
             const block = code.codeBlockForAddress(ret_addr) orelse break;
 
+            const advance = if (comptime contexts.powerpc_frames)
+                contexts.capturedFrameAdvance(frame_top, frame_size, frame_length - frame_offset)
+            else
+                frame_size;
             iterator.call(frame_top, frame_size, block, ret_addr);
 
-            frame_offset += frame_size;
+            frame_offset += advance;
         }
     } else {
         while (frame_offset < frame_length) {
             const callstack: *const layouts.Callstack = @ptrFromInt(layouts.UNTAG(cs_cell.*));
             const frame_top = callstack.frameTopAt(frame_offset);
-            const ret_addr = @as(*const Cell, @ptrFromInt(frame_top + FRAME_RETURN_ADDRESS)).*;
+            const ret_addr = contexts.frameReturnAddress(frame_top);
 
             const block = code.codeBlockForAddress(ret_addr) orelse break;
             const frame_size = block.stackFrameSizeForAddress(ret_addr);
@@ -62,15 +69,16 @@ pub fn iterateCallstack(vm: *FactorVM, ctx: *const contexts.Context, comptime It
 
     const code = vm.code orelse return;
 
-    if ((builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32)) {
+    if ((builtin.cpu.arch == .arm or builtin.cpu.arch == .powerpc or builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or contexts.mips_frames or builtin.cpu.arch == .s390x or builtin.cpu.arch == .riscv32 or contexts.sparc_frames)) {
         while (top < bottom) {
-            const ret_addr = @as(*const Cell, @ptrFromInt(top + FRAME_RETURN_ADDRESS)).*;
+            const ret_addr = contexts.frameReturnAddress(top);
             if (ret_addr == 0) break;
 
             const block = code.codeBlockForAddress(ret_addr) orelse break;
 
-            const next_frame = @as(*const Cell, @ptrFromInt(top)).*;
-            const frame_size = next_frame -| top;
+            const parent = contexts.frameParent(top);
+            const frame_size = parent -| top;
+            const next_frame = contexts.liveFrameNext(top, parent, bottom);
 
             iterator.call(top, frame_size, block, ret_addr);
 
@@ -78,7 +86,7 @@ pub fn iterateCallstack(vm: *FactorVM, ctx: *const contexts.Context, comptime It
         }
     } else {
         while (top < bottom) {
-            const ret_addr = @as(*const Cell, @ptrFromInt(top + FRAME_RETURN_ADDRESS)).*;
+            const ret_addr = contexts.frameReturnAddress(top);
             if (ret_addr == 0) break;
 
             const block = code.codeBlockForAddress(ret_addr) orelse break;
@@ -168,4 +176,43 @@ pub export fn primitive_callstack_bounds(vm_asm: *VMAssemblyFields) callconv(.c)
     }
     vm.push(layouts.false_object);
     vm.push(layouts.false_object);
+}
+
+test "System z live and saved callstacks follow frame links past spills" {
+    if (builtin.cpu.arch != .s390x) return error.SkipZigTest;
+    var block: CodeBlock align(16) = undefined;
+    block.initialize(.optimized, 64, 16);
+    const address = block.entryPoint() + 8;
+    var blocks = [_]Cell{@intFromPtr(&block)};
+    var heap: @import("code_heap.zig").CodeHeap = undefined;
+    heap.all_blocks_sorted = .empty;
+    heap.all_blocks_sorted.items = &blocks;
+    heap.all_blocks_sorted.capacity = 1;
+    heap.pending_blocks = .empty;
+    var vm: FactorVM = undefined;
+    vm.code = &heap;
+    const Accumulator = struct {
+        count: usize = 0,
+        sizes: [2]Cell = @splat(0),
+        fn call(self: *@This(), _: Cell, size: Cell, _: *CodeBlock, _: Cell) void {
+            if (self.count < self.sizes.len) self.sizes[self.count] = size;
+            self.count += 1;
+        }
+    };
+    var live: [6]Cell align(16) = .{ 0, address, 0xdeadbeef, 0xfeedface, 0, address };
+    live[0] = @intFromPtr(&live) + 32;
+    live[4] = @intFromPtr(&live) + 48;
+    var context: contexts.Context = undefined;
+    context.callstack_top = @intFromPtr(&live);
+    context.callstack_bottom = @intFromPtr(&live) + 48;
+    var live_result: Accumulator = .{};
+    iterateCallstack(&vm, &context, Accumulator, &live_result);
+    try std.testing.expectEqual(@as(usize, 2), live_result.count);
+    try std.testing.expectEqualSlices(Cell, &.{32, 16}, &live_result.sizes);
+    var saved: [8]Cell align(16) = .{ 0, layouts.tagFixnum(48), 32, address, 0xdeadbeef, 0xfeedface, 16, address };
+    var saved_cell = @intFromPtr(&saved) | @backingInt(layouts.TypeTag.callstack);
+    var saved_result: Accumulator = .{};
+    iterateCallstackObject(&vm, &saved_cell, Accumulator, &saved_result);
+    try std.testing.expectEqual(@as(usize, 2), saved_result.count);
+    try std.testing.expectEqualSlices(Cell, &.{32, 16}, &saved_result.sizes);
 }

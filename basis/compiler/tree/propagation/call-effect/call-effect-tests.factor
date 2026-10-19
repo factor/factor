@@ -193,6 +193,8 @@ TUPLE: my-tuple a b c ;
 
 ! Regression
 [ composed <class-info> (infer-value) ] [ uninferable? ] must-fail-with
+! Recovering an uninferable value must return only f, preserving stack balance.
+{ f } [ null-info infer-value ] unit-test
 { t } [ [ 1 ] [ 2 ] compose <literal-info> (infer-value) ( -- x x ) effect= ] unit-test
 { } [ "IN: compiler.tree.propagation.call-effect.tests USING:
 kernel kernel.private ; : blub ( x -- ) { composed } declare call( -- ) ;" eval( -- ) ] unit-test

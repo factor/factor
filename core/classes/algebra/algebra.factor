@@ -61,7 +61,9 @@ INSTANCE: anonymous-predicate classoid
     anonymous-predicate boa ;
 
 ! Used for ordering classes
-M: anonymous-predicate rank-class drop 1.5 ;
+! The rank is ordering metadata; the exact ratio needs no floating arithmetic.
+M: anonymous-predicate rank-class
+    drop floating-point-supported? [ 1.5 ] [ 3/2 ] if ;
 
 DEFER: (class<=)
 

@@ -1,6 +1,7 @@
 ! Copyright (C) 2016 Björn Lindqvist
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel literals ui.gestures x11.X
+USING: accessors assocs combinators kernel literals math math.bitwise
+math.order ui.gestures x11.X
 x11.keysymdef ;
 IN: ui.backend.x11.keys
 
@@ -100,6 +101,22 @@ PRIVATE>
 : code>sym ( code -- name/code/f action? )
     dup keypad-characters at* [ nip ] [ drop ] if
     dup codes at* [ nip dup t and ] when ;
+
+! GDK maps printable Latin-1 keysyms directly and encodes Unicode
+! scalars in the low 24 bits of 0x01xxxxxx keysyms. Leave legacy X11
+! keysyms and invalid Unicode values to the backend's GDK conversion.
+: direct-keysym>unicode ( keysym -- code/f )
+    dup 0x20 0x7e between? over 0xa0 0xff between? or [
+    ] [
+        dup 0x01000000 0x0110ffff between? [
+            0x00ffffff bitand
+            dup 0xd800 0xdfff between? [ drop f ] when
+        ] [ drop f ] if
+    ] if ;
+
+: keysym>unicode ( keysym fallback -- code )
+    [ dup direct-keysym>unicode ] dip swap
+    [ 2nip ] [ call( keysym -- code ) ] if* ; inline
 
 : event-modifiers ( event -- seq )
     state>> modifiers modifier ;

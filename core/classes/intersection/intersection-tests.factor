@@ -52,7 +52,7 @@ PREDICATE: odd/float-between-10-20 < union{ odd-integer float }
     10 20 between? ;
 
 { t } [ 17 odd/float-between-10-20? ] unit-test
-{ t } [ 17.4 odd/float-between-10-20? ] unit-test
+{ t } [ 17.4 odd/float-between-10-20? ] floating-point-unit-test
 { f } [ 18 odd/float-between-10-20? ] unit-test
 { f } [ 5 odd/float-between-10-20? ] unit-test
-{ f } [ 5.75 odd/float-between-10-20? ] unit-test
+{ f } [ 5.75 odd/float-between-10-20? ] floating-point-unit-test

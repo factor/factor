@@ -16,6 +16,7 @@ C-LIBRARY: libcrypto {
     ] }
     { macos "libcrypto.35.dylib" }
     { linux $[ 32-bit? "libcrypto.so.1.1" "libcrypto.so.3" ? ] }
+    { haiku "libcrypto.so.3" }
     { unix "libcrypto.so" }
 }
 

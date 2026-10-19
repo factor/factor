@@ -1,0 +1,60 @@
+.text
+.align 2
+.globl dispatch_peer_enter
+dispatch_peer_enter:
+ subu %r31,%r31,64
+ st %r1,%r31,0
+ st %r30,%r31,4
+ st %r14,%r31,8
+ st %r15,%r31,12
+ st %r16,%r31,16
+ st %r17,%r31,20
+ st %r18,%r31,24
+ st %r19,%r31,28
+ st %r20,%r31,32
+ st %r21,%r31,36
+ st %r22,%r31,40
+ st %r23,%r31,44
+ st %r24,%r31,48
+ st %r25,%r31,52
+ or %r10,%r0,%r2
+ or %r16,%r0,%r3
+ or %r17,%r0,%r4
+ ld %r14,%r16,8
+ ld %r15,%r16,12
+ or.u %r23,%r0,%hi16(trampoline)
+ or %r23,%r23,%lo16(trampoline)
+ or.u %r4,%r0,0x1111
+ or %r4,%r4,0x2222
+ jsr %r10
+ ld %r2,%r14,0
+ ld %r1,%r31,0
+ ld %r30,%r31,4
+ ld %r14,%r31,8
+ ld %r15,%r31,12
+ ld %r16,%r31,16
+ ld %r17,%r31,20
+ ld %r18,%r31,24
+ ld %r19,%r31,28
+ ld %r20,%r31,32
+ ld %r21,%r31,36
+ ld %r22,%r31,40
+ ld %r23,%r31,44
+ ld %r24,%r31,48
+ ld %r25,%r31,52
+ addu %r31,%r31,64
+ jmp %r1
+.globl dispatch_peer_primitive_entry
+dispatch_peer_primitive_entry:
+ st %r4,%r2,4
+ or.u %r4,%r0,0xdead
+ or %r4,%r4,0xbeef
+ br dispatch_peer_primitive
+.globl dispatch_peer_word_entry
+dispatch_peer_word_entry:
+ st %r4,%r14,0
+ jmp %r1
+.globl dispatch_peer_tail_entry
+dispatch_peer_tail_entry:
+ st %r22,%r14,0
+ jmp %r1

@@ -3,7 +3,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.parser alien.syntax classes.struct
-combinators kernel layouts literals namespaces openssl.libcrypto
+combinators kernel layouts literals math namespaces openssl.libcrypto
 sequences system words ;
 IN: openssl.libssl
 
@@ -17,6 +17,7 @@ C-LIBRARY: libssl {
     ] }
     { macos "libssl.35.dylib" }
     { linux $[ 32-bit? "libssl.so.1.1" "libssl.so.3" ? ] }
+    { haiku "libssl.so.3" }
     { unix "libssl.so" }
 }
 
@@ -65,6 +66,7 @@ CONSTANT: SSL_CTRL_SESS_MISSES              29
 CONSTANT: SSL_CTRL_SESS_TIMEOUTS            30
 CONSTANT: SSL_CTRL_SESS_CACHE_FULL          31
 CONSTANT: SSL_CTRL_OPTIONS                  32
+CONSTANT: SSL_CTRL_CLEAR_OPTIONS            77
 CONSTANT: SSL_CTRL_MODE                     33
 
 CONSTANT: SSL_CTRL_GET_READ_AHEAD           40
@@ -629,23 +631,39 @@ FUNCTION: void SSL_CTX_set_client_CA_list ( SSL_CTX* ctx, SSL* list )
 ! This function should never be called directly
 FUNCTION: long SSL_CTX_ctrl ( SSL_CTX* ctx, int cmd, long larg, void* parg )
 
-! Protocol limits are C macros, not exported functions.
-: SSL_CTX_set_min_proto_version ( ssl version -- result )
-    SSL_CTRL_SET_MIN_PROTO_VERSION swap f SSL_CTX_ctrl ;
-: SSL_CTX_set_max_proto_version ( ssl version -- result )
-    SSL_CTRL_SET_MAX_PROTO_VERSION swap f SSL_CTX_ctrl ;
-: SSL_CTX_get_min_proto_version ( ssl -- version )
-    SSL_CTRL_GET_MIN_PROTO_VERSION 0 f SSL_CTX_ctrl ;
-: SSL_CTX_get_max_proto_version ( ssl -- version )
-    SSL_CTRL_GET_MAX_PROTO_VERSION 0 f SSL_CTX_ctrl ;
+! LibreSSL exports protocol-limit functions; OpenSSL provides control macros.
+FUNCTION-ALIAS: (SSL_CTX_set_min_proto_version-direct) int SSL_CTX_set_min_proto_version ( SSL_CTX* ctx, uint16_t version )
+: SSL_CTX_set_min_proto_version ( ctx version -- result )
+    "SSL_CTX_set_min_proto_version" "libssl" dlsym?
+    [ (SSL_CTX_set_min_proto_version-direct) ] [ SSL_CTRL_SET_MIN_PROTO_VERSION swap f SSL_CTX_ctrl ] if ;
+FUNCTION-ALIAS: (SSL_CTX_set_max_proto_version-direct) int SSL_CTX_set_max_proto_version ( SSL_CTX* ctx, uint16_t version )
+: SSL_CTX_set_max_proto_version ( ctx version -- result )
+    "SSL_CTX_set_max_proto_version" "libssl" dlsym?
+    [ (SSL_CTX_set_max_proto_version-direct) ] [ SSL_CTRL_SET_MAX_PROTO_VERSION swap f SSL_CTX_ctrl ] if ;
+FUNCTION-ALIAS: (SSL_CTX_get_min_proto_version-direct) int SSL_CTX_get_min_proto_version ( SSL_CTX* ctx )
+: SSL_CTX_get_min_proto_version ( ctx -- result )
+    "SSL_CTX_get_min_proto_version" "libssl" dlsym?
+    [ (SSL_CTX_get_min_proto_version-direct) ] [ SSL_CTRL_GET_MIN_PROTO_VERSION 0 f SSL_CTX_ctrl ] if ;
+FUNCTION-ALIAS: (SSL_CTX_get_max_proto_version-direct) int SSL_CTX_get_max_proto_version ( SSL_CTX* ctx )
+: SSL_CTX_get_max_proto_version ( ctx -- result )
+    "SSL_CTX_get_max_proto_version" "libssl" dlsym?
+    [ (SSL_CTX_get_max_proto_version-direct) ] [ SSL_CTRL_GET_MAX_PROTO_VERSION 0 f SSL_CTX_ctrl ] if ;
+FUNCTION-ALIAS: (SSL_set_min_proto_version-direct) int SSL_set_min_proto_version ( SSL* ssl, uint16_t version )
 : SSL_set_min_proto_version ( ssl version -- result )
-    SSL_CTRL_SET_MIN_PROTO_VERSION swap f SSL_ctrl ;
+    "SSL_set_min_proto_version" "libssl" dlsym?
+    [ (SSL_set_min_proto_version-direct) ] [ SSL_CTRL_SET_MIN_PROTO_VERSION swap f SSL_ctrl ] if ;
+FUNCTION-ALIAS: (SSL_set_max_proto_version-direct) int SSL_set_max_proto_version ( SSL* ssl, uint16_t version )
 : SSL_set_max_proto_version ( ssl version -- result )
-    SSL_CTRL_SET_MAX_PROTO_VERSION swap f SSL_ctrl ;
-: SSL_get_min_proto_version ( ssl -- version )
-    SSL_CTRL_GET_MIN_PROTO_VERSION 0 f SSL_ctrl ;
-: SSL_get_max_proto_version ( ssl -- version )
-    SSL_CTRL_GET_MAX_PROTO_VERSION 0 f SSL_ctrl ;
+    "SSL_set_max_proto_version" "libssl" dlsym?
+    [ (SSL_set_max_proto_version-direct) ] [ SSL_CTRL_SET_MAX_PROTO_VERSION swap f SSL_ctrl ] if ;
+FUNCTION-ALIAS: (SSL_get_min_proto_version-direct) int SSL_get_min_proto_version ( SSL* ssl )
+: SSL_get_min_proto_version ( ssl -- result )
+    "SSL_get_min_proto_version" "libssl" dlsym?
+    [ (SSL_get_min_proto_version-direct) ] [ SSL_CTRL_GET_MIN_PROTO_VERSION 0 f SSL_ctrl ] if ;
+FUNCTION-ALIAS: (SSL_get_max_proto_version-direct) int SSL_get_max_proto_version ( SSL* ssl )
+: SSL_get_max_proto_version ( ssl -- result )
+    "SSL_get_max_proto_version" "libssl" dlsym?
+    [ (SSL_get_max_proto_version-direct) ] [ SSL_CTRL_GET_MAX_PROTO_VERSION 0 f SSL_ctrl ] if ;
 
 FUNCTION: void SSL_CTX_set_default_passwd_cb ( SSL_CTX* ctx, void* cb )
 
@@ -664,14 +682,64 @@ FUNCTION: void SSL_CTX_set_tmp_dh_callback ( SSL_CTX* ctx, void* dh )
 
 FUNCTION: void SSL_CTX_set_tmp_rsa_callback ( SSL_CTX* ctx, void* rsa )
 
-FUNCTION: ulong SSL_CTX_set_options ( SSL_CTX* ctx, ulong options )
-FUNCTION: ulong SSL_set_options ( SSL* ssl, ulong options )
+! OpenSSL 3 widened option masks to uint64_t, including on ILP32.
+! Earlier libraries retain the existing machine-word option ABI. Query so
+! loading this vocabulary does not invoke FFI during bootstrap parsing.
+: openssl-64-bit-options? ( -- ? )
+    OpenSSL_version_num 0x30000000 >= ;
 
-FUNCTION: ulong SSL_CTX_clear_options ( SSL_CTX* ctx, ulong options )
-FUNCTION: ulong SSL_clear_options ( SSL* ssl, ulong options )
+! LibreSSL and older OpenSSL expose these APIs only as control macros.
+! Preserve the public unsigned mask result when the control ABI returns long.
+: unsigned-ssl-options ( options -- options' )
+    ulong unsigned-interval nip bitand ;
 
-FUNCTION: ulong SSL_CTX_get_options ( SSL_CTX* ctx )
-FUNCTION: ulong SSL_get_options ( SSL* ssl )
+FUNCTION-ALIAS: (SSL_CTX_set_options-ulong) ulong SSL_CTX_set_options ( SSL_CTX* ctx, ulong options )
+FUNCTION-ALIAS: (SSL_CTX_set_options-uint64) uint64_t SSL_CTX_set_options ( SSL_CTX* ctx, uint64_t options )
+: SSL_CTX_set_options ( ctx options -- options )
+    "SSL_CTX_set_options" "libssl" dlsym? [
+        openssl-64-bit-options?
+        [ (SSL_CTX_set_options-uint64) ] [ (SSL_CTX_set_options-ulong) ] if
+    ] [ SSL_CTRL_OPTIONS swap f SSL_CTX_ctrl unsigned-ssl-options ] if ;
+
+FUNCTION-ALIAS: (SSL_set_options-ulong) ulong SSL_set_options ( SSL* ssl, ulong options )
+FUNCTION-ALIAS: (SSL_set_options-uint64) uint64_t SSL_set_options ( SSL* ssl, uint64_t options )
+: SSL_set_options ( ssl options -- options )
+    "SSL_set_options" "libssl" dlsym? [
+        openssl-64-bit-options?
+        [ (SSL_set_options-uint64) ] [ (SSL_set_options-ulong) ] if
+    ] [ SSL_CTRL_OPTIONS swap f SSL_ctrl unsigned-ssl-options ] if ;
+
+FUNCTION-ALIAS: (SSL_CTX_clear_options-ulong) ulong SSL_CTX_clear_options ( SSL_CTX* ctx, ulong options )
+FUNCTION-ALIAS: (SSL_CTX_clear_options-uint64) uint64_t SSL_CTX_clear_options ( SSL_CTX* ctx, uint64_t options )
+: SSL_CTX_clear_options ( ctx options -- options )
+    "SSL_CTX_clear_options" "libssl" dlsym? [
+        openssl-64-bit-options?
+        [ (SSL_CTX_clear_options-uint64) ] [ (SSL_CTX_clear_options-ulong) ] if
+    ] [ SSL_CTRL_CLEAR_OPTIONS swap f SSL_CTX_ctrl unsigned-ssl-options ] if ;
+
+FUNCTION-ALIAS: (SSL_clear_options-ulong) ulong SSL_clear_options ( SSL* ssl, ulong options )
+FUNCTION-ALIAS: (SSL_clear_options-uint64) uint64_t SSL_clear_options ( SSL* ssl, uint64_t options )
+: SSL_clear_options ( ssl options -- options )
+    "SSL_clear_options" "libssl" dlsym? [
+        openssl-64-bit-options?
+        [ (SSL_clear_options-uint64) ] [ (SSL_clear_options-ulong) ] if
+    ] [ SSL_CTRL_CLEAR_OPTIONS swap f SSL_ctrl unsigned-ssl-options ] if ;
+
+FUNCTION-ALIAS: (SSL_CTX_get_options-ulong) ulong SSL_CTX_get_options ( SSL_CTX* ctx )
+FUNCTION-ALIAS: (SSL_CTX_get_options-uint64) uint64_t SSL_CTX_get_options ( SSL_CTX* ctx )
+: SSL_CTX_get_options ( ctx -- options )
+    "SSL_CTX_get_options" "libssl" dlsym? [
+        openssl-64-bit-options?
+        [ (SSL_CTX_get_options-uint64) ] [ (SSL_CTX_get_options-ulong) ] if
+    ] [ SSL_CTRL_OPTIONS 0 f SSL_CTX_ctrl unsigned-ssl-options ] if ;
+
+FUNCTION-ALIAS: (SSL_get_options-ulong) ulong SSL_get_options ( SSL* ssl )
+FUNCTION-ALIAS: (SSL_get_options-uint64) uint64_t SSL_get_options ( SSL* ssl )
+: SSL_get_options ( ssl -- options )
+    "SSL_get_options" "libssl" dlsym? [
+        openssl-64-bit-options?
+        [ (SSL_get_options-uint64) ] [ (SSL_get_options-ulong) ] if
+    ] [ SSL_CTRL_OPTIONS 0 f SSL_ctrl unsigned-ssl-options ] if ;
 
 FUNCTION: ulong SSL_get_secure_renegotiation_support ( SSL* ssl )
 

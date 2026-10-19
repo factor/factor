@@ -1,24 +1,24 @@
-USING: kernel layouts literals math math.parser
+USING: compiler.test.literal-metadata kernel layouts literals math math.parser
 math.parser.private sequences strings tools.test ;
 IN: math.parser.tests
 
 ! #507: whole-token complex literals, including signed exponents and ratios.
-{ C{ -1.5 3.0 } } [ -1.5+3.0j ] unit-test
-{ C{ -1.5 3.0 } } [ "-1.5+3.0j" string>number ] unit-test
+{ C{ -1.5 3.0 } } [ -1.5+3.0j ] literal-metadata-unit-test
+{ C{ -1.5 3.0 } } [ "-1.5+3.0j" string>number ] literal-metadata-unit-test
 { C{ 1/2 -1/3 } } [ "1/2-1/3j" string>number ] unit-test
 { C{ 1 1/2 } } [ "1+1/2j" string>number ] unit-test
 { C{ -1 -1/2 } } [ "-1-1/2j" string>number ] unit-test
-{ C{ 0.001 20000.0 } } [ "1e-3+2e+4j" string>number ] unit-test
+{ C{ 0.001 20000.0 } } [ "1e-3+2e+4j" string>number ] literal-metadata-unit-test
 { C{ 1+1/2 3 } } [ "1+1/2+3j" string>number ] unit-test
 { C{ -1-1/2 -3 } } [ "-1-1/2-3j" string>number ] unit-test
 { C{ 0 2 } } [ "2j" string>number ] unit-test
-{ C{ 0 -2.0 } } [ "-2.0j" string>number ] unit-test
+{ C{ 0 -2.0 } } [ "-2.0j" string>number ] literal-metadata-unit-test
 { C{ 0 1 } } [ "+j" string>number ] unit-test
 { C{ 0 -1 } } [ "-j" string>number ] unit-test
 { C{ 2 1 } } [ "2+j" string>number ] unit-test
 { C{ 2 -1 } } [ "2-j" string>number ] unit-test
 { 3 } [ "3+0j" string>number ] unit-test
-{ C{ 3 -0.0 } } [ "3-0.0j" string>number ] unit-test
+{ C{ 3 -0.0 } } [ "3-0.0j" string>number ] literal-metadata-unit-test
 { f } [ "j" string>number ] unit-test
 { f } [ "abcj" string>number ] unit-test
 { f } [ "1++2j" string>number ] unit-test
@@ -60,7 +60,7 @@ IN: math.parser.tests
 { f } [ "1+1/2+2" string>number ] unit-test
 
 { 100000 } [ "100,000" string>number ] unit-test
-{ 100000.0 } [ "100,000.0" string>number ] unit-test
+{ 100000.0 } [ "100,000.0" string>number ] literal-metadata-unit-test
 
 { f } [ "," string>number ] unit-test
 { f } [ "-," string>number ] unit-test
@@ -69,61 +69,61 @@ IN: math.parser.tests
 { f } [ ",2" string>number ] unit-test
 { f } [ "-,2" string>number ] unit-test
 
-{ 2.0 } [ "4/2." string>number ] unit-test
-{ 2.0 } [ "1+2/2." string>number ] unit-test
-{ -2.0 } [ "-1-2/2." string>number ] unit-test
+{ 2.0 } [ "4/2." string>number ] literal-metadata-unit-test
+{ 2.0 } [ "1+2/2." string>number ] literal-metadata-unit-test
+{ -2.0 } [ "-1-2/2." string>number ] literal-metadata-unit-test
 { f } [ "4/2.0" string>number ] unit-test
 { f } [ "4./2" string>number ] unit-test
-{ 2.0 } [ "2." string>number ] unit-test
-{ 2.0 } [ "+2." string>number ] unit-test
-{ 0.25 } [ "1/4." string>number ] unit-test
+{ 2.0 } [ "2." string>number ] literal-metadata-unit-test
+{ 2.0 } [ "+2." string>number ] literal-metadata-unit-test
+{ 0.25 } [ "1/4." string>number ] literal-metadata-unit-test
 { f } [ "1/4.0" string>number ] unit-test
 { f } [ "1./4" string>number ] unit-test
-{ 0.25 } [ ".25" string>number ] unit-test
-{ -2.0 } [ "-2." string>number ] unit-test
-{ -0.25 } [ "-.25" string>number ] unit-test
+{ 0.25 } [ ".25" string>number ] literal-metadata-unit-test
+{ -2.0 } [ "-2." string>number ] literal-metadata-unit-test
+{ -0.25 } [ "-.25" string>number ] literal-metadata-unit-test
 { f }  [ "-." string>number ] unit-test
 { f }  [ "1/." string>number ] unit-test
 
 { 255 } [ "ff" hex> ] unit-test
 
-{ 100.0 } [ "1.0e2" string>number ] unit-test
-{ 100.0 } [ "100.0" string>number ] unit-test
-{ 100.0 } [ "100." string>number ] unit-test
+{ 100.0 } [ "1.0e2" string>number ] literal-metadata-unit-test
+{ 100.0 } [ "100.0" string>number ] literal-metadata-unit-test
+{ 100.0 } [ "100." string>number ] literal-metadata-unit-test
 
-{ 100.0 } [ "1e2" string>number ] unit-test
-{ 100.0 } [ "1e+2" string>number ] unit-test
+{ 100.0 } [ "1e2" string>number ] literal-metadata-unit-test
+{ 100.0 } [ "1e+2" string>number ] literal-metadata-unit-test
 { 0x1e2 } [ "1e2" hex> ] unit-test
 
-{ 0x1.999999999999ap-3 } [ "0.2" string>number ] unit-test
-{ 0x1.3333333333333p0  } [ "1.2" string>number ] unit-test
-{ 0o1.146314631463146314p0 } [ "1.2" string>number ] unit-test
-{ 0b1.0011001100110011001100110011001100110011001100110011p0 } [ "1.2" string>number ] unit-test
-{ 0x1.5555555555555p0  } [ "1.333,333,333,333,333,333" string>number ] unit-test
-{ 0x1.aaaaaaaaaaaabp0  } [ "1.666,666,666,666,666,666" string>number ] unit-test
+{ 0x1.999999999999ap-3 } [ "0.2" string>number ] literal-metadata-unit-test
+{ 0x1.3333333333333p0  } [ "1.2" string>number ] literal-metadata-unit-test
+{ 0o1.146314631463146314p0 } [ "1.2" string>number ] literal-metadata-unit-test
+{ 0b1.0011001100110011001100110011001100110011001100110011p0 } [ "1.2" string>number ] literal-metadata-unit-test
+{ 0x1.5555555555555p0  } [ "1.333,333,333,333,333,333" string>number ] literal-metadata-unit-test
+{ 0x1.aaaaaaaaaaaabp0  } [ "1.666,666,666,666,666,666" string>number ] literal-metadata-unit-test
 
 { "100.0" }
 [ "1.0e2" string>number number>string ]
 unit-test
 
-{ -100.0 } [ "-1.0e2" string>number ] unit-test
-{ -100.0 } [ "-100.0" string>number ] unit-test
-{ -100.0 } [ "-100." string>number ] unit-test
+{ -100.0 } [ "-1.0e2" string>number ] literal-metadata-unit-test
+{ -100.0 } [ "-100.0" string>number ] literal-metadata-unit-test
+{ -100.0 } [ "-100." string>number ] literal-metadata-unit-test
 
 { "-100.0" }
 [ "-1.0e2" string>number number>string ]
 unit-test
 
-{ -100.0 } [ "-1.e2" string>number ] unit-test
+{ -100.0 } [ "-1.e2" string>number ] literal-metadata-unit-test
 
 { "0.01" } [ "1.0e-2" string>number number>string ] unit-test
-{ 0.01 } [ "1.0e-2" string>number ] unit-test
+{ 0.01 } [ "1.0e-2" string>number ] literal-metadata-unit-test
 
 { "-0.01" } [ "-1.0e-2" string>number number>string ] unit-test
-{ -0.01 } [ "-1.0e-2" string>number ] unit-test
+{ -0.01 } [ "-1.0e-2" string>number ] literal-metadata-unit-test
 { "-0.01" } [ "-1.e-2" string>number number>string ] unit-test
 
-{ -1.0e-12 } [ "-1.0e-12" string>number ] unit-test
+{ -1.0e-12 } [ "-1.0e-12" string>number ] literal-metadata-unit-test
 { "-0.000000000001" } [ "-1.0e-12" string>number number>string ] unit-test
 
 { f } [ "-1e-2e4" string>number ] unit-test
@@ -161,12 +161,12 @@ unit-test
 { t } [ "-0/0." string>number fp-sign ] unit-test
 
 { "1/0." } [ 1/0. number>string ] unit-test
-{ 1/0. } [ "1/0." string>number ] unit-test
+{ 1/0. } [ "1/0." string>number ] literal-metadata-unit-test
 
 { "-1/0." } [ -1/0. number>string ] unit-test
-{ -1/0. } [ "-1/0." string>number ] unit-test
+{ -1/0. } [ "-1/0." string>number ] literal-metadata-unit-test
 
-{ -0.5 } [ "-1/2." string>number ] unit-test
+{ -0.5 } [ "-1/2." string>number ] literal-metadata-unit-test
 
 { "-0.0" } [ -0.0 number>string ] unit-test
 
@@ -203,63 +203,63 @@ unit-test
 { "1.0p-1074" } [ 1 bits>double >oct ] unit-test
 { "-0.0" } [ -0.0 >oct ] unit-test
 
-{ 1.0 } [ "1.0p0" hex> ] unit-test
-{ 1.5 } [ "1.8p0" hex> ] unit-test
-{ 1.875 } [ "1.ep0" hex> ] unit-test
-{ 1.90625 } [ "1.e8p0" hex> ] unit-test
-{ 1.03125 } [ "1.08p0" hex> ] unit-test
-{ 15.5 } [ "f.8p0" hex> ] unit-test
-{ 15.53125 } [ "f.88p0" hex> ] unit-test
-{ -15.5 } [ "-f.8p0" hex> ] unit-test
-{ 15.5 } [ "f.8p0" hex> ] unit-test
-{ -15.5 } [ "-f.8p0" hex> ] unit-test
-{ 62.0 } [ "f.8p2" hex> ] unit-test
-{ 3.875 } [ "f.8p-2" hex> ] unit-test
-{ $[ 1 bits>double ] } [ "1.0p-1074" hex> ] unit-test
-{ 0.0 } [ "1.0p-1075" hex> ] unit-test
-{ 1/0. } [ "1.0p1024" hex> ] unit-test
-{ -1/0. } [ "-1.0p1024" hex> ] unit-test
+{ 1.0 } [ "1.0p0" hex> ] literal-metadata-unit-test
+{ 1.5 } [ "1.8p0" hex> ] literal-metadata-unit-test
+{ 1.875 } [ "1.ep0" hex> ] literal-metadata-unit-test
+{ 1.90625 } [ "1.e8p0" hex> ] literal-metadata-unit-test
+{ 1.03125 } [ "1.08p0" hex> ] literal-metadata-unit-test
+{ 15.5 } [ "f.8p0" hex> ] literal-metadata-unit-test
+{ 15.53125 } [ "f.88p0" hex> ] literal-metadata-unit-test
+{ -15.5 } [ "-f.8p0" hex> ] literal-metadata-unit-test
+{ 15.5 } [ "f.8p0" hex> ] literal-metadata-unit-test
+{ -15.5 } [ "-f.8p0" hex> ] literal-metadata-unit-test
+{ 62.0 } [ "f.8p2" hex> ] literal-metadata-unit-test
+{ 3.875 } [ "f.8p-2" hex> ] literal-metadata-unit-test
+{ $[ 1 bits>double ] } [ "1.0p-1074" hex> ] literal-metadata-unit-test
+{ 0.0 } [ "1.0p-1075" hex> ] literal-metadata-unit-test
+{ 1/0. } [ "1.0p1024" hex> ] literal-metadata-unit-test
+{ -1/0. } [ "-1.0p1024" hex> ] literal-metadata-unit-test
 
-{ 1.0 } [ "1.0p0" bin> ] unit-test
-{ 1.5 } [ "1.1p0" bin> ] unit-test
-{ 1.875 } [ "1.111p0" bin> ] unit-test
-{ 1.90625 } [ "1.11101p0" bin> ] unit-test
-{ 1.03125 } [ "1.00001p0" bin> ] unit-test
-{ 15.5 } [ "1111.1p0" bin> ] unit-test
-{ 15.53125 } [ "1111.10001p0" bin> ] unit-test
-{ -15.5 } [ "-1111.1p0" bin> ] unit-test
-{ 15.5 } [ "1111.1p0" bin> ] unit-test
-{ -15.5 } [ "-1111.1p0" bin> ] unit-test
-{ 62.0 } [ "1111.1p2" bin> ] unit-test
-{ 3.875 } [ "1111.1p-2" bin> ] unit-test
-{ $[ 1 bits>double ] } [ "1.0p-1074" bin> ] unit-test
-{ 0.0 } [ "1.0p-1075" bin> ] unit-test
-{ 1/0. } [ "1.0p1024" bin> ] unit-test
-{ -1/0. } [ "-1.0p1024" bin> ] unit-test
+{ 1.0 } [ "1.0p0" bin> ] literal-metadata-unit-test
+{ 1.5 } [ "1.1p0" bin> ] literal-metadata-unit-test
+{ 1.875 } [ "1.111p0" bin> ] literal-metadata-unit-test
+{ 1.90625 } [ "1.11101p0" bin> ] literal-metadata-unit-test
+{ 1.03125 } [ "1.00001p0" bin> ] literal-metadata-unit-test
+{ 15.5 } [ "1111.1p0" bin> ] literal-metadata-unit-test
+{ 15.53125 } [ "1111.10001p0" bin> ] literal-metadata-unit-test
+{ -15.5 } [ "-1111.1p0" bin> ] literal-metadata-unit-test
+{ 15.5 } [ "1111.1p0" bin> ] literal-metadata-unit-test
+{ -15.5 } [ "-1111.1p0" bin> ] literal-metadata-unit-test
+{ 62.0 } [ "1111.1p2" bin> ] literal-metadata-unit-test
+{ 3.875 } [ "1111.1p-2" bin> ] literal-metadata-unit-test
+{ $[ 1 bits>double ] } [ "1.0p-1074" bin> ] literal-metadata-unit-test
+{ 0.0 } [ "1.0p-1075" bin> ] literal-metadata-unit-test
+{ 1/0. } [ "1.0p1024" bin> ] literal-metadata-unit-test
+{ -1/0. } [ "-1.0p1024" bin> ] literal-metadata-unit-test
 
-{ 1.0 } [ "1.0p0" oct> ] unit-test
-{ 1.5 } [ "1.4p0" oct> ] unit-test
-{ 1.875 } [ "1.7p0" oct> ] unit-test
-{ 1.90625 } [ "1.72p0" oct> ] unit-test
-{ 1.03125 } [ "1.02p0" oct> ] unit-test
-{ 15.5 } [ "17.4p0" oct> ] unit-test
-{ 15.53125 } [ "17.42p0" oct> ] unit-test
-{ -15.5 } [ "-17.4p0" oct> ] unit-test
-{ 15.5 } [ "17.4p0" oct> ] unit-test
-{ -15.5 } [ "-17.4p0" oct> ] unit-test
-{ 62.0 } [ "17.4p2" oct> ] unit-test
-{ 3.875 } [ "17.4p-2" oct> ] unit-test
-{ $[ 1 bits>double ] } [ "1.0p-1074" oct> ] unit-test
-{ 0.0 } [ "1.0p-1075" oct> ] unit-test
-{ 1/0. } [ "1.0p1024" oct> ] unit-test
-{ -1/0. } [ "-1.0p1024" oct> ] unit-test
+{ 1.0 } [ "1.0p0" oct> ] literal-metadata-unit-test
+{ 1.5 } [ "1.4p0" oct> ] literal-metadata-unit-test
+{ 1.875 } [ "1.7p0" oct> ] literal-metadata-unit-test
+{ 1.90625 } [ "1.72p0" oct> ] literal-metadata-unit-test
+{ 1.03125 } [ "1.02p0" oct> ] literal-metadata-unit-test
+{ 15.5 } [ "17.4p0" oct> ] literal-metadata-unit-test
+{ 15.53125 } [ "17.42p0" oct> ] literal-metadata-unit-test
+{ -15.5 } [ "-17.4p0" oct> ] literal-metadata-unit-test
+{ 15.5 } [ "17.4p0" oct> ] literal-metadata-unit-test
+{ -15.5 } [ "-17.4p0" oct> ] literal-metadata-unit-test
+{ 62.0 } [ "17.4p2" oct> ] literal-metadata-unit-test
+{ 3.875 } [ "17.4p-2" oct> ] literal-metadata-unit-test
+{ $[ 1 bits>double ] } [ "1.0p-1074" oct> ] literal-metadata-unit-test
+{ 0.0 } [ "1.0p-1075" oct> ] literal-metadata-unit-test
+{ 1/0. } [ "1.0p1024" oct> ] literal-metadata-unit-test
+{ -1/0. } [ "-1.0p1024" oct> ] literal-metadata-unit-test
 
 { 0 } [ "0" string>number ] unit-test
 { 0 } [ "00" string>number ] unit-test
 { 0 } [ "0,000" string>number ] unit-test
-{ 0.0 } [ "0." string>number ] unit-test
-{ 0.0 } [ "0.0" string>number ] unit-test
-{ 0.0 } [ "0x0.0p0" string>number ] unit-test
+{ 0.0 } [ "0." string>number ] literal-metadata-unit-test
+{ 0.0 } [ "0.0" string>number ] literal-metadata-unit-test
+{ 0.0 } [ "0x0.0p0" string>number ] literal-metadata-unit-test
 { 0 } [ "0x0" string>number ] unit-test
 { 0 } [ "0o0" string>number ] unit-test
 { 0 } [ "0b0" string>number ] unit-test
@@ -292,11 +292,11 @@ unit-test
 
 { 0x7FFF,ABCD } [ "0x7FFF,ABCD" string>number ] unit-test
 
-{ 1.0 } [ "0x1.0p0" string>number ] unit-test
-{ 6.0 } [ "0x1.8p2" string>number ] unit-test
-{ 0.375 } [ "0x1.8p-2" string>number ] unit-test
-{ -6.0 } [ "-0x1.8p2" string>number ] unit-test
-{ -0.375 } [ "-0x1.8p-2" string>number ] unit-test
+{ 1.0 } [ "0x1.0p0" string>number ] literal-metadata-unit-test
+{ 6.0 } [ "0x1.8p2" string>number ] literal-metadata-unit-test
+{ 0.375 } [ "0x1.8p-2" string>number ] literal-metadata-unit-test
+{ -6.0 } [ "-0x1.8p2" string>number ] literal-metadata-unit-test
+{ -0.375 } [ "-0x1.8p-2" string>number ] literal-metadata-unit-test
 
 { f } [ "0x" string>number ] unit-test
 { f } [ "0b" string>number ] unit-test
@@ -328,48 +328,48 @@ unit-test
 { f } [ "0x1.0" string>number ] unit-test
 
 ! hex float rounds to even on half
-{ 0x1.0000,0000,0000,0p0 } [ "0x1.0000,0000,0000,0,8p0" string>number ] unit-test
-{ 0x1.0000,0000,0000,2p0 } [ "0x1.0000,0000,0000,1,8p0" string>number ] unit-test
-{ 0x1.0000,0000,0000,0p0 } [ "0x8.0000,0000,0000,4p-3" string>number ] unit-test
-{ 0x1.0000,0000,0000,2p0 } [ "0x8.0000,0000,0000,Cp-3" string>number ] unit-test
+{ 0x1.0000,0000,0000,0p0 } [ "0x1.0000,0000,0000,0,8p0" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,2p0 } [ "0x1.0000,0000,0000,1,8p0" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,0p0 } [ "0x8.0000,0000,0000,4p-3" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,2p0 } [ "0x8.0000,0000,0000,Cp-3" string>number ] literal-metadata-unit-test
 
-{ -0x1.0000,0000,0000,0p0 } [ "-0x1.0000,0000,0000,0,8p0" string>number ] unit-test
-{ -0x1.0000,0000,0000,2p0 } [ "-0x1.0000,0000,0000,1,8p0" string>number ] unit-test
-{ -0x1.0000,0000,0000,0p0 } [ "-0x8.0000,0000,0000,4p-3" string>number ] unit-test
-{ -0x1.0000,0000,0000,2p0 } [ "-0x8.0000,0000,0000,Cp-3" string>number ] unit-test
+{ -0x1.0000,0000,0000,0p0 } [ "-0x1.0000,0000,0000,0,8p0" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,2p0 } [ "-0x1.0000,0000,0000,1,8p0" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,0p0 } [ "-0x8.0000,0000,0000,4p-3" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,2p0 } [ "-0x8.0000,0000,0000,Cp-3" string>number ] literal-metadata-unit-test
 
 ! hex float rounds to nearest with tiny epsilons
-{ 0x1.0000,0000,0000,0p0 } [ "0x1.0000,0000,0000,0,4p0" string>number ] unit-test
-{ 0x1.0000,0000,0000,0p0 } [ "0x1.0000,0000,0000,0,7Fp0" string>number ] unit-test
-{ 0x1.0000,0000,0000,0p0 } [ "0x1.0000,0000,0000,0,7FFF,FFFF,FFFF,FFFFp0" string>number ] unit-test
+{ 0x1.0000,0000,0000,0p0 } [ "0x1.0000,0000,0000,0,4p0" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,0p0 } [ "0x1.0000,0000,0000,0,7Fp0" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,0p0 } [ "0x1.0000,0000,0000,0,7FFF,FFFF,FFFF,FFFFp0" string>number ] literal-metadata-unit-test
 
-{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,0,Cp0" string>number ] unit-test
-{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,0,81p0" string>number ] unit-test
-{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,0,8000,0000,0000,0001p0" string>number ] unit-test
+{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,0,Cp0" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,0,81p0" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,0,8000,0000,0000,0001p0" string>number ] literal-metadata-unit-test
 
-{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,1,4p0" string>number ] unit-test
-{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,1,7Fp0" string>number ] unit-test
-{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,1,7FFF,FFFF,FFFF,FFFFp0" string>number ] unit-test
+{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,1,4p0" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,1,7Fp0" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,1p0 } [ "0x1.0000,0000,0000,1,7FFF,FFFF,FFFF,FFFFp0" string>number ] literal-metadata-unit-test
 
-{ 0x1.0000,0000,0000,2p0 } [ "0x1.0000,0000,0000,1,Cp0" string>number ] unit-test
-{ 0x1.0000,0000,0000,2p0 } [ "0x1.0000,0000,0000,1,81p0" string>number ] unit-test
-{ 0x1.0000,0000,0000,2p0 } [ "0x1.0000,0000,0000,1,8000,0000,0000,0001p0" string>number ] unit-test
+{ 0x1.0000,0000,0000,2p0 } [ "0x1.0000,0000,0000,1,Cp0" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,2p0 } [ "0x1.0000,0000,0000,1,81p0" string>number ] literal-metadata-unit-test
+{ 0x1.0000,0000,0000,2p0 } [ "0x1.0000,0000,0000,1,8000,0000,0000,0001p0" string>number ] literal-metadata-unit-test
 
-{ -0x1.0000,0000,0000,0p0 } [ "-0x1.0000,0000,0000,0,4p0" string>number ] unit-test
-{ -0x1.0000,0000,0000,0p0 } [ "-0x1.0000,0000,0000,0,7Fp0" string>number ] unit-test
-{ -0x1.0000,0000,0000,0p0 } [ "-0x1.0000,0000,0000,0,7FFF,FFFF,FFFF,FFFFp0" string>number ] unit-test
+{ -0x1.0000,0000,0000,0p0 } [ "-0x1.0000,0000,0000,0,4p0" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,0p0 } [ "-0x1.0000,0000,0000,0,7Fp0" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,0p0 } [ "-0x1.0000,0000,0000,0,7FFF,FFFF,FFFF,FFFFp0" string>number ] literal-metadata-unit-test
 
-{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,0,Cp0" string>number ] unit-test
-{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,0,81p0" string>number ] unit-test
-{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,0,8000,0000,0000,0001p0" string>number ] unit-test
+{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,0,Cp0" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,0,81p0" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,0,8000,0000,0000,0001p0" string>number ] literal-metadata-unit-test
 
-{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,1,4p0" string>number ] unit-test
-{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,1,7Fp0" string>number ] unit-test
-{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,1,7FFF,FFFF,FFFF,FFFFp0" string>number ] unit-test
+{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,1,4p0" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,1,7Fp0" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,1p0 } [ "-0x1.0000,0000,0000,1,7FFF,FFFF,FFFF,FFFFp0" string>number ] literal-metadata-unit-test
 
-{ -0x1.0000,0000,0000,2p0 } [ "-0x1.0000,0000,0000,1,Cp0" string>number ] unit-test
-{ -0x1.0000,0000,0000,2p0 } [ "-0x1.0000,0000,0000,1,81p0" string>number ] unit-test
-{ -0x1.0000,0000,0000,2p0 } [ "-0x1.0000,0000,0000,1,8000,0000,0000,0001p0" string>number ] unit-test
+{ -0x1.0000,0000,0000,2p0 } [ "-0x1.0000,0000,0000,1,Cp0" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,2p0 } [ "-0x1.0000,0000,0000,1,81p0" string>number ] literal-metadata-unit-test
+{ -0x1.0000,0000,0000,2p0 } [ "-0x1.0000,0000,0000,1,8000,0000,0000,0001p0" string>number ] literal-metadata-unit-test
 
 ! #453
 ! hex> dec> oct> bin> shouldn't admit radix prefixes
@@ -395,19 +395,19 @@ unit-test
 { f } [ "0x0" bin> ] unit-test
 
 ! #1229, float parsing bug, and a regression
-{ -0.5 } [ "-.5" dec> ] unit-test
+{ -0.5 } [ "-.5" dec> ] literal-metadata-unit-test
 { 0 } [ "0" hex> ] unit-test
 
 { t } [ most-positive-fixnum number>string string>number fixnum? ] unit-test
 { t } [ most-negative-fixnum number>string string>number fixnum? ] unit-test
 
 ! large/small numbers/exponents correctly cancel out
-{ 1.0 } [ "1" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
-{ 1.0 } [ "0x1" 1000 [ CHAR: 0 ] "" replicate-as append "p-4000" append string>number ] unit-test
-{ 1.0 } [ "0." 3000 [ CHAR: 0 ] "" replicate-as append "1e3001" append string>number ] unit-test
-{ 1.0 } [ "0x0." 1000 [ CHAR: 0 ] "" replicate-as append "1p4004" append string>number ] unit-test
+{ 1.0 } [ "1" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] literal-metadata-unit-test
+{ 1.0 } [ "0x1" 1000 [ CHAR: 0 ] "" replicate-as append "p-4000" append string>number ] literal-metadata-unit-test
+{ 1.0 } [ "0." 3000 [ CHAR: 0 ] "" replicate-as append "1e3001" append string>number ] literal-metadata-unit-test
+{ 1.0 } [ "0x0." 1000 [ CHAR: 0 ] "" replicate-as append "1p4004" append string>number ] literal-metadata-unit-test
 { 1.0 } [ "1" 3000 [ CHAR: 0 ] "" replicate-as append "." append
-              3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+              3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] literal-metadata-unit-test
 
 ! We correctly parse the biggest/smallest float correctly
 ! (ie the 1/0. or 0/0. short-circuit optimization doesn't apply)
@@ -421,20 +421,20 @@ unit-test
 { 0x7fefffffffffffff } [ "0b1.1111111111111111111111111111111111111111111111111111p1023" string>number double>bits ] unit-test
 ! Actual biggest/smallest parseable floats are a little
 ! larger/smaller than IEE754 values because of rounding
-{ 0x1.0p-1074 } [ "0x0.fffffffffffffcp-1074" string>number ] unit-test
-{ 4.94065645841246544e-324 } [ "4.94065645841246517e-324" string>number ] unit-test
-{ 0x1.fffffffffffffp1023 } [ "0x1.fffffffffffff7ffffffffffffffffp1023" string>number ] unit-test
-{ 1.79769313486231571e+308 } [ "1.797693134862315807e+308" string>number ] unit-test
+{ 0x1.0p-1074 } [ "0x0.fffffffffffffcp-1074" string>number ] literal-metadata-unit-test
+{ 4.94065645841246544e-324 } [ "4.94065645841246517e-324" string>number ] literal-metadata-unit-test
+{ 0x1.fffffffffffffp1023 } [ "0x1.fffffffffffff7ffffffffffffffffp1023" string>number ] literal-metadata-unit-test
+{ 1.79769313486231571e+308 } [ "1.797693134862315807e+308" string>number ] literal-metadata-unit-test
 
 ! XXX: disable for right now, see #1362 or #1408
 ! { 0.25 } [ "1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
 ! { 1.25 } [ "1+1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
 
 ! #1356 #1231
-{ 1/0. } [ "1e100000" string>number ] unit-test
-{ 0.0  } [ "1e-100000" string>number ] unit-test
-{ 1/0. } [ "0x1p300000" string>number ] unit-test
-{ 0.0  } [ "0x1p-300000" string>number ] unit-test
+{ 1/0. } [ "1e100000" string>number ] literal-metadata-unit-test
+{ 0.0  } [ "1e-100000" string>number ] literal-metadata-unit-test
+{ 1/0. } [ "0x1p300000" string>number ] literal-metadata-unit-test
+{ 0.0  } [ "0x1p-300000" string>number ] literal-metadata-unit-test
 
 { "143.99999999999997" } [ 0x1.1ffffffffffffp7 number>string ] unit-test
 { "144.0" } [ 0x1.2p7 number>string ] unit-test
@@ -617,7 +617,7 @@ unit-test
     1.3201219024272826e+162   1.3893748715780833e+65
       6.447847606411378e+49    5.465125341473931e+80
 } [| n |
-    { n } [ n float>dec dec> ] unit-test
+    { n } [ n float>dec dec> ] literal-metadata-unit-test
 ] each
 
 {
@@ -658,3 +658,13 @@ unit-test
     { 0.0 -0.0 1.25 -1.25 5.0e-324 1.7976931348623157e308 }
     [ 10 >base ] map
 ] unit-test
+
+! Exact mixed IEEE literals assemble their integer ratio before rounding.
+{ 0x3ffaaaaaaaaaaaab }
+[ 1 2 3 mixed-literal-ratio boa ?add-ratio double>bits ] unit-test
+{ 0xbffaaaaaaaaaaaab }
+[ 1 2 3 mixed-literal-ratio boa ?add-ratio ?neg double>bits ] unit-test
+{ 0x3ff0000000000000 }
+[ 1 1 9007199254740992 mixed-literal-ratio boa ?add-ratio double>bits ] unit-test
+{ 0x3ff0000000000002 }
+[ 1 3 9007199254740992 mixed-literal-ratio boa ?add-ratio double>bits ] unit-test

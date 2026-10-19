@@ -1,0 +1,9 @@
+# NetBSD's native N64 userland uses the soft-float C ABI. Factor's JIT
+# retains hardware floating point and transports native FP values in GPRs.
+include vm/Config.netbsd
+include vm/Config.mips.64
+PLAF_MASTER_HEADERS += vm/os-netbsd-mips.hpp
+# MIPS III is compatible with the 5Kf Malta foundation and NetBSD userland.
+CFLAGS += -march=mips3 -msoft-float
+CXXFLAGS += -march=mips3 -msoft-float
+ASFLAGS += -march=mips3 -msoft-float

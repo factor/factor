@@ -6,6 +6,10 @@ void factor_vm::primitive_exit() { exit((int)to_fixnum(ctx->pop())); }
 
 void exit(int status) {
   close_console();
+#ifdef FACTOR_ANDROID
+  if (android_embedded_runtime_p())
+    android_process_exit(status);
+#endif
   ::exit(status);
 }
 

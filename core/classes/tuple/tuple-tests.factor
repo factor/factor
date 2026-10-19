@@ -545,9 +545,19 @@ unit-test
 must-fail-with
 
 ! Check fixnum coercer
-[ 0.0 "hi" declared-types boa n>> ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
+[ 0.0 "hi" declared-types boa n>> ] [
+    dup no-method? [
+        [ object>> double>bits 0 = ]
+        [ generic>> \ integer>fixnum-strict eq? ] bi and
+    ] [ drop f ] if
+] must-fail-with
 
-[ declared-types new 0.0 >>n n>> ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
+[ declared-types new 0.0 >>n n>> ] [
+    dup no-method? [
+        [ object>> double>bits 0 = ]
+        [ generic>> \ integer>fixnum-strict eq? ] bi and
+    ] [ drop f ] if
+] must-fail-with
 
 { T{ declared-types f 33333 "asdf" } }
 [ 33333 >bignum "asdf" declared-types boa ] unit-test
@@ -561,29 +571,44 @@ must-fail-with
 ! Check bignum coercer
 TUPLE: bignum-coercer { n bignum initial: $[ 0 >bignum ] } ;
 
-{ 13 bignum } [ 13.5 bignum-coercer boa n>> dup class-of ] unit-test
+{ 13 bignum } [ 13.5 bignum-coercer boa n>> dup class-of ] floating-point-unit-test
 
-{ 13 bignum } [ bignum-coercer new 13.5 >>n n>> dup class-of ] unit-test
+{ 13 bignum } [ bignum-coercer new 13.5 >>n n>> dup class-of ] floating-point-unit-test
 
 ! Check float coercer
 TUPLE: float-coercer { n float } ;
 
-{ 13.0 float } [ 13 float-coercer boa n>> dup class-of ] unit-test
+{ 13.0 float } [ 13 float-coercer boa n>> dup class-of ] floating-point-unit-test
 
-{ 13.0 float } [ float-coercer new 13 >>n n>> dup class-of ] unit-test
+{ 13.0 float } [ float-coercer new 13 >>n n>> dup class-of ] floating-point-unit-test
 
 ! Check integer coercer
 TUPLE: integer-coercer { n integer } ;
 
-[ 13.5 integer-coercer boa n>> dup class-of ] [ T{ bad-slot-value f 13.5 integer } = ] must-fail-with
+[ 13.5 integer-coercer boa n>> dup class-of ] [
+    dup bad-slot-value? [
+        [ value>> double>bits 0x402b000000000000 = ]
+        [ class>> integer eq? ] bi and
+    ] [ drop f ] if
+] must-fail-with
 
-[ integer-coercer new 13.5 >>n n>> dup class-of ] [ T{ bad-slot-value f 13.5 integer } = ] must-fail-with
+[ integer-coercer new 13.5 >>n n>> dup class-of ] [
+    dup bad-slot-value? [
+        [ value>> double>bits 0x402b000000000000 = ]
+        [ class>> integer eq? ] bi and
+    ] [ drop f ] if
+] must-fail-with
 
 : foo ( a b -- c ) declared-types boa ;
 
 \ foo def>> must-infer
 
-[ 0.0 "hi" foo ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
+[ 0.0 "hi" foo ] [
+    dup no-method? [
+        [ object>> double>bits 0 = ]
+        [ generic>> \ integer>fixnum-strict eq? ] bi and
+    ] [ drop f ] if
+] must-fail-with
 
 [ "hi" 0.0 declared-types boa ]
 [ T{ no-method f "hi" integer>fixnum-strict } = ]

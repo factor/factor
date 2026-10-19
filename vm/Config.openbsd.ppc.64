@@ -1,0 +1,10 @@
+include vm/Config.openbsd
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-ppc.linux.o $(BUILD_DIR)/cpu-ppc.o
+PLAF_MASTER_HEADERS += vm/os-openbsd-ppc.64.hpp vm/cpu-ppc.hpp vm/powerpc.hpp
+ARCHITECTURE_FLAG := -m64 -mabi=elfv2
+
+# Keep collector retry conditions in GPRs across ELFv2 exception unwinding.
+# The complete image-less GC suite exercises the throw/rethrow retry path.
+ifeq ($(IS_CLANG),1)
+CXXFLAGS += -mllvm -ppc-disable-non-volatile-cr
+endif

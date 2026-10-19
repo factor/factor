@@ -1,7 +1,7 @@
 USING: accessors compiler.cfg compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.ranges
-compiler.cfg.registers cpu.architecture cpu.x86.assembler.operands heaps kernel
+compiler.cfg.registers cpu.architecture cpu.x86.assembler.operands heaps kernel literals
 namespaces system tools.test ;
 IN: compiler.cfg.linear-scan.allocation.tests
 
@@ -33,12 +33,12 @@ cpu x86.64? [
     ] unit-test
 
     ! register-status
-    { { RAX 1/0. } } [
+    { { RAX $[ allocation-infinity ] } } [
         f machine-registers init-allocator
         interval-[30,46] machine-registers register-status
     ] unit-test
 
-    { { RBX 1/0. } } [
+    { { RBX $[ allocation-infinity ] } } [
         f machine-registers init-allocator
         H{ { 25 int-rep } { 49 int-rep } } representations set
         interval-[30,60] add-active
@@ -48,18 +48,18 @@ cpu x86.64? [
     ! free-positions
     {
         {
-            { RAX 1/0. }
-            { RBX 1/0. }
-            { RCX 1/0. }
-            { RDX 1/0. }
-            { RBP 1/0. }
-            { RSI 1/0. }
-            { RDI 1/0. }
-            { R8 1/0. }
-            { R9 1/0. }
-            { R10 1/0. }
-            { R11 1/0. }
-            { R12 1/0. }
+            { RAX $[ allocation-infinity ] }
+            { RBX $[ allocation-infinity ] }
+            { RCX $[ allocation-infinity ] }
+            { RDX $[ allocation-infinity ] }
+            { RBP $[ allocation-infinity ] }
+            { RSI $[ allocation-infinity ] }
+            { RDI $[ allocation-infinity ] }
+            { R8 $[ allocation-infinity ] }
+            { R9 $[ allocation-infinity ] }
+            { R10 $[ allocation-infinity ] }
+            { R11 $[ allocation-infinity ] }
+            { R12 $[ allocation-infinity ] }
         }
     } [
         machine-registers int-regs free-positions

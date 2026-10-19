@@ -10,8 +10,14 @@ FROM: sequences.private => array-capacity ;
 IN: compiler.tree.propagation.recursive
 
 : check-fixed-point ( node infos1 infos2 -- )
-    [ value-info<= ] 2all?
-    [ drop ] [ label>> f >>fixed-point drop ] if ;
+    ! A bottom argument makes this recursive edge unreachable. Its other
+    ! arguments cannot invalidate the fixed point of reachable edges.
+    over [ class>> null-class? ] any? [
+        3drop
+    ] [
+        [ value-info<= ] 2all?
+        [ drop ] [ label>> f >>fixed-point drop ] if
+    ] if ;
 
 : latest-input-infos ( node -- infos )
     in-d>> [ value-info ] map ;

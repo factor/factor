@@ -1,0 +1,22 @@
+--- a/std/c.zig
++++ b/std/c.zig
+@@ -11150,6 +11150,7 @@
+         ENABLE = 1,
+         DISABLE = 0,
+     },
++    .openbsd => enum(c_int) { ENABLE = 0, DISABLE = 1 },
+     .linux => if (native_abi.isMusl()) enum(c_int) {
+         ENABLE = 0,
+         DISABLE = 1,
+--- a/std/c/openbsd.zig
++++ b/std/c/openbsd.zig
+@@ -269,8 +269,8 @@
+ };
+ 
+ pub const MAX_PAGE_SHIFT = switch (builtin.cpu.arch) {
+-    .x86 => 12,
+     .sparc64 => 13,
++    else => 12,
+ };
+ 
+ pub const PTHREAD_STACK_MIN = switch (builtin.cpu.arch) {

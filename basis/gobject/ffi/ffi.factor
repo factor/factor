@@ -14,6 +14,7 @@ LIBRARY: gobject
 C-LIBRARY: gobject {
     { windows "libgobject-2.0-0.dll" }
     { macos "libgobject-2.0.dylib" }
+    { haiku "libgobject-2.0.so.0" }
     { linux "libgobject-2.0.so.0" }
     { unix "libgobject-2.0.so" }
 }

@@ -1,0 +1,6 @@
+include vm/Config.openbsd
+include vm/Config.arm.32
+# OpenBSD armv7 uses base AAPCS, with VFP instructions but core FP arguments.
+CFLAGS := $(filter-out -mfloat-abi=hard,$(CFLAGS)) -mfloat-abi=softfp
+CXXFLAGS := $(filter-out -mfloat-abi=hard,$(CXXFLAGS)) -mfloat-abi=softfp
+ASFLAGS := $(filter-out -mfloat-abi=hard,$(ASFLAGS)) -mfloat-abi=softfp

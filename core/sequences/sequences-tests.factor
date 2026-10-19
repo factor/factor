@@ -490,7 +490,7 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
         { 135 0 95 }
         { 255 0 175 }
     } [ { 0 0 255 } distance ] minimum-by
-] unit-test
+] floating-point-unit-test
 
 [ -1 0 <repetition> ] must-fail
 { { } } [ 0 0 <repetition> >array ] unit-test

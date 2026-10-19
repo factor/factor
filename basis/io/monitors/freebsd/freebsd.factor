@@ -1,16 +1,10 @@
-USING: kernel io.backend io.monitors io.monitors.recursive
-io.files io.pathnames io.buffers io.ports io.timeouts
-io.backend.unix io.encodings.utf8 assocs namespaces make
-sequences locals system destructors accessors ;
+! Copyright (C) 2026 Doug Coleman.
+! See https://factorcode.org/license.txt for BSD license.
+USING: io.backend io.monitors io.monitors.bsd system ;
 IN: io.monitors.freebsd
 
-TUPLE: freebsd-monitor < monitor handle ;
-
-M:: freebsd (monitor) ( path recursive? mailbox -- monitor )
-    path normalize-path :> path
-    path mailbox freebsd-monitor new-monitor ;
-
-M: freebsd-monitor dispose*
-    [ handle>> dispose ] [ call-next-method ] bi ;
+M: freebsd init-monitors init-bsd-monitors ;
+M: freebsd dispose-monitors dispose-bsd-monitors ;
+M: freebsd (monitor) <bsd-monitor> ;
 
 freebsd set-io-backend

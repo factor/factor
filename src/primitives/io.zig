@@ -1,3 +1,4 @@
+const builtin = @import("builtin");
 // primitives/io.zig - File I/O and image saving primitives
 
 const std = @import("std");
@@ -394,9 +395,10 @@ pub export fn primitive_existsp(vm_asm: *VMAssemblyFields) callconv(.c) void {
     // Use std.c.stat extern to check if file exists (posix.stat doesn't exist in std)
     const S = struct {
         extern "c" fn stat(path: [*:0]const u8, buf: *anyopaque) c_int;
+        extern "c" fn __stat50(path: [*:0]const u8, buf: *anyopaque) c_int;
     };
-    var stat_buf: [256]u8 = undefined; // Buffer for stat struct
-    const result = S.stat(path_data, &stat_buf);
+    var stat_buf: [256]u8 align(16) = undefined; // Native stat may use aligned doubleword stores.
+    const result = if (builtin.os.tag == .netbsd) S.__stat50(path_data, &stat_buf) else S.stat(path_data, &stat_buf);
 
     vm.push(vm.tagBoolean(result >= 0));
 }

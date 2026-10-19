@@ -1,4 +1,5 @@
-USING: bootstrap.image io.pathnames kernel pcre2 sequences
+USING: bootstrap.image io.directories io.files.temp io.pathnames kernel
+namespaces pcre2 sequences
 tools.deploy.backend tools.test ;
 IN: tools.deploy.backend.tests
 
@@ -26,6 +27,15 @@ IN: tools.deploy.backend.tests
 ] unit-test
 
 ! staging-command-line
+! The first stage reads the seed from resource:, while later stages read
+! the writable user cache. Neither lookup depends on the launch directory.
+{ t t } [ [
+    { "compiler" } input-image-name
+    my-boot-image-name resource-path =
+    { "compiler" "ui" } input-image-name
+    { "compiler" } staging-image-name =
+] with-test-directory ] unit-test
+
 { t } [
     { "one" "two" } staging-command-line
     {

@@ -5,6 +5,7 @@ IN: opengl.gl.extensions
 
 ERROR: unknown-gl-platform ;
 << {
+    { [ os android? ] [ "opengl.gl.android" ] }
     { [ os windows? ] [ "opengl.gl.windows" ] }
     { [ os macos? ]  [ "opengl.gl.macos" ] }
     { [ os unix? ] [

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "support": {
+    "freebsd": {
+      "release": "14.5-RELEASE",
+      "riscv32": false,
+      "riscv64": true,
+      "sources": [
+        "https://www.freebsd.org/releases/14.5R/hardware/",
+        "https://download.freebsd.org/releases/VM-IMAGES/14.5-RELEASE/riscv64/Latest/"
+      ]
+    },
+    "openbsd": {
+      "release": "7.9",
+      "riscv32": false,
+      "riscv64": true,
+      "sources": [
+        "https://www.openbsd.org/riscv64.html",
+        "https://cdn.openbsd.org/pub/OpenBSD/7.9/riscv64/INSTALL.riscv64"
+      ]
+    },
+    "netbsd": {
+      "release": "11.0",
+      "riscv32": false,
+      "riscv64": true,
+      "sources": [
+        "https://wiki.netbsd.org/ports/riscv/",
+        "https://wiki.netbsd.org/ports/qemu_riscv/",
+        "https://netbsd.org/releases/formal-11/NetBSD-11.0.html"
+      ]
+    },
+    "dragonfly": {
+      "release": "6.4",
+      "riscv32": false,
+      "riscv64": false,
+      "sources": [
+        "https://www.dragonflybsd.org/download/"
+      ]
+    }
+  },
+  "factor_status": "BSD_PORT_IN_PROGRESS",
+  "firmware": "QEMU default OpenSBI; U-Boot qemu-riscv64_smode for FreeBSD/OpenBSD; direct GENERIC64 ELF kernel for NetBSD"
+}

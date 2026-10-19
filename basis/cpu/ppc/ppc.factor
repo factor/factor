@@ -4,8 +4,8 @@ USING: accessors alien alien.accessors alien.c-types alien.complex alien.data
 alien.libraries assocs byte-arrays classes.algebra classes.struct combinators
 compiler.cfg compiler.cfg.build-stack-frame compiler.cfg.comparisons
 compiler.cfg.instructions compiler.cfg.intrinsics compiler.cfg.registers
-compiler.cfg.stack-frame compiler.codegen compiler.codegen.fixup
-compiler.constants compiler.units cpu.architecture cpu.ppc.assembler fry io
+compiler.cfg.stack-frame compiler.codegen compiler.codegen.relocation compiler.codegen.labels compiler.codegen.gc-maps
+compiler.constants compiler.units cpu.architecture cpu.ppc.assembler cpu.ppc.relocation fry io
 kernel layouts literals locals make math math.order ranges memory
 namespaces prettyprint sequences system vm words ;
 QUALIFIED-WITH: alien.c-types c
@@ -36,7 +36,10 @@ HOOK: allows-null-dereference os ( -- ? )
 
 M: label B  [ 0 B  ] dip rc-relative-ppc-3-pc label-fixup ;
 M: label BL [ 0 BL ] dip rc-relative-ppc-3-pc label-fixup ;
-M: label BC [ 0 BC ] dip rc-relative-ppc-2-pc label-fixup ;
+! Conditional branches have only a signed 16-bit byte displacement.
+! Keep the condition local and let a full-range B reach the target label.
+! Two local branches preserve BO/BI, including CTR decrement semantics.
+M: label BC [ 8 BC 8 B ] dip B ;
 
 CONSTANT: scratch-reg    30
 CONSTANT: fp-scratch-reg 30
@@ -52,7 +55,7 @@ M: ppc machine-registers
 
 M: ppc frame-reg 31 ;
 M: ppc.32 vm-stack-space 16 ;
-M: ppc.64 vm-stack-space 32 ;
+M: ppc64 vm-stack-space 32 ;
 M: ppc complex-addressing? f ;
 
 ! PW1-PW8 parameter save slots
@@ -85,53 +88,53 @@ M: ppc gc-root-offset
 
 HOOK: %clear-tag-bits cpu ( dst src -- )
 M: ppc.32 %clear-tag-bits tag-bits get CLRRWI ;
-M: ppc.64 %clear-tag-bits tag-bits get CLRRDI ;
+M: ppc64 %clear-tag-bits tag-bits get CLRRDI ;
 
 HOOK: %store-cell cpu ( dst src offset -- )
 M: ppc.32 %store-cell STW ;
-M: ppc.64 %store-cell STD ;
+M: ppc64 %store-cell STD ;
 
 HOOK: %store-cell-x cpu ( dst src offset -- )
 M: ppc.32 %store-cell-x STWX ;
-M: ppc.64 %store-cell-x STDX ;
+M: ppc64 %store-cell-x STDX ;
 
 HOOK: %store-cell-update cpu ( dst src offset -- )
 M: ppc.32 %store-cell-update STWU ;
-M: ppc.64 %store-cell-update STDU ;
+M: ppc64 %store-cell-update STDU ;
 
 HOOK: %load-cell cpu ( dst src offset -- )
 M: ppc.32 %load-cell LWZ ;
-M: ppc.64 %load-cell LD ;
+M: ppc64 %load-cell LD ;
 
 HOOK: %trap-null cpu ( src -- )
 M: ppc.32 %trap-null
     allows-null-dereference [ 0 TWEQI ] [ drop ] if ;
-M: ppc.64 %trap-null
+M: ppc64 %trap-null
     allows-null-dereference [ 0 TDEQI ] [ drop ] if ;
 
 HOOK: %load-cell-x cpu ( dst src offset -- )
 M: ppc.32 %load-cell-x LWZX ;
-M: ppc.64 %load-cell-x LDX ;
+M: ppc64 %load-cell-x LDX ;
 
 HOOK: %load-cell-imm cpu ( dst imm -- )
 M: ppc.32 %load-cell-imm LOAD32 ;
-M: ppc.64 %load-cell-imm LOAD64 ;
+M: ppc64 %load-cell-imm LOAD64 ;
 
 HOOK: %compare-cell cpu ( cr lhs rhs -- )
 M: ppc.32 %compare-cell CMPW ;
-M: ppc.64 %compare-cell CMPD ;
+M: ppc64 %compare-cell CMPD ;
 
 HOOK: %compare-cell-imm cpu ( cr lhs imm -- )
 M: ppc.32 %compare-cell-imm CMPWI ;
-M: ppc.64 %compare-cell-imm CMPDI ;
+M: ppc64 %compare-cell-imm CMPDI ;
 
 HOOK: %load-cell-imm-rc cpu ( -- rel-class )
 M: ppc.32 %load-cell-imm-rc rc-absolute-ppc-2/2 ;
-M: ppc.64 %load-cell-imm-rc rc-absolute-ppc-2/2/2/2  ;
+M: ppc64 %load-cell-imm-rc rc-absolute-ppc-2/2/2/2  ;
 
 M: ppc.32 %load-immediate
     dup -0x8000 0x7fff between? [ LI ] [ LOAD32 ] if ;
-M: ppc.64 %load-immediate
+M: ppc64 %load-immediate
     dup -0x8000 0x7fff between? [ LI ] [ LOAD64 ] if ;
 
 M: ppc %load-reference
@@ -171,8 +174,8 @@ M:: ppc %replace-imm ( src loc -- )
         { [ dup not ] [
             drop scratch-reg \ f type-number LI ] }
         { [ dup fixnum? ] [
-            [ scratch-reg ] dip tag-fixnum LI ] }
-        [ scratch-reg 0 LI rc-absolute rel-literal ]
+            [ scratch-reg ] dip tag-fixnum %load-immediate ] }
+        [ [ scratch-reg ] dip %load-reference ]
     } cond
     scratch-reg reg offset %store-cell ;
 
@@ -191,13 +194,15 @@ M: ppc stack-frame-size
     16 align ;
 
 M: ppc %call
-    0 BL rc-relative-ppc-3-pc rel-word-pic ;
+    12 0 %load-cell-imm %load-cell-imm-rc rel-word-pic
+    12 MTCTR BCTRL ;
 
 : instrs ( n -- b ) 4 * ; inline
 
 M: ppc %jump
-    6 0 %load-cell-imm 1 instrs %load-cell-imm-rc rel-here
-    0 B rc-relative-ppc-3-pc rel-word-pic-tail ;
+    6 0 %load-cell-imm cpu ppc.32? [ 4 ] [ 7 ] if instrs %load-cell-imm-rc rel-here
+    12 0 %load-cell-imm %load-cell-imm-rc rel-word-pic-tail
+    12 MTCTR BCTR ;
 
 M: ppc %dispatch
     [ nip 0 %load-cell-imm 3 instrs %load-cell-imm-rc rel-here ]
@@ -224,7 +229,7 @@ M: ppc    %add-imm    ADDI  ;
 M: ppc    %sub        SUB   ;
 M: ppc    %sub-imm    SUBI  ;
 M: ppc.32 %mul        MULLW ;
-M: ppc.64 %mul        MULLD ;
+M: ppc64 %mul        MULLD ;
 M: ppc    %mul-imm    MULLI ;
 M: ppc    %and        AND   ;
 M: ppc    %and-imm    ANDI. ;
@@ -233,27 +238,37 @@ M: ppc    %or-imm     ORI   ;
 M: ppc    %xor        XOR   ;
 M: ppc    %xor-imm    XORI  ;
 M: ppc.32 %shl        SLW   ;
-M: ppc.64 %shl        SLD   ;
+M: ppc64 %shl        SLD   ;
 M: ppc.32 %shl-imm    SLWI  ;
-M: ppc.64 %shl-imm    SLDI  ;
+M: ppc64 %shl-imm    SLDI  ;
 M: ppc.32 %shr        SRW   ;
-M: ppc.64 %shr        SRD   ;
+M: ppc64 %shr        SRD   ;
 M: ppc.32 %shr-imm    SRWI  ;
-M: ppc.64 %shr-imm    SRDI  ;
+M: ppc64 %shr-imm    SRDI  ;
 M: ppc.32 %sar        SRAW  ;
-M: ppc.64 %sar        SRAD  ;
+M: ppc64 %sar        SRAD  ;
 M: ppc.32 %sar-imm    SRAWI ;
-M: ppc.64 %sar-imm    SRADI ;
-M: ppc.32 %min        [ 0 CMPW ] [ 0 ISEL ] 2bi ;
-M: ppc.64 %min        [ 0 CMPD ] [ 0 ISEL ] 2bi ;
-M: ppc.32 %max        [ 0 CMPW ] [ swap 0 ISEL ] 2bi ;
-M: ppc.64 %max        [ 0 CMPD ] [ swap 0 ISEL ] 2bi ;
+M: ppc64 %sar-imm    SRADI ;
+! ISEL is unavailable on older PowerPC CPUs such as the 750 and 970.
+! Branch before writing either input so register allocation may alias dst.
+:: select-integer ( dst src1 src2 branch -- )
+    "select-first" define-label "select-end" define-label
+    0 src1 src2 %compare-cell
+    0 "select-first" get branch execute( cr address -- )
+    dst src2 MR
+    "select-end" get B
+    "select-first" get resolve-label
+    dst src1 MR
+    "select-end" get resolve-label ;
+
+M: ppc %min \ BLE select-integer ;
+M: ppc %max \ BGE select-integer ;
 M: ppc    %not        NOT ;
 M: ppc    %neg        NEG ;
 M: ppc.32 %log2       [ CNTLZW ] [ drop dup NEG ] [ drop dup 31 ADDI ] 2tri ;
-M: ppc.64 %log2       [ CNTLZD ] [ drop dup NEG ] [ drop dup 63 ADDI ] 2tri ;
+M: ppc64 %log2       [ CNTLZD ] [ drop dup NEG ] [ drop dup 63 ADDI ] 2tri ;
 M: ppc.32 %bit-count  POPCNTW ;
-M: ppc.64 %bit-count  POPCNTD ;
+M: ppc64 %bit-count  POPCNTD ;
 
 M: ppc %copy
     2over eq? [ 3drop ] [
@@ -284,7 +299,7 @@ M: ppc %fixnum-sub
 
 M: ppc.32 %fixnum-mul
     [ MULLWO. ] overflow-template ;
-M: ppc.64 %fixnum-mul
+M: ppc64 %fixnum-mul
     [ MULLDO. ] overflow-template ;
 
 M: ppc %add-float FADD ;
@@ -310,28 +325,28 @@ M: ppc integer-float-needs-stack-frame? t ;
     reserved-area-size + ;
 
 M:: ppc.32 %integer>float ( dst src -- )
-    ! Sign extend to a doubleword and store.
-    scratch-reg src 31 %sar-imm
+    ! Bias the signed word into an exactly representable IEEE double.
+    ! FCFID is not implemented by classic 32-bit PowerPC processors.
+    scratch-reg src 0x8000 XORIS
+    scratch-reg 1 4 scratch@ STW
+    scratch-reg 0x4330 LIS
     scratch-reg 1 0 scratch@ STW
-    src 1 4 scratch@ STW
-    ! Load back doubleword into FPR and convert from integer.
     dst 1 0 scratch@ LFD
-    dst dst FCFID ;
+    fp-scratch-reg B{ 67 48 0 0 128 0 0 0 } %load-double
+    dst dst fp-scratch-reg FSUB ;
 
-M:: ppc.64 %integer>float ( dst src -- )
+M:: ppc64 %integer>float ( dst src -- )
     src 1 0 scratch@ STD
     dst 1 0 scratch@ LFD
     dst dst FCFID ;
 
 M:: ppc.32 %float>integer ( dst src -- )
-    fp-scratch-reg src FRIZ
-    fp-scratch-reg fp-scratch-reg FCTIWZ
+    fp-scratch-reg src FCTIWZ
     fp-scratch-reg 1 0 scratch@ STFD
     dst 1 4 scratch@ LWZ ;
 
-M:: ppc.64 %float>integer ( dst src -- )
-    fp-scratch-reg src FRIZ
-    fp-scratch-reg fp-scratch-reg FCTID
+M:: ppc64 %float>integer ( dst src -- )
+    fp-scratch-reg src FCTIDZ
     fp-scratch-reg 1 0 scratch@ STFD
     dst 1 0 scratch@ LD ;
 
@@ -403,11 +418,11 @@ M:: ppc %save-context ( temp1 temp2 -- )
     rs-reg temp1 "retainstack" context offset-of %store-cell ;
 
 M:: ppc %c-invoke ( name dll gc-map -- )
-    11 0 %load-cell-imm name dll %load-cell-imm-rc rel-dlsym
+    12 0 %load-cell-imm name dll %load-cell-imm-rc rel-dlsym
     has-toc [
         2 0 %load-cell-imm name dll %load-cell-imm-rc rel-dlsym-toc
     ] when
-    11 MTCTR
+    12 MTCTR
     BCTRL
     gc-map gc-map-here ;
 
@@ -437,23 +452,76 @@ M:: ppc %c-invoke ( name dll gc-map -- )
 :: load-reg-param ( vreg rep reg -- )
     reg rep vreg %spill ;
 
-:: load-stack-param ( vreg rep n -- )
-    rep scratch-reg-class n param@ rep {
-        { int-rep    [ [ frame-reg ] dip %load-cell ] }
-        { tagged-rep [ [ frame-reg ] dip %load-cell ] }
-        { float-rep  [ [ frame-reg ] dip LFS ] }
-        { double-rep [ [ frame-reg ] dip LFD ] }
-        { vector-rep [ scratch-reg swap LI frame-reg scratch-reg LVX ] }
-        { scalar-rep [ scratch-reg swap LI frame-reg scratch-reg LVX ] }
-    } case
+HOOK: ppc64-stack-shadows? cpu ( -- ? )
+M: object ppc64-stack-shadows? f ;
+
+! Fixed ELFv2 HFA tails can arrive in GP registers after the FPR bank ends.
+! Use this callback's own parameter area to reinterpret the packed GP word.
+:: load-ppc64-register-tail ( vreg rep n -- )
+    n 8 /i :> slot
+    slot 3 + 1 slot 8 * param@ %store-cell
+    rep scratch-reg-class 1 n param@
+    rep float-rep? [ LFS ] [ LFD ] if
     rep scratch-reg-class rep vreg %spill ;
+
+:: load-stack-param ( vreg rep n -- )
+    ppc64-stack-shadows? rep reg-class-of float-regs = and n 64 < and [
+        vreg rep n load-ppc64-register-tail
+    ] [
+        rep scratch-reg-class n param@ rep {
+            { int-rep    [ [ frame-reg ] dip %load-cell ] }
+            { tagged-rep [ [ frame-reg ] dip %load-cell ] }
+            { float-rep  [ [ frame-reg ] dip LFS ] }
+            { double-rep [ [ frame-reg ] dip LFD ] }
+            { vector-rep [ scratch-reg swap LI frame-reg scratch-reg LVX ] }
+            { scalar-rep [ scratch-reg swap LI frame-reg scratch-reg LVX ] }
+        } case
+        rep scratch-reg-class rep vreg %spill
+    ] if ;
+
+! SysV PPC32 variadic callees use CR6 to decide whether to save FPRs.
+:: ppc-varargs-indicator ( varargs? reg-inputs -- )
+    varargs? cpu ppc.32? and [
+        reg-inputs [ second reg-class-of float-regs = ] any?
+        [ 6 CRSET ] [ 6 CRCLR ] if
+    ] when ;
+
+! PPC64 tags unnamed scalars and ELFv2 HFA members with parameter offsets.
+! Store every member first so packed float HFAs produce complete GP words.
+:: store-ppc64-shadows ( reg-inputs -- )
+    reg-inputs [| input |
+        input length 4 = [
+            input first input second input fourth store-stack-param
+        ] when
+    ] each ;
+
+:: load-ppc64-shadows ( reg-inputs -- )
+    reg-inputs [| input |
+        input length 4 = [
+            input fourth 8 /i :> slot
+            slot 8 < [ slot 3 + 1 slot 8 * param@ %load-cell ] when
+        ] when
+    ] each ;
+
+:: load-ppc64-stack-shadows ( stack-inputs -- )
+    stack-inputs [| input |
+        input second reg-class-of float-regs = [
+            input third 8 /i :> slot
+            slot 8 < [ slot 3 + 1 slot 8 * param@ %load-cell ] when
+        ] when
+    ] each ;
 
 :: emit-alien-insn ( varargs? reg-inputs stack-inputs
                      reg-outputs dead-outputs
                      cleanup stack-size
                      quot -- )
     stack-inputs [ first3 store-stack-param ] each
+    reg-inputs store-ppc64-shadows
     reg-inputs [ first3 store-reg-param ] each
+    reg-inputs load-ppc64-shadows
+    varargs? cpu ppc64? and ppc64-stack-shadows? or
+    [ stack-inputs load-ppc64-stack-shadows ] when
+    varargs? reg-inputs ppc-varargs-indicator
     quot call
     reg-outputs [ first3 load-reg-param ] each
     dead-outputs [ first2 discard-reg-param ] each
@@ -467,15 +535,15 @@ M:: ppc %alien-indirect ( src
                           reg-outputs dead-outputs
                           cleanup stack-size
                           gc-map -- )
-    reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size [
+    varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size [
         has-toc [
-            11 src load-param
-            2 11 1 cells %load-cell
-            11 11 0 cells %load-cell
+            12 src load-param
+            2 12 1 cells %load-cell
+            12 12 0 cells %load-cell
         ] [
-            11 src load-param
+            12 src load-param
         ] if
-        11 MTCTR
+        12 MTCTR
         BCTRL
         gc-map gc-map-here
     ] emit-alien-insn ;
@@ -689,7 +757,7 @@ M:: ppc.32 %convert-integer ( dst src c-type -- )
         { c:uint   [ ] }
     } case ;
 
-M:: ppc.64 %convert-integer ( dst src c-type -- )
+M:: ppc64 %convert-integer ( dst src c-type -- )
     c-type {
         { c:char      [ dst src 56 CLRLDI dst dst EXTSB ] }
         { c:uchar     [ dst src 56 CLRLDI ] }
@@ -720,7 +788,7 @@ M: ppc.32 %load-memory-imm
         } case
     ] if ;
 
-M: ppc.64 %load-memory-imm
+M: ppc64 %load-memory-imm
     or? [
         pick %trap-null
         {
@@ -762,7 +830,7 @@ M: ppc.32 %load-memory
         } case
     ] if ;
 
-M: ppc.64 %load-memory
+M: ppc64 %load-memory
     [ [ 0 assert= ] bi@ ] 2dip
     or? [
         pick %trap-null
@@ -803,7 +871,7 @@ M: ppc.32 %store-memory-imm
         } case
     ] if ;
 
-M: ppc.64 %store-memory-imm
+M: ppc64 %store-memory-imm
     or? [
         {
             { c:char      [ STB ] }
@@ -842,7 +910,7 @@ M: ppc.32 %store-memory
         } case
     ] if ;
 
-M: ppc.64 %store-memory
+M: ppc64 %store-memory
     [ [ 0 assert= ] bi@ ] 2dip
     or? [
         {
@@ -912,21 +980,38 @@ M:: ppc %check-nursery-branch ( label size cc temp1 temp2 -- )
 M: ppc %call-gc
     \ minor-gc %call gc-map-here ;
 
+M: ppc.32 safepoint-gc-map-offset 8 ;
+M: ppc64 safepoint-gc-map-offset 20 ;
+
+M: ppc %safepoint
+    scratch-reg 0 %load-cell-imm %load-cell-imm-rc rel-safepoint
+    scratch-reg scratch-reg 0 STW ;
+
 M:: ppc %prologue ( stack-size -- )
     0 MFLR
     0 1 lr-save %store-cell
     11 0 %load-cell-imm %load-cell-imm-rc rel-this
     11 1 2 cells neg %store-cell
-    11 stack-size LI
+    11 stack-size %load-immediate
     11 1 1 cells neg %store-cell
-    1 1 stack-size neg %store-cell-update ;
+    stack-size neg -0x8000 0x7fff between? [
+        1 1 stack-size neg %store-cell-update
+    ] [
+        11 11 NEG
+        1 1 11 cpu ppc.32? [ STWUX ] [ STDUX ] if
+    ] if ;
 
 ! At the end of each word that calls a subroutine, we store
 ! the previous link register value in r0 by popping it off
 ! the stack, set the link register to the contents of r0,
 ! and jump to the link register.
 M:: ppc %epilogue ( stack-size -- )
-    1 1 stack-size ADDI
+    stack-size -0x8000 0x7fff between? [
+        1 1 stack-size ADDI
+    ] [
+        0 stack-size %load-immediate
+        1 1 0 ADD
+    ] if
     0 1 lr-save %load-cell
     0 MTLR ;
 
@@ -1060,9 +1145,23 @@ USE: vocabs
     { [ os linux? ] [
         {
             { [ cpu ppc.32? ] [ "cpu.ppc.32.linux" require ] }
+            { [ cpu ppc.64le? ] [ "cpu.ppc.64le.linux" require ] }
             { [ cpu ppc.64? ] [ "cpu.ppc.64.linux" require ] }
             [ ]
         } cond
+      ] }
+    { [ os netbsd? cpu ppc.32? and ] [
+        "cpu.ppc.32.netbsd" require
+      ] }
+    { [ os openbsd? ] [
+        cpu ppc.32?
+        [ "cpu.ppc.32.openbsd" require ]
+        [ "cpu.ppc.64.openbsd" require ] if
+      ] }
+    { [ os freebsd? ] [
+        cpu ppc.32?
+        [ "cpu.ppc.32.freebsd" require ]
+        [ "cpu.ppc.64.freebsd" require ] if
       ] }
     [ ]
 } cond

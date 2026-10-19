@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor authors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators compiler.codegen.relocation compiler.constants
 cpu.riscv.64.assembler.registers endian kernel locals make math

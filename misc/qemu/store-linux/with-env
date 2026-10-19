@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Run from the checkout inside a prepared NixOS or Guix guest.
+set -euo pipefail
+manager=${1:?Usage: with-env nix|guix [--system=SYSTEM] COMMAND [ARG...]}
+shift
+target_system=
+if [[ ${1:-} == --system=* ]]; then
+    target_system=${1#--system=}
+    shift
+fi
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../.." && pwd -P)
+
+case "$manager" in
+    nix)
+        system_args=()
+        if [[ -n $target_system ]]; then
+            system_args=(--argstr system "$target_system")
+        fi
+        if [[ -n ${FACTOR_UI_BACKEND:-} ]]; then
+            system_args+=(--argstr uiBackend "$FACTOR_UI_BACKEND")
+        fi
+        revision=$(FACTOR_STORE_LINUX_ROOT="$root" nix-instantiate --eval --strict --expr \
+            '(builtins.fromJSON (builtins.readFile (builtins.getEnv "FACTOR_STORE_LINUX_ROOT" + "/flake.lock"))).nodes.nixpkgs.locked.rev')
+        revision=${revision#\"}
+        revision=${revision%\"}
+        [[ $revision =~ ^[0-9a-f]{40}$ ]]
+        printf -v command '%q ' "$@"
+        exec nix-shell --pure \
+            --keep FACTOR_TEST_CHILD_IMAGE --keep FACTOR_UI_BACKEND \
+            --keep DISPLAY --keep XAUTHORITY --keep GDK_BACKEND \
+            --keep GTK_A11Y --keep LIBGL_ALWAYS_SOFTWARE \
+            --keep XDG_RUNTIME_DIR --keep DBUS_SESSION_BUS_ADDRESS \
+            -I "nixpkgs=https://github.com/NixOS/nixpkgs/archive/$revision.tar.gz" \
+            "$root/shell.nix" "${system_args[@]}" --arg withTests true --run "$command"
+        ;;
+    guix)
+        system_args=()
+        manifest="$root/manifest.scm"
+        shell_command=(xvfb-run -- bash "$root/misc/guix-shell")
+        if [[ ${FACTOR_HEADLESS+x} == x ]]; then
+            shell_command=(-- bash "$root/misc/guix-shell")
+        fi
+        if [[ -n $target_system ]]; then
+            system_args=(--system="$target_system")
+            export FACTOR_GUIX_SYSTEM="$target_system"
+        elif [[ -n ${FACTOR_GUIX_SYSTEM:-} ]]; then
+            system_args=(--system="$FACTOR_GUIX_SYSTEM")
+        fi
+        if [[ -n ${FACTOR_GUIX_SYSTEM:-} ]]; then
+            export FACTOR_GUIX_MANIFEST="$manifest"
+            manifest="$root/misc/qemu/store-linux/guix-target-manifest.scm"
+        fi
+        exec guix shell --pure "${system_args[@]}" \
+            --preserve='^(FACTOR_TEST_CHILD_IMAGE|FACTOR_UI_BACKEND|FACTOR_HEADLESS|DISPLAY|XAUTHORITY|GDK_BACKEND|GTK_A11Y|LIBGL_ALWAYS_SOFTWARE|XDG_RUNTIME_DIR|DBUS_SESSION_BUS_ADDRESS)$' \
+            -m "$manifest" "${shell_command[@]}" "$@"
+        ;;
+    *)
+        printf 'Unknown package manager: %s\n' "$manager" >&2
+        exit 2
+        ;;
+esac

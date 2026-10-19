@@ -92,6 +92,8 @@ struct code_block {
     }
   }
 
+  cell dlsym_parameter_index_at_or_before(cell address);
+
   cell offset(cell addr) const { return addr - entry_point(); }
 
   cell address_for_offset(cell offset) const {

@@ -1,0 +1,8 @@
+include vm/Config.unix
+PLAF_DLL_OBJS += $(BUILD_DIR)/os-genunix.o $(BUILD_DIR)/os-illumos.o $(BUILD_DIR)/mvm-unix.o
+PLAF_MASTER_HEADERS += vm/os-genunix.hpp vm/os-illumos.hpp
+LIBS := -ldl -lsocket -lnsl -lm -lrt -lpthread
+
+FFI_TEST_CFLAGS := -fPIC
+CFLAGS += -fPIC
+CXXFLAGS += -fPIC

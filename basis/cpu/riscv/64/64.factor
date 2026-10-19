@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor authors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.arrays alien.c-types alien.data arrays assocs
 byte-arrays classes.algebra classes.struct combinators compiler.cfg

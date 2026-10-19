@@ -59,6 +59,7 @@ set-default-fp-env
     ] with-rounding-mode
 ] unit-test
 
++round-down+ rounding-mode-supported? [
 {
     0x3fd5,5555,5555,5555
     0x3fc9,9999,9999,9999
@@ -72,7 +73,9 @@ set-default-fp-env
         -1.0 3.0 /f double>bits
     ] with-rounding-mode
 ] unit-test
+] when
 
++round-up+ rounding-mode-supported? [
 {
     0x3fd5,5555,5555,5556
     0x3fc9,9999,9999,999a
@@ -86,6 +89,7 @@ set-default-fp-env
         -1.0 3.0 /f double>bits
     ] with-rounding-mode
 ] unit-test
+] when
 
 {
     0x3fd5,5555,5555,5555

@@ -14,4 +14,4 @@ FUNCTION: float-array-struct ffi_array_struct ( float-array-struct x )
 { 11.0 22.0 33.0 } [
     float-array-struct <struct> float-array{ 1.0 2.0 3.0 } >>values
     ffi_array_struct values>> first3
-] unit-test
+] floating-point-unit-test

@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "scope": "Live primary-owner foundation manifests only; these do not overlay compiler/io acceptance. Paths are relative to the selected result root. Routing defaults preserve original identity in output. Missing optional artifacts are not passes.",
+  "sources": [
+    {
+      "path": "agents/mips-port/work/mips-evidence/foundation.json"
+    },
+    {
+      "path": "agents/powerpc-port/work-evidence/foundation.json"
+    },
+    {
+      "path": "agents/powerpc-zig/work/qemu-matrix/ppc64/zig-foundation.json"
+    },
+    {
+      "path": "agents/s390x-port/work/s390x/foundation.json"
+    },
+    {
+      "path": "agents/sparc-port/artifacts/foundation.json"
+    },
+    {
+      "path": "agents/powerpc-port/work-evidence/freebsd145-*-foundation.json",
+      "defaults": {
+        "os": "freebsd"
+      }
+    },
+    {
+      "path": "agents/sparc-port/artifacts/runtime-build.json",
+      "defaults": {
+        "os": "linux"
+      }
+    },
+    {
+      "path": "new-linux/alpha/frozen-*/foundation.json"
+    },
+    {
+      "path": "new-linux/sh4/superh-foundation-evidence.json"
+    },
+    {
+      "path": "loongarch/runtime-manifest.json",
+      "defaults": {
+        "id": "loongarch-full-vm-runtime",
+        "os": "linux",
+        "arch": "loongarch64"
+      },
+      "variant_format": "vm-keyed"
+    },
+    {
+      "path": "m68k-toolchain/manifest.json",
+      "defaults": {
+        "id": "m68k-custom-toolchain",
+        "os": "linux",
+        "arch": "m68k"
+      }
+    },
+    {
+      "path": "new-bsd/vax-netbsd11/status.json",
+      "defaults": {
+        "id": "netbsd-vax-native-foundation",
+        "os": "netbsd",
+        "arch": "vax",
+        "pointer_bits": 32,
+        "endian": "little"
+      }
+    },
+    {
+      "path": "new-bsd/bringup-pending.json",
+      "defaults": {
+        "os": "netbsd",
+        "arch": "ppc32",
+        "id": "netbsd-ppc32-infrastructure-blocked"
+      }
+    },
+    {
+      "path": "new-bsd/sparc64-openbsd79/foundation.json",
+      "defaults": {
+        "id": "sparc64-openbsd79-infrastructure",
+        "os": "openbsd",
+        "arch": "sparc64"
+      }
+    },
+    {
+      "path": "new-bsd/ppc64-openbsd79/foundation.json",
+      "defaults": {
+        "id": "ppc64-openbsd79-infrastructure",
+        "os": "openbsd",
+        "arch": "ppc64"
+      }
+    },
+    {
+      "path": "new-bsd/armv7-openbsd79/foundation.json",
+      "defaults": {
+        "id": "armv7-openbsd79-infrastructure",
+        "os": "openbsd",
+        "arch": "arm32"
+      }
+    },
+    {
+      "path": "new-bsd/ppc32-freebsd145/foundation.json",
+      "defaults": {
+        "id": "ppc32-freebsd145-infrastructure",
+        "os": "freebsd",
+        "arch": "ppc32"
+      }
+    },
+    {
+      "path": "new-bsd/ppc64be-freebsd145/foundation.json",
+      "defaults": {
+        "id": "ppc64be-freebsd145-infrastructure",
+        "os": "freebsd",
+        "arch": "ppc64"
+      }
+    },
+    {
+      "path": "new-bsd/ppc64le-freebsd145/foundation.json",
+      "defaults": {
+        "id": "ppc64le-freebsd145-infrastructure",
+        "os": "freebsd",
+        "arch": "ppc64"
+      }
+    },
+    {
+      "path": "new-linux/hppa/hppa-foundation-evidence.json"
+    },
+    {
+      "path": "logs/sparc-bsd/factor-foundation.json"
+    },
+    {
+      "path": "freebsd/armv7/foundation.json"
+    },
+    {
+      "path": "agents/powerpc-port/work-evidence/recovery-*/foundation.json"
+    },
+    {
+      "path": "agents/powerpc-zig/work-evidence/recovery-*/foundation.json"
+    },
+    {
+      "path": "new-bsd/alpha-netbsd11/foundation-native.json"
+    },
+    {
+      "path": "new-bsd/armv7-openbsd79/proof/milestones.json",
+      "defaults": {
+        "id": "openbsd-arm32-native-vm-milestones",
+        "os": "openbsd",
+        "arch": "arm32",
+        "pointer_bits": 32,
+        "endian": "little"
+      }
+    },
+    {
+      "path": "new-bsd/alpha-openbsd79/foundation-native.json"
+    },
+    {
+      "path": "new-bsd/macppc-openbsd79/foundation.json",
+      "defaults": {
+        "id": "openbsd79-macppc-native-infrastructure",
+        "os": "openbsd",
+        "arch": "ppc32",
+        "pointer_bits": 32,
+        "endian": "big"
+      }
+    },
+    {
+      "path": "acceptance/linux-mips64be/root-full-prefix-review.json",
+      "defaults": {
+        "id": "linux-mips64be-user-mode-full-prefix-review",
+        "os": "linux",
+        "arch": "mips64",
+        "pointer_bits": 64,
+        "endian": "big",
+        "abi": "GNU N64",
+        "execution": "QEMU user-mode; not full-system guest acceptance"
+      }
+    },
+    {
+      "path": "acceptance/linux-mips64el/root-full-prefix-review.json",
+      "defaults": {
+        "id": "linux-mips64le-user-mode-full-prefix-review",
+        "os": "linux",
+        "arch": "mips64",
+        "pointer_bits": 64,
+        "endian": "little",
+        "abi": "GNU N64",
+        "execution": "QEMU user-mode; not full-system guest acceptance"
+      }
+    },
+    {
+      "path": "acceptance/linux-mips32/root-zig-full-prefix-review.json",
+      "defaults": {
+        "id": "linux-mips32-zig-user-mode-full-prefix-review",
+        "os": "linux",
+        "arch": "mips32",
+        "pointer_bits": 32,
+        "abi": "GNU O32 BE and LE separate",
+        "execution": "Zig only QEMU user-mode; not full-system or whole-family acceptance"
+      }
+    },
+    {
+      "path": "acceptance/freebsd-riscv64/root-full-prefix-review.json",
+      "defaults": {
+        "id": "freebsd-riscv64-root-reviewed-full-prefixes",
+        "os": "freebsd",
+        "arch": "riscv64",
+        "pointer_bits": 64,
+        "endian": "little",
+        "abi": "LP64D",
+        "execution": "Native full-system guest; frozen bf2 epochs, C++ runtime64a patch; single-hart icache scope"
+      }
+    },
+    {
+      "path": "acceptance/openbsd-arm64/root-full-prefix-review.json",
+      "defaults": {
+        "id": "openbsd-arm64-root-reviewed-full-prefixes",
+        "os": "openbsd",
+        "arch": "aarch64",
+        "pointer_bits": 64,
+        "endian": "little",
+        "execution": "Native full-system; frozen bf2 plus C++64a runtime patch"
+      }
+    },
+    {
+      "path": "acceptance/linux-mips32/root-cpp-o32be-full-prefix-review.json",
+      "defaults": {
+        "id": "linux-mips32be-cpp-user-mode-full-prefix-review",
+        "os": "linux",
+        "arch": "mips32",
+        "pointer_bits": 32,
+        "endian": "big",
+        "abi": "GNU O32",
+        "execution": "C++ only QEMU user-mode; not full-system or whole-family acceptance"
+      }
+    },
+    {
+      "path": "acceptance/linux-mips32/root-cpp-o32el-full-prefix-review.json",
+      "defaults": {
+        "id": "linux-mips32le-cpp-user-mode-full-prefix-review",
+        "os": "linux",
+        "arch": "mips32",
+        "pointer_bits": 32,
+        "endian": "little",
+        "abi": "GNU O32",
+        "execution": "C++ QEMU user-mode, frozen8687; not full-system, N32 or current-master acceptance"
+      }
+    },
+    {
+      "path": "acceptance/netbsd-riscv64/root-full-prefix-review.json",
+      "defaults": {
+        "id": "netbsd-riscv64-root-reviewed-full-prefixes",
+        "os": "netbsd",
+        "arch": "riscv64",
+        "pointer_bits": 64,
+        "endian": "little",
+        "execution": "Native full-system; frozen bf2 plus C++64a callbacks and8df native network aliases"
+      }
+    },
+    {
+      "path": "acceptance/linux-riscv32/root-full-prefix-review.json",
+      "defaults": {
+        "id": "linux-riscv32-root-reviewed-headless-full-prefixes",
+        "os": "linux",
+        "arch": "riscv32",
+        "pointer_bits": 32,
+        "endian": "little",
+        "execution": "Frozen full-system headless consumers; historical evolving-resource Zig user cold, no independent C++ cold"
+      }
+    },
+    {
+      "path": "acceptance/openbsd-riscv64/root-full-prefix-review.json",
+      "defaults": {
+        "id": "openbsd-riscv64-root-reviewed-full-prefixes",
+        "os": "openbsd",
+        "arch": "riscv64",
+        "pointer_bits": 64,
+        "endian": "little",
+        "execution": "Native full-system; frozen bf2 ordinary origins plus C++64a callbacks and exact SSL8b deltas; temporary restore wxallowed limits retained"
+      }
+    },
+    {
+      "path": "acceptance/openbsd-x86/root-full-prefix-review.json",
+      "defaults": {
+        "id": "openbsd-x86-root-reviewed-full-prefixes",
+        "os": "openbsd",
+        "arch": "x86",
+        "pointer_bits": 32,
+        "endian": "little",
+        "execution": "Native full-system; original f7 ordinary cold/compiler and split-clone IO, frozen b53 plus89535 resources and8e9 runtime"
+      }
+    },
+    {
+      "path": "acceptance/linux-s390x-user/result.json",
+      "defaults": {
+        "id": "linux-s390x-root-reviewed-user-full-prefixes",
+        "os": "linux",
+        "arch": "s390x",
+        "pointer_bits": 64,
+        "endian": "big",
+        "execution": "Private patched QEMU user-mode; frozen C++3c/Zigd49 shared C++ image; no independent Zig cold, full-system or current-master acceptance"
+      }
+    }
+  ]
+}

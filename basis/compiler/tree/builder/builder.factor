@@ -71,7 +71,8 @@ PRIVATE>
         in-d word/quot build-tree-with unclip-last in-d>> :> in-d'
         {
             { [ dup not ] [ ] }
-            { [ dup ends-with-terminate? ] [ out-d [ f swap <#push> ] map append ] }
+            ! dip can emit retain-stack cleanup after an unconditional throw.
+            { [ dup [ #terminate? ] any? ] [ out-d [ f swap <#push> ] map append ] }
             [ in-d' out-d [ 2length assert= ] [ <#copy> suffix ] 2bi ]
         } cond
     ] [ inference-error? ] ignore-error/f ;

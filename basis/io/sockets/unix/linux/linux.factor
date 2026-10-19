@@ -5,4 +5,4 @@ IN: io.sockets.unix.linux
 
 ! Linux seems to use the same port-space for ipv4 and ipv6.
 
-M: linux resolve-localhost { T{ ipv4 f "0.0.0.0" } } ;
+M: linux-kernel resolve-localhost { T{ ipv4 f "0.0.0.0" } } ;

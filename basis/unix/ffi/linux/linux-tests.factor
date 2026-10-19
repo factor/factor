@@ -3,9 +3,10 @@ unix.ffi ;
 IN: unix.ffi.linux.tests
 
 { 16 4 } [ sockaddr-in heap-size sockaddr-in c-type-align ] unit-test
-{ 4096 4096 9 } [ MAXPATHLEN PATH_MAX SO_KEEPALIVE ] unit-test
+{ 4096 4096 } [ MAXPATHLEN PATH_MAX ] unit-test
+cpu mips? [ { 8 } [ SO_KEEPALIVE ] unit-test ] [ { 9 } [ SO_KEEPALIVE ] unit-test ] if
 
-cpu x86? [
+cpu x86? cpu mips? or [
     { 384 4 } [ utmpx heap-size utmpx c-type-align ] unit-test
     { 340 348 364 } [
         "ut_tv" utmpx offset-of

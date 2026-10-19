@@ -1,0 +1,4 @@
+include vm/Config.netbsd
+include vm/Config.hppa.32
+PLAF_MASTER_HEADERS += vm/os-netbsd-hppa.hpp
+PLAF_DLL_OBJS += $(BUILD_DIR)/atomic-netbsd-hppa.o

@@ -2,7 +2,7 @@
 ! Copyright (C) 2024 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators kernel kernel.private
-layouts make math math.order math.private sbufs sequences
+layouts make math math.order math.parser.integer-float math.private sbufs sequences
 sequences.private strings ;
 IN: math.parser
 
@@ -62,9 +62,19 @@ TUPLE: number-parse
 : digit-in-radix ( number-parse n char -- number-parse n digit ? )
     digit> pick radix>> over > ; inline
 
+TUPLE: literal-denominator value ;
+TUPLE: mixed-literal-ratio numerator denominator ;
+
+: make-integer-literal-ratio ( numerator denominator -- float )
+    dup zero? [
+        drop zero? 0x7ff8000000000000 0x7ff0000000000000 ?
+    ] [ ratio>binary64-bits ] if bits>double ;
+
 : ?make-ratio ( num denom/f -- ratio/f )
+    dup literal-denominator? [ value>> make-integer-literal-ratio ] [
     ! don't use number= to allow 0. for "1/0."
-    [ dup 0 = [ 2drop f ] [ / ] if ] [ drop f ] if* ; inline
+    [ dup 0 = [ 2drop f ] [ / ] if ] [ drop f ] if*
+    ] if ; inline
 
 TUPLE: float-parse
     { radix fixnum }
@@ -112,7 +122,17 @@ CONSTANT: min-magnitude-10 -323
 CONSTANT: max-magnitude-2 1027
 CONSTANT: min-magnitude-2 -1074
 
+: make-integer-float-dec-exponent ( float-parse n -- float )
+    over [ exponent>> ] [ magnitude>> ] bi +
+    {
+        { [ dup max-magnitude-10 > ] [ 3drop 0x7ff0000000000000 ] }
+        { [ dup min-magnitude-10 < ] [ 3drop 0 ] }
+        [ drop [ [ exponent>> ] [ point>> ] bi - ] dip
+          swap 10 swap scaled-integer>binary64-bits ]
+    } cond bits>double ;
+
 : make-float-dec-exponent ( float-parse n/f -- float/f )
+    floating-point-supported? [
     over [ exponent>> ] [ magnitude>> ] bi +
     {
         { [ dup max-magnitude-10 > ] [ 3drop 1/0. ] }
@@ -121,7 +141,8 @@ CONSTANT: min-magnitude-2 -1074
             [ [ radix>> ] [ point>> ] [ exponent>> ] tri - (pow) ]
             [ swap /f ] bi*
         ]
-    } cond ; inline
+    } cond
+    ] [ make-integer-float-dec-exponent ] if ; inline
 
 : base2-digits ( digits radix -- digits' )
     {
@@ -136,7 +157,17 @@ CONSTANT: min-magnitude-2 -1074
 : base2-magnitude ( float-parse -- point )
     [ magnitude>> ] [ radix>> ] bi base2-digits ; inline
 
+: make-integer-float-bin-exponent ( float-parse n -- float )
+    over [ exponent>> ] [ base2-magnitude ] bi +
+    {
+        { [ dup max-magnitude-2 > ] [ 3drop 0x7ff0000000000000 ] }
+        { [ dup min-magnitude-2 < ] [ 3drop 0 ] }
+        [ drop [ [ exponent>> ] [ base2-point ] bi - ] dip
+          swap 2 swap scaled-integer>binary64-bits ]
+    } cond bits>double ;
+
 : make-float-bin-exponent ( float-parse n/f -- float/f )
+    floating-point-supported? [
     over [ exponent>> ] [ base2-magnitude ] bi +
     {
         { [ dup max-magnitude-2 > ] [ 3drop 1/0. ] }
@@ -145,7 +176,8 @@ CONSTANT: min-magnitude-2 -1074
             [ [ drop 2 ] [ base2-point ] [ exponent>> ] tri - (pow) ]
             [ swap /f ] bi*
         ]
-    } cond ; inline
+    } cond
+    ] [ make-integer-float-bin-exponent ] if ; inline
 
 : ?default-exponent ( float-parse n/f -- float-parse' n/f' )
     over exponent>> [
@@ -171,18 +203,21 @@ CONSTANT: min-magnitude-2 -1074
     [
         {
             { [ dup bignum? ] [ bignum-?neg ] }
-            { [ dup fp-nan? ] [ fp-?neg ] }
+            { [ dup float? ] [ fp-?neg ] }
             [ neg ]
         } cond
     ] [ f ] if* ; inline
 
 : ?pos ( n/f -- +n/f )
-    dup fp-nan? [
+    dup float? [
         double>bits 63 2^ bitnot bitand bits>double
     ] when ; inline
 
 : ?add-ratio ( m n/f -- m+n/f )
-    dup real? [ + ] [ 2drop f ] if ; inline
+    dup mixed-literal-ratio? [
+        [ numerator>> ] [ denominator>> ] bi
+        [ swap [ * ] dip + ] keep make-integer-literal-ratio
+    ] [ dup real? [ + ] [ 2drop f ] if ] if ; inline
 
 : @abort ( i number-parse n x -- f )
     4drop f ; inline
@@ -255,7 +290,10 @@ DEFER: @neg-digit
 : @denom-digit-or-punc ( i number-parse n char -- n/f )
     [ [ @denom-digit ] require-next-digit ] [
         {
-            { CHAR: . [ >float [ @abort ] next-digit ] }
+            { CHAR: . [
+                floating-point-supported? [ >float ] [ literal-denominator boa ] if
+                [ @abort ] next-digit
+            ] }
             [ @denom-digit ]
         } case
     ] if-skip ; inline
@@ -280,9 +318,30 @@ DEFER: @neg-digit
     { fixnum number-parse integer fixnum } declare
     digit-in-radix [ add-digit [ @num-digit-or-punc ] require-next-digit ] [ @abort ] if ;
 
+! Preserve exact components until the mixed literal has been assembled.
+: ->mixed-denominator ( i number-parse n -- n/f )
+    @split [ @denom-digit ] require-next-digit
+    dup literal-denominator? [ value>> mixed-literal-ratio boa ] [ ?make-ratio ] if ;
+
+DEFER: @mixed-num-digit
+
+: @mixed-num-digit-or-punc ( i number-parse n char -- n/f )
+    [ [ @mixed-num-digit ] require-next-digit ] [
+        {
+            { CHAR: / [ ->mixed-denominator ] }
+            [ @mixed-num-digit ]
+        } case
+    ] if-skip ; inline
+
+: @mixed-num-digit ( i number-parse n char -- n/f )
+    { fixnum number-parse integer fixnum } declare
+    digit-in-radix
+    [ add-digit [ @mixed-num-digit-or-punc ] require-next-digit ]
+    [ @abort ] if ;
+
 : ->numerator ( i number-parse n -- n/f )
     { fixnum number-parse integer } declare
-    @split [ @num-digit ] require-next-digit ?add-ratio ;
+    @split [ @mixed-num-digit ] require-next-digit ?add-ratio ;
 
 : @pos-digit-or-punc ( i number-parse n char -- n/f )
     [ [ @pos-digit ] require-next-digit ] [
@@ -1050,7 +1109,20 @@ CONSTANT: lookup-table {
 
 PRIVATE>
 
+: integer-only-float>base ( n radix -- str )
+    over double>bits {
+        { [ dup 0x7ff0000000000000 = ] [ 3drop "1/0." ] }
+        { [ dup 0xfff0000000000000 = ] [ 3drop "-1/0." ] }
+        { [ dup 0x7fffffffffffffff bitand 0x7ff0000000000000 > ] [
+            2nip 63 bit? "-0/0." "0/0." ?
+        ] }
+        { [ dup zero? ] [ 3drop "0.0" ] }
+        { [ dup 0x8000000000000000 = ] [ 3drop "-0.0" ] }
+        [ drop float>base ]
+    } cond ;
+
 M: float >base
+    floating-point-supported? [
     {
         { [ over fp-nan? ] [ drop fp-sign "-0/0." "0/0." ? ] }
         { [ over 1/0. =  ] [ 2drop "1/0." ] }
@@ -1058,6 +1130,7 @@ M: float >base
         { [ over  0.0 fp-bitwise= ] [ 2drop  "0.0" ] }
         { [ over -0.0 fp-bitwise= ] [ 2drop "-0.0" ] }
         [ float>base ]
-    } cond ;
+    } cond
+    ] [ integer-only-float>base ] if ;
 
 : # ( n -- ) number>string % ; inline

@@ -47,7 +47,7 @@ IN: compiler.tests.spilling
     } cleave ;
 
 { 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 }
-[ 1.0 float-spill-bug ] unit-test
+[ 1.0 float-spill-bug ] floating-point-unit-test
 
 { t } [ \ float-spill-bug word-optimized? ] unit-test
 
@@ -132,7 +132,7 @@ IN: compiler.tests.spilling
     } cleave ;
 
 { 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 }
-[ 1.0 float-fixnum-spill-bug ] unit-test
+[ 1.0 float-fixnum-spill-bug ] floating-point-unit-test
 
 { t } [ \ float-fixnum-spill-bug word-optimized? ] unit-test
 
@@ -211,7 +211,7 @@ IN: compiler.tests.spilling
             }
         }
     }
-} [ 1 spill-test-1 ] unit-test
+} [ 1 spill-test-1 ] floating-point-unit-test
 
 : spill-test-2 ( a -- b )
     dup 1.0 float+
@@ -341,4 +341,4 @@ IN: compiler.tests.spilling
     float*
     float* ;
 
-{ t } [ 1.0 spill-test-2 1.0 \ spill-test-2 def>> call = ] unit-test
+{ t } [ 1.0 spill-test-2 1.0 \ spill-test-2 def>> call = ] floating-point-unit-test

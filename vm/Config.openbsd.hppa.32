@@ -1,0 +1,6 @@
+# GNU HPPA C++17 builds have no OpenBSD Clang return protector.
+RETGUARD_FLAGS ?=
+include vm/Config.openbsd
+include vm/Config.hppa.32
+PLAF_MASTER_HEADERS += vm/os-openbsd-hppa.hpp
+PLAF_MASTER_HEADERS += vm/atomic-openbsd-hppa.hpp

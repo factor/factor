@@ -83,7 +83,7 @@ ERROR: bad-live-ranges interval ;
 : find-next-use ( live-interval new -- n )
     [ uses>> ] [ live-interval-start ] bi*
     '[ [ spill-slot?>> not ] [ n>> ] bi _ >= and ] find nip
-    [ n>> ] [ 1/0. ] if* ;
+    [ n>> ] [ allocation-infinity ] if* ;
 
 : find-use-positions ( live-intervals new assoc -- )
     '[ [ _ find-next-use ] [ reg>> ] bi _ add-use-position ] each ;

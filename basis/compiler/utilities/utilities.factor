@@ -1,8 +1,26 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators.short-circuit hashtables kernel
+USING: arrays assocs combinators.short-circuit hashtables kernel layouts
 math math.order namespaces sequences vectors ;
 IN: compiler.utilities
+
+! Compiler positions and virtual registers are fixnum sequence indices.
+! Bounds outside that range preserve their sentinel ordering without FP.
+: compiler-position-infinity ( -- n )
+    floating-point-supported?
+    [ 1/0. ] [ most-positive-fixnum 1 + ] if ;
+
+: compiler-position-negative-infinity ( -- n )
+    floating-point-supported?
+    [ -1/0. ] [ most-negative-fixnum 1 - ] if ;
+
+! A finite spill cost sums at most an array's worth of weighted uses.
+! Protected intervals must outweigh every such sum, even for bignum weights.
+: compiler-spill-infinity ( weights -- n )
+    floating-point-supported? [ drop 1/0. ] [
+        [ values ] [ { } ] if* 1 [ max ] reduce
+        max-array-capacity * 1 +
+    ] if ;
 
 : flattener ( seq quot -- seq vector quot' )
     over length <vector> [

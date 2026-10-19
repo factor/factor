@@ -5,7 +5,7 @@ USING: accessors alien alien.c-types alien.data arrays colors
 combinators combinators.smart continuations kernel math
 math.constants math.functions math.rectangles math.vectors
 namespaces opengl opengl.capabilities opengl.gl opengl.shaders
-opengl.textures sequences sets specialized-arrays splitting
+opengl.textures sequences sets specialized-arrays splitting system
 ui.gadgets ui.pens ;
 SPECIALIZED-ARRAY: alien.c-types:float
 IN: ui.render
@@ -341,7 +341,11 @@ SYMBOL: gl3-render-state
     "3.30" has-glsl-version? ;
 
 : gl3-shader-source ( source -- source' )
-    glsl-330? [ "#version 330 core" "#version 130" replace ] unless ;
+    os android? [
+        "#version 330 core" "#version 300 es\nprecision highp float;" replace
+    ] [
+        glsl-330? [ "#version 330 core" "#version 130" replace ] unless
+    ] if ;
 
 : bind-gl3-attributes ( program attributes -- )
     [ rot glBindAttribLocation ] with each-index ;
@@ -353,7 +357,7 @@ SYMBOL: gl3-render-state
         glCreateProgram [ swap attach-shaders ] keep
     ] dip
     dupd bind-gl3-attributes
-    dup 0 "out_color" glBindFragDataLocation
+    os android? [ ] [ dup 0 "out_color" glBindFragDataLocation ] if
     [ glLinkProgram ] keep gl-error check-gl-program ;
 
 : create-gl3-program ( -- program )

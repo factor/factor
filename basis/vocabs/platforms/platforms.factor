@@ -48,7 +48,7 @@ SYNTAX: <MACOS
 
 SYNTAX: <LINUX
     "LINUX>" parse-multiline-string
-    os linux? [ ".linux" parse-platform-section ] [ drop ] if ;
+    os linux-kernel? [ ".linux" parse-platform-section ] [ drop ] if ;
 
 SYNTAX: <WINDOWS
     "WINDOWS>" parse-multiline-string
@@ -81,7 +81,7 @@ SYNTAX: <!MACOS
 
 SYNTAX: <!LINUX
     "!LINUX>" parse-multiline-string
-    os linux? [ drop ] [ ".linux" parse-platform-section ] if ;
+    os linux-kernel? [ drop ] [ ".linux" parse-platform-section ] if ;
 
 SYNTAX: <!WINDOWS
     "!WINDOWS>" parse-multiline-string
@@ -91,7 +91,7 @@ SYNTAX: USE-UNIX: scan-token os unix? [ use-vocab ] [ drop ] if ;
 SYNTAX: USE-BSD: scan-token os bsd? [ use-vocab ] [ drop ] if ;
 SYNTAX: USE-FREEBSD: scan-token os freebsd? [ use-vocab ] [ drop ] if ;
 SYNTAX: USE-MACOS: scan-token os macos? [ use-vocab ] [ drop ] if ;
-SYNTAX: USE-LINUX: scan-token os linux? [ use-vocab ] [ drop ] if ;
+SYNTAX: USE-LINUX: scan-token os linux-kernel? [ use-vocab ] [ drop ] if ;
 SYNTAX: USE-WINDOWS: scan-token os windows? [ use-vocab ] [ drop ] if ;
 SYNTAX: USE-OS-SUFFIX: scan-token os name>> "." glue require ;
 

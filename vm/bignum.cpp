@@ -473,7 +473,22 @@ fixnum factor_vm::bignum_to_fixnum_strict(bignum* bn) {
 #define inf std::numeric_limits<double>::infinity()
 
 // Allocates memory
-bignum* factor_vm::double_to_bignum(double x) {
+bignum* factor_vm::double_to_bignum(vm_float x) {
+#if defined(FACTOR_INTEGER_ONLY)
+  (void)x;
+  general_error(ERROR_FLOAT_UNSUPPORTED, false_object, false_object);
+  return nullptr;
+#else
+#if defined(__vax__)
+  uint64_t bits = x.bits();
+  bignum_length_type length = ieee_integer_length(bits, BIGNUM_DIGIT_LENGTH);
+  if (length == 0) return BIGNUM_ZERO();
+  bignum* result = allot_bignum(length, x.sign());
+  bignum_digit_type* digits = BIGNUM_START_PTR(result);
+  for (bignum_length_type i = 0; i < length; ++i)
+    digits[i] = (bignum_digit_type)ieee_integer_digit(bits, BIGNUM_DIGIT_LENGTH, i);
+  return result;
+#else
   if (x == inf || x == -inf || x != x)
     return (BIGNUM_ZERO());
   int exponent;
@@ -503,6 +518,8 @@ bignum* factor_vm::double_to_bignum(double x) {
     }
     return (result);
   }
+#endif
+#endif
 }
 
 #undef DTB_WRITE_DIGIT

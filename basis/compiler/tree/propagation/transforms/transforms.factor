@@ -50,7 +50,7 @@ IN: compiler.tree.propagation.transforms
 } [
     [
         in-d>> dup one-mod-custom-inlining [ nip ] [
-            dup first value-info interval>> [0,inf] interval-subset?
+            dup first value-info interval>> interval-nonnegative?
             [ rem-custom-inlining ] [ drop f ] if
         ] if*
     ] "custom-inlining" set-word-prop
@@ -159,7 +159,7 @@ IN: compiler.tree.propagation.transforms
 
 ! Right shifts cannot overflow, but machine shifts mask oversized counts.
 \ fixnum-shift [
-    in-d>> second value-info interval>> 0 [-inf,b] interval-subset?
+    in-d>> second value-info interval>> interval-nonpositive?
     [ [ fixnum-bits neg max fixnum-shift-fast ] ] [ f ] if
 ] "custom-inlining" set-word-prop
 

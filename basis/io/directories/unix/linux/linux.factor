@@ -10,7 +10,7 @@ IN: io.directories.unix.linux
         readdir64_r [ (throw-errno) ] unless-zero
     ] 2keep void* deref ; inline
 
-M: linux (directory-entries)
+M: linux-kernel (directory-entries)
     [
         dirent new
         '[ _ _ next-dirent ] [ >directory-entry ] produce nip

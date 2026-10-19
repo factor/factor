@@ -1,6 +1,6 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: endian kernel make math math.bitwise ;
+USING: endian kernel make math math.bitwise namespaces system ;
 IN: cpu.ppc.assembler
 
 ! This vocabulary implements the V2.06B Power ISA found at https://www.power.org.
@@ -13,14 +13,18 @@ IN: cpu.ppc.assembler
 ! In Factor, we write:
 !   14 15 10 STW
 
+SYMBOL: ppc-little-endian
+ppc.64le cpu = ppc-little-endian set-global
+
 : insn ( operand opcode -- )
-    { 26 0 } bitfield 4 >be % ;
+    { 26 0 } bitfield ppc-little-endian get [ 4 >le ] [ 4 >be ] if % ;
 
 : a-insn ( rt ra rb rc xo rc opcode -- )
     [ { 0 1 6 11 16 21 } bitfield ] dip insn ;
 
-: b-insn ( bo bi bd aa lk opcode -- )
-    [ { 0 1 2 16 21 } bitfield ] dip insn ;
+:: b-insn ( bo bi bd aa lk opcode -- )
+    bo bi bd 0x3fff bitand aa lk
+    { 0 1 2 16 21 } bitfield opcode insn ;
 
 : d-insn ( rt ra d opcode -- )
     [ 0xffff bitand { 0 16 21 } bitfield ] dip insn ;
@@ -31,8 +35,9 @@ IN: cpu.ppc.assembler
 : evx-insn ( rt ra rb xo opcode -- )
     [ { 0 11 16 21 } bitfield ] dip insn ;
 
-: i-insn ( li aa lk opcode -- )
-    [ { 0 1 2 } bitfield ] dip insn ;
+:: i-insn ( li aa lk opcode -- )
+    li 0xffffff bitand aa lk
+    { 0 1 2 } bitfield opcode insn ;
 
 : m-insn ( rs ra sh mb me rc opcode -- )
     [ { 0 1 6 11 16 21 } bitfield ] dip insn ;

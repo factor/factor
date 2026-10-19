@@ -8,10 +8,18 @@ const Cell = layouts.Cell;
 
 // On x86_64-macos under Rosetta, getpagesize() returns 4096 even though
 // system call performance characteristics.
-pub const page_size: usize = if (builtin.cpu.arch == .x86_64 and builtin.os.tag == .macos)
+pub const page_size: usize = if (builtin.os.tag == .linux and
+    (builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64))
+    8192
+else if (builtin.cpu.arch == .x86_64 and builtin.os.tag == .macos)
     4096
 else
     std.heap.page_size_min;
+
+// LoongArch Linux supports kernels with multiple base page sizes.
+pub fn pageSize() usize {
+    return if (builtin.cpu.arch == .loongarch64 and builtin.os.tag == .linux) std.heap.pageSize() else page_size;
+}
 
 // The start/end fields point to the usable memory region
 pub const Segment = struct {
@@ -42,7 +50,8 @@ pub const Segment = struct {
     // Extra low guard pages can be unlocked during GC for stack headroom.
     pub fn initWithGuardPages(size_param: Cell, executable: bool, num_low_guard_pages: usize) !Segment {
         // Page-align size to ensure guard pages work (mprotect requires page alignment)
-        const size = (std.math.add(Cell, size_param, page_size - 1) catch return error.OutOfMemory) & ~@as(Cell, page_size - 1);
+        const page = pageSize();
+        const size = (std.math.add(Cell, size_param, page - 1) catch return error.OutOfMemory) & ~@as(Cell, page - 1);
 
         const prot: platform.PROT = if (executable)
             .{ .READ = true, .WRITE = true, .EXEC = true }
@@ -50,18 +59,20 @@ pub const Segment = struct {
             .{ .READ = true, .WRITE = true };
 
         // Allocate: [low guard pages][usable memory][high guard page]
-        const low_guard_size = std.math.mul(Cell, num_low_guard_pages, page_size) catch return error.OutOfMemory;
+        const low_guard_size = std.math.mul(Cell, num_low_guard_pages, page) catch return error.OutOfMemory;
         const guarded_size = std.math.add(Cell, low_guard_size, size) catch return error.OutOfMemory;
-        const alloc_size = std.math.add(Cell, guarded_size, page_size) catch return error.OutOfMemory;
+        const alloc_size = std.math.add(Cell, guarded_size, page) catch return error.OutOfMemory;
 
         // On ARM64 macOS, executable memory requires MAP_JIT flag
         const is_arm64_macos = builtin.cpu.arch == .aarch64 and
             (builtin.os.tag == .macos or builtin.os.tag == .ios);
 
-        const map_flags: platform.MAP = if (executable and is_arm64_macos)
+        var map_flags: platform.MAP = if (executable and is_arm64_macos)
             .{ .TYPE = .PRIVATE, .ANONYMOUS = true, .JIT = true }
         else
             .{ .TYPE = .PRIVATE, .ANONYMOUS = true };
+
+        if (builtin.os.tag == .openbsd and !executable) map_flags.STACK = true;
 
         const ptr = platform.mmap(
             null,
@@ -126,7 +137,7 @@ pub const Segment = struct {
     }
 
     pub fn isOverflow(self: *const Segment, addr: Cell) bool {
-        return addr >= self.end and addr < (self.end + page_size);
+        return addr >= self.end and addr < (self.end + pageSize());
     }
 
     // Check if address is in the usable segment
@@ -151,7 +162,7 @@ pub const Segment = struct {
         // High guard page
         const hi = self.end;
         const hi_ptr: *align(std.heap.page_size_min) anyopaque = @ptrFromInt(hi);
-        if (platform.mprotect(hi_ptr, page_size, prot) != 0) return error.MprotectFailed;
+        if (platform.mprotect(hi_ptr, pageSize(), prot) != 0) return error.MprotectFailed;
     }
 };
 

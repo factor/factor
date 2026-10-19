@@ -1,0 +1,5 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-alpha.o $(BUILD_DIR)/cpu-alpha-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-alpha.hpp
+# IEEE software completion and dynamic rounding are required by Factor floats.
+CFLAGS += -mieee-with-inexact -mfp-rounding-mode=d
+CXXFLAGS += -mieee-with-inexact -mfp-rounding-mode=d

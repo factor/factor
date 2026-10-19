@@ -1,0 +1,62 @@
+diff --git a/crb.c b/crb.c
+index c79d4b2..4c52c8c 100644
+--- a/crb.c
++++ b/crb.c
+@@ -132,7 +132,22 @@ crb_write(long channel, unsigned long length, const char *buf,
+ unsigned long
+ crb_get_env(unsigned long id, char *buf, unsigned long length)
+ {
+-  /* FIXME */
++  /* SRM tty_dev selects the single COM1 console implemented above.  */
++  if (id == 0xf && length != 0) {
++    buf[0] = '0';
++    return 1;
++  }
++#ifdef SRM_BOOT_FLAGS
++  if (id == 0x8) {
++    const char *flags = SRM_BOOT_FLAGS;
++    unsigned long n = 0;
++    while (flags[n] && n < length) {
++      buf[n] = flags[n];
++      ++n;
++    }
++    return n;
++  }
++#endif
+   return 0xc000000000000000ul;
+ }
+ 
+diff --git a/init.c b/init.c
+index 383775c..379d4f7 100644
+--- a/init.c
++++ b/init.c
+@@ -140,10 +140,8 @@ init_page_table(void)
+ 
+   set_pte ((unsigned long)INIT_HWRPB, &hwrpb);
+   
+-  /* ??? SRM maps some amount of memory at 0x20000000 for use by programs
+-     started from the console prompt.  Including the bootloader.  While
+-     we're emulating MILO, don't bother as we jump straight to the kernel
+-     loaded into KSEG.  */
++  /* SRM scratch page for console buffers and the PROM call stack.  */
++  set_pte (0x20000000UL, alloc (PAGE_SIZE, PAGE_SIZE));
+ }
+ 
+ static void
+diff --git a/pal.S b/pal.S
+index 8d55a0a..e41fdfe 100644
+--- a/pal.S
++++ b/pal.S
+@@ -1423,6 +1423,12 @@ CallPal_CallSys:
+ 	and	p5, PS_M_CM, p0
+ 	beq	p0, 0f
+ 
++	// Keep the PCB snapshot current before the kernel copies it at fork.
++	mfpr	p1, ptPcbb
++	mfpr	p2, qemu_unique
++	stq_p	p2, PCB_Q_UNIQUE(p1)
++	mb
++
+ 	bsr	p7, CallPal_Stack_Frame_FromUser
+ 
+ 	mfpr	p0, ptEntSys

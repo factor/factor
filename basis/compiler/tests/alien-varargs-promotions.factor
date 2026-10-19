@@ -27,6 +27,8 @@ FUNCTION: double vap_control_float ( )
 FUNCTION: double vap_call_reader ( void* callback )
 
 : promotion-unit-test ( expected quot -- ) [ compile-call ] curry unit-test ;
+: floating-point-promotion-unit-test ( expected quot -- )
+    [ compile-call ] curry floating-point-unit-test ;
 
 { { 1 0 -1 255 65535 -7 65530 } } [
     7 <iota> [ vap_control_integer ] map
@@ -51,8 +53,8 @@ FUNCTION: double vap_call_reader ( void* callback )
 ! A numeric enum representation still undergoes the same source conversion.
 { -7 } [ 0 -7 vap-signed ] promotion-unit-test
 { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
-{ 0.10000000149011612 } [ vap_control_float ] promotion-unit-test
-{ t } [ 0 0.1 vap-float vap_control_float = ] promotion-unit-test
+{ 0.10000000149011612 } [ vap_control_float ] floating-point-promotion-unit-test
+{ t } [ 0 0.1 vap-float vap_control_float = ] floating-point-promotion-unit-test
 
 : indirect-vap-bool ( tag value ptr -- result )
     int { int bool } cdecl 1 alien-indirect-varargs ;
@@ -71,9 +73,9 @@ FUNCTION: double vap_call_reader ( void* callback )
 { t } [
     0 0.1 "vap_read_float" "varargs-promotions" library-dll dlsym
     indirect-vap-float vap_control_float =
-] promotion-unit-test
+] floating-point-promotion-unit-test
 
-cpu arm.64? [
+cpu arm.64? cpu loongarch.64? or [
     SYMBOL: promotion-values
     CALLBACK: double vap-runtime-reader ( int tag, ... )
     CALLBACK: double vap-tail-reader (
@@ -88,12 +90,12 @@ cpu arm.64? [
             4array promotion-values set-global 0.0
         ] vap-runtime-reader [ vap_call_reader ] with-callback
         drop promotion-values get
-    ] promotion-unit-test
+    ] floating-point-promotion-unit-test
     { { 1 -7 65530 0.10000000149011612 } } [
         [| tag b s u value |
             tag drop b s u value 4array promotion-values set-global 0.0
         ]
         vap-tail-reader [ vap_call_reader ] with-callback
         drop promotion-values get
-    ] promotion-unit-test
+    ] floating-point-promotion-unit-test
 ] when

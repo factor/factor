@@ -1,26 +1,30 @@
 USING: accessors calendar concurrency.futures continuations destructors
 http.client http.server io.servers io.sockets
 io.sockets.secure io.sockets.secure.openssl io.timeouts kernel
-math math.parser sequences strings tools.test ;
+io.sockets.secure.testing math math.parser sequences strings tools.test ;
 IN: io.sockets.secure.openssl.tests
 
-{ 200 } [ "https://www.google.se" http-get drop code>> ] unit-test
+{ 200 } [
+    "local HTTPS response" [ http-get drop code>> ] with-local-https-server
+] unit-test
 
-[ "https://factorcode.org:80" http-get ] must-fail
 
 : tls-request-error ( url -- error/f )
     [ http-get 2drop f ] [ nip ] recover ;
 
 ! TLS on a plain HTTP socket must fail promptly, including on Windows.
 ! Use an assigned port so concurrent test processes cannot collide.
+: tls-on-http ( -- )
+    <http-server> "127.0.0.1" 0 <inet4> >>insecure f >>secure [
+        "https://127.0.0.1:" insecure-addr port>> number>string
+        append [ tls-request-error ] curry future
+        5 seconds ?future-timeout [ rethrow ] when*
+    ] with-threaded-server ;
+
+[ tls-on-http ] must-fail
+
 10 [
-    [
-        <http-server> "127.0.0.1" 0 <inet4> >>insecure f >>secure [
-            "https://127.0.0.1:" insecure-addr port>> number>string
-            append [ tls-request-error ] curry future
-            5 seconds ?future-timeout [ rethrow ] when*
-        ] with-threaded-server
-    ] [
+    [ tls-on-http ] [
         dup string? [ "SSL routines" swap subseq? ] [ drop f ] if
     ] must-fail-with
 ] times

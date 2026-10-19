@@ -1,0 +1,5 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-mips.o $(BUILD_DIR)/cpu-mips.64-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-mips.hpp vm/mips.hpp
+CFLAGS += -march=mips64r2 -mabi=64
+CXXFLAGS += -march=mips64r2 -mabi=64
+ASFLAGS += -march=mips64r2 -mabi=64

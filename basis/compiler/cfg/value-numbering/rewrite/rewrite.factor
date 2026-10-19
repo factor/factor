@@ -47,7 +47,7 @@ M: ##load-reference insn>literal obj>> ;
 
 : vreg-immediate-comparand? ( vreg -- ? )
     vreg>insn {
-        { [ dup ##load-integer? ] [ val>> tag-fixnum immediate-comparand? ] }
+        { [ dup ##load-integer? ] [ val>> immediate-comparand? ] }
         { [ dup ##load-reference? ] [ obj>> immediate-comparand? ] }
         [ drop f ]
     } cond ;

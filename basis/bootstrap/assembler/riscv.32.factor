@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor authors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: assocs bootstrap.image.private compiler.codegen.relocation
 compiler.constants compiler.units cpu.riscv.32.assembler
@@ -102,7 +102,8 @@ CALLBACK-STUB special-objects get set-at
     temp tuple type-number tag-fixnum LI
     [ type temp rot BNE ] [ type obj tuple-class-offset LW ] jit-conditional*
     f cache load-address rel-literal
-    temp type mega-cache-size get 1 - bootstrap-cells ANDI
+    temp type 1 SRLI
+    temp temp mega-cache-size get 1 - bootstrap-cells ANDI
     cache cache temp ADD temp cache array-start-offset LW
     [ type temp rot BNE ] [
         temp MEGA-HITS 0 LW temp temp 1 ADDI temp MEGA-HITS 0 SW

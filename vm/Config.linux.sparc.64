@@ -1,0 +1,5 @@
+include vm/Config.linux
+include vm/Config.sparc.64
+PLAF_MASTER_HEADERS += vm/os-linux-sparc.hpp vm/os-linux-sparc-context.hpp
+
+PLAF_DLL_OBJS += $(BUILD_DIR)/sparc-linux-sigreturn.o

@@ -1,6 +1,6 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types alien.data alien.strings
+USING: bootstrap.ui.platform accessors alien.accessors alien.c-types alien.data alien.strings
 arrays assocs cairo.ffi classes.struct combinators continuations
 destructors environment gdk-pixbuf.ffi gdk3.ffi glib.backend
 glib.ffi gobject gobject.ffi gtk3.ffi io io.encodings.binary
@@ -142,7 +142,9 @@ SYMBOL: event-scale-factor
     ] dip gtk_widget_get_toplevel window send-scroll t ;
 
 : key-sym ( keyval -- string/f action? )
-    code>sym [ dup integer? [ gdk_keyval_to_unicode 1string ] when ] dip ;
+    code>sym [
+        dup integer? [ [ gdk_keyval_to_unicode ] keysym>unicode 1string ] when
+    ] dip ;
 
 : key-event>gesture ( event -- key-gesture )
     [ event-modifiers ] [ keyval>> key-sym ] [
@@ -529,12 +531,16 @@ M: gtk3-ui-backend (with-ui)
 M: gtk3-ui-backend stop-event-loop
     gtk_main_quit ;
 
-os { linux freebsd } member? [
-    gtk3-ui-backend ui-backend set-global
+os gtk3-backend-platform? [
+    gtk3-ui-backend register-ui-backend
 ] when
 
+! Haiku uses its native display session. This predicate also runs before CLI
+! argument parsing; initialize GTK only in (with-ui), where failures are checked.
 M: gtk3-ui-backend ui-backend-available?
-    "DISPLAY" os-env empty? "WAYLAND_DISPLAY" os-env empty? and not ;
+    os haiku? [ t ] [
+        "DISPLAY" os-env empty? "WAYLAND_DISPLAY" os-env empty? and not
+    ] if ;
 
 { "ui.backend.gtk3" "ui.gadgets.editors" }
 "ui.backend.gtk3.input-methods.editors" require-when

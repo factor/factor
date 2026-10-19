@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax
-classes.struct kernel math unix.types ;
+classes.struct kernel literals math system vocabs unix.types ;
 IN: unix.time
 
 STRUCT: timeval
@@ -11,6 +11,8 @@ STRUCT: timeval
 STRUCT: timespec
     { sec time_t }
     { nsec long } ;
+
+os linux? cpu openrisc.32? and [ "unix.time.linux.openrisc.32" require ] when
 
 : <timeval> ( sec usec -- timeval )
     timeval new
@@ -31,6 +33,9 @@ STRUCT: timezone
     { minuteswest int }
     { dsttime int } ;
 
+TYPEDEF: long tm-gmtoff
+<< os haiku? [ \ int \ tm-gmtoff typedef ] when >>
+
 STRUCT: tm
     { sec int }
     { min int }
@@ -41,7 +46,7 @@ STRUCT: tm
     { wday int }
     { yday int }
     { isdst int }
-    { gmtoff long }
+    { gmtoff tm-gmtoff }
     { zone c-string } ;
 
 FUNCTION: time_t time ( time_t* t )
@@ -49,3 +54,6 @@ FUNCTION: tm* localtime ( time_t* clock )
 FUNCTION: int gettimeofday ( timeval* TP, void* TZP )
 FUNCTION: int settimeofday ( timeval* TP, timezone* TZP )
 FUNCTION: int adjtime ( timeval* delta, timeval* olddelta )
+
+! NetBSD libc keeps the pre-time_t-64 entry points under their old names.
+os netbsd? [ "unix.time.netbsd" require ] when

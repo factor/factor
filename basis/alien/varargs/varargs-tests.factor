@@ -20,10 +20,15 @@ STRUCT: va-hva { x float-4 } { y float-4 } ;
     [ [ memory quot call ] with-va-scope ] [ raw free ] finally ; inline
 
 :: cursor-at ( memory platform -- cursor )
+    platform s390x? [
+        256 memory <displaced-alien> 56 memory <displaced-alien>
+        160 memory <displaced-alien> -40 -32 platform <platform-va-cursor>
+    ] [
     256 memory <displaced-alien>
     64 memory <displaced-alien>
     192 memory <displaced-alien>
-    -64 -128 platform <platform-va-cursor> ;
+    -64 -128 platform <platform-va-cursor>
+    ] if ;
 
 ! A macOS anonymous slot occupies eight bytes even for a promoted char.
 { -7 3.5 42 } [
@@ -250,13 +255,129 @@ SYMBOL: escaped-copy
 [ va-list-outside-callback-scope? ] must-fail-with
 
 { t t f } [
-    va_list native-va-list-type? cpu arm.64? cpu riscv? or =
-    va_list lookup-c-type native-va-list-type? cpu arm.64? cpu riscv? or =
+    va_list native-va-list-type? cpu arm.64? cpu riscv? or cpu mips? or cpu s390x? or cpu loongarch.64? or cpu hppa? or =
+    va_list lookup-c-type native-va-list-type? cpu arm.64? cpu riscv? or cpu mips? or cpu s390x? or cpu loongarch.64? or cpu hppa? or =
     int native-va-list-type?
 ] unit-test
 
-cpu arm.64? cpu riscv? or [
+cpu arm.64? cpu riscv? or cpu mips? or cpu s390x? or cpu loongarch.64? or [
     ! Keep declarations in a separately loaded file: parser words inside a
     ! false quotation still execute while the surrounding source is parsed.
     "resource:basis/alien/varargs/native/forwarding.factor" run-test-file
 ] when
+
+! MIPS variadic arguments use contiguous saved GP slots and then stack data.
+! O32 slots are four bytes and a double starts at an even slot.
+{ 17 2.5 23 } [
+    [| mem |
+        17 mem 256 set-alien-signed-4
+        2.5 mem 264 set-alien-double
+        23 mem 272 set-alien-signed-4
+        mem mipsel.32 cursor-at :> cursor
+        cursor int va-arg cursor double va-arg cursor int va-arg
+    ] with-va-memory
+] unit-test
+
+{ 17 2.5 23 } [
+    [| mem |
+        17 mem 256 set-alien-signed-4
+        2.5 mem 264 set-alien-double
+        23 mem 272 set-alien-signed-4
+        mem mipsel.64 cursor-at :> cursor
+        cursor int va-arg cursor double va-arg cursor int va-arg
+    ] with-va-memory
+] unit-test
+
+! Both MIPS ABIs pass even aggregates larger than two cells by value.
+{ 31 37 41 43 } [
+    [| mem |
+        31 mem 256 set-alien-signed-8
+        37 mem 264 set-alien-signed-8
+        41 mem 272 set-alien-signed-8
+        43 mem 280 set-alien-signed-4
+        mem mipsel.64 cursor-at :> cursor
+        cursor va-triple va-arg [ x>> ] [ y>> ] [ z>> ] tri
+        cursor int va-arg
+    ] with-va-memory
+] unit-test
+
+! Check slot addresses independently of the host byte order. N64 big endian
+! scalars use the low word (+4); an aggregate begins at its slot's first byte.
+{ 260 264 } [
+    [| mem |
+        mem mips.64 cursor-at :> cursor
+        cursor int <va-layout> va-arg-address alien-address mem alien-address -
+        cursor stack>> alien-address mem alien-address -
+    ] with-va-memory
+] unit-test
+{ 256 280 } [
+    [| mem |
+        mem mips.64 cursor-at :> cursor
+        cursor va-triple <va-layout> va-arg-address alien-address mem alien-address -
+        cursor stack>> alien-address mem alien-address -
+    ] with-va-memory
+] unit-test
+{ 256 260 } [
+    [| mem |
+        mem mips.32 cursor-at :> cursor
+        cursor int <va-layout> va-arg-address alien-address mem alien-address -
+        cursor stack>> alien-address mem alien-address -
+    ] with-va-memory
+] unit-test
+
+{ 17 23 264 } [
+    [| mem |
+        17 mem 256 set-alien-signed-4
+        23 mem 260 set-alien-signed-4
+        mem mipsel.32 cursor-at :> cursor
+        cursor int va-arg cursor int va-arg
+        cursor stack>> alien-address mem alien-address -
+    ] with-va-memory
+] unit-test
+
+! PA32 va_list walks down through mirrored GP homes and native stack slots.
+{ -7 3.5 42 } [
+    [| mem |
+        -7 mem 248 set-alien-signed-4 3.5 mem 240 set-alien-double
+        42 mem 236 set-alien-signed-4
+        mem hppa.32 cursor-at 252 mem <displaced-alien> >>stack :> cursor
+        cursor int va-arg cursor double va-arg cursor int va-arg
+    ] with-va-memory
+] unit-test
+STRUCT: va-hppa-three { bytes uchar[3] } ;
+STRUCT: va-hppa-seven { bytes uchar[7] } ;
+{ 253 240 249 248 } [
+    [| mem |
+        mem hppa.32 cursor-at :> cursor
+        cursor va-hppa-three <va-layout> va-arg-address alien-address mem alien-address -
+        cursor double <va-layout> va-arg-address alien-address mem alien-address -
+        mem hppa.32 cursor-at :> aggregate
+        aggregate va-hppa-seven <va-layout> va-arg-address alien-address mem alien-address -
+        aggregate stack>> alien-address mem alien-address -
+    ] with-va-memory
+] unit-test
+{ 11 22 22 } [
+    [| mem |
+        11 mem 252 set-alien-signed-4 22 mem 248 set-alien-signed-4
+        mem hppa.32 cursor-at :> cursor
+        cursor int va-arg cursor va-copy :> copy
+        cursor int va-arg copy int va-arg
+    ] with-va-memory
+] unit-test
+
+! Foreign O32/PA32 scalar alignment is independent of the host C ABI.
+! x86-32 describes double as four-aligned; both target argument homes are eight-aligned.
+{ 264 272 } [
+    [| mem |
+        mem mipsel.32 cursor-at 260 mem <displaced-alien> >>stack :> cursor
+        cursor double <va-layout> 4 >>alignment va-arg-address alien-address mem alien-address -
+        cursor stack>> alien-address mem alien-address -
+    ] with-va-memory
+] unit-test
+{ 240 240 } [
+    [| mem |
+        mem hppa.32 cursor-at 252 mem <displaced-alien> >>stack :> cursor
+        cursor double <va-layout> 4 >>alignment va-arg-address alien-address mem alien-address -
+        cursor stack>> alien-address mem alien-address -
+    ] with-va-memory
+] unit-test

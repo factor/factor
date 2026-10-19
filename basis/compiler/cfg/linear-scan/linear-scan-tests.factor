@@ -1,5 +1,5 @@
 USING: tools.test random sorting sequences hashtables assocs
-kernel arrays splitting namespaces math accessors vectors
+kernel literals arrays splitting namespaces math accessors vectors
 math.order grouping strings strings.private classes layouts
 cpu.architecture
 compiler.cfg
@@ -347,7 +347,7 @@ H{
 {
     {
         1
-        1/0.
+        $[ allocation-infinity ]
     }
 } [
     H{

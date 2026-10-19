@@ -246,7 +246,17 @@ template <typename Fixup> struct call_frame_slot_visitor {
   //              [size]
 
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
+#if !defined(FACTOR_SPARC) && !defined(FACTOR_HPPA) && !defined(FACTOR_ALPHA)
     (void)size;
+#endif
+#ifdef FACTOR_PPC
+    // Pre-prologue, leaf and post-epilogue PCs retain their code block, but
+    // their spill map does not describe the caller frame currently in R1.
+    if (ppc_signal_frame_p(frame_top, size) &&
+        ppc_signal_frame_state(frame_top) != ppc_active &&
+        ppc_signal_frame_state(frame_top) != ppc_temporary)
+      return;
+#endif
     cell return_address = owner->offset(addr);
 
     code_block* compiled =
@@ -263,7 +273,27 @@ template <typename Fixup> struct call_frame_slot_visitor {
     FACTOR_PRINT("call frame code block " << compiled << " with offset "
                  << return_address);
 #endif
+#if defined(FACTOR_PPC)
+    // The synthetic signal continuation owns the interrupted PC; its spills
+    // are in the interrupted frame, beyond the 16/32-byte continuation.
+    cell* stack_pointer = (cell*)(frame_top +
+        (ppc_signal_frame_p(frame_top, size) ? size +
+          (ppc_signal_frame_state(frame_top) == ppc_temporary ? 32 : 0) : 0));
+#elif defined(FACTOR_SPARC) || defined(FACTOR_HPPA) || defined(FACTOR_GC_ROOTS_AT_PREDECESSOR_SP)
+    // The saved return names caller code; its roots reside in the parent frame.
+    cell* stack_pointer = (cell*)(frame_top + size);
+#elif defined(FACTOR_ALPHA)
+    // Alpha maps include the ordinary 32-byte callee linkage frame.
+    // A signal at a leaf or prolog entry synthesizes 16 bytes of linkage.
+    // The saved FP is above the caller's locals, so the observed linked
+    // size is the owner's frame size minus 16, rather than a constant 16.
+    // Compensate so the same map still reaches the caller's spill area.
+    cell* stack_pointer = (cell*)(size + JIT_FRAME_SIZE - LEAF_FRAME_SIZE ==
+        compiled->stack_frame_size()
+        ? frame_top + LEAF_FRAME_SIZE - JIT_FRAME_SIZE : frame_top);
+#else
     cell* stack_pointer = (cell*)frame_top;
+#endif
     uint8_t* bitmap = info->gc_info_bitmap();
 
     // Subtract old value of base pointer from every derived pointer.
@@ -382,7 +412,11 @@ template <typename Fixup> struct call_frame_code_block_visitor {
         Fixup::translated_code_block_map ? owner : fixup.fixup_code(owner);
     cell fixed_addr = compiled->address_for_offset(owner->offset(addr));
 
+#ifdef FACTOR_SPARC
+    sparc_set_frame_return_address(frame_top, fixed_addr);
+#else
     *(cell*)(frame_top + FRAME_RETURN_ADDRESS) = fixed_addr;
+#endif
   }
 };
 
@@ -416,6 +450,36 @@ void slot_visitor<Fixup>::visit_context_code_blocks() {
   FACTOR_FOR_EACH(parent->active_contexts) {
     parent->iterate_callstack(*iter, call_frame_visitor, fixup);
   }
+#ifdef FACTOR_SPARC
+  /* A resumed delay-slot instruction can have an unrelated branch target
+   * in NPC. Trace and relocate each independently, plus raw window i7. */
+  auto visit_saved_pc = [&](cell* slot, cell bias) {
+    cell address = *slot + bias;
+    if (!parent->code->seg->in_segment_p(address)) return;
+    code_block* owner = parent->code->code_block_for_address(address);
+    code_block* translated = fixup.translate_code(owner);
+    cell offset = address - (cell)owner - sizeof(code_block);
+    code_block* compiled = Fixup::translated_code_block_map
+        ? translated : fixup.fixup_code(owner);
+    *slot = compiled->entry_point() + offset - bias;
+  };
+  for (auto& pending : parent->sparc_signal_slots) {
+    if (!pending.active) continue;
+    if (!parent->active_contexts.count(pending.owner)) {
+      pending.active = false;
+      continue;
+    }
+#if defined(__OpenBSD__)
+    factor_sparc_openbsd_visit_signal_code(&pending.saved.roots,
+        factor_sparc_window_cookie,
+#else
+    factor_sparc_visit_signal_code(&pending.saved,
+#endif
+        [](void* opaque, uintptr_t* value, unsigned bias) {
+          (*static_cast<decltype(visit_saved_pc)*>(opaque))(value, bias);
+        }, &visit_saved_pc);
+  }
+#endif
 }
 
 template <typename Fixup>

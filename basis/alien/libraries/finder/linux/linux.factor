@@ -10,16 +10,21 @@ IN: alien.libraries.finder.linux
 <PRIVATE
 
 CONSTANT: elf-machine-map {
-    { ppc.32 20 } { ppc.64 21 } { x86.32 3 }
-    { x86.64 62 } { arm.64 183 } { riscv.32 243 } { riscv.64 243 }
+    { ppc.32 20 } { ppc.64 21 } { ppc.64le 21 } { x86.32 3 }
+    { s390x 22 }
+    { x86.64 62 } { alpha.64 0x9026 } { arm.32 40 } { arm.64 183 } { riscv.32 243 } { riscv.64 243 } { openrisc.32 92 } { loongarch.64 258 }
 }
 
 CONSTANT: emulation-map {
     { x86.32 "elf_i386" }
     { x86.64 "elf_x86_64" }
+    { alpha.64 "elf64alpha" }
     { arm.64 "aarch64linux" }
     { riscv.32 "elf32lriscv" }
     { riscv.64 "elf64lriscv" }
+    { openrisc.32 "elf32or1k" }
+    { loongarch.64 "elf64loongarch" }
+    { s390x "elf64_s390" }
 }
 
 : parse-ldconfig-lines ( string -- triple )
@@ -32,17 +37,25 @@ CONSTANT: emulation-map {
         ] dip 3array
     ] map ;
 
-: load-ldconfig-cache ( -- seq )
+: system-ldconfig-cache ( -- seq )
     "ldconfig" find-in-path [
         { "/usr/sbin/ldconfig" "/sbin/ldconfig" }
         [ dup file-exists? [ file-executable? ] [ drop f ] if ] find nip
     ] unless*
     [
         "-p" 2array <process> swap >>command +closed+ >>stderr
-        utf8 [ read-lines ] with-process-reader* nip 0 = [
-            [ "=>" swap subseq? ] filter parse-ldconfig-lines
-        ] [ drop { } ] if
+        utf8 [ read-lines ] with-process-reader* nip 0 =
+        [ ] [ drop { } ] if
     ] [ { } ] if* ;
+
+! Nixpkgs wrappers already provide a textual `ldconfig -p` listing through
+! this variable. Keep that interface without requiring an FHS cache or
+! trusting its architecture labels; candidates are checked as ELF below.
+: load-ldconfig-cache ( -- seq )
+    "FACTOR_LD_SO_CACHE" os-env [
+        utf8 file-lines
+    ] [ system-ldconfig-cache ] if*
+    [ "=>" swap subseq? ] filter parse-ldconfig-lines ;
 
 ! Inspect, do not dlopen, discovery candidates: loading would execute their
 ! constructors. Also reject linker scripts and foreign-architecture DSOs.
@@ -119,8 +132,9 @@ CONSTANT: emulation-map {
     ] [ { } ] if*
     {
         { x86.64 "x86_64" } { x86.32 "i386" } { arm.64 "aarch64" }
-        { riscv.32 "riscv32" } { riscv.64 "riscv64" }
+        { riscv.32 "riscv32" } { riscv.64 "riscv64" } { openrisc.32 "or1k" } { loongarch.64 "loongarch64" }
         { ppc.32 "powerpc" } { ppc.64 "powerpc64" }
+        { s390x "s390x" }
     } cpu of [
         "/etc/ld-musl-" ".path" surround
         dup file-exists? [ utf8 file-contents ":\n" split harvest append ] [ drop ] if
@@ -128,9 +142,13 @@ CONSTANT: emulation-map {
     { "/lib" "/usr/lib" "/lib64" "/usr/lib64" "/usr/local/lib" } append
     {
         { x86.64 "x86_64-linux-gnu" } { x86.32 "i386-linux-gnu" }
+        { alpha.64 "alpha-linux-gnu" }
         { arm.64 "aarch64-linux-gnu" }
         { riscv.32 "riscv32-linux-gnu" }
+        { openrisc.32 "or1k-linux-gnu" }
         { riscv.64 "riscv64-linux-gnu" }
+        { loongarch.64 "loongarch64-linux-gnu" }
+        { s390x "s390x-linux-gnu" }
     } cpu of [
         [ "/lib" swap append-path ] [ "/usr/lib" swap append-path ] bi 2array append
     ] when* members ;

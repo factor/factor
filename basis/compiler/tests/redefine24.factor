@@ -28,7 +28,7 @@ TYPEDEF: alien.c-types:float type-2
     TYPEDEF: float type-2" eval( -- )
 ] unit-test
 
-{ 3 } [ 1.0 2.0 callback indirect ] unit-test
+{ 3 } [ 1.0 2.0 callback indirect ] floating-point-unit-test
 
 { } [
     "USING: alien.c-types alien.syntax ;
@@ -36,4 +36,4 @@ TYPEDEF: alien.c-types:float type-2
     TYPEDEF: float type-3" eval( -- )
 ] unit-test
 
-{ 3.0 } [ 1.0 2.0 callback indirect ] unit-test
+{ 3.0 } [ 1.0 2.0 callback indirect ] floating-point-unit-test

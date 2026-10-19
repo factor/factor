@@ -13,6 +13,11 @@ IN: tools.test
 
 TUPLE: test-failure < source-file-error continuation ;
 
+TUPLE: test-skip reason experiment path line# ;
+
+SYMBOL: test-skips
+test-skips [ V{ } clone ] initialize
+
 SYMBOL: +test-failure+
 
 M: test-failure error-type drop +test-failure+ ;
@@ -68,7 +73,12 @@ SYMBOL: current-test-file
     [ { } input with-datastack output assert-sequence= f f ] [ t ] recover t ;
 
 : (long-unit-test) ( output input -- error/f failed? tested? )
-    long-unit-tests-enabled? get [ (unit-test) ] [ 2drop f f f ] if ;
+    long-unit-tests-enabled? get
+    [ (unit-test) ] [ 2drop "long unit tests disabled" f f ] if ;
+
+: (floating-point-unit-test) ( output input -- error/f failed? tested? )
+    floating-point-supported?
+    [ (unit-test) ] [ 2drop "floating point unsupported" f f ] if ;
 
 : (unit-test-comparator) ( output input comparator -- error/f failed? tested? )
     swapd '[
@@ -82,6 +92,14 @@ SYMBOL: current-test-file
 
 : (unit-test-v~) ( output input -- error/f failed? tested? )
     [ v~ ] (unit-test-comparator) ;
+
+: (floating-point-unit-test~) ( output input -- error/f failed? tested? )
+    floating-point-supported?
+    [ (unit-test~) ] [ 2drop "floating point unsupported" f f ] if ;
+
+: (floating-point-unit-test-v~) ( output input -- error/f failed? tested? )
+    floating-point-supported?
+    [ (unit-test-v~) ] [ 2drop "floating point unsupported" f f ] if ;
 
 : short-effect ( effect -- pair )
     [ in>> length ] [ out>> length ] bi 2array ;
@@ -106,6 +124,18 @@ M: did-not-fail summary drop "Did not fail" ;
 :: (must-not-fail) ( quot -- error/f failed? tested? )
     [ { } quot with-datastack drop f f ] [ t ] recover t ;
 
+: (floating-point-must-fail) ( quot -- error/f failed? tested? )
+    floating-point-supported?
+    [ (must-fail) ] [ drop "floating point unsupported" f f ] if ;
+
+: (floating-point-must-fail-with) ( quot pred -- error/f failed? tested? )
+    floating-point-supported?
+    [ (must-fail-with) ] [ 2drop "floating point unsupported" f f ] if ;
+
+: (floating-point-must-not-fail) ( quot -- error/f failed? tested? )
+    floating-point-supported?
+    [ (must-not-fail) ] [ drop "floating point unsupported" f f ] if ;
+
 : experiment-title ( word -- string )
     "(" ?head drop ")" ?tail drop
     H{ { CHAR: - CHAR: \s } } substitute >title ;
@@ -128,7 +158,11 @@ MACRO: <experiment> ( word -- quot )
                 e current-test-file get line# notify-test-failed
             ] [ rethrow ] if
         ] [ drop ] if
-    ] [ 2drop "Warning: test skipped!" print ] if ; inline
+    ] [
+        drop "test disabled" or
+        [ e current-test-file get line# test-skip boa test-skips get push ]
+        [ "SKIPPED: " write print ] bi
+    ] if ; inline
 
 : parse-test ( accum word -- accum )
     literalize suffix!
@@ -149,6 +183,7 @@ SYNTAX: DEFINE-TEST-WORD:
     [
         "fake" current-test-file set
         V{ } clone test-failures set
+        V{ } clone test-skips set
         call
         test-failures get
     ] with-scope notify-error-observers ; inline
@@ -158,6 +193,7 @@ PRIVATE>
 : run-test-file ( path -- )
     dup current-test-file [
         test-failures get current-test-file get +test-failure+ delete-file-errors
+        test-skips get [ path>> current-test-file get = ] reject! drop
         '[ _ [ run-file ] with-default-pprint-config ] [
             restartable-tests? get
             [ dup compute-restarts empty? not ] [ f ] if
@@ -179,7 +215,9 @@ SYMBOL: forget-tests?
             swap
             "Warning: possible long unit test for " write
             vocab-name write " - " write
-            1,000,000,000 /f pprint " seconds" print
+            floating-point-supported?
+            [ 1,000,000,000 /f pprint " seconds" ]
+            [ pprint " nanoseconds" ] if print
         ] [ 2drop ] if
     ] [ 2drop ] if* ;
 
@@ -206,6 +244,12 @@ PRIVATE>
     [ cleanup-unique-directory ] with-temp-directory ; inline
 
 DEFINE-TEST-WORD: unit-test
+DEFINE-TEST-WORD: floating-point-unit-test
+DEFINE-TEST-WORD: floating-point-unit-test~
+DEFINE-TEST-WORD: floating-point-unit-test-v~
+DEFINE-TEST-WORD: floating-point-must-fail
+DEFINE-TEST-WORD: floating-point-must-fail-with
+DEFINE-TEST-WORD: floating-point-must-not-fail
 DEFINE-TEST-WORD: unit-test~
 DEFINE-TEST-WORD: unit-test-v~
 DEFINE-TEST-WORD: unit-test-comparator
@@ -225,6 +269,8 @@ M: test-failure error. ( error -- )
     } cleave ;
 
 : :test-failures ( -- ) test-failures get errors. ;
+
+: :test-skips ( -- ) test-skips get [ . ] each ;
 
 : test ( prefix -- ) loaded-child-vocab-names test-vocabs ;
 
@@ -247,6 +293,10 @@ M: test-failure error. ( error -- )
             [ load ] [ test ] bi
         ] if
     ] each
+    test-skips get empty? [
+        "==== SKIPPED TESTS: " write test-skips get length pprint nl
+        :test-skips
+    ] unless
     test-failures get empty?
     [ [ "==== FAILING TESTS" print flush :test-failures ] unless ]
     [ 0 1 ? exit ] bi ;

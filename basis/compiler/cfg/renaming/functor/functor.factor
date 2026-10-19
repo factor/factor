@@ -42,7 +42,7 @@ M: alien-call-insn rename-insn-defs
 
 M: ##callback-inputs rename-insn-defs
     [ [ first3 DEF-QUOT 2dip 3array ] map ] change-reg-outputs
-    [ [ first4 DEF-QUOT 3dip 4array ] map ] change-stack-outputs
+    [ [ unclip DEF-QUOT call prefix ] map ] change-stack-outputs
     drop ;
 
 ! Special rename-insn-uses methods
@@ -53,15 +53,15 @@ M: ##phi rename-insn-uses
     [ USE-QUOT assoc-map ] change-inputs drop ;
 
 M: alien-call-insn rename-insn-uses
-    [ [ first3 USE-QUOT 2dip 3array ] map ] change-reg-inputs
-    [ [ first4 USE-QUOT 3dip 4array ] map ] change-stack-inputs
+    [ [ unclip USE-QUOT call prefix ] map ] change-reg-inputs
+    [ [ unclip USE-QUOT call prefix ] map ] change-stack-inputs
     drop ;
 
 M: ##alien-indirect rename-insn-uses
     USE-QUOT change-src call-next-method ;
 
 M: ##callback-outputs rename-insn-uses
-    [ [ first3 USE-QUOT 2dip 3array ] map ] change-reg-inputs
+    [ [ unclip USE-QUOT call prefix ] map ] change-reg-inputs
     drop ;
 
 ! Generate methods for everything else

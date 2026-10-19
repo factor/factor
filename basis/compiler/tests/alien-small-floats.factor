@@ -1,7 +1,7 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax combinators io io.pathnames
-kernel math namespaces system tools.test tools.test.ffi ;
+USING: accessors alien alien.c-types alien.libraries alien.syntax combinators io io.pathnames
+kernel math namespaces sequences system tools.test tools.test.ffi ;
 IN: compiler.tests.alien-small-floats-driver
 
 <<
@@ -25,5 +25,15 @@ ffi_test_small_floats_available 0 > cpu arm.64? and [
 
 "small" small-abi-cases get report-ffi-coverage
 required-small-floats? [
-    small-abi-cases get os linux? [ 26 ] [ 24 ] if >= [ "Reduced-type coverage incomplete" throw ] unless
+    floating-point-supported? [
+        small-abi-cases get
+    ] [
+        small-abi-cases get zero? [ "Unsupported FP ABI cases executed" throw ] unless
+        test-skips get [
+            [ path>> "compiler/tests/small-floats/" subseq-of? ]
+            [ reason>> "floating point unsupported" = ] bi and
+        ] count
+    ] if
+    os linux? [ 26 ] [ 24 ] if >=
+    [ "Reduced-type coverage incomplete" throw ] unless
 ] when

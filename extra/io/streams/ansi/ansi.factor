@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs destructors formatting io
+USING: accessors arrays assocs colors destructors formatting io
 io.streams.escape-codes io.streams.string io.styles kernel math
 math.functions math.vectors namespaces sequences strings
 terminfo ;
@@ -62,10 +62,15 @@ MEMO: fg-colors ( use-dim -- colormap )
     ] when ;
 
 : color>rgb ( color -- rgb )
-    [ red>> ] [ green>> ] [ blue>> ] tri 3array ;
+    [ red>> ] [ green>> ] [ blue>> ] tri 3array
+    floating-point-supported? [ ] [ [ color-component>rational ] map ] if ;
+
+: color-distance ( rgb palette-rgb -- distance )
+    floating-point-supported?
+    [ distance ] [ [ - sq ] [ + ] 2map-reduce ] if ;
 
 : color>ansi ( color palette -- ansi )
-    [ color>rgb '[ _ distance ] ] dip
+    [ color>rgb '[ _ color-distance ] ] dip
     [ keys swap minimum-by ] [ at ] bi
     [ "%d" sprintf ] map ";" join "\e[" "m" surround ;
 

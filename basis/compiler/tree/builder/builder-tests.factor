@@ -3,6 +3,14 @@ compiler.tree.builder continuations kernel locals math ranges
 sequences stack-checker stack-checker.errors tools.test words ;
 IN: compiler.tree.builder.tests
 
+: throwing-dip ( x -- y )
+    1 2 [ "unreachable" throw ] dip ; inline
+
+{ t } [
+    { -1 } { -2 } \ throwing-dip build-sub-tree
+    [ #terminate? ] any?
+] unit-test
+
 : inline-recursive ( -- ) inline-recursive ; inline recursive
 
 { t } [ \ inline-recursive build-tree [ #recursive? ] any? ] unit-test

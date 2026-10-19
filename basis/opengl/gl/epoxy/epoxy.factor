@@ -10,6 +10,7 @@ IN: opengl.gl.epoxy
 LIBRARY: epoxy
 
 C-LIBRARY: epoxy {
+    { haiku "libepoxy.so.0" }
     { linux "libepoxy.so.0" }
     { unix "libepoxy.so" }
 }

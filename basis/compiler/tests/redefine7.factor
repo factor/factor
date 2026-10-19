@@ -24,4 +24,4 @@ IN: compiler.tests.redefine7
 
 { 2.0 } [
     1.0 "my-inline" "compiler.tests.redefine7" lookup-word execute
-] unit-test
+] floating-point-unit-test

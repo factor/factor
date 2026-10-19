@@ -1,4 +1,4 @@
-USING: alien.c-types ascii assocs kernel make math namespaces
+USING: compiler.test.literal-metadata alien.c-types ascii assocs kernel make math namespaces
 sequences specialized-arrays tools.test ;
 IN: assocs.tests
 SPECIALIZED-ARRAY: double
@@ -154,17 +154,17 @@ unit-test
 [ "hi" 5 H{ { 1 2 } { 3 4 } } clone [ rename-at ] keep ]
 unit-test
 
-{
-    H{ { 1.0 1.0 } { 2.0 2.0 } }
-} [
-    double-array{ 1.0 2.0 } [ dup ] H{ } map>assoc
-] unit-test
+! Float-key insertion and lookup require numeric float equality.
+{ t } [
+    { { 1.0 1.0 } { 2.0 2.0 } } [ first2 ] H{ } map>assoc
+    double-array{ 1.0 2.0 } [ dup ] H{ } map>assoc =
+] floating-point-unit-test
 
 {
     { { 1.0 1.0 } { 2.0 2.0 } }
 } [
     double-array{ 1.0 2.0 } [ dup ] map>alist
-] unit-test
+] literal-metadata-unit-test
 
 { { 3 } } [
     [

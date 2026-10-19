@@ -74,7 +74,7 @@ pub fn setSafepointGuard(vm: *vm_mod.FactorVM, locked: bool) !void {
         return error.NoSafepointPage;
     }
 
-    const page_size = segments.page_size;
+    const page_size = segments.pageSize();
     const ptr: *align(std.heap.page_size_min) anyopaque = @ptrFromInt(safepoint_page);
 
     const prot: platform.PROT = if (locked)
@@ -100,7 +100,7 @@ pub fn isSafepoint(vm: *vm_mod.FactorVM, addr: Cell) bool {
     const code_heap = vm.code orelse return false;
     if (code_heap.safepoint_page == 0) return false;
 
-    const page_size = segments.page_size;
+    const page_size = segments.pageSize();
     const page_mask = ~(page_size - 1);
     return (addr & page_mask) == code_heap.safepoint_page;
 }
@@ -388,7 +388,13 @@ const itimerval = extern struct {
 
 const ITIMER_REAL: c_int = 0;
 
-extern "c" fn setitimer(which: c_int, new_value: *const itimerval, old_value: ?*itimerval) c_int;
+const IntervalTimer = struct {
+    extern "c" fn setitimer(which: c_int, new_value: *const itimerval, old_value: ?*itimerval) c_int;
+    extern "c" fn __setitimer50(which: c_int, new_value: *const itimerval, old_value: ?*itimerval) c_int;
+};
+// NetBSD's modern timeval has a 64-bit time_t; the unversioned symbol
+// accepts the legacy time32 layout. Match sys/time.h's native rename.
+const setitimer = if (builtin.os.tag == .netbsd) IntervalTimer.__setitimer50 else IntervalTimer.setitimer;
 
 // Start the sampling profiler
 pub fn startSamplingProfiler(vm: *vm_mod.FactorVM, samples_per_second: Cell) !void {
@@ -484,7 +490,7 @@ test "safepoint page protection" {
 
     // Mirror image.zig: the safepoint page is a dedicated non-executable
     // mapping because macOS rejects mprotect() on MAP_JIT memory.
-    const page_size = segments.page_size;
+    const page_size = segments.pageSize();
     const safepoint_region = platform.mmap(
         null,
         page_size,

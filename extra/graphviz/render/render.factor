@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Alex Vondrak.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: assocs calendar combinators compiler.units continuations
-graphviz.dot images.loader.private images.viewer io.backend io.directories
+graphviz.dot images.loader.private io.backend io.directories
 io.encodings.latin1 io.encodings.utf8 io.files
 io.files.temp io.files.unique io.launcher io.standard-paths
 kernel locals make namespaces sequences summary system threads
@@ -115,13 +115,17 @@ PRIVATE>
         ] cleanup-unique-file
     ] with-temp-directory ; inline
 
+: show-preview ( path word-name -- )
+    "images.viewer" require
+    "images.viewer" lookup-word execute( path -- ) ;
+
 PRIVATE>
 
 : preview ( graph -- )
-    [ image. ] with-preview ;
+    [ "image." show-preview ] with-preview ;
 
 : preview-window ( graph -- )
-    [ image-window ] with-preview ;
+    [ "image-window" show-preview ] with-preview ;
 
 : preview-open ( graph -- )
     [ open-item 1 seconds sleep ] with-preview ;

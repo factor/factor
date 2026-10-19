@@ -1,0 +1,14 @@
+--- a/sysdeps/unix/sysv/linux/sh/sysdep.h
++++ b/sysdeps/unix/sysv/linux/sh/sysdep.h
+@@ -292,2 +292,3 @@
+-    register long int r3 asm ("%r3") = SYS_ify (name);			      \
+-    SUBSTITUTE_ARGS_##nr(args);						      \
++    long int _syscall_number = SYS_ify (name); \
++    SUBSTITUTE_ARGS_##nr(args); \
++    register long int r3 asm ("%r3") = _syscall_number;						      \
+@@ -306,2 +307,3 @@
+-    register long int r3 asm ("%r3") = (name);				      \
+-    SUBSTITUTE_ARGS_##nr(args);						      \
++    long int _syscall_number = (name); \
++    SUBSTITUTE_ARGS_##nr(args); \
++    register long int r3 asm ("%r3") = _syscall_number;						      \

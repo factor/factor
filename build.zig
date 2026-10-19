@@ -8,15 +8,39 @@ fn runCommand(b: *std.Build, argv: []const []const u8) []const u8 {
 pub fn build(b: *std.Build) void {
     // Use native target by default. The VM architecture must match the boot image.
     // Override with -Dtarget= if cross-compiling.
-    const target = b.standardTargetOptions(.{});
+    var target = b.standardTargetOptions(.{});
+    if (target.result.cpu.arch == .powerpc and target.result.os.tag == .linux and target.result.abi.isGnu() and target.result.dynamic_linker.get() == null) {
+        // Zig does not infer glibc's interpreter for PPC32 in this snapshot.
+        var query = target.query;
+        query.dynamic_linker = .init("/lib/ld.so.1");
+        target = b.resolveTargetQuery(query);
+    }
+    if (target.result.cpu.arch == .arm and target.result.os.tag == .freebsd and target.result.dynamic_linker.get() == null) {
+        // ARM hard-float targets need the native FreeBSD interpreter explicitly.
+        var query = target.query;
+        query.dynamic_linker = .init("/libexec/ld-elf.so.1");
+        target = b.resolveTargetQuery(query);
+    }
     const native_target = target.result.cpu.arch == b.graph.host.result.cpu.arch and
         target.result.os.tag == b.graph.host.result.os.tag and
         target.result.abi == b.graph.host.result.abi;
     const optimize = b.standardOptimizeOption(.{});
+    const unwind_lib: ?std.Build.LazyPath = if (target.result.os.tag == .freebsd and target.result.cpu.arch == .arm) blk: {
+        const prepare = b.addSystemCommand(&.{"python3"});
+        prepare.addFileArg(b.path("misc/zig/freebsd-arm-unwind.py"));
+        prepare.addDirectoryArg(.zig_lib);
+        break :blk prepare.addOutputDirectoryArg("zig-lib");
+    } else null;
+
     const keep_symbols = b.option(bool, "keep_symbols", "Keep symbol names in release builds for debugging") orelse false;
+    const copy_to_root = b.option(bool, "copy-to-root", "Copy the installed VM into the source directory") orelse true;
+    const libc_file = b.option([]const u8, "libc-file", "Libc configuration for the target VM and C headers");
+    const target_libc: ?std.Build.LazyPath = if (libc_file) |path| .{ .cwd_relative = path } else null;
+    const target_sysroot = b.option([]const u8, "target-sysroot", "Search the target sysroot for runtime libraries");
 
     // Get git and date info at build time
-    const git_label = runCommand(b, &.{ "git", "log", "-1", "--format=heads/master-%h" });
+    const git_label = b.option([]const u8, "git-label", "Git label for frozen sources (defaults to the current Git HEAD)") orelse
+        runCommand(b, &.{ "git", "log", "-1", "--format=heads/master-%h" });
     const compile_time = runCommand(b, &.{ "date", "+%b %e %Y %H:%M:%S" });
 
     const options = b.addOptions();
@@ -26,11 +50,13 @@ pub fn build(b: *std.Build) void {
     const translate_c = b.dependency("translate_c", .{});
     const locale_c = Translator.init(translate_c, .{
         .c_source_file = b.path("src/locale.h"),
+        .libc_file = target_libc,
         .target = target,
         .optimize = optimize,
     }).mod;
     const windows_c = if (target.result.os.tag == .windows) Translator.init(translate_c, .{
         .c_source_file = b.path("src/windows.h"),
+        .libc_file = target_libc,
         .target = target,
         .optimize = optimize,
     }).mod else null;
@@ -38,6 +64,7 @@ pub fn build(b: *std.Build) void {
     // Main Factor VM executable
     const exe = b.addExecutable(.{
         .name = "factor",
+        .zig_lib_dir = unwind_lib,
         .use_llvm = true,
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/main.zig"),
@@ -54,15 +81,86 @@ pub fn build(b: *std.Build) void {
 
     // Link libc for system calls
     exe.root_module.link_libc = true;
+    if (target_libc) |path| exe.setLibCFile(path);
+    if (target_sysroot) |path| {
+        exe.root_module.addLibraryPath(.{ .cwd_relative = b.pathJoin(&.{ path, "usr/lib" }) });
+        exe.root_module.addLibraryPath(.{ .cwd_relative = b.pathJoin(&.{ path, "lib" }) });
+        if (target.result.cpu.arch == .loongarch64) {
+            exe.root_module.addLibraryPath(.{ .cwd_relative = b.pathJoin(&.{ path, "usr/lib64" }) });
+            exe.root_module.addLibraryPath(.{ .cwd_relative = b.pathJoin(&.{ path, "lib64" }) });
+        }
+        exe.root_module.addLibraryPath(.{ .cwd_relative = b.pathJoin(&.{ path, "usr/local/lib" }) });
+    }
+    exe.root_module.addCSourceFile(.{ .file = b.path("src/libc.c") });
+    if (target.result.os.tag == .linux and target.result.cpu.arch == .loongarch64) {
+        exe.root_module.addCSourceFile(.{ .file = b.path("src/loongarch-context.c") });
+        exe.root_module.addCSourceFile(.{ .file = b.path("vm/cpu-loongarch.64-trampoline.S") });
+    }
+    if (target.result.os.tag == .linux and switch (target.result.cpu.arch) {
+        .mips, .mipsel, .mips64, .mips64el => true,
+        else => false,
+    })
+        exe.root_module.addCSourceFile(.{ .file = b.path("src/mips-context.c") });
+    if ((target.result.os.tag == .linux or target.result.os.tag == .freebsd) and switch (target.result.cpu.arch) {
+        .powerpc, .powerpc64, .powerpc64le => true,
+        else => false,
+    }) {
+        exe.root_module.addCSourceFile(.{ .file = b.path("src/powerpc-context.c") });
+        exe.root_module.addCSourceFile(.{ .file = b.path("src/powerpc-abi.c") });
+    }
+    if (target.result.os.tag == .netbsd and target.result.cpu.arch == .powerpc) {
+        exe.root_module.addCSourceFile(.{ .file = b.path("src/powerpc-abi.c") });
+    }
+    if (target.result.os.tag == .linux and (target.result.cpu.arch == .sparc or target.result.cpu.arch == .sparc64)) {
+        exe.root_module.addCSourceFile(.{ .file = b.path("vm/cpu-sparc-trampoline.S") });
+        exe.root_module.addCSourceFile(.{ .file = b.path("vm/sparc-linux-sigreturn.S") });
+        exe.root_module.addCSourceFile(.{ .file = b.path("src/sparc_linux_signal.c") });
+    }
     if (target.result.os.tag == .windows) {
         exe.root_module.addCSourceFile(.{ .file = b.path("src/windows_format.c") });
+    }
+
+    // This Zig snapshot emits PPC64 GNU modules with an ELFv2 module flag.
+    // Expose frontend IR so the ELFv1 backend can select descriptor codegen.
+    if (target.result.cpu.arch == .powerpc64 and target.result.os.tag == .linux and target.result.abi.isGnu()) {
+        const ir_step = b.step("powerpc64-elfv1-ir", "Emit PowerPC64 GNU frontend IR for ELFv1 backend codegen");
+        const frontend = b.addExecutable(.{
+            .name = "factor-elfv1",
+            .use_llvm = true,
+            .root_module = b.createModule(.{
+                .root_source_file = b.path("src/main.zig"),
+                .target = target,
+                .optimize = optimize,
+            }),
+        });
+        frontend.root_module.link_libc = true;
+        frontend.rdynamic = true;
+        if (target_libc) |path| frontend.setLibCFile(path);
+        frontend.root_module.addOptions("build_options", options);
+        frontend.root_module.addImport("locale_c", locale_c);
+        const install_ir = b.addInstallFile(frontend.getEmittedLlvmIr(), "powerpc64-elfv1/factor.ll");
+        ir_step.dependOn(&install_ir.step);
+        const frontend_tests = b.addTest(.{
+            .use_llvm = true,
+            .root_module = b.createModule(.{
+                .root_source_file = b.path("src/main.zig"),
+                .target = target,
+                .optimize = optimize,
+            }),
+        });
+        frontend_tests.root_module.link_libc = true;
+        if (target_libc) |path| frontend_tests.setLibCFile(path);
+        frontend_tests.root_module.addOptions("build_options", options);
+        frontend_tests.root_module.addImport("locale_c", locale_c);
+        const install_test_ir = b.addInstallFile(frontend_tests.getEmittedLlvmIr(), "powerpc64-elfv1/tests.ll");
+        ir_step.dependOn(&install_test_ir.step);
     }
 
     // Export dynamic symbols so Factor runtime can find primitives via dlsym
     // This is equivalent to -rdynamic in GCC
     exe.rdynamic = true;
 
-    if (target.result.abi.isMusl()) {
+    if (target.result.abi.isMusl() or (target.result.cpu.arch == .arm and target.result.os.tag == .freebsd)) {
         exe.linkage = .dynamic;
     }
 
@@ -88,9 +186,48 @@ pub fn build(b: *std.Build) void {
         exe.root_module.linkFramework("CoreText", .{});
         exe.root_module.linkFramework("ApplicationServices", .{});
         exe.root_module.linkFramework("Carbon", .{});
-    } else if (target.result.os.tag == .linux) {
+    } else if (switch (target.result.os.tag) {
+        .linux, .freebsd, .netbsd, .openbsd, .dragonfly => true,
+        else => false,
+    }) {
         // Link math library for floor/ceil/etc
-        exe.root_module.linkSystemLibrary("m", .{});
+        // Factor resolves math functions through dlsym at runtime.
+        exe.root_module.linkSystemLibrary("m", .{ .needed = true });
+    }
+
+    // Zig's SPARC ELF executables currently fail in the GNU dynamic loader.
+    // Preserve LLVM code generation while letting the target GCC supply ELF
+    // layout, CRT startup, and libgcc through an explicit build step.
+    if (target.result.os.tag == .linux and
+        (target.result.cpu.arch == .sparc or target.result.cpu.arch == .sparc64))
+    {
+        const compiler = b.option([]const u8, "gnu-compiler", "GNU SPARC compiler for gnu-link") orelse "sparc64-linux-gnu-gcc";
+        const object_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        });
+        object_module.addOptions("build_options", options);
+        object_module.addImport("locale_c", locale_c);
+        const object = b.addObject(.{
+            .name = "factor-gnu",
+            .root_module = object_module,
+            .use_llvm = true,
+        });
+        object.bundle_compiler_rt = false;
+        if (target_libc) |path| object.setLibCFile(path);
+        const link = b.addSystemCommand(&.{ compiler, if (target.result.cpu.arch == .sparc) "-m32" else "-m64", "-rdynamic" });
+        link.addArtifactArg(object);
+        link.addFileArg(b.path("src/libc.c"));
+        link.addFileArg(b.path("vm/cpu-sparc-trampoline.S"));
+        link.addFileArg(b.path("vm/sparc-linux-sigreturn.S"));
+        link.addFileArg(b.path("src/sparc_linux_signal.c"));
+        link.addArgs(&.{ "-lm", "-ldl", "-pthread", "-o" });
+        const binary = link.addOutputFileArg("factor-gnu");
+        const install = b.addInstallFile(binary, "bin/factor-gnu");
+        const gnu_step = b.step("gnu-link", "Build SPARC LLVM VM objects and link with target GNU GCC");
+        gnu_step.dependOn(&install.step);
     }
 
     b.installArtifact(exe);
@@ -107,7 +244,7 @@ pub fn build(b: *std.Build) void {
     // zig-out/bin/factor lacks; without it Cocoa/UI code hangs headless.
     // We copy from the freshly-built artifact (not ./factor) so we never mv the
     // symlink over the real binary.
-    if (native_target and target.result.os.tag == .macos) {
+    if (copy_to_root and native_target and target.result.os.tag == .macos) {
         // Run with cwd = build root, so the bundle paths stay relative.
         const mkdir_bundle = b.addSystemCommand(&.{ "mkdir", "-p", "Factor.app/Contents/MacOS", "Factor.app/Contents/Frameworks" });
         mkdir_bundle.setCwd(b.path("."));
@@ -136,7 +273,7 @@ pub fn build(b: *std.Build) void {
         link_factor.setCwd(b.path("."));
         link_factor.step.dependOn(&codesign.step);
         b.getInstallStep().dependOn(&link_factor.step);
-    } else if (native_target) {
+    } else if (copy_to_root and native_target) {
         // On non-macOS platforms there's no app bundle, so just drop the
         // freshly-built binary at the build root as ./factor (mirroring `make`'s
         // default target). Use the build system's own file-copy step rather than
@@ -158,6 +295,8 @@ pub fn build(b: *std.Build) void {
 
     // Unit tests
     const tests = b.addTest(.{
+        .zig_lib_dir = unwind_lib,
+        .use_llvm = true,
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/main.zig"),
             .target = target,
@@ -165,6 +304,45 @@ pub fn build(b: *std.Build) void {
         }),
     });
     tests.root_module.link_libc = true;
+    if (target_libc) |path| tests.setLibCFile(path);
+    if (target_sysroot) |path| {
+        tests.root_module.addLibraryPath(.{ .cwd_relative = b.pathJoin(&.{ path, "usr/lib" }) });
+        tests.root_module.addLibraryPath(.{ .cwd_relative = b.pathJoin(&.{ path, "lib" }) });
+        if (target.result.cpu.arch == .loongarch64) {
+            tests.root_module.addLibraryPath(.{ .cwd_relative = b.pathJoin(&.{ path, "usr/lib64" }) });
+            tests.root_module.addLibraryPath(.{ .cwd_relative = b.pathJoin(&.{ path, "lib64" }) });
+        }
+        tests.root_module.addLibraryPath(.{ .cwd_relative = b.pathJoin(&.{ path, "usr/local/lib" }) });
+    }
+    if (switch (target.result.os.tag) {
+        .linux, .freebsd, .netbsd, .openbsd, .dragonfly => true,
+        else => false,
+    }) tests.root_module.linkSystemLibrary("m", .{ .needed = true });
+    tests.root_module.addCSourceFile(.{ .file = b.path("src/libc.c") });
+    if (target.result.os.tag == .linux and target.result.cpu.arch == .loongarch64) {
+        tests.root_module.addCSourceFile(.{ .file = b.path("src/loongarch-context.c") });
+        tests.root_module.addCSourceFile(.{ .file = b.path("vm/cpu-loongarch.64-trampoline.S") });
+    }
+    if (target.result.os.tag == .linux and switch (target.result.cpu.arch) {
+        .mips, .mipsel, .mips64, .mips64el => true,
+        else => false,
+    })
+        tests.root_module.addCSourceFile(.{ .file = b.path("src/mips-context.c") });
+    if ((target.result.os.tag == .linux or target.result.os.tag == .freebsd) and switch (target.result.cpu.arch) {
+        .powerpc, .powerpc64, .powerpc64le => true,
+        else => false,
+    }) {
+        tests.root_module.addCSourceFile(.{ .file = b.path("src/powerpc-context.c") });
+        tests.root_module.addCSourceFile(.{ .file = b.path("src/powerpc-abi.c") });
+    }
+    if (target.result.os.tag == .netbsd and target.result.cpu.arch == .powerpc) {
+        tests.root_module.addCSourceFile(.{ .file = b.path("src/powerpc-abi.c") });
+    }
+    if (target.result.os.tag == .linux and (target.result.cpu.arch == .sparc or target.result.cpu.arch == .sparc64)) {
+        tests.root_module.addCSourceFile(.{ .file = b.path("vm/cpu-sparc-trampoline.S") });
+        tests.root_module.addCSourceFile(.{ .file = b.path("vm/sparc-linux-sigreturn.S") });
+        tests.root_module.addCSourceFile(.{ .file = b.path("src/sparc_linux_signal.c") });
+    }
     if (target.result.os.tag == .windows) {
         tests.root_module.addCSourceFile(.{ .file = b.path("src/windows_format.c") });
     }
@@ -175,6 +353,10 @@ pub fn build(b: *std.Build) void {
     const run_tests = b.addRunArtifact(tests);
     const test_step = b.step("test", "Run tests");
     test_step.dependOn(&run_tests.step);
+
+    const install_tests = b.addInstallArtifact(tests, .{ .dest_sub_path = "factor-tests" });
+    const test_bin_step = b.step("test-bin", "Install native tests for execution on a target machine");
+    test_bin_step.dependOn(&install_tests.step);
 
     // Keep the native notification tests independently runnable on Windows,
     // without requiring the rest of the VM to bootstrap first.

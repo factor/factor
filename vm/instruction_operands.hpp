@@ -59,10 +59,17 @@ enum relocation_class {
   // absolute address in a 1 byte location
   RC_ABSOLUTE_1,
   RC_ABSOLUTE_RISCV_I,
-  RC_ABSOLUTE_RISCV_LI
+  RC_ABSOLUTE_RISCV_LI,
+  // CPU-specific slots: retain the four-bit class / 24-bit offset format.
+  RC_NATIVE_0 = 14,
+  RC_NATIVE_1 = 15
 };
 
+#if defined(FACTOR_ARM32)
+static const cell rel_arm_b_mask = 0x00ffffff;
+#else
 static const cell rel_arm_b_mask = 0x03ffffff;
+#endif
 static const cell rel_arm_b_cond_ldr_mask = 0x00ffffe0;
 static const cell rel_arm_ldur_mask = 0x001ff000;
 static const cell rel_arm_cmp_mask = 0x003ffc00;

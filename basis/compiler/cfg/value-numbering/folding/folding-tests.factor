@@ -1,5 +1,5 @@
-USING: accessors compiler.cfg.comparisons compiler.cfg.instructions compiler.cfg.value-numbering compiler.test
-kernel kernel.private layouts locals math math.bitwise math.floats.env math.private sequences
+USING: arrays accessors compiler.cfg.comparisons compiler.cfg.instructions compiler.cfg.value-numbering compiler.test
+kernel kernel.private layouts literals locals math math.bitwise math.floats.env math.floats.env.test-support math.private sequences
 tools.test ;
 IN: compiler.cfg.value-numbering.folding.tests
 
@@ -9,33 +9,44 @@ IN: compiler.cfg.value-numbering.folding.tests
 ! #1556: both branch-produced literals and literals selected by ?.
 { f } [ [ [ 3 ] [ 4 ] if fixnum>float ] has-integer>float? ] unit-test
 { f } [ [ { float object } declare 1 -1 ? - ] has-integer>float? ] unit-test
-{ 3.0 } [ t [ [ 3 ] [ 4 ] if fixnum>float ] compile-call ] unit-test
-{ 4.0 } [ f [ [ 3 ] [ 4 ] if fixnum>float ] compile-call ] unit-test
-{ 9.0 } [ 10.0 t [ { float object } declare 1 -1 ? - ] compile-call ] unit-test
-{ 11.0 } [ 10.0 f [ { float object } declare 1 -1 ? - ] compile-call ] unit-test
+{ 3.0 } [ t [ [ 3 ] [ 4 ] if fixnum>float ] compile-call ] floating-point-unit-test
+{ 4.0 } [ f [ [ 3 ] [ 4 ] if fixnum>float ] compile-call ] floating-point-unit-test
+{ 9.0 } [ 10.0 t [ { float object } declare 1 -1 ? - ] compile-call ] floating-point-unit-test
+{ 11.0 } [ 10.0 f [ { float object } declare 1 -1 ? - ] compile-call ] floating-point-unit-test
 
 ! Shared values must retain their integer representation.
 { f } [ [ [ 3 ] [ 4 ] if dup fixnum>float ] has-integer>float? ] unit-test
-{ 3 3.0 } [ t [ [ 3 ] [ 4 ] if dup fixnum>float ] compile-call ] unit-test
-{ 4 4.0 } [ f [ [ 3 ] [ 4 ] if dup fixnum>float ] compile-call ] unit-test
+{ 3 3.0 } [ t [ [ 3 ] [ 4 ] if dup fixnum>float ] compile-call ] floating-point-unit-test
+{ 4 4.0 } [ f [ [ 3 ] [ 4 ] if dup fixnum>float ] compile-call ] floating-point-unit-test
 ! A single input can feed multiple outputs of a phi.
 { f } [ [ [ 3 dup ] [ 4 dup ] if fixnum>float ] has-integer>float? ] unit-test
-{ 3 3.0 } [ t [ [ 3 dup ] [ 4 dup ] if fixnum>float ] compile-call ] unit-test
-{ 4 4.0 } [ f [ [ 3 dup ] [ 4 dup ] if fixnum>float ] compile-call ] unit-test
-{ t } [ [ { fixnum object } declare [ ] [ drop 4 ] if fixnum>float ] has-integer>float? ] unit-test
+{ 3 3.0 } [ t [ [ 3 dup ] [ 4 dup ] if fixnum>float ] compile-call ] floating-point-unit-test
+{ 4 4.0 } [ f [ [ 3 dup ] [ 4 dup ] if fixnum>float ] compile-call ] floating-point-unit-test
+! A runtime primitive call also preserves the conversion when no intrinsic
+! is registered; only intrinsic lowering produces this CFG instruction.
+[ \ fixnum>float intrinsic-enabled? ] call 1array
+[ [ { fixnum object } declare [ ] [ drop 4 ] if fixnum>float ] has-integer>float? ] unit-test
 
 ! Inexact conversion remains at runtime to honor rounding modes and flags.
 cell 8 = [
-    { t } [ [ [ 0x20000000000001 ] [ 4 ] if fixnum>float ] has-integer>float? ] unit-test
+    [ \ fixnum>float intrinsic-enabled? ] call 1array
+    [ [ [ 0x20000000000001 ] [ 4 ] if fixnum>float ] has-integer>float? ] unit-test
 ] when
 
 ! Exercise CFG folding directly, independently of tree constant folding.
+floating-point-supported?
 {
     {
         T{ ##load-integer { dst 0 } { val -3 } }
         T{ ##load-reference { dst 1 } { obj -3.0 } }
     }
-} [
+}
+{
+    {
+        T{ ##load-integer { dst 0 } { val -3 } }
+        T{ ##integer>float { dst 1 } { src 0 } }
+    }
+} ? [
     {
         T{ ##load-integer { dst 0 } { val -3 } }
         T{ ##integer>float { dst 1 } { src 0 } }
@@ -46,7 +57,8 @@ cell 8 = [
     {
         T{ ##load-integer { dst 0 } { val 0x20000000000000 } }
         T{ ##integer>float { dst 1 } { src 0 } }
-    } value-numbering-step last ##load-reference?
+    } value-numbering-step last
+    floating-point-supported? [ ##load-reference? ] [ ##integer>float? ] if
 ] unit-test
 
 { t } [
@@ -64,18 +76,18 @@ cell 8 = [
 
     { 0x4340000000000000 } [
         +round-down+ [ t selected-inexact-float ] with-rounding-mode double>bits
-    ] unit-test
+    ] +round-down+ rounding-mode-unit-test
     { 0x4340000000000001 } [
         +round-up+ [ t selected-inexact-float ] with-rounding-mode double>bits
-    ] unit-test
+    ] +round-up+ rounding-mode-unit-test
     { t } [
         t [ selected-inexact-float ] collect-fp-exceptions
         nip +fp-inexact+ swap member?
-    ] unit-test
+    ] floating-point-unit-test
     { f } [
         f [ selected-inexact-float ] collect-fp-exceptions
         nip +fp-inexact+ swap member?
-    ] unit-test
+    ] floating-point-unit-test
 ] when
 
 ! Folded machine integers must retain target-width wrapping. In particular,

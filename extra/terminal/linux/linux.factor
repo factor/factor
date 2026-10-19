@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays classes.struct io.streams.c kernel
+USING: accessors arrays classes.struct io.streams.c kernel literals
 math system terminal unix unix.ffi ;
 QUALIFIED-WITH: alien.c-types c
 
@@ -9,7 +9,7 @@ IN: terminal.linux
 
 <PRIVATE
 
-CONSTANT: TIOCGWINSZ 0x5413
+CONSTANT: TIOCGWINSZ $[ cpu mips? cpu alpha.64? or cpu sparc? or 0x40087468 0x5413 ? ]
 
 STRUCT: winsize
 { ws_row c:ushort }

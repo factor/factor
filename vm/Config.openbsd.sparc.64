@@ -1,0 +1,4 @@
+include vm/Config.openbsd
+include vm/Config.sparc.64
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-sparc-openbsd.o $(BUILD_DIR)/sparc-openbsd-stackghost.o
+PLAF_MASTER_HEADERS += vm/os-openbsd-sparc.hpp vm/sparc-openbsd-context.h vm/sparc-openbsd-signal.h vm/sparc-openbsd-signal-roots.h vm/sparc-openbsd-stackghost.h

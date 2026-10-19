@@ -99,9 +99,9 @@ pub const InlineCacheJit = struct {
         defer _ = vm.data_roots.pop();
 
         if (self.pic_type == .tag) {
-            vm.dispatch_stats.pic_tag_count += 1;
+            vm.dispatch_stats.pic_tag_count +%= 1;
         } else {
-            vm.dispatch_stats.pic_tuple_count += 1;
+            vm.dispatch_stats.pic_tuple_count +%= 1;
         }
 
         const byte_offset: Fixnum = -index * @as(Fixnum, @sizeOf(Cell));
@@ -239,11 +239,11 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
 
 fn updatePicTransitions(vm: *FactorVM, pic_size: Cell) void {
     if (pic_size == vm.max_pic_size) {
-        vm.dispatch_stats.pic_to_mega_transitions += 1;
+        vm.dispatch_stats.pic_to_mega_transitions +%= 1;
     } else if (pic_size == 0) {
-        vm.dispatch_stats.cold_call_to_ic_transitions += 1;
+        vm.dispatch_stats.cold_call_to_ic_transitions +%= 1;
     } else if (pic_size == 1) {
-        vm.dispatch_stats.ic_to_pic_transitions += 1;
+        vm.dispatch_stats.ic_to_pic_transitions +%= 1;
     }
 }
 
@@ -376,17 +376,60 @@ pub const CallSitePatcher = struct {
         return insn_ptr.*;
     }
 
+    fn isLongPowerPCCallSite(return_address: Cell) bool {
+        const branch = armCallSiteInsn(return_address);
+        if (branch & ~@as(u32, 1) != 0x4e800420) return false;
+        if (@as(*align(1) const u32, @ptrFromInt(return_address - 8)).* != 0x7d8903a6) return false;
+        if (@sizeOf(Cell) == 8) {
+            const p: *align(1) const [5]u32 = @ptrFromInt(return_address - 28);
+            return p[0] & 0xffff0000 == 0x3d800000 and p[1] & 0xffff0000 == 0x618c0000 and
+                p[2] == 0x798c07c6 and p[3] & 0xffff0000 == 0x658c0000 and p[4] & 0xffff0000 == 0x618c0000;
+        }
+        const p: *align(1) const [2]u32 = @ptrFromInt(return_address - 16);
+        return p[0] & 0xffff0000 == 0x3d800000 and p[1] & 0xffff0000 == 0x618c0000;
+    }
+
     fn isValidCallSite(return_address: Cell) bool {
         return switch (builtin.cpu.arch) {
             .x86, .x86_64 => blk: {
                 const opcode = x86CallSiteOpcode(return_address);
                 break :blk opcode == call_opcode or opcode == jmp_opcode;
             },
+            .arm => blk: {
+                const p: *align(1) const [3]u32 = @ptrFromInt(return_address - 8);
+                break :blk p[0] == 0xe59fc004 and
+                    (p[1] == 0xe12fff3c or p[1] == 0xe12fff1c) and p[2] == 0xea000000;
+            },
             .aarch64 => (armCallSiteInsn(return_address) & arm_b_mask) == arm_b_pattern,
+            .powerpc, .powerpc64, .powerpc64le => isLongPowerPCCallSite(return_address) or (armCallSiteInsn(return_address) & 0xfc000002) == 0x48000000,
+            .loongarch64 => blk: {
+                const p: *align(1) const [2]u32 = @ptrFromInt(return_address - 8);
+                break :blk p[0] & 0xfe000000 == 0x1c000000 and @import("loongarch.zig").isJirl(p[1]);
+            },
             .riscv64, .riscv32 => blk: {
                 const p: *align(1) const [2]u32 = @ptrFromInt(return_address - 8);
                 break :blk (p[0] & 0xfff) == 0x297 and
                     ((p[1] & 0xfffff) == 0x280e7 or (p[1] & 0xfffff) == 0x28067);
+            },
+            .mips, .mipsel, .mips64, .mips64el => blk: {
+                const instruction = @as(*align(1) const u32, @ptrFromInt(return_address - 8)).*;
+                if (instruction != 0x0320f809 and instruction != 0x03200008) break :blk false;
+                if (@as(*align(1) const u32, @ptrFromInt(return_address - 4)).* != 0) break :blk false;
+                if (@sizeOf(Cell) == 4) {
+                    const literal: *align(1) const [2]u32 = @ptrFromInt(return_address - 16);
+                    break :blk literal[0] & 0xffff0000 == 0x3c190000 and literal[1] & 0xffff0000 == 0x37390000;
+                }
+                const literal: *align(1) const [7]u32 = @ptrFromInt(return_address - 36);
+                if (literal[0] & 0xffff0000 != 0x34190000) break :blk false;
+                inline for ([_]usize{ 1, 3, 5 }) |i| {
+                    if (literal[i] != 0x0019cc38 or literal[i + 1] & 0xffff0000 != 0x37390000) break :blk false;
+                }
+                break :blk true;
+            },
+            .sparc, .sparc64 => @import("sparc.zig").CallSite(Cell).valid(return_address),
+            .s390x => blk: {
+                const p: [*]const u8 = @ptrFromInt(return_address - 6);
+                break :blk p[0] == 0xc0 and (p[1] == 0xe5 or p[1] == 0xf4);
             },
             else => @compileError("Unsupported architecture for call site patching"),
         };
@@ -417,8 +460,18 @@ pub const CallSitePatcher = struct {
                 // while callers pass the address of the following instruction.
                 break :blk @intCast(@as(i64, @intCast(return_address - 4)) + signed_imm26 * 4);
             },
+            .powerpc, .powerpc64, .powerpc64le => if (isLongPowerPCCallSite(return_address))
+                @truncate(@import("native_relocations.zig").load(builtin.cpu.arch, 0, return_address - 8, 0))
+            else
+                (return_address - 4) +% @as(Cell, @bitCast(@as(layouts.Fixnum, @import("powerpc.zig").branchDisplacement(armCallSiteInsn(return_address))))),
+            .arm => @as(*align(1) const Cell, @ptrFromInt(return_address + 4)).*,
             .riscv32 => return_address -% 8 +% @as(u32, @truncate(@as(u64, @bitCast(@import("riscv.zig").pairDisplacement(@ptrFromInt(return_address - 8)))))),
+            .loongarch64 => @intCast(@as(i64, @intCast(return_address - 8)) + @import("loongarch.zig").pairDisplacement(@ptrFromInt(return_address - 8))),
             .riscv64 => @intCast(@as(i64, @intCast(return_address - 8)) + @import("riscv.zig").pairDisplacement(@ptrFromInt(return_address - 8))),
+            .mips, .mipsel => @import("mips.zig").loadLiteral32(@ptrFromInt(return_address - 16)),
+            .mips64, .mips64el => @intCast(@import("mips.zig").loadLiteral64(@ptrFromInt(return_address - 36))),
+            .sparc, .sparc64 => @import("sparc.zig").CallSite(Cell).target(return_address),
+            .s390x => @intCast(@as(i64, @intCast(return_address - 6)) + @import("s390x.zig").branchDisplacement(@ptrFromInt(return_address - 6))),
             else => @compileError("Unsupported architecture for call site patching"),
         };
     }
@@ -442,13 +495,44 @@ pub const CallSitePatcher = struct {
                 insn_ptr.* = (insn & 0xfc000000) | (imm26 & 0x03ffffff);
                 icache.flushICache(return_address - 4, 4);
             },
+            .powerpc, .powerpc64, .powerpc64le => {
+                if (isLongPowerPCCallSite(return_address)) {
+                    @import("native_relocations.zig").store(builtin.cpu.arch, 0, return_address - 8, target);
+                    const size: Cell = if (@sizeOf(Cell) == 8) 28 else 16;
+                    icache.flushICache(return_address - size, size);
+                } else {
+                    @import("native_relocations.zig").store(builtin.cpu.arch, 1, return_address, target);
+                    icache.flushICache(return_address - 4, 4);
+                }
+            },
+            .arm => {
+                @as(*align(1) Cell, @ptrFromInt(return_address + 4)).* = target;
+                icache.flushICache(return_address + 4, @sizeOf(Cell));
+            },
             .riscv32 => {
                 @import("riscv.zig").storePair32(@ptrFromInt(return_address - 8), target -% (return_address - 8));
                 icache.flushICache(return_address - 8, 8);
             },
+            .loongarch64 => {
+                @import("loongarch.zig").storePair(@ptrFromInt(return_address - 8), @as(i64,@intCast(target)) - @as(i64,@intCast(return_address - 8)));
+                icache.flushICache(return_address - 8,8);
+            },
             .riscv64 => {
                 @import("riscv.zig").storePair(@ptrFromInt(return_address - 8), @as(i64, @intCast(target)) - @as(i64, @intCast(return_address - 8)));
                 icache.flushICache(return_address - 8, 8);
+            },
+            .mips, .mipsel, .mips64, .mips64el => {
+                const size: Cell = if (@sizeOf(Cell) == 4) 16 else 36;
+                if (@sizeOf(Cell) == 4) @import("mips.zig").storeLiteral32(@ptrFromInt(return_address - size), @intCast(target)) else @import("mips.zig").storeLiteral64(@ptrFromInt(return_address - size), target);
+                icache.flushICache(return_address - size, size);
+            },
+            .sparc, .sparc64 => {
+                const size = @import("sparc.zig").CallSite(Cell).patch(return_address, target) catch @panic("SPARC inline cache branch outside encoding range");
+                icache.flushICache(return_address - size, size);
+            },
+            .s390x => {
+                @import("s390x.zig").storeBranch(@ptrFromInt(return_address - 6), @as(i64, @intCast(target)) - @as(i64, @intCast(return_address - 6)));
+                icache.flushICache(return_address - 6, 6);
             },
             else => @compileError("Unsupported architecture for call site patching"),
         }
@@ -457,8 +541,14 @@ pub const CallSitePatcher = struct {
     pub fn isTailCallSite(return_address: Cell) bool {
         return switch (builtin.cpu.arch) {
             .x86, .x86_64 => x86CallSiteOpcode(return_address) == jmp_opcode,
+            .arm => armCallSiteInsn(return_address) == 0xe12fff1c,
             .aarch64 => (armCallSiteInsn(return_address) >> 31) == 0,
+            .powerpc, .powerpc64, .powerpc64le => (armCallSiteInsn(return_address) & 1) == 0,
+            .loongarch64 => (@as(*align(1) const u32, @ptrFromInt(return_address - 4)).* & 0x1f) == 0,
             .riscv64, .riscv32 => (@as(*align(1) const u32, @ptrFromInt(return_address - 4)).* & 0xf80) == 0,
+            .mips, .mipsel, .mips64, .mips64el => @as(*align(1) const u32, @ptrFromInt(return_address - 8)).* == 0x03200008,
+            .sparc, .sparc64 => @import("sparc.zig").CallSite(Cell).tail(return_address),
+            .s390x => @as(*const u8, @ptrFromInt(return_address - 5)).* == 0xf4,
             else => @compileError("Unsupported architecture for call site patching"),
         };
     }
@@ -503,6 +593,50 @@ test "megamorphic cache hashcode" {
 
 test "call site patcher" {
     switch (builtin.cpu.arch) {
+        .mips, .mipsel, .mips64, .mips64el => {
+            var call32 = [_]u32{ 0x3c190000, 0x37390000, 0x0320f809, 0 };
+            var call64 = [_]u32{ 0x34190000, 0x0019cc38, 0x37390000, 0x0019cc38, 0x37390000, 0x0019cc38, 0x37390000, 0x0320f809, 0 };
+            const return_address = if (@sizeOf(Cell) == 4) @intFromPtr(&call32) + @sizeOf(@TypeOf(call32)) else @intFromPtr(&call64) + @sizeOf(@TypeOf(call64));
+            try std.testing.expect(CallSitePatcher.isValidCallSite(return_address));
+            try std.testing.expect(!CallSitePatcher.isTailCallSite(return_address));
+            for ([_]Cell{ 0, 0x12345678, std.math.maxInt(Cell) }) |target| {
+                CallSitePatcher.setCallTarget(return_address, target);
+                try std.testing.expectEqual(target, CallSitePatcher.getCallTarget(return_address));
+            }
+            @as(*align(1) u32, @ptrFromInt(return_address - 8)).* = 0x03200008;
+            try std.testing.expect(CallSitePatcher.isTailCallSite(return_address));
+        },
+        .powerpc, .powerpc64, .powerpc64le => {
+            var branch: u32 = 0x48000001;
+            const return_address = @intFromPtr(&branch) + 4;
+            try std.testing.expect(CallSitePatcher.isValidCallSite(return_address));
+            try std.testing.expect(!CallSitePatcher.isTailCallSite(return_address));
+            for ([_]isize{ 0, 16, -16, 33554428, -33554432 }) |offset| {
+                const target = (return_address - 4) +% @as(Cell, @bitCast(offset));
+                CallSitePatcher.setCallTarget(return_address, target);
+                try std.testing.expectEqual(target, CallSitePatcher.getCallTarget(return_address));
+                try std.testing.expectEqual(@as(u32, 0x48000001), branch & 0xfc000003);
+            }
+            branch = 0x48000000;
+            try std.testing.expect(CallSitePatcher.isTailCallSite(return_address));
+            branch = 0x48000002;
+            try std.testing.expect(!CallSitePatcher.isValidCallSite(return_address));
+            var long_call = if (@sizeOf(Cell) == 8)
+                [_]u32{ 0x3d800000, 0x618c0000, 0x798c07c6, 0x658c0000, 0x618c0000, 0x7d8903a6, 0x4e800421 }
+            else
+                [_]u32{ 0x3d800000, 0x618c0000, 0x7d8903a6, 0x4e800421 };
+            const long_ra = @intFromPtr(&long_call) + @sizeOf(@TypeOf(long_call));
+            try std.testing.expect(CallSitePatcher.isValidCallSite(long_ra));
+            try std.testing.expect(!CallSitePatcher.isTailCallSite(long_ra));
+            for ([_]Cell{ 0, 0x12345678, std.math.maxInt(Cell), long_ra +% 0x4000000 }) |target| {
+                CallSitePatcher.setCallTarget(long_ra, target);
+                try std.testing.expectEqual(target, CallSitePatcher.getCallTarget(long_ra));
+            }
+            long_call[long_call.len - 1] = 0x4e800420;
+            try std.testing.expect(CallSitePatcher.isTailCallSite(long_ra));
+            long_call[long_call.len - 2] = 0;
+            try std.testing.expect(!CallSitePatcher.isValidCallSite(long_ra));
+        },
         .x86, .x86_64 => {
             var x86_call = [_]u8{ 0xe8, 0, 0, 0, 0 };
             const call_return_address = @intFromPtr(&x86_call[4]) + 1;
@@ -518,6 +652,19 @@ test "call site patcher" {
             const jmp_return_address = @intFromPtr(&x86_jmp[4]) + 1;
             try std.testing.expect(CallSitePatcher.isValidCallSite(jmp_return_address));
             try std.testing.expect(CallSitePatcher.isTailCallSite(jmp_return_address));
+        },
+        .arm => {
+            var call = [_]u32{ 0xe59fc004, 0xe12fff3c, 0xea000000, 0x12345679 };
+            const ra = @intFromPtr(&call[2]);
+            try std.testing.expect(CallSitePatcher.isValidCallSite(ra));
+            try std.testing.expect(!CallSitePatcher.isTailCallSite(ra));
+            try std.testing.expectEqual(@as(Cell, 0x12345679), CallSitePatcher.getCallTarget(ra));
+            CallSitePatcher.setCallTarget(ra, 0x23456789);
+            try std.testing.expectEqual(@as(Cell, 0x23456789), CallSitePatcher.getCallTarget(ra));
+            call[1] = 0xe12fff1c;
+            try std.testing.expect(CallSitePatcher.isTailCallSite(ra));
+            call[0] = 0;
+            try std.testing.expect(!CallSitePatcher.isValidCallSite(ra));
         },
         .aarch64 => {
             var arm_bl = [_]u8{ 0, 0, 0, 0 };
@@ -557,6 +704,22 @@ test "call site patcher" {
             try std.testing.expect(CallSitePatcher.isTailCallSite(return_address));
             call[0] = 0x00000013;
             try std.testing.expect(!CallSitePatcher.isValidCallSite(return_address));
+        },
+        .s390x => {
+            var call = [_]u8{ 0xc0, 0xe5, 0, 0, 0, 0 };
+            const ra = @intFromPtr(&call) + call.len;
+            try std.testing.expect(CallSitePatcher.isValidCallSite(ra));
+            try std.testing.expect(!CallSitePatcher.isTailCallSite(ra));
+            try std.testing.expectEqual(ra - 6, CallSitePatcher.getCallTarget(ra));
+            for ([_]isize{ 16, -342, 2048, -4096 }) |delta| {
+                const target: usize = @bitCast(@as(isize, @bitCast(ra - 6)) + delta);
+                CallSitePatcher.setCallTarget(ra, target);
+                try std.testing.expectEqual(target, CallSitePatcher.getCallTarget(ra));
+            }
+            call[1] = 0xf4;
+            try std.testing.expect(CallSitePatcher.isTailCallSite(ra));
+            call[0] = 0xa7;
+            try std.testing.expect(!CallSitePatcher.isValidCallSite(ra));
         },
         else => return error.SkipZigTest,
     }

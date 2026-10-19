@@ -9,10 +9,15 @@ TUPLE: bsd-file-info < unix-file-info birth-time flags gen ;
 
 M: bsd new-file-info bsd-file-info new ;
 
+HOOK: stat>birth-time os ( stat -- birth-time )
+
+! DragonFly's struct stat has no birth timestamp.
+M: bsd stat>birth-time drop f ;
+
 M: bsd stat>file-info
     [ call-next-method ] keep
     {
         [ st_flags>> >>flags ]
         [ st_gen>> >>gen ]
-        [ st_birthtimespec>> timespec>unix-time >>birth-time ]
+        [ stat>birth-time >>birth-time ]
     } cleave ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators compiler.cfg.predecessors
+USING: compiler.utilities accessors assocs combinators compiler.cfg.predecessors
 compiler.cfg.rpo deques dlists kernel math math.order
 namespaces sequences sorting vectors ;
 IN: compiler.cfg.dominance
@@ -53,9 +53,9 @@ SYMBOLS: preorder maxpreorder ;
 
 PRIVATE>
 
-: pre-of ( bb -- n ) [ preorder get at ] [ -1/0. ] if* ;
+: pre-of ( bb -- n ) [ preorder get at ] [ compiler-position-negative-infinity ] if* ;
 
-: maxpre-of ( bb -- n ) [ maxpreorder get at ] [ 1/0. ] if* ;
+: maxpre-of ( bb -- n ) [ maxpreorder get at ] [ compiler-position-infinity ] if* ;
 
 <PRIVATE
 

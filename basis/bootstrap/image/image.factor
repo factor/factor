@@ -14,7 +14,7 @@ vocabs words ;
 IN: bootstrap.image
 
 : arch-name ( os cpu -- arch )
-    [ [ windows? ] [ ppc? ] bi* or ] 2check
+    [ [ windows? ] [ [ ppc? ] [ s390x? ] bi or ] bi* or ] 2check
     [ [ drop unix ] dip ] unless
     [ name>> ] bi@ "-" glue ;
 
@@ -31,8 +31,14 @@ CONSTANT: image-names
     {
         "windows-x86.32" "unix-x86.32"
         "windows-x86.64" "unix-x86.64"
-        "windows-arm.64" "unix-arm.64"
-        "unix-riscv.32" "unix-riscv.64"
+        "windows-arm.64" "unix-arm.64" "unix-arm.32"
+        "unix-riscv.32" "unix-riscv.64" "unix-openrisc.32" "unix-loongarch.64"
+        "unix-sparc.32" "unix-sparc.64"
+        "linux-s390x" "unix-alpha.64"
+        "unix-hppa.32" "unix-sh4.32"
+        "unix-mips.32" "unix-mips.64" "unix-mipsel.32" "unix-mipsel.64"
+        "linux-ppc.32" "linux-ppc.64" "linux-ppc.64le"
+        "freebsd-ppc.32" "freebsd-ppc.64" "freebsd-ppc.64le" "netbsd-ppc.32"
     }
 
 <PRIVATE
@@ -116,7 +122,11 @@ SYMBOL: special-objects
 : jit-conditional* ( test-quot false-quot -- )
     [ '[ 4 + @ ] ] dip jit-conditional ; inline
 
+SYMBOL: big-endian
+
 : make-jit ( quot -- parameters literals code )
+    big-endian get endian:big-endian little-endian ?
+    relocation-byte-order [
     [
         0 extra-offset set
         init-relocation
@@ -124,10 +134,17 @@ SYMBOL: special-objects
         parameter-table get >array
         literal-table get >array
         relocation-table get >byte-array
-    ] B{ } make 2array ;
+    ] B{ } make 2array
+    ] with-variable ;
 
 : make-jit-no-params ( quot -- code )
     make-jit 2nip ;
+
+! Preserve fixed parameters after the prefix supplied dynamically by the VM.
+:: make-jit-with-parameters ( quot dynamic-count -- template )
+    quot make-jit :> ( parameters literals template )
+    literals empty? t assert=
+    template parameters dynamic-count tail >array suffix ;
 
 : jit-define ( quot n -- )
     [ make-jit-no-params ] dip special-objects get set-at ;
@@ -151,8 +168,7 @@ SYMBOL: special-objects
 
 SYMBOL: bootstrapping-image
 
-! Image output format
-SYMBOL: big-endian
+! Image output format (big-endian is declared above make-jit)
 
 SYMBOL: architecture
 

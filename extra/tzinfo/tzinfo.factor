@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data alien.endian arrays
-assocs calendar classes.struct combinators endian hashtables io
-io.encodings.binary io.files kernel locals math math.order
+assocs calendar classes.struct combinators endian environment hashtables io
+io.encodings.binary io.files io.pathnames kernel locals math math.order
 sequences strings ;
 
 IN: tzinfo
@@ -109,4 +109,5 @@ PRIVATE>
     [ instant convert-timezone ] [ from-utc ] bi* ;
 
 : load-tzinfo ( name -- tzinfo )
-    "/usr/share/zoneinfo/" prepend file>tzinfo ;
+    "TZDIR" os-env [ "/usr/share/zoneinfo" ] when-empty
+    prepend-path file>tzinfo ;

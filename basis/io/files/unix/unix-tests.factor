@@ -225,8 +225,12 @@ os linux? [
 
 "resource:basis/io/files/unix/fixtures/append.factor" run-test-file
 
-[
-    vm-path "-i=" image-path append "-no-user-init" "-no-monitors"
-    "resource:basis/io/files/unix/fixtures/fifo-run.factor" absolute-path
-    5 narray <process> swap >>command 20 seconds >>timeout try-process
-] must-not-fail
+! Android's SELinux policy denies creating FIFO nodes in application data
+! directories. The launcher itself is covered by io.launcher tests there.
+os android? not [
+    [
+        vm-path "-i=" image-path append "-no-user-init" "-no-monitors"
+        "resource:basis/io/files/unix/fixtures/fifo-run.factor" absolute-path
+        5 narray <process> swap >>command try-process
+    ] must-not-fail
+] when

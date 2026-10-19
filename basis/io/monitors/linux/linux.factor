@@ -44,7 +44,7 @@ TUPLE: linux-monitor < monitor wd inotify watches ;
         "Calling <monitor> outside with-monitors" throw
     ] unless ;
 
-M: linux (monitor)
+M: linux-kernel (monitor)
     swap [
         <recursive-monitor>
     ] [
@@ -131,7 +131,7 @@ M: linux-monitor dispose*
 : inotify-read-thread ( port -- )
     [ inotify-read-loop ] curry ignore-errors ;
 
-M: linux init-monitors
+M: linux-kernel init-monitors
     H{ } clone watches namespaces:set
     <inotify> [
         [ inotify namespaces:set ]
@@ -143,5 +143,5 @@ M: linux init-monitors
         "Linux kernel version is too old" throw
     ] if* ;
 
-M: linux dispose-monitors
+M: linux-kernel dispose-monitors
     inotify get dispose ;

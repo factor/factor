@@ -1,0 +1,4026 @@
+{
+  "defaults": {
+    "stall_seconds": 3600,
+    "heap": [
+      "-young=16",
+      "-aging=16"
+    ],
+    "build": {
+      "make": "gmake",
+      "jobs": 1
+    },
+    "execution": {
+      "runner": [],
+      "env": {}
+    }
+  },
+  "targets": {
+    "dragonflybsd-x86-64": {
+      "build": {
+        "config": "dragonflybsd.x86.64"
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/dragonfly/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34100",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-x86_64",
+          "-m",
+          "2048",
+          "-smp",
+          "2",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34100-:22",
+          "-device",
+          "e1000,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
+        ],
+        "drives": [
+          {
+            "file": "/run/user/1001/fp/owned-fp-validation-50-20261010-v7/dragonflybsd-x86-64/vm-final-v7-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=ide,index=0"
+          },
+          {
+            "file": "/run/user/1001/fp/owned-fp-validation-50-20261010-v7/dragonflybsd-x86-64/vm-final-v7-v1/disk-1.qcow2",
+            "format": "qcow2",
+            "options": "if=ide,index=1"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now"
+      },
+      "work_root": "/root"
+    },
+    "freebsd-arm-32": {
+      "build": {
+        "config": "freebsd.arm.32"
+      },
+      "seed": "unix-arm.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/freebsd/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34101",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "/usr/bin/qemu-system-arm",
+          "-machine",
+          "virt,highmem=off,gic-version=2",
+          "-cpu",
+          "cortex-a15",
+          "-m",
+          "2048",
+          "-smp",
+          "2",
+          "-global",
+          "virtio-mmio.force-legacy=true",
+          "-bios",
+          "${repo}/work/qemu-matrix/new-bsd/arm32-netbsd11/firmware/usr/share/AAVMF/AAVMF32_CODE.fd",
+          "-display",
+          "none",
+          "-netdev",
+          "user,id=n,ipv6=off,hostfwd=tcp:127.0.0.1:34101-:22",
+          "-device",
+          "virtio-net-device,netdev=n,mrg_rxbuf=off"
+        ],
+        "drives": [
+          {
+            "file": "/dev/shm/owned-fp-validation-50-20261009-v6/freebsd-arm-32/vm-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now"
+      },
+      "work_root": "/root"
+    },
+    "freebsd-arm-64": {
+      "build": {
+        "config": "freebsd.arm.64"
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/freebsd/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34102",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-aarch64",
+          "-m",
+          "2048",
+          "-smp",
+          "1",
+          "-machine",
+          "virt",
+          "-cpu",
+          "cortex-a72",
+          "-bios",
+          "/usr/share/AAVMF/AAVMF_CODE.fd",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34102-:22",
+          "-device",
+          "virtio-net-pci,netdev=n"
+        ],
+        "drives": [
+          {
+            "file": "/run/user/1001/fp/owned-fp-validation-50-20261009-v6/freebsd-arm-64/vm-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now"
+      },
+      "work_root": "/root"
+    },
+    "freebsd-ppc-32": {
+      "build": {
+        "config": "freebsd.ppc.32",
+        "make": "/root/owned-stock-freebsd-ppc-32-source51-v1/install/bin/make"
+      },
+      "seed": "freebsd-ppc.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34103",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "/usr/bin/qemu-system-ppc",
+          "-M",
+          "mac99,via=pmu",
+          "-m",
+          "1024",
+          "-smp",
+          "1",
+          "-nographic",
+          "-cdrom",
+          "${repo}/work/qemu-matrix/new-bsd/ppc32-freebsd145/disc1.iso",
+          "-boot",
+          "d",
+          "-net",
+          "nic,model=rtl8139",
+          "-net",
+          "user,hostfwd=tcp:127.0.0.1:34103-:22",
+          "-prom-env",
+          "input-device=scca",
+          "-prom-env",
+          "output-device=scca"
+        ],
+        "drives": [
+          {
+            "file": "/run/user/1001/fp/bsd-resume-20261010/freebsd-ppc-32-v3-O0-shortconsole/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=ide"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "console_char_delay": 0.12,
+        "console_steps": [
+          {
+            "expect": "boot immediately",
+            "send": " \r"
+          },
+          {
+            "expect": "OK",
+            "send": "set hint.ata.0.mode=PIO4\r"
+          },
+          {
+            "expect": "OK",
+            "send": "set hint.ata.1.mode=PIO4\r"
+          },
+          {
+            "expect": "OK",
+            "send": "set vfs.root.mountfrom=ufs:/dev/ada0s3\r"
+          },
+          {
+            "expect": "OK",
+            "send": "boot\r"
+          },
+          {
+            "expect": "Starting sshd.",
+            "send": ""
+          }
+        ]
+      },
+      "work_root": "/root"
+    },
+    "freebsd-ppc-64-be": {
+      "build": {
+        "config": "freebsd.ppc.64",
+        "make": "/root/owned-stock-freebsd-ppc-64-be-source51-v1/install/bin/make"
+      },
+      "seed": "freebsd-ppc.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34104",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "/usr/bin/qemu-system-ppc64",
+          "-M",
+          "pseries",
+          "-cpu",
+          "POWER9",
+          "-m",
+          "4096",
+          "-smp",
+          "1",
+          "-vga",
+          "none",
+          "-boot",
+          "d",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34104-:22",
+          "-device",
+          "virtio-net-pci,netdev=n",
+          "-cdrom",
+          "${repo}/work/qemu-matrix/new-bsd/ppc64be-freebsd145/disc1.iso"
+        ],
+        "drives": [
+          {
+            "file": "/run/user/1001/fp/owned-fp-validation-50-20261009-v6/freebsd-ppc-64-be/vm-latest-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "uname -a; sysctl hw.physmem; c++ --version; /root/owned-stock-gnu-make-freebsd-ppc-64-be-4631a09187-v7-v1/install/bin/make --version; df -k /root",
+        "console_char_delay": 0.12,
+        "console_steps": [
+          {
+            "expect": "boot immediately",
+            "send": " \r"
+          },
+          {
+            "expect": "OK",
+            "send": "set vfs.root.mountfrom=ufs:/dev/vtbd0s2a\r"
+          },
+          {
+            "expect": "OK",
+            "send": "boot\r"
+          },
+          {
+            "expect": "Starting sshd.",
+            "send": ""
+          }
+        ]
+      },
+      "work_root": "/root"
+    },
+    "freebsd-ppc-64-le": {
+      "build": {
+        "config": "freebsd.ppc.64",
+        "make": "/root/owned-stock-freebsd-ppc-64-le-source51-v1/install/bin/make"
+      },
+      "seed": "freebsd-ppc.64le",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34105",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "/usr/bin/qemu-system-ppc64",
+          "-M",
+          "pseries",
+          "-cpu",
+          "POWER9",
+          "-m",
+          "4096",
+          "-smp",
+          "1",
+          "-vga",
+          "none",
+          "-boot",
+          "d",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34105-:22",
+          "-device",
+          "virtio-net-pci,netdev=n",
+          "-cdrom",
+          "${repo}/work/qemu-matrix/new-bsd/ppc64le-freebsd145/disc1.iso"
+        ],
+        "drives": [
+          {
+            "file": "/dev/shm/owned-fp-validation-50-20261009-v6/freebsd-ppc-64-le/vm-latest-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "uname -a; sysctl hw.physmem; c++ --version; /root/owned-stock-gnu-make-freebsd-ppc-64-le-4631a09187-v7-v1/install/bin/make --version; df -k /root",
+        "console_char_delay": 0.12,
+        "console_steps": [
+          {
+            "expect": "boot immediately",
+            "send": " \r"
+          },
+          {
+            "expect": "OK",
+            "send": "set vfs.root.mountfrom=ufs:/dev/vtbd0p2\r"
+          },
+          {
+            "expect": "OK",
+            "send": "boot -s\r"
+          },
+          {
+            "expect": "Enter full pathname",
+            "send": "\r"
+          },
+          {
+            "expect": "# ",
+            "send": "/sbin/fsck -y /dev/vtbd0p2\r"
+          },
+          {
+            "expect": "# ",
+            "send": "/sbin/reboot\r"
+          },
+          {
+            "expect": "boot immediately",
+            "send": " \r"
+          },
+          {
+            "expect": "OK",
+            "send": "set vfs.root.mountfrom=ufs:/dev/vtbd0p2\r"
+          },
+          {
+            "expect": "OK",
+            "send": "boot\r"
+          },
+          {
+            "expect": "Starting sshd.",
+            "send": ""
+          },
+          {
+            "expect": "login:",
+            "send": "root\r"
+          },
+          {
+            "expect": "# ",
+            "send": "ifconfig vtnet0 inet 10.0.2.15 netmask 255.255.255.0; route add default 10.0.2.2; echo OWNED_USERNET_READY\r"
+          },
+          {
+            "expect": "OWNED_USERNET_READY",
+            "send": "exit\r"
+          }
+        ]
+      },
+      "work_root": "/root"
+    },
+    "freebsd-riscv-64": {
+      "build": {
+        "config": "freebsd.riscv.64",
+        "make": "/mnt/fp-rv-source51-space-v1/gnu-make-source51/install/bin/make"
+      },
+      "seed": "unix-riscv.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "/home/sheeple/.ssh/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34106",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-riscv64",
+          "-machine",
+          "virt",
+          "-m",
+          "4096",
+          "-smp",
+          "2",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34106-:22",
+          "-device",
+          "virtio-net-device,netdev=n",
+          "-device",
+          "virtio-rng-device",
+          "-device",
+          "virtio-blk-device,drive=root",
+          "-kernel",
+          "/usr/lib/u-boot/qemu-riscv64_smode/uboot.elf",
+          "-device",
+          "virtio-blk-device,drive=owned_scratch,serial=fp-rv-source51-space-v1"
+        ],
+        "drives": [
+          {
+            "file": "/dev/shm/owned-fp-validation-50-20261009-v6/freebsd-riscv-64/vm-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=none,id=root"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "8G",
+            "options": "if=none,id=owned_scratch"
+          }
+        ]
+      },
+      "work_root": "/mnt/fp-rv-source51-space-v1"
+    },
+    "freebsd-x86-32": {
+      "build": {
+        "config": "freebsd.x86.32"
+      },
+      "seed": "unix-x86.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/freebsd/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34107",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-i386",
+          "-m",
+          "2048",
+          "-smp",
+          "1",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34107-:22",
+          "-device",
+          "virtio-net-pci,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
+        ],
+        "drives": [
+          {
+            "file": "/run/user/1001/fp/bsd-resume-20261010/freebsd-x86-32-v4-stockproof/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now"
+      },
+      "work_root": "/root"
+    },
+    "freebsd-x86-64": {
+      "build": {
+        "config": "freebsd.x86.64"
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/freebsd/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34108",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-x86_64",
+          "-m",
+          "2048",
+          "-smp",
+          "1",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34108-:22",
+          "-device",
+          "virtio-net-pci,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
+        ],
+        "drives": [
+          {
+            "file": "/run/user/1001/fp/owned-fp-validation-50-20261009-v6/freebsd-x86-64/vm-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now"
+      },
+      "work_root": "/root"
+    },
+    "linux-alpha-64": {
+      "build": {
+        "config": "linux.alpha.64",
+        "env": {
+          "CC": "alpha-linux-gnu-gcc",
+          "CXX": "alpha-linux-gnu-g++"
+        }
+      },
+      "seed": "unix-alpha.64",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/root/usr/lib/alpha-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/root/usr/lib/alpha-linux-gnu/engines-3:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/root/usr/lib/alpha-linux-gnu/ossl-modules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/root/usr/lib/alpha-linux-gnu/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/root/usr/lib/alpha-linux-gnu/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/root/usr/lib/alpha-linux-gnu/krb5/plugins/preauth:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/root/usr/lib/alpha-linux-gnu/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/root/usr/lib/alpha-linux-gnu/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/root/usr/lib/alpha-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/root/usr/lib/alpha-linux-gnu:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-alpha-64",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/agents/alpha-acceptance/linux-runtime-complete/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/mime-data-v3",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/loaders-v3.cache",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/alpha/image-closure-v2/root/usr/lib/alpha-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders"
+        },
+        "runner": [
+          "qemu-alpha",
+          "-L",
+          "/usr/alpha-linux-gnu"
+        ]
+      }
+    },
+    "linux-arm-32": {
+      "build": {
+        "config": "linux.arm.32",
+        "env": {
+          "LD_LIBRARY_PATH": "/home/fp-latest-linux-arm-32-89cc491a78-v2/runtime-dependencies"
+        }
+      },
+      "seed": "unix-arm.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/arm32/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34109",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "/home/fp-latest-linux-arm-32-89cc491a78-v2/runtime-dependencies"
+        }
+      },
+      "guest": {
+        "argv": [
+          "/usr/bin/qemu-system-arm",
+          "-machine",
+          "virt",
+          "-cpu",
+          "cortex-a15",
+          "-smp",
+          "2",
+          "-m",
+          "1024",
+          "-kernel",
+          "${repo}/work/qemu-matrix/arm32/vmlinuz",
+          "-initrd",
+          "${repo}/work/qemu-matrix/arm32/initrd",
+          "-append",
+          "console=ttyAMA0 root=/dev/vda rw",
+          "-device",
+          "virtio-blk-device,drive=disk0",
+          "-netdev",
+          "user,id=n0,hostfwd=tcp:127.0.0.1:34109-:22",
+          "-device",
+          "virtio-net-device,netdev=n0"
+        ],
+        "drives": [
+          {
+            "file": "${repo}/work/qemu-matrix/arm32/linux.raw",
+            "format": "raw",
+            "options": "if=none,id=disk0"
+          }
+        ]
+      },
+      "work_root": "/home"
+    },
+    "linux-arm-64": {
+      "build": {
+        "config": "linux.arm.64",
+        "env": {
+          "CC": "aarch64-linux-gnu-gcc",
+          "CXX": "aarch64-linux-gnu-g++"
+        }
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64/final-v7/cxx-lib:/dev/shm/owned-fp-validation-45-20261009/arm64-sqlite-package-v1/root/usr/lib/aarch64-linux-gnu:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-arm-64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64/gtk3-closure-v3/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64/image-closure-v2/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64/lib",
+          "OPENSSL_CONF": "/dev/null",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64",
+          "XDG_CACHE_HOME": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64/cache",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64/gtk3-closure-v3/root/usr/share:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64/image-closure-v2/root/usr/share",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64/image-closure-v2/loaders.cache",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-arm-64/image-closure-v2/root/usr/lib/aarch64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders"
+        },
+        "runner": [
+          "qemu-aarch64",
+          "-L",
+          "/usr/aarch64-linux-gnu"
+        ]
+      }
+    },
+    "linux-hppa-32": {
+      "build": {
+        "config": "linux.hppa.32",
+        "env": {
+          "CC": "hppa-linux-gnu-gcc",
+          "CXX": "hppa-linux-gnu-g++"
+        }
+      },
+      "seed": "unix-hppa.32",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/root/usr/lib/hppa-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/root/usr/lib/hppa-linux-gnu/engines-3:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/root/usr/lib/hppa-linux-gnu/ossl-modules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/root/usr/lib/hppa-linux-gnu/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/root/usr/lib/hppa-linux-gnu/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/root/usr/lib/hppa-linux-gnu/krb5/plugins/preauth:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/root/usr/lib/hppa-linux-gnu/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/root/usr/lib/hppa-linux-gnu/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/root/usr/lib/hppa-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/root/usr/lib/hppa-linux-gnu:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-hppa-32",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/new-linux/hppa/root/usr/lib/hppa-linux-gnu/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/mime-data-v3",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/loaders-v3.cache",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/hppa/image-closure-v2/root/usr/lib/hppa-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders"
+        },
+        "runner": [
+          "qemu-hppa",
+          "-L",
+          "/usr/hppa-linux-gnu"
+        ]
+      }
+    },
+    "linux-loongarch-64": {
+      "build": {
+        "config": "linux.loongarch.64",
+        "env": {
+          "CC": "${repo}/work/qemu-matrix/loongarch/assets/cross-tools/bin/loongarch64-unknown-linux-gnu-gcc",
+          "CXX": "${repo}/work/qemu-matrix/loongarch/assets/cross-tools/bin/loongarch64-unknown-linux-gnu-g++"
+        }
+      },
+      "seed": "unix-loongarch.64",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/gtk4-closure-v4/root/usr/lib/loongarch64-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/gtk4-closure-v4/root/usr/lib/loongarch64-linux-gnu/dri:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/gtk4-closure-v4/root/usr/lib/loongarch64-linux-gnu/gbm:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/gtk4-closure-v4/root/usr/lib/loongarch64-linux-gnu/gio/modules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/gtk4-closure-v4/root/usr/lib/loongarch64-linux-gnu/gstreamer-1.0:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/gtk4-closure-v4/root/usr/lib/loongarch64-linux-gnu/libproxy:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/gtk4-closure-v4/root/usr/lib/loongarch64-linux-gnu/sasl2:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/gtk4-closure-v4/root/usr/share/glib-2.0/schemas:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib/loongarch64-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib/loongarch64-linux-gnu/engines-3:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib/loongarch64-linux-gnu/gio/modules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib/loongarch64-linux-gnu/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib/loongarch64-linux-gnu/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib/loongarch64-linux-gnu/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib/loongarch64-linux-gnu/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib/loongarch64-linux-gnu/krb5/plugins/preauth:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib/loongarch64-linux-gnu/libheif/plugins:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib/loongarch64-linux-gnu/ossl-modules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/lib64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/share/gdb/auto-load/usr/lib/loongarch64-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/root/usr/lib/loongarch64-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/root/usr/lib64:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-loongarch-64",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/new-linux/loongarch64/root/usr/lib/loongarch64-linux-gnu/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/final-stream-v8/fontconfig/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/final-stream-v8/fontconfig",
+          "XDG_CACHE_HOME": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/final-stream-v8/xdg-cache",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root/usr/share",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/stock-builtin-loader-directory",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/loaders.cache",
+          "QEMU_LD_PREFIX": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-loongarch-64/image-closure-v2/root"
+        },
+        "runner": [
+          "qemu-loongarch64",
+          "-L",
+          "${repo}/work/qemu-matrix/loongarch/assets/cross-tools/bin/../target"
+        ]
+      }
+    },
+    "linux-mips-32-be": {
+      "build": {
+        "config": "linux.mips.32",
+        "env": {
+          "CC": "${repo}/work/qemu-matrix/new-linux/toolchains/mips32--glibc--stable-2026.08-1/bin/mips-buildroot-linux-gnu-gcc",
+          "CXX": "${repo}/work/qemu-matrix/new-linux/toolchains/mips32--glibc--stable-2026.08-1/bin/mips-buildroot-linux-gnu-g++",
+          "CFLAGS": "-mfp32",
+          "CXXFLAGS": "-O2 -mfp32"
+        }
+      },
+      "seed": "unix-mips.32",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/qemu-matrix/new-linux/toolchains/mips32--glibc--stable-2026.08-1/mips-buildroot-linux-gnu/lib:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/lib/mips-linux-gnu:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/lib/mips-linux-gnu/security:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/lib/systemd/system:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/lib/systemd/system/sockets.target.wants:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/coreutils:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/engines-1.1:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gio/modules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/krb5/plugins/preauth:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/Cwd:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/Fcntl:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/File/Glob:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/Hash/Util:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/IO:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/List/Util:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/POSIX:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/Socket:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/attributes:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/re:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/share/glib-2.0/schemas:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/lib/mips-linux-gnu:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/lib/mips-linux-gnu/security:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/lib/systemd/system:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/lib/systemd/system/sockets.target.wants:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/coreutils:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/engines-1.1:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gio/modules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/krb5/plugins/preauth:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/Cwd:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/Fcntl:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/File/Glob:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/Hash/Util:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/IO:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/List/Util:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/POSIX:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/Socket:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/attributes:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/perl-base/auto/re:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/share/glib-2.0/schemas:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-mips-32-be",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/agents/mips-port/work/mips-evidence/be-ssl/o32be-install/lib/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2",
+          "XDG_CACHE_HOME": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/cache",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/share",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/image-closure-v2/root/usr/lib/mips-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-be/qualification-v3/loaders.cache",
+          "QEMU_LD_PREFIX": "/dev/shm/owned-fp-validation-fixed-20261008/linux-mips-32-be/nss-runtime-prefix-v1"
+        },
+        "runner": [
+          "qemu-mips",
+          "-L",
+          "/dev/shm/owned-fp-validation-fixed-20261008/linux-mips-32-be/nss-runtime-prefix-v1"
+        ]
+      }
+    },
+    "linux-mips-32-le": {
+      "build": {
+        "config": "linux.mips.32",
+        "env": {
+          "CC": "${repo}/work/qemu-matrix/new-linux/toolchains/mips32el--glibc--stable-2026.08-1/bin/mipsel-buildroot-linux-gnu-gcc",
+          "CXX": "${repo}/work/qemu-matrix/new-linux/toolchains/mips32el--glibc--stable-2026.08-1/bin/mipsel-buildroot-linux-gnu-g++",
+          "CFLAGS": "-mfp32",
+          "CXXFLAGS": "-O2 -mfp32"
+        }
+      },
+      "seed": "unix-mipsel.32",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/qemu-matrix/new-linux/toolchains/mips32el--glibc--stable-2026.08-1/mipsel-buildroot-linux-gnu/lib:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/lib/mipsel-linux-gnu:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/lib/mipsel-linux-gnu/security:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/lib/systemd/system:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/lib/systemd/system/sockets.target.wants:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/engines-1.1:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gio/modules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/krb5/plugins/preauth:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/Cwd:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/Fcntl:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/File/Glob:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/Hash/Util:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/IO:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/List/Util:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/POSIX:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/Socket:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/attributes:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/re:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/libexec/coreutils:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/share/glib-2.0/schemas:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/lib/mipsel-linux-gnu:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/lib/mipsel-linux-gnu/security:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/lib/systemd/system:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/lib/systemd/system/sockets.target.wants:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/engines-1.1:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gio/modules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/krb5/plugins/preauth:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/Cwd:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/Fcntl:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/File/Glob:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/Hash/Util:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/IO:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/List/Util:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/POSIX:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/Socket:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/attributes:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/perl-base/auto/re:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/libexec/coreutils:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/share/glib-2.0/schemas:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-mips-32-le",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/new-linux/mipsel/root/usr/lib/mipsel-linux-gnu/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2",
+          "XDG_CACHE_HOME": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/cache",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/share",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/root/usr/lib/mipsel-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-mips-32-le/image-closure-v2/loaders.cache",
+          "QEMU_LD_PREFIX": "${repo}/work/qemu-matrix/new-linux/toolchains/mips32el--glibc--stable-2026.08-1/mipsel-buildroot-linux-gnu/sysroot"
+        },
+        "runner": [
+          "qemu-mipsel",
+          "-L",
+          "${repo}/work/qemu-matrix/new-linux/toolchains/mips32el--glibc--stable-2026.08-1/mipsel-buildroot-linux-gnu/sysroot"
+        ]
+      }
+    },
+    "linux-mips-64-be": {
+      "build": {
+        "config": "linux.mips.64",
+        "env": {
+          "CC": "${repo}/work/qemu-matrix/agents/mips-port/work/mips-evidence/n64be-cc",
+          "CXX": "${repo}/work/qemu-matrix/agents/mips-port/work/mips-evidence/n64be-cxx",
+          "CFLAGS": "-march=mips64r2 -mabi=64",
+          "CXXFLAGS": "-O2 -march=mips64r2 -mabi=64"
+        }
+      },
+      "seed": "unix-mips.64",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/lib/cairo:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/lib/gtk-2.0/2.10.0/engines:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/lib/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/lib/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/lib/gtk-2.0/modules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/lib/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/lib/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/lib64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/share/gdb/auto-load${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/install/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/install/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/install/lib64:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-mips-64-be",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/agents/mips-port/work/mips-evidence/be-ssl/n64be-install/lib/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/final-stream-v8/fontconfig/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/final-stream-v8/fontconfig",
+          "XDG_CACHE_HOME": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/final-stream-v8/xdg-cache",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/share",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/install/lib/gdk-pixbuf-2.0/2.10.0/loaders",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-be/image-closure-v2/loaders.cache"
+        },
+        "runner": [
+          "qemu-mips64",
+          "-L",
+          "${repo}/work/qemu-matrix/agents/mips-port/work/mips-evidence/n64be-support/sysroot"
+        ]
+      }
+    },
+    "linux-mips-64-le": {
+      "build": {
+        "config": "linux.mips.64",
+        "env": {
+          "CC": "${repo}/work/qemu-matrix/agents/mips-port/work/mips-evidence/n64-cc",
+          "CXX": "${repo}/work/qemu-matrix/agents/mips-port/work/mips-evidence/n64-cxx",
+          "CFLAGS": "-march=mips64r2 -mabi=64",
+          "CXXFLAGS": "-O2 -march=mips64r2 -mabi=64"
+        }
+      },
+      "seed": "unix-mipsel.64",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/gtk4-closure-v4/root/lib/mips64el-linux-gnuabi64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/gtk4-closure-v4/root/usr/lib/mips64el-linux-gnuabi64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/gtk4-closure-v4/root/usr/lib/mips64el-linux-gnuabi64/gtk-4.0/4.0.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/lib/mips64el-linux-gnuabi64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/engines-3:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/gio/modules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/krb5/plugins/preauth:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/ossl-modules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl-base/auto/Cwd:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl-base/auto/Fcntl:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl-base/auto/File/Glob:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl-base/auto/Hash/Util:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl-base/auto/IO:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl-base/auto/List/Util:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl-base/auto/POSIX:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl-base/auto/Socket:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl-base/auto/attributes:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl-base/auto/re:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/B:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Compress/Raw/Bzip2:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Compress/Raw/Zlib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Cwd:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/DB_File:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Data/Dumper:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Devel/Peek:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Digest/MD5:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Digest/SHA:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Encode:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Encode/Byte:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Encode/CN:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Encode/EBCDIC:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Encode/JP:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Encode/KR:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Encode/Symbol:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Encode/TW:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Encode/Unicode:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Fcntl:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/File/DosGlob:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/File/Glob:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Filter/Util/Call:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/GDBM_File:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Hash/Util:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Hash/Util/FieldHash:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/I18N/Langinfo:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/IO:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/IPC/SysV:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/List/Util:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/MIME/Base64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Math/BigInt/FastCalc:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/NDBM_File:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/ODBM_File:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Opcode:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/POSIX:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/PerlIO/encoding:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/PerlIO/mmap:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/PerlIO/scalar:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/PerlIO/via:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/SDBM_File:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Socket:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Storable:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Sys/Hostname:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Sys/Syslog:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Time/HiRes:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Time/Piece:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Unicode/Collate:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/Unicode/Normalize:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/attributes:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/mro:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/re:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/threads:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/perl/5.36.0/auto/threads/shared:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/share/gdb/auto-load/usr/lib/mips64el-linux-gnuabi64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/root/lib/mips64el-linux-gnuabi64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/root/usr/lib/mips64el-linux-gnuabi64:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-mips-64-le",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/new-linux/mips64el/root/usr/lib/mips64el-linux-gnuabi64/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/final-stream-v8/fontconfig/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/final-stream-v8/fontconfig",
+          "XDG_CACHE_HOME": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/final-stream-v8/xdg-cache",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/share",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/root/usr/lib/mips64el-linux-gnuabi64/gdk-pixbuf-2.0/2.10.0/loaders",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mipsloong/linux-mips-64-le/image-closure-v2/loaders.cache"
+        },
+        "runner": [
+          "qemu-mips64el",
+          "-L",
+          "${repo}/work/qemu-matrix/agents/mips-port/work/mips-evidence/n64-sysroot"
+        ]
+      }
+    },
+    "linux-openrisc-32": {
+      "build": {
+        "config": "linux.openrisc.32",
+        "env": {
+          "CC": "${assets}/openrisc/assets/openrisc--glibc--stable-2025.08-1/bin/or1k-buildroot-linux-gnu-gcc",
+          "CXX": "${assets}/openrisc/assets/openrisc--glibc--stable-2025.08-1/bin/or1k-buildroot-linux-gnu-g++"
+        }
+      },
+      "seed": "unix-openrisc.32",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "runner": [
+          "${repo}/harness/qemu-user.sh",
+          "qemu-or1k",
+          "any",
+          "${assets}/openrisc-libs/runtime-root"
+        ]
+      }
+    },
+    "linux-ppc-32": {
+      "build": {
+        "config": "linux.ppc.32"
+      },
+      "seed": "linux-ppc.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34110",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-ppc",
+          "-machine",
+          "mac99",
+          "-cpu",
+          "7400",
+          "-m",
+          "1024",
+          "-smp",
+          "1",
+          "-accel",
+          "tcg",
+          "-kernel",
+          "${repo}/work/qemu-matrix/new-linux/ppc32/kernel",
+          "-initrd",
+          "${repo}/work/qemu-matrix/new-linux/ppc32/initrd",
+          "-append",
+          "root=/dev/sda rw console=ttyPZ0 net.ifnames=0",
+          "-device",
+          "sungem,netdev=net0",
+          "-netdev",
+          "user,id=net0,hostfwd=tcp:127.0.0.1:34110-:22"
+        ],
+        "drives": [
+          {
+            "file": "/dev/shm/owned-fp-validation-45-20261009/linux-ppc-32/vm-final-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=ide"
+          }
+        ]
+      },
+      "work_root": "/home"
+    },
+    "linux-ppc-64-be": {
+      "build": {
+        "config": "linux.ppc.64",
+        "env": {
+          "CC": "powerpc64-linux-gnu-gcc",
+          "CXX": "powerpc64-linux-gnu-g++"
+        }
+      },
+      "seed": "linux-ppc.64",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-ppc-64-be:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-be/gtk3-closure-v3/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-be/image-closure-v2/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-be/lib",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/new-linux/ppc64be/root/usr/lib/powerpc64-linux-gnu/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-be/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-be",
+          "XDG_CACHE_HOME": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-be/cache",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-be/gtk3-closure-v3/root/usr/share:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-be/image-closure-v2/root/usr/share",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-be/image-closure-v2/loaders.cache",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-be/image-closure-v2/root/usr/lib/powerpc64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders"
+        },
+        "runner": [
+          "qemu-ppc64",
+          "-cpu",
+          "power9",
+          "-L",
+          "${repo}/work/qemu-matrix/agents/ppc64-cpp-cause/evidence/descriptor-free-user-assets-20261005/sysroot"
+        ]
+      }
+    },
+    "linux-ppc-64-le": {
+      "build": {
+        "config": "linux.ppc.64",
+        "env": {
+          "CC": "powerpc64le-linux-gnu-gcc",
+          "CXX": "powerpc64le-linux-gnu-g++"
+        }
+      },
+      "seed": "linux-ppc.64le",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le/final-v7/cxx-lib:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-ppc-64-le:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le/gtk3-closure-v3/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le/image-closure-v2/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le/lib",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/cpp-port-repair-20261005/full-send-ten/network-enabled-continuations/ppc-runtime-preflight/le-libraries/usr/lib/powerpc64le-linux-gnu/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le",
+          "XDG_CACHE_HOME": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le/cache",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le/gtk3-closure-v3/root/usr/share:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le/image-closure-v2/root/usr/share",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le/image-closure-v2/loaders.cache",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-ppc-64-le/image-closure-v2/root/usr/lib/powerpc64le-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders"
+        },
+        "runner": [
+          "qemu-ppc64le",
+          "-L",
+          "/usr/powerpc64le-linux-gnu"
+        ]
+      }
+    },
+    "linux-riscv-32": {
+      "build": {
+        "config": "linux.riscv.32",
+        "env": {
+          "CC": "${repo}/work/qemu-matrix/riscv-linux/buildroot-2026.08/output/host/bin/riscv32-buildroot-linux-gnu-gcc",
+          "CXX": "${repo}/work/qemu-matrix/riscv-linux/buildroot-2026.08/output/host/bin/riscv32-buildroot-linux-gnu-g++"
+        }
+      },
+      "seed": "unix-riscv.32",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/qemu-matrix/riscv-linux/buildroot-2026.08/output/host/riscv32-buildroot-linux-gnu/lib:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/lib:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/lib/cairo:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/lib/gtk-2.0/2.10.0/engines:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/lib/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/lib/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/lib/gtk-2.0/modules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/lib/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/lib/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/share/gdb/auto-load${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/install/lib:${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/install/lib:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-riscv-32",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32",
+          "QEMU_LD_PREFIX": "${repo}/work/qemu-matrix/riscv-linux/buildroot-2026.08/output/host/riscv32-buildroot-linux-gnu/sysroot",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/share",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/install/lib/gdk-pixbuf-2.0/2.10.0/loaders",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/linux-io-candidate/ui-prerequisites/linux-riscv-32/image-closure-v2/loaders.cache"
+        },
+        "runner": [
+          "qemu-riscv32",
+          "-L",
+          "${repo}/work/qemu-matrix/riscv-linux/buildroot-2026.08/output/host/riscv32-buildroot-linux-gnu/sysroot"
+        ]
+      }
+    },
+    "linux-riscv-64": {
+      "build": {
+        "config": "linux.riscv.64"
+      },
+      "seed": "unix-riscv.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/riscv-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34111",
+          "factor@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-riscv64",
+          "-machine",
+          "virt",
+          "-m",
+          "2048",
+          "-smp",
+          "2",
+          "-netdev",
+          "user,id=net0,hostfwd=tcp:127.0.0.1:34111-:22",
+          "-device",
+          "virtio-net-device,netdev=net0",
+          "-drive",
+          "if=pflash,format=raw,unit=0,readonly=on,file=/usr/share/qemu-efi-riscv64/RISCV_VIRT_CODE.fd",
+          "-device",
+          "virtio-blk-device,drive=root",
+          "-device",
+          "virtio-blk-device,drive=seed"
+        ],
+        "drives": [
+          {
+            "file": "${repo}/work/qemu-matrix/riscv-linux/vars.fd",
+            "format": "raw",
+            "options": "if=pflash,unit=1"
+          },
+          {
+            "file": "${repo}/work/qemu-matrix/riscv-linux/riscv64.qcow2",
+            "format": "qcow2",
+            "options": "if=none,id=root"
+          },
+          {
+            "file": "${repo}/work/qemu-matrix/riscv-linux/seed.iso",
+            "format": "raw",
+            "options": "if=none,id=seed"
+          }
+        ],
+        "shutdown": "sync; sudo -n /sbin/poweroff"
+      },
+      "work_root": "/home/factor"
+    },
+    "linux-s390x-64": {
+      "build": {
+        "config": "linux.s390x",
+        "args": [
+          "SITE_CFLAGS=-mno-vx",
+          "SITE_CXXFLAGS=-mno-vx"
+        ],
+        "env": {
+          "CC": "s390x-linux-gnu-gcc",
+          "CXX": "s390x-linux-gnu-g++",
+          "CFLAGS": "-mno-vx",
+          "CXXFLAGS": "-O2 -mno-vx"
+        }
+      },
+      "seed": "linux-s390x",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64/final-v7/cxx-lib:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-s390x-64:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64/gtk3-closure-v3/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64/image-closure-v2/lib:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64/lib",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/agents/s390x-port/work/s390x/recovery-20261003/debian-runtime-root/usr/lib/s390x-linux-gnu/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64",
+          "XDG_CACHE_HOME": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64/cache",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64/gtk3-closure-v3/root/usr/share:${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64/image-closure-v2/root/usr/share",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64/image-closure-v2/loaders.cache",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-mainstream/linux-s390x-64/image-closure-v2/root/usr/lib/s390x-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders"
+        },
+        "runner": [
+          "qemu-s390x",
+          "-L",
+          "/usr/s390x-linux-gnu"
+        ]
+      }
+    },
+    "linux-sh4-32": {
+      "build": {
+        "config": "linux.sh4.32",
+        "env": {
+          "CC": "sh4-linux-gnu-gcc",
+          "CXX": "sh4-linux-gnu-g++"
+        }
+      },
+      "seed": "unix-sh4.32",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/root/usr/lib/sh4-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/root/usr/lib/sh4-linux-gnu/engines-3:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/root/usr/lib/sh4-linux-gnu/ossl-modules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/root/usr/lib/sh4-linux-gnu/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/root/usr/lib/sh4-linux-gnu/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/root/usr/lib/sh4-linux-gnu/krb5/plugins/preauth:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/root/usr/lib/sh4-linux-gnu/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/root/usr/lib/sh4-linux-gnu/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/root/usr/lib/sh4-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/root/usr/lib/sh4-linux-gnu:${repo}/work/cpp-port-repair-20261005/full-send-ten/network-enabled-continuations/sh4-capstone-runtime/lib:${repo}/work/qemu-matrix/sh4-glibc/epoch-2.43-syscall-order-r2/io-prefix-corrected/usr/lib/sh4-linux-gnu",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/mime-data-v3",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/loaders-v3.cache",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sh4/image-closure-v2/root/usr/lib/sh4-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders"
+        },
+        "runner": [
+          "${repo}/work/qemu-matrix/sh4-qemu/build-9ded45a-fpu-signal-incremental/qemu-sh4",
+          "-L",
+          "${repo}/work/qemu-matrix/sh4-glibc/epoch-2.43-syscall-order-r2/io-prefix-corrected"
+        ]
+      }
+    },
+    "linux-sparc-32": {
+      "build": {
+        "config": "linux.sparc.32",
+        "env": {
+          "CC": "sparc64-linux-gnu-gcc",
+          "CXX": "sparc64-linux-gnu-g++",
+          "CFLAGS": "-m32 -mcpu=v9",
+          "CXXFLAGS": "-O2 -m32 -mcpu=v9"
+        }
+      },
+      "seed": "unix-sparc.32",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "OPENSSL_sparcv9cap": "1:0",
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/image-closure-v2/root/lib/sparc-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/image-closure-v2/root/usr/lib/sparc-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/image-closure-v2/root/usr/lib/sparc-linux-gnu/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/image-closure-v2/root/usr/lib/sparc-linux-gnu/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/image-closure-v2/root/usr/lib/sparc-linux-gnu/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/image-closure-v2/root/usr/lib/sparc-linux-gnu/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/image-closure-v2/root/usr/lib/sparc-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/root/lib/sparc-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/root/usr/lib/sparc-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/root/usr/lib/sparc-linux-gnu/pango/1.6.0/modules:${repo}/work/qemu-matrix/agents/sparc-bsd-finish/artifacts/linux32-deps/install/lib",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/agents/sparc-bsd-finish/artifacts/linux32-deps/install/lib/ossl-modules",
+          "QEMU_RESERVED_VA": "0x80000000",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc",
+          "PANGO_RC_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/pangorc",
+          "XDG_DATA_DIRS": "/dev/shm/validation-resume-20261010-runtime-ports-sparc-mime-v3",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/image-closure-v2/loaders.cache",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc/image-closure-v2/root/usr/lib/sparc-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders"
+        },
+        "runner": [
+          "/usr/bin/qemu-sparc32plus",
+          "-L",
+          "${repo}/work/qemu-matrix/agents/sparc-port/artifacts/definitive-8e26dc47d8/sysroot32"
+        ]
+      }
+    },
+    "linux-sparc-64": {
+      "build": {
+        "config": "linux.sparc.64",
+        "env": {
+          "CC": "sparc64-linux-gnu-gcc",
+          "CXX": "sparc64-linux-gnu-g++"
+        }
+      },
+      "seed": "unix-sparc.64",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {
+          "OPENSSL_sparcv9cap": "1:0",
+          "LD_LIBRARY_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/root/usr/lib/sparc64-linux-gnu:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/root/usr/lib/sparc64-linux-gnu/engines-3:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/root/usr/lib/sparc64-linux-gnu/ossl-modules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/root/usr/lib/sparc64-linux-gnu/gtk-2.0/2.10.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/root/usr/lib/sparc64-linux-gnu/gtk-2.0/2.10.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/root/usr/lib/sparc64-linux-gnu/krb5/plugins/preauth:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/root/usr/lib/sparc64-linux-gnu/gtk-3.0/3.0.0/printbackends:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/root/usr/lib/sparc64-linux-gnu/gtk-3.0/3.0.0/immodules:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/root/usr/lib/sparc64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders:${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/root/usr/lib/sparc64-linux-gnu:/dev/shm/owned-fp-validation-fixed-20261008/runtime-dependencies/linux-sparc-64",
+          "OPENSSL_CONF": "/dev/null",
+          "OPENSSL_MODULES": "${repo}/work/qemu-matrix/new-linux/sparc64/root/usr/lib/sparc64-linux-gnu/ossl-modules",
+          "FONTCONFIG_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/fonts.conf",
+          "FONTCONFIG_PATH": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64",
+          "XDG_DATA_DIRS": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/mime-data-v3",
+          "GDK_PIXBUF_MODULE_FILE": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/loaders-v3.cache",
+          "GDK_PIXBUF_MODULEDIR": "${repo}/work/validation-resume-20261010/bulk-ui/runtime-ports/sparc64/image-closure-v2/root/usr/lib/sparc64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders"
+        },
+        "runner": [
+          "qemu-sparc64",
+          "-L",
+          "/usr/sparc64-linux-gnu"
+        ]
+      }
+    },
+    "illumos-x86-64": {
+      "build": {
+        "config": "illumos.x86.64",
+        "make": "gmake",
+        "jobs": 4
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/illumos-x86-64/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34222",
+          "factor@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {
+          "DISPLAY": ":99"
+        }
+      },
+      "extract_command": "gzip -dc | pax -r",
+      "guest": {
+        "argv": [
+          "qemu-system-x86_64",
+          "-machine",
+          "q35,accel=kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "4096",
+          "-smp",
+          "4",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34222-:22",
+          "-device",
+          "e1000,netdev=n",
+          "-no-reboot"
+        ],
+        "drives": [
+          {
+            "file": "${assets}/illumos-x86-64/system.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "display_args": [
+          "-display",
+          "vnc=127.0.0.1:42"
+        ],
+        "setup": "test -S /tmp/.X11-unix/X99 || (nohup Xvfb :99 -screen 0 1280x1024x24 >/tmp/factor-xvfb.log 2>&1 &)",
+        "shutdown": "sync; pfexec /usr/sbin/shutdown -y -g 0 -i 5"
+      },
+      "stall_seconds": 0,
+      "work_root": "/export/home/factor"
+    },
+    "linux-x86-32": {
+      "build": {
+        "config": "linux.x86.32"
+      },
+      "seed": "unix-x86.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/linux/id_ed25519",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34112",
+          "factor@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-i386",
+          "-enable-kvm",
+          "-cpu",
+          "host",
+          "-kernel",
+          "${repo}/work/qemu-matrix/linux/i386-vmlinuz",
+          "-initrd",
+          "${repo}/work/qemu-matrix/linux/i386-initrd",
+          "-append",
+          "root=/dev/vda rw console=ttyS0 net.ifnames=0",
+          "-m",
+          "2048",
+          "-smp",
+          "2",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34112-:22",
+          "-device",
+          "virtio-net-pci,netdev=n"
+        ],
+        "drives": [
+          {
+            "file": "${repo}/work/qemu-matrix/linux/i386.raw",
+            "format": "raw",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; sudo -n /sbin/poweroff"
+      },
+      "work_root": "/home/factor"
+    },
+    "linux-x86-64": {
+      "build": {
+        "config": "linux.x86.64",
+        "env": {
+          "CC": "gcc",
+          "CXX": "g++"
+        }
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "local"
+      },
+      "execution": {
+        "env": {},
+        "runner": []
+      }
+    },
+    "linux-x86-64-musl": {
+      "build": {
+        "config": "linux.x86.64",
+        "make": "make",
+        "env": {
+          "MUSL": "1"
+        }
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/linux/id_ed25519",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ConnectTimeout=20",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-p",
+          "34113",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {
+          "MUSL": "1"
+        }
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-x86_64",
+          "-M",
+          "pc",
+          "-m",
+          "4096",
+          "-smp",
+          "1",
+          "-no-reboot",
+          "-kernel",
+          "${repo}/work/linux-musl-alpine-20261006/iso-boot/boot/vmlinuz-virt",
+          "-initrd",
+          "${repo}/work/linux-musl-alpine-20261006/iso-boot/boot/initramfs-virt",
+          "-append",
+          "console=ttyS0 modules=loop,squashfs,sd-mod,usb-storage quiet",
+          "-cdrom",
+          "${repo}/work/linux-musl-alpine-20261006/downloads/alpine-virt-3.24.2-x86_64.iso",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34113-:22",
+          "-device",
+          "virtio-net-pci,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
+        ],
+        "drives": [
+          {
+            "file": "${repo}/work/linux-musl-alpine-20261006/native-vm-v5/scratch.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "setup": "ip link set lo up; ip addr show lo; ping -c 1 127.0.0.1; test ! -e /tmp/fp51m-v1; mkdir -m 700 /tmp/fp51m-v1; test \"$(cd /tmp/fp51m-v1 && pwd -P)\" = /tmp/fp51m-v1; test \"$(stat -c %u:%a /tmp/fp51m-v1)\" = 0:700",
+        "console_steps": [
+          {
+            "expect": "login:",
+            "send": "root\r"
+          },
+          {
+            "expect": "localhost:~#",
+            "send": "set -eu; modprobe ext4; mkdir -p /work; mount -t ext4 /dev/vda /work; mount --bind /work/alpine-usr /usr; ip link set lo up; ip link set eth0 up; udhcpc -i eth0 -q; mkdir -p /root/.ssh /etc/ssh; chmod 700 /root/.ssh; printf '%s\\n' 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID9UaKA05Op4GotVj+PrytDqtXlwR39K4b7MDPaI0W4Z sheeple@agent1' > /root/.ssh/authorized_keys; chmod 600 /root/.ssh/authorized_keys; ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''; /usr/sbin/sshd -f /dev/null -o PermitRootLogin=prohibit-password -o PasswordAuthentication=no; echo OWNED_ALPINE_MUSL_SSH_READY\r"
+          }
+        ]
+      },
+      "heap": [
+        "-young=16",
+        "-aging=16",
+        "-tenured=128"
+      ],
+      "work_root": "/work"
+    },
+    "netbsd-alpha-64": {
+      "build": {
+        "config": "netbsd.alpha.64",
+        "env": {
+          "PATH": "/usr/alpha-build/alpha-tools/bin:/usr/pkg/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+          "CC": "gcc",
+          "CXX": "g++"
+        }
+      },
+      "seed": "unix-alpha.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/new-bsd/alpha-netbsd11/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34114",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {
+          "PATH": "/usr/alpha-build/alpha-tools/bin:/usr/pkg/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+          "CC": "gcc",
+          "CXX": "g++"
+        }
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-alpha",
+          "-machine",
+          "clipper,graphics=off",
+          "-cpu",
+          "ev67",
+          "-m",
+          "4096",
+          "-smp",
+          "1",
+          "-kernel",
+          "${repo}/work/qemu-matrix/new-bsd/alpha-netbsd11/netbsd11-stable-GENERIC.QEMU",
+          "-netdev",
+          "user,id=net0,hostfwd=tcp:127.0.0.1:34114-:22",
+          "-device",
+          "tulip,netdev=net0",
+          "-bios",
+          "/usr/share/qemu/palcode-clipper",
+          "-L",
+          "/usr/share/seabios",
+          "-global",
+          "cmd646-ide.secondary=1"
+        ],
+        "drives": [
+          {
+            "file": "/dev/shm/owned-fp-validation-fixed-20261008/restored-netbsd-alpha/rtc-test-overlay.qcow2",
+            "format": "qcow2",
+            "options": "if=ide,index=0"
+          },
+          {
+            "file": "/dev/shm/owned-fp-validation-fixed-20261008/restored-netbsd-alpha/recovery-build.ffs",
+            "format": "raw",
+            "options": "if=ide,index=1"
+          },
+          {
+            "file": "/dev/shm/owned-fp-validation-fixed-20261008/restored-netbsd-alpha/netbsd-final-wd2-2g.raw",
+            "format": "raw",
+            "options": "if=ide,index=2"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -h now",
+        "halt_marker": "halted.",
+        "setup": "if test ! -x /usr/alpha-build/alpha-tools/bin/gmake; then mount -t ffs /dev/wd1c /usr/alpha-build; fi; if ! mount | grep -q \"^/dev/wd2c on /usr/alpha-final \"; then mount -t ffs /dev/wd2c /usr/alpha-final; fi; df -k /usr/alpha-final; test -x /usr/alpha-build/alpha-tools/bin/gmake",
+        "console_steps": [
+          {
+            "expect": "root device:",
+            "send": "wd0c\n"
+          },
+          {
+            "expect": "dump device",
+            "send": "none\n"
+          },
+          {
+            "expect": "file system",
+            "send": "\n"
+          },
+          {
+            "expect": "init path",
+            "send": "\n"
+          }
+        ]
+      },
+      "io_prefix": [
+        "/usr/bin/nice",
+        "-n",
+        "10"
+      ],
+      "commands": {
+        "build": "gmake CONFIG=vm/Config.netbsd.alpha.64 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
+      },
+      "work_root": "/usr/alpha-final"
+    },
+    "netbsd-arm-32": {
+      "build": {
+        "config": "netbsd.arm.32"
+      },
+      "seed": "unix-arm.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34115",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "/usr/bin/qemu-system-arm",
+          "-machine",
+          "virt",
+          "-cpu",
+          "cortex-a15",
+          "-smp",
+          "2",
+          "-m",
+          "2048",
+          "-bios",
+          "${repo}/work/qemu-matrix/new-bsd/arm32-netbsd11/firmware/usr/share/AAVMF/AAVMF32_CODE.fd",
+          "-netdev",
+          "user,id=n0,hostfwd=tcp:127.0.0.1:34115-:22",
+          "-device",
+          "virtio-net-device,netdev=n0"
+        ],
+        "drives": [
+          {
+            "file": "${repo}/work/qemu-matrix/new-bsd/arm32-netbsd11/guest.raw",
+            "format": "raw",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "2G",
+            "options": "if=virtio"
+          }
+        ],
+        "setup": "PATH=/usr/sbin:/sbin:/usr/bin:/bin:$PATH; export PATH; dmesg | tail -80; test \"$(disklabel ld5 | awk '/total sectors:/ {print $3}')\" = 4194304; test \"$(dd if=/dev/rld5c bs=4096 count=1 2>/dev/null | tr -d '\\000' | wc -c)\" -eq 0; newfs -I -O 2 /dev/rld5c; mkdir /fp-owned-work; mount -t ffs /dev/ld5c /fp-owned-work; df -k /fp-owned-work",
+        "console_steps": [
+          {
+            "expect": "Option 1 will be chosen",
+            "send": "\r"
+          }
+        ],
+        "resume_setup": "/sbin/mount -t ffs /dev/ld5c /fp-owned-work"
+      },
+      "commands": {
+        "build": "gmake CONFIG=vm/Config.netbsd.arm.32 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
+      },
+      "work_root": "/fp-owned-work"
+    },
+    "netbsd-arm-64": {
+      "build": {
+        "config": "netbsd.arm.64"
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "/home/sheeple/.ssh/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34116",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-aarch64",
+          "-m",
+          "2048",
+          "-smp",
+          "1",
+          "-machine",
+          "virt",
+          "-cpu",
+          "cortex-a72",
+          "-bios",
+          "/usr/share/qemu-efi-aarch64/QEMU_EFI.fd",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34116-:22",
+          "-device",
+          "virtio-net-device,netdev=n",
+          "-device",
+          "virtio-blk-device,drive=d",
+          "-device",
+          "virtio-rng-pci"
+        ],
+        "drives": [
+          {
+            "file": "/dev/shm/owned-fp-validation-fixed-20261008/netbsd-arm-64/vm-fixed-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=none,id=d"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now"
+      },
+      "commands": {
+        "build": "gmake CONFIG=vm/Config.netbsd.arm.64 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
+      },
+      "work_root": "/root"
+    },
+    "netbsd-hppa-32": {
+      "build": {
+        "config": "netbsd.hppa.32",
+        "make": "/root/owned-stock-netbsd-hppa-32-source51-v1/install/bin/make",
+        "env": {
+          "LD_BIND_NOW": "1"
+        }
+      },
+      "seed": "unix-hppa.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/new-bsd/hppa/netbsd/id_ecdsa",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ConnectTimeout=20",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-p",
+          "34117",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {
+          "LD_BIND_NOW": "1"
+        }
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-hppa",
+          "-machine",
+          "B160L",
+          "-m",
+          "2048",
+          "-nic",
+          "user,model=tulip,hostfwd=tcp:127.0.0.1:34117-:22"
+        ],
+        "drives": [
+          {
+            "file": "/dev/shm/owned-fp-validation-final-v2-20261009/netbsd-hppa-32/guest-before-kernel.qcow2",
+            "format": "qcow2",
+            "options": "if=scsi"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "1024M",
+            "options": "if=scsi"
+          }
+        ],
+        "setup": "PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH; export PATH; set -eu; test -e /dev/sd1b || (cd /dev; ./MAKEDEV sd1); cat > /root/owned-scratch-swap.disklabel <<'OWNED_LABEL'\ntype: SCSI\ndisk: QEMU HARDDISK\nlabel: owned-swap\nflags:\nbytes/sector: 512\nsectors/track: 63\ntracks/cylinder: 16\nsectors/cylinder: 1008\ncylinders: 2080\ntotal sectors: 2097152\nrpm: 5400\ninterleave: 1\ntrackskew: 0\ncylinderskew: 0\nheadswitch: 0\ntrack-to-track seek: 0\n3 partitions:\n b: 2097152 0 swap 0 0 0\n c: 2097152 0 unused 0 0 0\nOWNED_LABEL\ndisklabel -R -r sd1 /root/owned-scratch-swap.disklabel; disklabel sd1; swapctl -a /dev/sd1b; swapctl -lk; sysctl hw.physmem hw.usermem; vmstat\n",
+        "resume_setup": "/sbin/swapctl -a /dev/sd1b"
+      },
+      "heap": [
+        "-young=16",
+        "-aging=16",
+        "-tenured=64"
+      ],
+      "commands": {
+        "build": "/root/owned-stock-netbsd-hppa-32-source51-v1/install/bin/make CONFIG=vm/Config.netbsd.hppa.32 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
+      },
+      "work_root": "/root"
+    },
+    "netbsd-ppc-32": {
+      "build": {
+        "config": "netbsd.ppc.32",
+        "make": "/usr/pkg/bin/gmake"
+      },
+      "seed": "netbsd-ppc.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "/home/sheeple/.ssh/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34118",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "/usr/bin/qemu-system-ppc",
+          "-machine",
+          "mac99,via=pmu,graphics=off",
+          "-cpu",
+          "g4",
+          "-m",
+          "256",
+          "-smp",
+          "1",
+          "-cdrom",
+          "${repo}/work/qemu-matrix/recovery-20261003/netppc-foundation-audit/native101/boot.iso",
+          "-boot",
+          "d",
+          "-prom-env",
+          "boot-device=cd:,ofwboot.xcf /netbsd",
+          "-nic",
+          "user,model=ne2k_pci,hostfwd=tcp:127.0.0.1:34118-:22",
+          "-prom-env",
+          "input-device=ttya",
+          "-prom-env",
+          "output-device=ttya"
+        ],
+        "drives": [
+          {
+            "file": "${repo}/work/cpp-port-repair-20261005/full-send-ten/network-enabled-continuations/netbsd-ppc32-storage-fixed-vm/guest.qcow2",
+            "format": "qcow2",
+            "options": "if=ide"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "1G",
+            "options": "if=ide,index=1"
+          }
+        ],
+        "setup": "set -eu; PATH=/usr/sbin:/sbin:/usr/bin:/bin:/usr/pkg/bin; export PATH; test -e /dev/rwd1c || (cd /dev && ./MAKEDEV wd1); test \"$(disklabel wd1 | awk '/total sectors:/ {print $3}')\" = 2097152; test \"$(dd if=/dev/rwd1c bs=4096 count=1 2>/dev/null | tr -d '\\000' | wc -c)\" -eq 0; cat > /root/owned-v7-scratch.disklabel <<'OWNED_SWAP'\ntype: IDE\ndisk: owned-swap\nlabel: owned-v7-swap\nflags:\nbytes/sector: 512\nsectors/track: 64\ntracks/cylinder: 16\nsectors/cylinder: 1024\ncylinders: 2048\ntotal sectors: 2097152\nrpm: 5400\ninterleave: 1\ntrackskew: 0\ncylinderskew: 0\nheadswitch: 0\ntrack-to-track seek: 0\ndrivedata: 0\n3 partitions:\n b: 2096128 1024 swap\n c: 2097152 0 unused 0 0\nOWNED_SWAP\ndisklabel -R -r wd1 /root/owned-v7-scratch.disklabel; swapctl -a /dev/wd1b; swapctl -lk; test \"$(swapctl -l | awk '$1==\"/dev/wd1b\" {print $2}')\" -ge 2096128; sysctl hw.physmem; vmstat; df -k /root",
+        "console_char_delay": 0.5,
+        "console_steps": [
+          {
+            "expect": "root device:",
+            "send": "wd0a\r"
+          },
+          {
+            "expect": "dump device",
+            "send": "\r"
+          },
+          {
+            "expect": "file system",
+            "send": "\r"
+          },
+          {
+            "expect": "init path",
+            "send": "\r"
+          }
+        ],
+        "resume_setup": "/sbin/swapctl -a /dev/wd1b"
+      },
+      "heap": [
+        "-young=4",
+        "-aging=4",
+        "-tenured=64"
+      ],
+      "commands": {
+        "build": "/usr/pkg/bin/gmake CONFIG=vm/Config.netbsd.ppc.32 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
+      },
+      "work_root": "/root"
+    },
+    "netbsd-riscv-64": {
+      "build": {
+        "config": "netbsd.riscv.64",
+        "make": "/usr/local/bin/gmake",
+        "env": {
+          "CC": "/usr/bin/cc",
+          "CXX": "/usr/bin/c++",
+          "PATH": "/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/pkg/bin"
+        }
+      },
+      "seed": "unix-riscv.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "/home/sheeple/.ssh/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34119",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {
+          "CC": "/usr/bin/cc",
+          "CXX": "/usr/bin/c++",
+          "PATH": "/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/pkg/bin"
+        }
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-riscv64",
+          "-machine",
+          "virt",
+          "-m",
+          "4096",
+          "-smp",
+          "2",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34119-:22",
+          "-device",
+          "virtio-net-device,netdev=n",
+          "-device",
+          "virtio-rng-device",
+          "-device",
+          "virtio-blk-device,drive=root",
+          "-kernel",
+          "${repo}/work/qemu-matrix/riscv-bsd/netbsd-kernel",
+          "-append",
+          "root=dk1"
+        ],
+        "drives": [
+          {
+            "file": "/dev/shm/owned-fp-validation-45-20261009/netbsd-riscv-64/compressed-base-v1/netbsd-stock-compressed.qcow2",
+            "format": "qcow2",
+            "options": "if=none,id=root"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now"
+      },
+      "commands": {
+        "build": "/usr/local/bin/gmake CONFIG=vm/Config.netbsd.riscv.64 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
+      },
+      "work_root": "/root"
+    },
+    "netbsd-sparc-32": {
+      "build": {
+        "config": "netbsd.sparc.32",
+        "make": "/root/owned-tools-20261008/install/bin/make",
+        "env": {
+          "PATH": "/sbin:/usr/sbin:/bin:/usr/bin:/usr/pkg/bin:/usr/local/bin"
+        }
+      },
+      "seed": "unix-sparc.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34120",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {
+          "PATH": "/sbin:/usr/sbin:/bin:/usr/bin:/usr/pkg/bin:/usr/local/bin"
+        }
+      },
+      "guest": {
+        "argv": [
+          "/usr/bin/qemu-system-sparc",
+          "-machine",
+          "SS-20,graphics=off",
+          "-cpu",
+          "TI-SuperSparc-50",
+          "-smp",
+          "1",
+          "-m",
+          "2047",
+          "-boot",
+          "c",
+          "-nic",
+          "user,hostfwd=tcp:127.0.0.1:34120-:22",
+          "-prom-env",
+          "input-device=ttya",
+          "-prom-env",
+          "output-device=ttya"
+        ],
+        "drives": [
+          {
+            "file": "${repo}/work/qemu-matrix/new-bsd/sparc32-netbsd11/guest.raw",
+            "format": "raw",
+            "options": "if=scsi"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "1G",
+            "options": "if=scsi"
+          }
+        ],
+        "setup": "uname -a; /sbin/sysctl hw.physmem hw.model hw.machine; test \"$(/sbin/sysctl -n hw.physmem)\" -ge 900000000; test ! -e /tmp/owned-fp-sparc32-native-controls-50-4631a09187; mkdir /tmp/owned-fp-sparc32-native-controls-50-4631a09187; printf %s 'type: SCSI\ndisk: owned-swap\nlabel: owned-fp-scratch\nflags:\nbytes/sector: 512\nsectors/track: 64\ntracks/cylinder: 16\nsectors/cylinder: 1024\ncylinders: 2048\ntotal sectors: 2097152\nrpm: 5400\ninterleave: 1\ntrackskew: 0\ncylinderskew: 0\nheadswitch: 0\ntrack-to-track seek: 0\ndrivedata: 0\n3 partitions:\n b: 2096128 1024 swap\n c: 2097152 0 unused 0 0\n' > /tmp/owned-fp-sparc32-native-controls-50-4631a09187/scratch.disklabel; test -b /dev/sd1b || (cd /dev && ./MAKEDEV sd1); /sbin/disklabel -R sd1 /tmp/owned-fp-sparc32-native-controls-50-4631a09187/scratch.disklabel; /sbin/disklabel sd1; /sbin/swapctl -a /dev/sd1b; /sbin/swapctl -l; /sbin/swapctl -s; test \"$(/sbin/swapctl -l | awk '$1==\"/dev/sd1b\" {print $2}')\" -ge 2096128",
+        "resume_setup": "/sbin/swapctl -a /dev/sd1b"
+      },
+      "commands": {
+        "build": "/root/owned-tools-20261008/install/bin/make CONFIG=vm/Config.netbsd.sparc.32 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
+      },
+      "work_root": "/root"
+    },
+    "netbsd-sparc-64": {
+      "build": {
+        "config": "netbsd.sparc.64"
+      },
+      "seed": "unix-sparc.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34121",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "/usr/bin/qemu-system-sparc64",
+          "-machine",
+          "sun4u",
+          "-m",
+          "3072",
+          "-nic",
+          "user,model=sunhme,hostfwd=tcp:127.0.0.1:34121-:22",
+          "-display",
+          "none",
+          "-prom-env",
+          "input-device=ttya",
+          "-prom-env",
+          "output-device=ttya",
+          "-boot",
+          "c"
+        ],
+        "drives": [
+          {
+            "file": "${repo}/work/qemu-matrix/new-bsd/sparc64-netbsd11/guest.raw",
+            "format": "raw",
+            "options": "if=ide"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "scratch_drives": [
+          {
+            "size": "2G",
+            "options": "if=ide,index=1"
+          }
+        ],
+        "setup": "PATH=/usr/sbin:/sbin:/usr/bin:/bin:$PATH; export PATH; set -eu; test -e /dev/rwd1c || (cd /dev; ./MAKEDEV wd1); test \"$(disklabel wd1 | awk '/total sectors:/ {print $3}')\" = 4194304; test \"$(dd if=/dev/rwd1c bs=4096 count=1 2>/dev/null | tr -d '\\000' | wc -c)\" -eq 0; newfs -I -O 2 /dev/rwd1c; mkdir /fp-owned-work; mount -t ffs /dev/wd1c /fp-owned-work; df -k /fp-owned-work",
+        "resume_setup": "/sbin/mount -t ffs /dev/wd1c /fp-owned-work"
+      },
+      "commands": {
+        "build": "gmake CONFIG=vm/Config.netbsd.sparc.64 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
+      },
+      "work_root": "/fp-owned-work"
+    },
+    "netbsd-x86-32": {
+      "build": {
+        "config": "netbsd.x86.32"
+      },
+      "seed": "unix-x86.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "/home/sheeple/.ssh/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34122",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-i386",
+          "-m",
+          "4096",
+          "-smp",
+          "1",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34122-:22",
+          "-device",
+          "e1000,netdev=n"
+        ],
+        "drives": [
+          {
+            "file": "${repo}/work/qemu-matrix/netbsd/i386/installed.img",
+            "format": "raw",
+            "options": "if=ide"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now"
+      },
+      "commands": {
+        "build": "gmake CONFIG=vm/Config.netbsd.x86.32 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
+      },
+      "work_root": "/root"
+    },
+    "netbsd-x86-64": {
+      "build": {
+        "config": "netbsd.x86.64",
+        "make": "/usr/pkg/bin/gmake",
+        "env": {
+          "LD_LIBRARY_PATH": "/usr/pkg/lib:/usr/X11R7/lib",
+          "LIBGL_ALWAYS_SOFTWARE": "1"
+        }
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "/home/sheeple/.ssh/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34123",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {
+          "LD_LIBRARY_PATH": "/usr/pkg/lib:/usr/X11R7/lib",
+          "LIBGL_ALWAYS_SOFTWARE": "1"
+        }
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-x86_64",
+          "-m",
+          "4096",
+          "-smp",
+          "1",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34123-:22",
+          "-device",
+          "e1000,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
+        ],
+        "drives": [
+          {
+            "file": "${repo}/work/ui-concurrency-proposal-20261009/netbsd-x86-64-stock-graphics-v1/stock-gui-base-v2.qcow2",
+            "format": "qcow2",
+            "options": "if=ide"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now"
+      },
+      "commands": {
+        "build": "/usr/pkg/bin/gmake CONFIG=vm/Config.netbsd.x86.64 BUILD_DIR=build-validation -j1 factor-executable factor-ffi-test; /usr/sbin/paxctl +m factor"
+      },
+      "work_root": "/root"
+    },
+    "openbsd-alpha-64": {
+      "build": {
+        "config": "openbsd.alpha.64"
+      },
+      "seed": "unix-alpha.64",
+      "transport": {
+        "kind": "serial",
+        "host": "127.0.0.1",
+        "port": 34528,
+        "login": [
+          {
+            "expect": "P00>>>",
+            "send": "boot dka0"
+          },
+          {
+            "expect": "login:",
+            "send": "root"
+          },
+          {
+            "expect": "#",
+            "send": "stty -echo"
+          }
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "kind": "command",
+        "argv": [
+          "ssh",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ExitOnForwardFailure=yes",
+          "-i",
+          "${assets}/openbsd-alpha/id_ed25519",
+          "-p",
+          "34527",
+          "-L",
+          "127.0.0.1:34528:127.0.0.1:21264",
+          "factor@127.0.0.1",
+          "cd /opt/obalpha-es40-v1/bundle && exec lib/ld-linux-x86-64.so.2 --library-path lib bin/es40 /home/factor/es40.cfg"
+        ],
+        "qmp": false,
+        "success_exit": 1,
+        "shutdown": "sync; /sbin/halt",
+        "outer": {
+          "transport": {
+            "kind": "ssh",
+            "argv": [
+              "ssh",
+              "-o",
+              "BatchMode=yes",
+              "-o",
+              "ConnectTimeout=20",
+              "-i",
+              "${assets}/openbsd-alpha/id_ed25519",
+              "-p",
+              "34527",
+              "factor@127.0.0.1"
+            ]
+          },
+          "guest": {
+            "argv": [
+              "qemu-system-x86_64",
+              "-enable-kvm",
+              "-cpu",
+              "host",
+              "-m",
+              "8192",
+              "-smp",
+              "1",
+              "-netdev",
+              "user,id=n,hostfwd=tcp:127.0.0.1:34527-:22",
+              "-device",
+              "virtio-net-pci,netdev=n"
+            ],
+            "drives": [
+              {
+                "file": "${assets}/openbsd-alpha/outer.qcow2",
+                "format": "qcow2",
+                "options": "if=virtio"
+              }
+            ],
+            "shutdown": "sync; sudo -n /sbin/poweroff"
+          }
+        },
+        "halt_marker": "halted"
+      },
+      "heap": [
+        "-young=16",
+        "-aging=16",
+        "-tenured=64"
+      ],
+      "work_root": "/mnt"
+    },
+    "openbsd-arm-32": {
+      "build": {
+        "config": "openbsd.arm.32",
+        "make": "/home/owned-stock-openbsd-arm-32-source51-v1/install/bin/make"
+      },
+      "seed": "unix-arm.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${repo}/work/qemu-matrix/linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34125",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-arm",
+          "-M",
+          "virt",
+          "-cpu",
+          "cortex-a15",
+          "-m",
+          "1024",
+          "-global",
+          "virtio-mmio.force-legacy=true",
+          "-bios",
+          "${repo}/work/qemu-matrix/new-bsd/arm32-netbsd11/firmware/usr/share/AAVMF/AAVMF32_CODE.fd",
+          "-netdev",
+          "user,id=n,ipv6=off,hostfwd=tcp:127.0.0.1:34125-:22",
+          "-device",
+          "virtio-net-device,netdev=n,mrg_rxbuf=off"
+        ],
+        "drives": [
+          {
+            "file": "/run/user/1001/fp/bsd-resume-20261010/openbsd-arm-32-v3-stockproof/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "df -k /home; mount; mount -u -o wxallowed /home; mount; df -k /home"
+      },
+      "work_root": "/home"
+    },
+    "openbsd-arm-64": {
+      "build": {
+        "config": "openbsd.arm.64"
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "/home/sheeple/.ssh/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34126",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-aarch64",
+          "-m",
+          "2048",
+          "-smp",
+          "1",
+          "-machine",
+          "virt",
+          "-cpu",
+          "cortex-a72",
+          "-bios",
+          "/usr/share/AAVMF/AAVMF_CODE.fd",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34126-:22",
+          "-device",
+          "virtio-net-pci,netdev=n"
+        ],
+        "drives": [
+          {
+            "file": "/dev/shm/owned-fp-validation-50-20261009-v6/openbsd-arm-64/vm-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "df -k /home; mount; mount -u -o wxallowed /home; mount; df -k /home"
+      },
+      "work_root": "/home"
+    },
+    "openbsd-riscv-64": {
+      "build": {
+        "config": "openbsd.riscv.64"
+      },
+      "seed": "unix-riscv.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "/home/sheeple/.ssh/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34127",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-riscv64",
+          "-machine",
+          "virt",
+          "-m",
+          "2048",
+          "-smp",
+          "1",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34127-:22",
+          "-device",
+          "virtio-net-device,netdev=n",
+          "-device",
+          "virtio-rng-device",
+          "-kernel",
+          "/usr/lib/u-boot/qemu-riscv64_smode/uboot.elf",
+          "-device",
+          "virtio-blk-device,drive=root"
+        ],
+        "drives": [
+          {
+            "file": "/run/user/1001/fp/owned-fp-validation-50-20261009-v6/openbsd-riscv-64/vm-latest50-v1/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=none,id=root"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "df -k /home; mount; mount -u -o wxallowed /home; mount; df -k /home"
+      },
+      "work_root": "/home"
+    },
+    "openbsd-x86-32": {
+      "build": {
+        "config": "openbsd.x86.32"
+      },
+      "seed": "unix-x86.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "/home/sheeple/.ssh/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34128",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-i386",
+          "-m",
+          "2048",
+          "-smp",
+          "1",
+          "-accel",
+          "tcg",
+          "-cpu",
+          "max",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34128-:22",
+          "-device",
+          "virtio-net-pci,netdev=n"
+        ],
+        "drives": [
+          {
+            "file": "/run/user/1001/fp/bsd-resume-20261010/openbsd-x86-32-v3-stockproof/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "df -k /usr/local; mount; mount -u -o wxallowed /usr/local; mount; df -k /usr/local",
+        "console_char_delay": 0.12
+      },
+      "work_root": "/usr/local"
+    },
+    "openbsd-x86-64": {
+      "build": {
+        "config": "openbsd.x86.64"
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "/home/sheeple/.ssh/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ControlMaster=no",
+          "-o",
+          "ControlPath=none",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "34129",
+          "root@127.0.0.1",
+          "-o",
+          "ServerAliveInterval=0"
+        ]
+      },
+      "execution": {
+        "env": {}
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-x86_64",
+          "-m",
+          "2048",
+          "-smp",
+          "1",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:34129-:22",
+          "-device",
+          "virtio-net-pci,netdev=n",
+          "-accel",
+          "kvm",
+          "-cpu",
+          "host"
+        ],
+        "drives": [
+          {
+            "file": "/run/user/1001/fp/bsd-resume-20261010/openbsd-x86-64-v4/disk-0.qcow2",
+            "format": "qcow2",
+            "options": "if=virtio"
+          }
+        ],
+        "shutdown": "sync; /sbin/shutdown -p now",
+        "setup": "df -k /home; mount; mount -u -o wxallowed /home; mount; df -k /home"
+      },
+      "work_root": "/home"
+    },
+    "haiku-arm-64": {
+      "build": {
+        "config": "haiku.arm.64",
+        "host": true,
+        "make": "make",
+        "jobs": 8,
+        "artifacts": [
+          "factor",
+          "libfactor-ffi-test.so"
+        ],
+        "env": {
+          "AR": "${assets}/haiku-arm64/sdk/bin/aarch64-unknown-haiku-ar",
+          "CC": "${assets}/haiku-arm64/sdk/bin/aarch64-unknown-haiku-gcc",
+          "CXX": "${assets}/haiku-arm64/sdk/bin/aarch64-unknown-haiku-g++"
+        }
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "serial",
+        "host": "127.0.0.1",
+        "port": 62464,
+        "binary_stdin": true
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-aarch64",
+          "-machine",
+          "virt",
+          "-cpu",
+          "max",
+          "-smp",
+          "2",
+          "-m",
+          "4096",
+          "-bios",
+          "/usr/lib/u-boot/qemu_arm64/u-boot.bin",
+          "-device",
+          "virtio-blk-device,drive=ui",
+          "-device",
+          "virtio-blk-device,drive=scratch",
+          "-device",
+          "virtio-blk-device,drive=system",
+          "-device",
+          "virtio-blk-device,drive=console",
+          "-device",
+          "virtio-keyboard-device",
+          "-device",
+          "virtio-tablet-device",
+          "-device",
+          "virtio-gpu-device",
+          "-device",
+          "virtio-rng-device",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:62464-:2222",
+          "-device",
+          "virtio-net-device,netdev=n",
+          "-no-reboot"
+        ],
+        "drives": [
+          {
+            "file": "${assets}/haiku-arm64/system.image",
+            "format": "raw",
+            "options": "if=none,id=system"
+          },
+          {
+            "file": "${assets}/haiku-arm64/console.iso",
+            "format": "raw",
+            "options": "if=none,id=console"
+          },
+          {
+            "file": "${assets}/haiku-arm64/runtime.iso",
+            "format": "raw",
+            "options": "if=none,id=ui"
+          }
+        ],
+        "scratch_drives": [
+          {
+            "size": "4G",
+            "options": "if=none,id=scratch"
+          }
+        ],
+        "console_steps": [
+          {
+            "expect": "runtime_loader: Cannot open file libmedia.so",
+            "send": ""
+          }
+        ],
+        "display_args": [
+          "-display",
+          "vnc=127.0.0.1:64"
+        ],
+        "vnc_server": "127.0.0.1::5964",
+        "vnc_actions": [
+          {
+            "pause": 3
+          },
+          {
+            "move": [
+              1210,
+              20
+            ]
+          },
+          {
+            "click": 1
+          },
+          {
+            "pause": 1
+          },
+          {
+            "move": [
+              1040,
+              227
+            ]
+          },
+          {
+            "pause": 1
+          },
+          {
+            "move": [
+              900,
+              408
+            ]
+          },
+          {
+            "key": "enter"
+          },
+          {
+            "pause": 5
+          },
+          {
+            "key": "enter"
+          },
+          {
+            "pause": 15
+          },
+          {
+            "text": "mkdir -p /tmp/m; mount /dev/disk/virtual/virtio"
+          },
+          {
+            "key": "tab"
+          },
+          {
+            "text": "/0/raw /tmp/m; exec /tmp/m/console 0.0.0.0 2222"
+          },
+          {
+            "key": "enter"
+          }
+        ],
+        "setup": "mkfs -q -t bfs /dev/disk/virtual/virtio_block/2/raw FactorScratch; mkdir -p /factor /ui; mount /dev/disk/virtual/virtio_block/2/raw /factor; mount -ro /dev/disk/virtual/virtio_block/3/raw /ui; df -h /factor",
+        "resume_setup": "mkdir -p /factor /ui; mount /dev/disk/virtual/virtio_block/2/raw /factor; mount -ro /dev/disk/virtual/virtio_block/3/raw /ui; df -h /factor",
+        "set_clock": true,
+        "shutdown": "printf FACTOR_HAIKU_SHUTDOWN; sync; shutdown -r",
+        "halt_marker": "FACTOR_HAIKU_SHUTDOWN"
+      },
+      "artifacts": [
+        "factor",
+        "factor.image",
+        "boot.image",
+        "libfactor-ffi-test.so"
+      ],
+      "execution": {
+        "env": {
+          "PATH": "/ui/test-runtime/bin:/ui/bin:/boot/system/bin:/bin",
+          "LIBRARY_PATH": "/ui/test-runtime/lib:/ui/lib:/boot/system/lib",
+          "OPENSSL_CONF": "/ui/test-runtime/data/ssl/openssl.cnf",
+          "OPENSSL_MODULES": "/ui/test-runtime/lib/ossl-modules",
+          "SSL_CERT_FILE": "/ui/test-runtime/data/ssl/CARootCertificates.pem"
+        }
+      },
+      "commands": {
+        "ui": "/ui/run-with-ui ./factor -no-user-init -resource-path=\"$PWD\" -i=\"$PWD/factor.image\" -run=tools.test ui"
+      },
+      "extract_command": "PATH=/ui/bin:$PATH /ui/bin/tar --warning=no-timestamp xzof -",
+      "stall_seconds": 0,
+      "work_root": "/factor"
+    },
+    "haiku-x86-64": {
+      "build": {
+        "config": "haiku.x86.64",
+        "make": "make"
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "ConnectTimeout=20",
+          "-i",
+          "${assets}/haiku/id_ed25519",
+          "-p",
+          "62346",
+          "user@127.0.0.1"
+        ]
+      },
+      "guest": {
+        "argv": [
+          "qemu-system-x86_64",
+          "-machine",
+          "pc,accel=kvm",
+          "-cpu",
+          "qemu64",
+          "-smp",
+          "1",
+          "-m",
+          "4096",
+          "-boot",
+          "order=c",
+          "-netdev",
+          "user,id=n,hostfwd=tcp:127.0.0.1:62346-:22",
+          "-device",
+          "e1000,netdev=n",
+          "-no-reboot"
+        ],
+        "drives": [
+          {
+            "file": "${assets}/haiku/system.qcow2",
+            "format": "qcow2",
+            "options": "if=ide"
+          }
+        ],
+        "shutdown": "sync; shutdown -q"
+      },
+      "work_root": "/boot/home"
+    },
+    "android-arm-64": {
+      "build": {
+        "config": "android.arm.64",
+        "host": true,
+        "make": "make",
+        "jobs": 12,
+        "targets": [
+          "factor-executable",
+          "factor-ffi-test",
+          "factor-lib",
+          "android-runtime-libs"
+        ],
+        "artifacts": [
+          "factor",
+          "libfactor.so",
+          "libfactor-ffi-test.so",
+          "android-libs"
+        ],
+        "env": {
+          "CC": "${assets}/android/android-ndk-r30/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang",
+          "CXX": "${assets}/android/android-ndk-r30/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++",
+          "CXXFLAGS": "-static-libstdc++",
+          "ANDROID_ABI": "arm64-v8a",
+          "ANDROID_NDK_ROOT": "${assets}/android/android-ndk-r30"
+        }
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "adb",
+        "argv": [
+          "${assets}/android/sdk/platform-tools/adb",
+          "-s",
+          "emulator-5556"
+        ]
+      },
+      "execution": {
+        "env": {
+          "SSL_CERT_DIR": "/system/etc/security/cacerts"
+        },
+        "directories": {
+          "HOME": ".home",
+          "TMPDIR": ".tmp",
+          "XDG_CACHE_HOME": ".cache",
+          "LD_LIBRARY_PATH": "android-libs"
+        }
+      },
+      "artifacts": [
+        "factor",
+        "factor.image",
+        "boot.image",
+        "libfactor.so",
+        "libfactor-ffi-test.so",
+        "android-libs/libcrypto.so",
+        "android-libs/libssl.so",
+        "android-libs/libsqlite3.so"
+      ],
+      "stall_seconds": 0,
+      "work_root": "/data/local/tmp"
+    },
+    "android-x86-64": {
+      "build": {
+        "config": "android.x86.64",
+        "host": true,
+        "make": "make",
+        "jobs": 12,
+        "targets": [
+          "factor-executable",
+          "factor-ffi-test",
+          "factor-lib",
+          "android-runtime-libs"
+        ],
+        "artifacts": [
+          "factor",
+          "libfactor.so",
+          "libfactor-ffi-test.so",
+          "android-libs"
+        ],
+        "env": {
+          "CC": "${assets}/android/android-ndk-r30/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang",
+          "CXX": "${assets}/android/android-ndk-r30/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang++",
+          "CXXFLAGS": "-static-libstdc++",
+          "ANDROID_ABI": "x86_64",
+          "ANDROID_NDK_ROOT": "${assets}/android/android-ndk-r30"
+        }
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "adb",
+        "argv": [
+          "${assets}/android/sdk/platform-tools/adb",
+          "-s",
+          "emulator-5554"
+        ]
+      },
+      "execution": {
+        "env": {
+          "SSL_CERT_DIR": "/system/etc/security/cacerts"
+        },
+        "directories": {
+          "HOME": ".home",
+          "TMPDIR": ".tmp",
+          "XDG_CACHE_HOME": ".cache",
+          "LD_LIBRARY_PATH": "android-libs"
+        }
+      },
+      "artifacts": [
+        "factor",
+        "factor.image",
+        "boot.image",
+        "libfactor.so",
+        "libfactor-ffi-test.so",
+        "android-libs/libcrypto.so",
+        "android-libs/libssl.so",
+        "android-libs/libsqlite3.so"
+      ],
+      "stall_seconds": 0,
+      "work_root": "/data/local/tmp"
+    },
+    "guix-x86-64": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.x86.64",
+        "make": "make",
+        "jobs": 4
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35220",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix make CONFIG=vm/Config.linux.x86.64 BUILD_DIR=build-validation -j4 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk4.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'"
+      }
+    },
+    "guix-arm-64": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.arm.64",
+        "make": "make",
+        "jobs": 4
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35221",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix make CONFIG=vm/Config.linux.arm.64 BUILD_DIR=build-validation -j4 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk4.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'"
+      }
+    },
+    "nixos-x86-64": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.x86.64",
+        "make": "make",
+        "jobs": 4
+      },
+      "seed": "unix-x86.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35222",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix make CONFIG=vm/Config.linux.x86.64 BUILD_DIR=build-validation -j4 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk4.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'"
+      }
+    },
+    "nixos-arm-64": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.arm.64",
+        "make": "make",
+        "jobs": 4
+      },
+      "seed": "unix-arm.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35223",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix make CONFIG=vm/Config.linux.arm.64 BUILD_DIR=build-validation -j4 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk4.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'"
+      }
+    },
+    "guix-x86-32": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.x86.32",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-x86.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35320",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix",
+          "--system=i686-linux"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix --system=i686-linux make CONFIG=vm/Config.linux.x86.32 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix --system=i686-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix --system=i686-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env guix --system=i686-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "kernel_architecture": "i686",
+      "package_system": "i686-linux"
+    },
+    "guix-arm-32": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.arm.32",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-arm.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35221",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix",
+          "--system=armhf-linux"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix --system=armhf-linux make CONFIG=vm/Config.linux.arm.32 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix --system=armhf-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix --system=armhf-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env guix --system=armhf-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "kernel_architecture": "aarch64",
+      "package_system": "armhf-linux"
+    },
+    "nixos-x86-32": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.x86.32",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-x86.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35222",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=i686-linux"
+        ]
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=i686-linux make CONFIG=vm/Config.linux.x86.32 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=i686-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=i686-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=i686-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "kernel_architecture": "x86_64",
+      "package_system": "i686-linux"
+    },
+    "nixos-arm-32": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.arm.32",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-arm.32",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35230",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=armv7l-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=armv7l-linux make CONFIG=vm/Config.linux.arm.32 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=armv7l-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=armv7l-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=armv7l-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "armv7l-linux",
+      "runtime_scope": "package-environment"
+    },
+    "nixos-riscv-64": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.riscv.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-riscv.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35231",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=riscv64-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=riscv64-linux make CONFIG=vm/Config.linux.riscv.64 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=riscv64-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=riscv64-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=riscv64-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "riscv64-linux",
+      "runtime_scope": "package-environment"
+    },
+    "nixos-ppc-64-be": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.ppc.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "linux-ppc.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35232",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=powerpc64-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=powerpc64-linux make CONFIG=vm/Config.linux.ppc.64 SITE_CXXFLAGS=-DFACTOR_NO_PTHREAD_CANCEL BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=powerpc64-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=powerpc64-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=powerpc64-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "powerpc64-linux",
+      "runtime_scope": "package-environment"
+    },
+    "nixos-ppc-64-le": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.ppc.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "linux-ppc.64le",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35233",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=powerpc64le-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=powerpc64le-linux make CONFIG=vm/Config.linux.ppc.64 BUILD_DIR=build-validation SITE_CXXFLAGS=-DFACTOR_NO_PTHREAD_CANCEL -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=powerpc64le-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=powerpc64le-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=powerpc64le-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "powerpc64le-linux",
+      "runtime_scope": "package-environment"
+    },
+    "nixos-s390x-64": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.s390x",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "linux-s390x",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35234",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=s390x-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=s390x-linux make CONFIG=vm/Config.linux.s390x BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=s390x-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=s390x-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=s390x-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "s390x-linux",
+      "runtime_scope": "package-environment"
+    },
+    "nixos-loongarch-64": {
+      "distribution": "nixos",
+      "build": {
+        "config": "linux.loongarch.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-loongarch.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35235",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "nix",
+          "--system=loongarch64-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env nix --system=loongarch64-linux make CONFIG=vm/Config.linux.loongarch.64 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env nix --system=loongarch64-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env nix --system=loongarch64-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env nix --system=loongarch64-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "loongarch64-linux",
+      "runtime_scope": "package-environment"
+    },
+    "guix-riscv-64": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.riscv.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "unix-riscv.64",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35236",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix",
+          "--system=riscv64-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix --system=riscv64-linux make CONFIG=vm/Config.linux.riscv.64 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix --system=riscv64-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix --system=riscv64-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env guix --system=riscv64-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "riscv64-linux",
+      "runtime_scope": "package-environment"
+    },
+    "guix-ppc-64-le": {
+      "distribution": "guix",
+      "build": {
+        "config": "linux.ppc.64",
+        "make": "make",
+        "jobs": 2
+      },
+      "seed": "linux-ppc.64le",
+      "transport": {
+        "kind": "ssh",
+        "argv": [
+          "ssh",
+          "-F",
+          "/dev/null",
+          "-i",
+          "${assets}/store-linux/id_ed25519",
+          "-o",
+          "IdentitiesOnly=yes",
+          "-o",
+          "BatchMode=yes",
+          "-o",
+          "StrictHostKeyChecking=no",
+          "-o",
+          "UserKnownHostsFile=/dev/null",
+          "-o",
+          "ConnectTimeout=20",
+          "-p",
+          "35237",
+          "root@127.0.0.1"
+        ]
+      },
+      "work_root": "/root",
+      "execution": {
+        "runner": [
+          "bash",
+          "misc/qemu/store-linux/with-env",
+          "guix",
+          "--system=powerpc64le-linux"
+        ],
+        "env": {
+          "FACTOR_UI_BACKEND": "gtk3"
+        }
+      },
+      "commands": {
+        "build": "bash misc/qemu/store-linux/with-env guix --system=powerpc64le-linux make CONFIG=vm/Config.linux.ppc.64 BUILD_DIR=build-validation -j2 factor-executable factor-ffi-test",
+        "numeric": "bash misc/qemu/store-linux/with-env guix --system=powerpc64le-linux make -f vm/tests/Makefile.ieee-float BUILD_DIR=build-numeric check",
+        "ui": "bash misc/qemu/store-linux/with-env guix --system=powerpc64le-linux xvfb-run -a env GDK_BACKEND=x11 GTK_A11Y=none LIBGL_ALWAYS_SOFTWARE=1 bash -eu -c './factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=tools.test ui; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init -run=ui.backend.gtk3.smoke-test; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/ui-graphics-provenance.factor; ./factor -i=\"$PWD/factor.image\" -resource-path=\"$PWD\" -no-user-init misc/qemu/store-linux/ui-listener.factor'",
+        "bootstrap": "bash misc/qemu/store-linux/with-env guix --system=powerpc64le-linux ./factor -no-user-init -resource-path=\"$PWD\" -young=16 -aging=16 -i=\"$PWD/boot.image\" -output-image=\"$PWD/factor.image\" -ui-backend=gtk3"
+      },
+      "package_system": "powerpc64le-linux",
+      "runtime_scope": "package-environment"
+    }
+  }
+}

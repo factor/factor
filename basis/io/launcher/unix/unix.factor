@@ -7,7 +7,7 @@ io.backend io.backend.unix io.backend.unix.multiplexers
 io.encodings.utf8 io.files.info io.files.private
 io.files.unix io.launcher io.launcher.private io.pathnames
 io.ports kernel libc locals math namespaces sequences simple-tokenizer
-splitting strings system unix unix.ffi unix.process unix.types ;
+splitting strings system unix unix.ffi unix.process unix.types vocabs ;
 QUALIFIED-WITH: unix.signals sig
 IN: io.launcher.unix
 
@@ -102,6 +102,7 @@ IN: io.launcher.unix
     dup sigset_t heap-size <byte-array>
     dup sigemptyset io-error
     dup SIGPIPE sigaddset io-error
+    os netbsd? [ dup SIGTERM sigaddset io-error ] when
     posix_spawnattr_setsigdefault check-posix ;
 
 : setup-process-group* ( attrp argv flags process -- attrp' argv flags' )
@@ -192,7 +193,7 @@ DESTRUCTOR: posix-spawnattr-destroy
 ! Probe PATH entries before spawning: on macOS, unsuccessful spawnp attempts
 ! are much more expensive than checking whether an executable exists.
 : spawn-candidate? ( path -- ? )
-    [ dup X_OK access 0 = [ directory? not ] [ drop f ] if ]
+    [ dup file-executable? [ directory? not ] [ drop f ] if ]
     [ 2drop f ] recover ;
 
 :: spawn-executable ( command -- path/f )
@@ -226,6 +227,7 @@ DESTRUCTOR: posix-spawnattr-destroy
                 setup-working-directory
                 posix-spawnattr-init &posix-spawnattr-destroy reset-ignored-signals*
             ] keep spawn-strings POSIX_SPAWN_SETSIGDEF
+            os netbsd? [ POSIX_SPAWN_RETURNERROR bitor ] when
         ]
         [
             setup-process-group*
@@ -252,9 +254,54 @@ M: unix (process-notifications?)
 
 ! fork() copies the page tables of the whole image, which makes it
 ! much slower than posix_spawn() for large heaps.
+:: fork-launcher ( process -- pid )
+    sigset_t heap-size <byte-array> :> mask
+    sigset_t heap-size <byte-array> :> old-mask
+    mask sigemptyset io-error
+    mask SIGTERM sigaddset io-error
+    SIG_BLOCK mask old-mask pthread_sigmask check-posix
+    [
+        [
+            ! A kill immediately after fork must not be consumed by the
+            ! VM's inherited SIGTERM handler before the child reaches exec.
+            SIGTERM SIG_DFL signal SIG_ERR = [ throw-errno ] when
+            SIG_SETMASK old-mask f pthread_sigmask check-posix
+            process fork-process
+        ] [ ] with-fork
+    ] [ SIG_SETMASK old-mask f pthread_sigmask check-posix ] finally ;
+
+:: use-posix-spawn? ( process -- ? )
+    os android? [
+        ! Bionic did not provide posix_spawn until API 28, and its chdir
+        ! file action did not arrive until API 34.
+        f
+    ] [
+        os linux-kernel? os haiku? or os macos? cpu arm.64? and or
+        ! NetBSD spawns in the kernel without copying the Factor heap.
+        ! Its spawn API has no setsid flag, so session creation still uses fork.
+        os netbsd? cpu alpha.64? not and
+        process group>> +new-session+ eq? not and or
+    ] if ;
+
 M: unix (run-process)
-    os linux? os macos? cpu arm.64? and or
-    [ spawn-process ] [ '[ _ fork-process ] [ ] with-fork ] if ;
+    dup use-posix-spawn?
+    [ spawn-process ] [ fork-launcher ] if ;
+
+! Normalize only an owned pipe canceled by this timer or a process kill.
+! A normal child exit alone does not establish cancellation.
+:: owned-pipe-disposal? ( error scope -- ? )
+    scope process>> :> process
+    error already-disposed?
+    scope timed-out?>> process killed>> or and [
+        process pipe>> [| pipe |
+            error disposable>>
+            dup pipe in>> eq? swap pipe out>> eq? or
+        ] [ f ] if*
+    ] [ f ] if ;
+
+M: unix process-io-error
+    2dup owned-pipe-disposal?
+    [ 2drop io-timeout ] [ drop rethrow ] if ;
 
 M: unix (kill-process)
     [ handle>> SIGTERM ] [ group>> ] bi {
@@ -277,3 +324,5 @@ M: unix (wait-for-processes)
         find-process dup
         [ swap code>status notify-exit f ] [ 2drop f ] if
     ] if ;
+
+os haiku? [ "io.launcher.haiku" require ] when

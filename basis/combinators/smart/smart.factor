@@ -1,5 +1,8 @@
 ! Copyright (C) 2009, 2011 Doug Coleman, John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
+IN: combinators.smart
+! classes.struct is loaded through stack-checker.transforms below.
+DEFER: cleave>array
 USING: accessors arrays assocs combinators continuations effects
 generalizations kernel math namespaces sequences
 sequences.generalizations stack-checker stack-checker.backend

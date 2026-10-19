@@ -213,11 +213,11 @@ M: small-bank-chordal-allocator allocate-cfg
 { t } [ [
     [ 1.0 100 [ fsin ] times 1.0 float+ ] compile-call
     1.168852488727981 1.e-9 ~
-] with-chordal-test ] unit-test
+] with-chordal-test ] floating-point-unit-test
 
 { 65537.0 } [ [
     [ 2.0 4 [ 2.0 fpow ] times 1.0 float+ ] compile-call
-] with-chordal-test ] unit-test
+] with-chordal-test ] floating-point-unit-test
 
 :: pressure-quotation ( -- quot )
     40 <iota> [ '[ _ swap nth >float 0.5 float+ ] ] map :> loads
@@ -226,14 +226,14 @@ M: small-bank-chordal-allocator allocate-cfg
 { t } [ [
     40 <iota> >array pressure-quotation compile-call
     40 <iota> [ >float 0.5 float+ ] map =
-] with-chordal-test ] unit-test
+] with-chordal-test ] floating-point-unit-test
 
 { t t t } [ [
     pressure-quotation measure-compilation "procedures" of first
     [ "allocation" of "repair-assignments" of 0 = ]
     [ "allocation" of "pressure-stores" of 0 > ]
     [ "passes" of last "spills" of 0 > ] tri
-] with-chordal-test ] unit-test
+] with-chordal-test ] floating-point-unit-test
 
 :: phi-pressure-quotation ( -- quot )
     40 <iota> [ 1 + >float '[ _ float+ ] ] map :> positive
@@ -249,7 +249,7 @@ M: small-bank-chordal-allocator allocate-cfg
 { 920.0 -720.0 } [ [
     2.5 t phi-pressure-quotation compile-call
     2.5 f phi-pressure-quotation compile-call
-] with-chordal-test ] unit-test
+] with-chordal-test ] floating-point-unit-test
 
 ! Allocation diagnostics make the theorem's certificate and the actual
 ! graph-policy work visible to the comparison harness.

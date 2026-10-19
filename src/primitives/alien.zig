@@ -39,8 +39,14 @@ pub fn initFfi() void {
     var global_mode = rtld_mode;
     global_mode.GLOBAL = true;
     if (builtin.os.tag == .linux) _ = platform.dlopen("libm.so.6", global_mode);
+    if (builtin.os.tag == .netbsd) _ = platform.dlopen("libm.so.0", global_mode);
 
-    null_dll = platform.dlopen(null, rtld_mode);
+    // NetBSD's dlopen(NULL) searches the main dependency group only;
+    // RTLD_DEFAULT also includes libraries loaded with RTLD_GLOBAL.
+    null_dll = if (builtin.os.tag == .netbsd)
+        @ptrFromInt(std.math.maxInt(usize) - 1) // RTLD_DEFAULT = (void *) -2
+    else
+        platform.dlopen(null, rtld_mode);
 }
 
 // --- Alien/FFI Primitives ---
@@ -577,7 +583,7 @@ pub export fn primitive_callback(vm_asm: *VMAssemblyFields) callconv(.c) void {
         vm.generalError(.callback_space_overflow, layouts.false_object, layouts.false_object);
     };
 
-    const func = stub.entryPoint();
+    const func = @import("../callbacks.zig").functionPointer(stub);
 
     const tagged = vm.allotObject(.alien, @sizeOf(layouts.Alien)) orelse
         vm.memoryError();
@@ -594,7 +600,7 @@ pub export fn primitive_free_callback(vm_asm: *VMAssemblyFields) callconv(.c) vo
     const alien_cell = vm.pop();
 
     if (vm.alienOffset(alien_cell)) |entry_point| {
-        const entry_addr: usize = @intFromPtr(entry_point);
+        const entry_addr: usize = @import("../callbacks.zig").functionEntry(@intFromPtr(entry_point));
         const code_block_addr = entry_addr - @sizeOf(code_blocks.CodeBlock);
         const stub: *code_blocks.CodeBlock = @ptrFromInt(code_block_addr);
 
@@ -602,4 +608,12 @@ pub export fn primitive_free_callback(vm_asm: *VMAssemblyFields) callconv(.c) vo
             callback_heap.free(stub);
         }
     }
+}
+
+test "NetBSD default FFI scope resolves native math functions" {
+    if (builtin.os.tag != .netbsd) return error.SkipZigTest;
+    initFfi();
+    const symbol = platform.dlsym(null_dll, "sin") orelse return error.MissingMathSymbol;
+    const sin: *const fn (f64) callconv(.c) f64 = @ptrCast(@alignCast(symbol));
+    try std.testing.expectApproxEqAbs(@as(f64, 1.0), sin(std.math.pi / 2.0), 1e-12);
 }

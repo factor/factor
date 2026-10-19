@@ -1,4 +1,4 @@
-USING: accessors arrays generic.single kernel math
+USING: compiler.test.literal-metadata accessors arrays generic.single kernel math
 math.functions slots tools.test words eval vocabs.parser ;
 IN: slots.tests
 
@@ -31,14 +31,14 @@ M: protocol-slot-test-tuple my-protocol-slot-test<< [ sqrt ] dip x<< ;
 { 4.0 } [
     T{ protocol-slot-test-tuple { x 3 } } clone
     [ 7 + ] change-my-protocol-slot-test x>>
-] unit-test
+] floating-point-unit-test
 
 UNION: comme-ci integer float ;
 UNION: comme-ca integer float ;
 comme-ca 25.5 "initial-value" set-word-prop
 
 { 0 t }    [ comme-ci initial-value ] unit-test
-{ 25.5 t } [ comme-ca initial-value ] unit-test
+{ 25.5 t } [ comme-ca initial-value ] literal-metadata-unit-test
 
 [
     "IN: slots.tuple TUPLE: foobar { foo myfoobarx } ;"

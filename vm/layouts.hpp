@@ -1,3 +1,5 @@
+#include "vm_float.hpp"
+
 namespace factor {
 
 typedef intptr_t fixnum;
@@ -254,7 +256,7 @@ struct boxed_float : object {
   cell padding;
 #endif
 
-  double n;
+  vm_float n;
 };
 
 // Assembly code makes assumptions about the layout of this struct:

@@ -118,7 +118,11 @@ void factor_vm::print_nested_obj(ostream& out, cell obj, fixnum nesting) {
       out << untag_fixnum(obj);
       break;
     case FLOAT_TYPE:
+#if defined(FACTOR_INTEGER_ONLY)
+      out << "<opaque float bits=" << vm_float_bits(untag_float(obj)) << ">";
+#else
       out << untag_float(obj);
+#endif
       break;
     case WORD_TYPE:
       print_word(out, untag<word>(obj), nesting - 1);

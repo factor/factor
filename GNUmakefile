@@ -1,24 +1,30 @@
 # build-<target> or build
+ifeq ($(INTEGER_ONLY),1)
+BUILD_DIR ?= build-integer-only
+else
 BUILD_DIR ?= build
+endif
 
 ifdef CONFIG
 	VERSION := 0.103
-	GIT_LABEL := $(shell echo $(shell git describe --all)-$(shell git rev-parse HEAD))
+	GIT_DESCRIBE := $(shell git describe --all 2>/dev/null || echo unknown)
+	GIT_REVISION := $(shell git rev-parse HEAD 2>/dev/null || echo unknown)
+	GIT_LABEL := $(GIT_DESCRIBE)-$(GIT_REVISION)
 	BUNDLE := Factor.app
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
 
-	SHELL_CC := $(shell printenv CC)
+	SHELL_CC := $(shell env | sed -n 's/^CC=//p')
 	ifeq ($(SHELL_CC),)
-		CC := $(shell which clang cc 2>/dev/null | head -n 1)
+		CC := $(shell command -v clang 2>/dev/null || command -v cc 2>/dev/null || command -v gcc 2>/dev/null)
 	else
 		CC := $(SHELL_CC)
 	endif
 
 	# gmake's default CXX is g++, we prefer c++
-	SHELL_CXX := $(shell printenv CXX)
+	SHELL_CXX := $(shell env | sed -n 's/^CXX=//p')
 	ifeq ($(SHELL_CXX),)
-		CXX := $(shell which clang++ c++ 2>/dev/null | head -n 1)
+		CXX := $(shell command -v clang++ 2>/dev/null || command -v c++ 2>/dev/null || command -v g++ 2>/dev/null)
 	else
 		CXX := $(SHELL_CXX)
 	endif
@@ -45,6 +51,10 @@ ifdef CONFIG
 		-pedantic \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)"
+
+	ifeq ($(INTEGER_ONLY),1)
+		COMMON_FLAGS += -DFACTOR_INTEGER_ONLY
+	endif
 
 	SITE_CFLAGS += $(SITE_COMMON_FLAGS)
 	SITE_CXXFLAGS += $(SITE_COMMON_FLAGS)
@@ -150,6 +160,7 @@ ifdef CONFIG
 		$(BUILD_DIR)/full_collector.o \
 		$(BUILD_DIR)/gc.o \
 		$(BUILD_DIR)/image.o \
+		$(BUILD_DIR)/ieee_float.o \
 		$(BUILD_DIR)/inline_cache.o \
 		$(BUILD_DIR)/instruction_operands.o \
 		$(BUILD_DIR)/io.o \
@@ -172,60 +183,7 @@ ifdef CONFIG
 		$(BUILD_DIR)/words.o \
 		$(BUILD_DIR)/zstd.o
 
-	MASTER_HEADERS := $(PLAF_MASTER_HEADERS) \
-		vm/assert.hpp \
-		vm/debug.hpp \
-		vm/layouts.hpp \
-		vm/platform.hpp \
-		vm/primitives.hpp \
-		vm/segments.hpp \
-		vm/gc_info.hpp \
-		vm/contexts.hpp \
-		vm/run.hpp \
-		vm/objects.hpp \
-		vm/sampling_profiler.hpp \
-		vm/errors.hpp \
-		vm/bignumint.hpp \
-		vm/bignum.hpp \
-		vm/booleans.hpp \
-		vm/instruction_operands.hpp \
-		vm/code_blocks.hpp \
-		vm/bump_allocator.hpp \
-		vm/bitwise_hacks.hpp \
-		vm/mark_bits.hpp \
-		vm/free_list.hpp \
-		vm/fixup.hpp \
-		vm/write_barrier.hpp \
-		vm/object_start_map.hpp \
-		vm/aging_space.hpp \
-		vm/tenured_space.hpp \
-		vm/data_heap.hpp \
-		vm/code_heap.hpp \
-		vm/gc.hpp \
-		vm/float_bits.hpp \
-		vm/io.hpp \
-		vm/image.hpp \
-		vm/callbacks.hpp \
-		vm/dispatch.hpp \
-		vm/vm.hpp \
-		vm/allot.hpp \
-		vm/tagged.hpp \
-		vm/data_roots.hpp \
-		vm/code_roots.hpp \
-		vm/generic_arrays.hpp \
-		vm/callstack.hpp \
-		vm/slot_visitor.hpp \
-		vm/to_tenured_collector.hpp \
-		vm/arrays.hpp \
-		vm/math.hpp \
-		vm/byte_arrays.hpp \
-		vm/jit.hpp \
-		vm/quotations.hpp \
-		vm/inline_cache.hpp \
-		vm/mvm.hpp \
-		vm/factor.hpp \
-		vm/utilities.hpp \
-		vm/zstd.hpp
+	MASTER_HEADERS := $(PLAF_MASTER_HEADERS) $(wildcard vm/*.hpp vm/*.h)
 
 	EXE_OBJS := $(PLAF_EXE_OBJS)
 
@@ -247,16 +205,29 @@ endif
 help:
 	@echo "Run '$(MAKE)' with one of the following parameters:"
 	@echo ""
+	@echo "linux-hppa-32"
+	@echo "linux-m68k-32"
+	@echo "netbsd-m68k-32"
 	@echo "linux-x86-32"
 	@echo "linux-x86-64"
+	@echo "openbsd-ppc-32"
+	@echo "openbsd-ppc-64"
 	@echo "linux-ppc-32"
 	@echo "linux-ppc-64"
 	@echo "linux-arm-32"
 	@echo "linux-arm-64"
+	@echo "android-arm-64"
+	@echo "android-x86-64"
+	@echo "haiku-arm-64"
+	@echo "linux-sparc-32"
+	@echo "linux-sparc-64"
 	@echo "linux-riscv-32"
+	@echo "linux-openrisc-32"
 	@echo "linux-riscv-64"
 	@echo "freebsd-x86-32"
 	@echo "freebsd-x86-64"
+	@echo "dragonflybsd-x86-64"
+	@echo "illumos-x86-64"
 	@echo "macos-x86-32"
 	@echo "macos-x86-64"
 	@echo "macos-x86-fat"
@@ -272,6 +243,7 @@ help:
 	@echo "WARNINGS=1  compile VM with comprehensive warning flags"
 	@echo "SITE_CFLAGS=...  additional C optimization flags"
 	@echo "SITE_CXXFLAGS=...  additional C++ optimization flags"
+	@echo "INTEGER_ONLY=1    explicit no-FP mode (opaque float payloads; FP operations rejected)"
 	@echo "LTO=1  compile VM with Link Time Optimization"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on macOS)"
 
@@ -282,6 +254,58 @@ freebsd-x86-32:
 
 freebsd-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64
+
+freebsd-arm-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.arm.32
+
+freebsd-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.arm.64
+
+haiku-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.haiku.arm.64
+
+haiku-x86-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.haiku.x86.64
+
+dragonflybsd-x86-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.dragonflybsd.x86.64
+
+illumos-x86-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.illumos.x86.64
+
+netbsd-x86-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.x86.32
+
+netbsd-x86-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.x86.64
+
+netbsd-arm-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.arm.32
+	/usr/sbin/paxctl +m factor
+
+netbsd-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.arm.64
+
+netbsd-riscv-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.riscv.64
+
+openbsd-x86-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.x86.32
+
+openbsd-x86-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.x86.64
+
+openbsd-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.arm.64
+
+openbsd-arm-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.arm.32
+
+openbsd-riscv-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.riscv.64
+
+freebsd-riscv-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.riscv.64
 
 macos-x86-32:
 	$(MAKE) $(ALL) macos.app CONFIG=vm/Config.macos.x86.32
@@ -295,14 +319,62 @@ macos-x86-fat:
 macos-arm-64:
 	$(MAKE) $(ALL) macos.app CONFIG=vm/Config.macos.arm.64
 
+netbsd-m68k-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.m68k.32
+
+linux-hppa-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.hppa.32
+
+netbsd-hppa-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.hppa.32
+
+linux-mips-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.mips.32
+
+linux-mips-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.mips.64
+
+netbsd-sh3-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.sh3.32
+
+linux-sh4-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.sh4.32
+
+linux-m68k-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.m68k.32
+
 linux-arm-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.32
 
 linux-arm-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
 
+android-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.android.arm.64
+
+android-x86-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.android.x86.64
+
+android-runtime-libs:
+	misc/android/build-runtime-libs.sh
+
+linux-s390x:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.s390x
+
+linux-sparc-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.sparc.32
+
+linux-sparc-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.sparc.64
+
 linux-riscv-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.riscv.32
+
+linux-openrisc-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.openrisc.32
+
+linux-loongarch-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.loongarch.64
 
 linux-riscv-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.riscv.64
@@ -312,6 +384,23 @@ linux-x86-32:
 
 linux-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.64
+
+openbsd-ppc-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.ppc.32
+
+.PHONY: openbsd-ppc-64
+openbsd-ppc-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.ppc.64
+
+.PHONY: netbsd-ppc-32
+netbsd-ppc-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.ppc.32
+
+freebsd-ppc-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.ppc.32
+
+freebsd-ppc-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.ppc.64
 
 linux-ppc-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.32
@@ -341,7 +430,19 @@ $(BUILD_DIR):
 $(BUILD_DIR)/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CXXFLAGS) -o $@ $<
 
-$(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
+ifeq ($(NO_PCH),1)
+PCH_DEPENDENCY :=
+PCHFLAGS :=
+else
+PCH_DEPENDENCY := $(BUILD_DIR)/master.hpp.gch
+endif
+
+$(BUILD_DIR)/math.o: vm/mips-soft-float.hpp
+$(BUILD_DIR)/ieee_float.o: CXXFLAGS += -fno-exceptions -fno-rtti
+$(BUILD_DIR)/ieee_float.o: vm/ieee_float.cpp vm/ieee_float.h vm/ieee_float.hpp | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/%.o: vm/%.cpp vm/master.hpp $(MASTER_HEADERS) $(PCH_DEPENDENCY) | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
 
 $(BUILD_DIR)/%.o: vm/%.mm $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
@@ -356,7 +457,7 @@ $(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
 $(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $@
 
-$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c vm/ffi_test.h vm/ffi_test_features.h vm/ffi_test_small.h vm/ffi_test_arm64.c vm/ffi_test_arm64.h vm/tests/ffi_uint_callback.c vm/tests/ffi_array_struct.c vm/tests/ffi_fp_status.c vm/ffi_test_varargs.c vm/ffi_test_varargs.h vm/ffi_test_varargs_outgoing.c vm/ffi_test_varargs_promotions.c vm/ffi_test_arm64_unions.c vm/ffi_test_riscv.c | $(BUILD_DIR)
+$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c vm/ffi_test.h vm/ffi_test_features.h vm/ffi_test_small.h vm/ffi_test_arm64.c vm/ffi_test_arm64.h vm/tests/ffi_uint_callback.c vm/tests/ffi_array_struct.c vm/tests/ffi_fp_status.c vm/mips-soft-float.hpp vm/ffi_test_varargs.c vm/ffi_test_varargs.h vm/ffi_test_varargs_outgoing.c vm/ffi_test_varargs_promotions.c vm/ffi_test_arm64_unions.c vm/ffi_test_riscv.c vm/ffi_test_openrisc.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
 macos.app: $(EXECUTABLE)
@@ -391,12 +492,12 @@ endif
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
-$(BUILD_DIR)/gc-tests$(EXE_EXTENSION): vm/tests/gc.cpp $(DLL_OBJS)
+$(BUILD_DIR)/gc-tests$(EXE_EXTENSION): vm/tests/gc.cpp vm/tests/jit_templates.hpp $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(DLL_OBJS) $(LIBS)
 
 # Run with the same CONFIG and build flags used for the VM.
 test-vm: $(BUILD_DIR)/gc-tests$(EXE_EXTENSION)
-	./$(BUILD_DIR)/gc-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/gc-tests$(EXE_EXTENSION)
 
 $(BUILD_DIR)/diagnostics-tests$(EXE_EXTENSION): vm/tests/diagnostics.cpp $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(DLL_OBJS) $(LIBS)
@@ -408,13 +509,20 @@ test-diagnostics: $(BUILD_DIR)/diagnostics-tests$(EXE_EXTENSION)
 test-vm: test-diagnostics
 
 $(BUILD_DIR)/riscv-tests$(EXE_EXTENSION): vm/tests/riscv.cpp vm/riscv.hpp | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(LIBS)
 
 .PHONY: test-riscv
 test-riscv: $(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
-	./$(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/riscv-tests$(EXE_EXTENSION)
 
 test-vm: test-riscv
+
+$(BUILD_DIR)/openrisc-tests$(EXE_EXTENSION): vm/tests/openrisc.cpp vm/openrisc.hpp | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(LIBS)
+
+.PHONY: test-openrisc
+test-openrisc: $(BUILD_DIR)/openrisc-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/openrisc-tests$(EXE_EXTENSION)
 
 ifneq ($(filter $(BUILD_DIR)/os-unix.o,$(DLL_OBJS)),)
 $(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION): vm/tests/unix_signals.cpp $(DLL_OBJS)
@@ -422,7 +530,7 @@ $(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION): vm/tests/unix_signals.cpp $(DLL
 
 .PHONY: test-unix-signals
 test-unix-signals: $(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION)
-	./$(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION)
 
 test-vm: test-unix-signals
 endif
@@ -437,6 +545,17 @@ test-windows-process-wait: $(BUILD_DIR)/windows-process-wait-tests$(EXE_EXTENSIO
 
 test-vm: test-windows-process-wait
 endif
+
+$(BUILD_DIR)/ieee-bits-tests$(EXE_EXTENSION): vm/tests/ieee_bits.cpp vm/ieee_bits.hpp | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) -o $@ $<
+
+.PHONY: test-ieee-bits
+test-ieee-bits: $(BUILD_DIR)/ieee-bits-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/ieee-bits-tests$(EXE_EXTENSION)
+
+.PHONY: test-ieee-float
+test-ieee-float:
+	$(MAKE) -f vm/tests/Makefile.ieee-float check BUILD_DIR=$(BUILD_DIR)/ieee-float CXX="$(TOOLCHAIN_PREFIX)$(CXX)" CC="$(TOOLCHAIN_PREFIX)$(CC)" CXXFLAGS="$(CXXFLAGS)" CFLAGS="$(CFLAGS)"
 
 .SUFFIXES: .mm
 
@@ -459,4 +578,27 @@ clean:
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
 .PHONY: factor-executable factor-lib factor-console factor-ffi-test test-vm tags clean help macos.app
-.PHONY: linux-riscv-32 linux-riscv-64 linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64
+.PHONY: openbsd-ppc-32 freebsd-ppc-32 freebsd-ppc-64 netbsd-m68k-32 linux-m68k-32 dragonflybsd-x86-64 illumos-x86-64 linux-openrisc-32 linux-riscv-32 linux-riscv-64 linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 android-arm-64 android-x86-64 android-runtime-libs freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64
+
+.PHONY: freebsd-arm-32 netbsd-arm-32 freebsd-arm-64 netbsd-x86-32 netbsd-x86-64 netbsd-arm-64 netbsd-riscv-64 openbsd-x86-32 openbsd-x86-64 openbsd-arm-64 openbsd-riscv-64 freebsd-riscv-64
+.PHONY: linux-sparc-32 linux-sparc-64
+
+.PHONY: linux-alpha-64 netbsd-alpha-64 openbsd-alpha-64
+linux-alpha-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.alpha.64
+netbsd-alpha-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.alpha.64
+openbsd-alpha-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.alpha.64
+
+netbsd-sparc-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.sparc.32
+
+netbsd-sparc-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.sparc.64
+
+.PHONY: netbsd-sparc-32 netbsd-sparc-64
+
+.PHONY: linux-hppa-32
+.PHONY: linux-sh4-32 netbsd-sh3-32
+.PHONY: linux-mips-32 linux-mips-64 netbsd-hppa-32 openbsd-arm-32 haiku-x86-64

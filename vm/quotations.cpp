@@ -145,8 +145,15 @@ void quotation_jit::iterate_quotation() {
   set_position(0);
 
   if (stack_frame) {
+#if defined(FACTOR_SPARC) || defined(FACTOR_SH)
+    // Publish the caller's return address and frame link before a safepoint
+    // walks these linked frames and visits the caller's spilled roots.
+    emit(parent->special_objects[JIT_PROLOG]);
+    emit(parent->special_objects[JIT_SAFEPOINT]);
+#else
     emit(parent->special_objects[JIT_SAFEPOINT]);
     emit(parent->special_objects[JIT_PROLOG]);
+#endif
   }
 
   cell length = array_capacity(elements.untagged());
@@ -373,9 +380,24 @@ cell factor_vm::lazy_jit_compile(cell quot_) {
 }
 
 // Allocates memory
+#if defined(__linux__) && defined(FACTOR_PPC) && defined(FACTOR_64) && \
+    defined(_CALL_ELF) && _CALL_ELF == 2
+// The Linux ELFv2 assembly entry keeps its native linkage below the published
+// Factor frame. Root its saved Factor return PC while compilation may compact
+// the code heap, then return the relocated PC to the assembly slot.
+VM_C_API cell factor_lazy_jit_compile_impl(cell quot, factor_vm* parent,
+                                            cell* return_address_slot) {
+  code_root return_address(*return_address_slot, parent);
+  cell result = parent->lazy_jit_compile(quot);
+  FACTOR_ASSERT(return_address.valid);
+  *return_address_slot = return_address.value;
+  return result;
+}
+#else
 VM_C_API cell lazy_jit_compile(cell quot, factor_vm* parent) {
   return parent->lazy_jit_compile(quot);
 }
+#endif
 
 bool factor_vm::quotation_compiled_p(quotation* quot) {
   return quot->entry_point != 0 &&

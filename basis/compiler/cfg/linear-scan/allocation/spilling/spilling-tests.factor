@@ -2,7 +2,7 @@ USING: accessors assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-cpu.architecture cpu.x86.assembler.operands kernel linked-assocs
+cpu.architecture cpu.x86.assembler.operands kernel literals linked-assocs
 locals namespaces sequences tools.test vectors ;
 IN: compiler.cfg.linear-scan.allocation.spilling.tests
 
@@ -173,7 +173,7 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
 ] unit-test
 
 {
-    { RCX 1/0. }
+    { RCX $[ allocation-infinity ] }
 } [
     f machine-registers init-allocator
     H{ { 20 int-rep } { 45 int-rep } { 21 int-rep } } representations set

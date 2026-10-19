@@ -184,6 +184,10 @@ FACTOR_EXPORT struct test_struct_14 ffi_test_44(void);
 FACTOR_EXPORT _Complex float ffi_test_45(int x);
 
 FACTOR_EXPORT _Complex double ffi_test_46(int x);
+FACTOR_EXPORT float ffi_test_complex_float_callback(
+    _Complex float (*callback)(int));
+FACTOR_EXPORT double ffi_test_complex_double_callback(
+    _Complex double (*callback)(int));
 
 FACTOR_EXPORT _Complex float ffi_test_47(_Complex float x, _Complex double y);
 

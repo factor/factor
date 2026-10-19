@@ -5,7 +5,8 @@ IN: classes.struct
 DEFER: struct-slots ! for stack-checker
 DEFER: struct-class? ! for stack-checker
 DEFER: <struct-boa> ! for stack-checker
-USING: accessors alien alien.arrays alien.c-types alien.data alien.parser
+USING: accessors alien alien.arrays alien.c-types alien.c-types.capabilities
+alien.data alien.parser
 arrays assocs byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
 classes.tuple.private combinators combinators.short-circuit
@@ -191,6 +192,10 @@ TUPLE: struct-c-type < abstract-c-type
     return-in-registers? ;
 
 INSTANCE: struct-c-type value-type
+
+! The stack checker loads the capability API before this class is defined.
+M: struct-c-type contains-floating-point?
+    fields>> [ type>> lookup-c-type contains-floating-point? ] any? ;
 
 M: struct-c-type lookup-c-type ;
 

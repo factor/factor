@@ -13,6 +13,7 @@ LIBRARY: gdk-pixbuf
 C-LIBRARY: gdk-pixbuf {
     { windows "libgdk_pixbuf-2.0-0.dll" }
     { macos "libgdk_pixbuf-2.0.dylib" }
+    { haiku "libgdk_pixbuf-2.0.so.0" }
     { linux "libgdk_pixbuf-2.0.so.0" }
     { unix "libgdk_pixbuf-2.0.so" }
 }

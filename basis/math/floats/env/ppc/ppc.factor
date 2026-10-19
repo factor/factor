@@ -1,12 +1,12 @@
 USING: accessors alien alien.c-types alien.syntax arrays assocs
 biassocs classes.struct combinators kernel literals math
 math.bitwise math.floats.env math.floats.env.private system
-cpu.ppc.assembler ;
+cpu.ppc.assembler vocabs ;
 IN: math.floats.env.ppc
 
-STRUCT: ppc-fpu-env
-    { padding uint }
-    { fpscr uint } ;
+! MFFS stores the numeric FPSCR in the low half of a native 64-bit word.
+! Reading the full word keeps the same numeric bits on both endian variants.
+STRUCT: ppc-fpu-env { fpscr ulonglong } ;
 
 STRUCT: ppc-vmx-env
     { vscr uint } ;
@@ -55,8 +55,11 @@ STRUCT: ppc-vmx-env
     ppc-vmx-env (struct)
     [ get_ppc_vmx_env ] keep ;
 
+HOOK: ppc-set-fp-exception-mode os ( env -- )
+M: object ppc-set-fp-exception-mode drop ;
+
 M: ppc-fpu-env (set-fp-env-register)
-    set_ppc_fpu_env ;
+    dup ppc-set-fp-exception-mode set_ppc_fpu_env ;
 
 M: ppc-vmx-env (set-fp-env-register)
     set_ppc_vmx_env ;
@@ -146,3 +149,5 @@ M: ppc-vmx-env (set-denormal-mode)
             { +denormal-flush+ [ vmx-denormal-mode-bits bitor  ] }
         } case
     ] curry change-vscr ; inline
+
+os linux? [ "math.floats.env.ppc.linux" require ] when

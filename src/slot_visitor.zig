@@ -235,7 +235,7 @@ pub fn visitCallstackObjectRoots(
     if (frame_length == 0) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
-    const linked_frames = builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32;
+    const linked_frames = builtin.cpu.arch == .powerpc or builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le or builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or contexts.mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x or contexts.sparc_frames;
     var frame_offset: Cell = 0;
 
     while (frame_offset < frame_length) {
@@ -243,10 +243,10 @@ pub fn visitCallstackObjectRoots(
 
         // arm64 callstack objects store the (relative) frame size at slot 0 and
         // the return address at +8; x86-64 stores the return address at +0.
-        const linked_frame_size: Cell = if (linked_frames) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
+        const linked_frame_size: Cell = if (linked_frames) contexts.capturedFrameSize(frame_top) else 0;
         if (linked_frames and (linked_frame_size == 0 or frame_offset + linked_frame_size > frame_length)) break;
 
-        const addr = @as(*const Cell, @ptrFromInt(frame_top + contexts.FRAME_RETURN_ADDRESS)).*;
+        const addr = contexts.frameReturnAddress(frame_top);
         if (addr == 0) break;
 
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
@@ -254,13 +254,13 @@ pub fn visitCallstackObjectRoots(
             continue;
         };
 
-        const advance = if (linked_frames) linked_frame_size else owner.stackFrameSizeForAddress(addr);
+        const advance = if (linked_frames) contexts.capturedFrameAdvance(frame_top, linked_frame_size, frame_length - frame_offset) else owner.stackFrameSizeForAddress(addr);
 
         if (comptime @hasDecl(Fixup, "visitCodeBlockOwner")) {
             fixup.visitCodeBlockOwner(owner);
         }
 
-        if (owner.blockGcInfo()) |gc_info| {
+        if (if (contexts.frameSpillRootsPresent(frame_top, linked_frame_size)) owner.blockGcInfo() else null) |gc_info| {
             const return_address_offset: u32 = @intCast(owner.offset(addr));
             if (lookup.callsiteIndex(gc_info, return_address_offset)) |callsite| {
                 // A frame's spilled roots number at most frame_size/cell. Fixups
@@ -271,7 +271,7 @@ pub fn visitCallstackObjectRoots(
                 if (comptime @hasDecl(Fixup, "ensureSlotCapacity")) {
                     fixup.ensureSlotCapacity(advance / @sizeOf(Cell));
                 }
-                const stack_pointer: [*]Cell = @ptrFromInt(frame_top);
+                const stack_pointer: [*]Cell = @ptrFromInt(contexts.frameSpillBase(frame_top, linked_frame_size));
                 const Visit = struct {
                     fn slot(slot_ptr: *Cell, fx: *Fixup) void {
                         fx.visitSlot(slot_ptr);
@@ -306,15 +306,17 @@ pub fn visitLiveCallstackRoots(
     if (top == 0 or bottom == 0 or top >= bottom) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
-    const linked_frames = builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .riscv32;
+    const linked_frames = builtin.cpu.arch == .powerpc or builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le or builtin.cpu.arch == .arm or builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or contexts.mips_frames or builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .s390x or contexts.sparc_frames;
 
     while (top < bottom) {
         // Return address: frame_top+0 on x86-64, frame_top+8 on arm64.
-        const addr = @as(*const Cell, @ptrFromInt(top + contexts.FRAME_RETURN_ADDRESS)).*;
+        const addr = contexts.frameReturnAddress(top);
         if (addr == 0) break;
 
         // arm64 frames are chained: *(top) is the predecessor frame top.
-        const next_top: Cell = if (linked_frames) @as(*const Cell, @ptrFromInt(top)).* else 0;
+        const parent: Cell = if (linked_frames) contexts.frameParent(top) else 0;
+        const frame_size: Cell = if (linked_frames) parent - top else 0;
+        const next_top: Cell = if (linked_frames) contexts.liveFrameNext(top, parent, bottom) else 0;
 
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
             if (linked_frames) {
@@ -332,10 +334,10 @@ pub fn visitLiveCallstackRoots(
             fixup.visitCodeBlockOwner(owner);
         }
 
-        if (owner.blockGcInfo()) |gc_info| {
+        if (if (contexts.frameSpillRootsPresent(top, frame_size)) owner.blockGcInfo() else null) |gc_info| {
             const return_address_offset: u32 = @intCast(owner.offset(addr));
             if (lookup.callsiteIndex(gc_info, return_address_offset)) |callsite| {
-                const stack_pointer: [*]Cell = @ptrFromInt(top);
+                const stack_pointer: [*]Cell = @ptrFromInt(contexts.frameSpillBase(top, frame_size));
                 const Visit = struct {
                     fn slot(slot_ptr: *Cell, fx: *Fixup) void {
                         fx.visitSlot(slot_ptr);

@@ -3,7 +3,7 @@
 
 USING: accessors combinators.short-circuit command-line
 io.pathnames kernel namespaces sequences strings system
-ui.operations urls vocabs ;
+urls vocabs vocabs.loader ;
 
 IN: webbrowser
 
@@ -20,10 +20,9 @@ PREDICATE: url-string < string
         [ >url protocol>> >boolean ]
     } 1&& ;
 
-[ pathname? ] \ open-item H{ } define-operation
-[ [ url? ] [ url-string? ] bi or ] \ open-url H{ } define-operation
-
 : webbrowser-main ( -- )
     command-line get [ open-url ] each ;
 
 MAIN: webbrowser-main
+
+{ "webbrowser" "ui.operations" } "webbrowser.ui" require-when

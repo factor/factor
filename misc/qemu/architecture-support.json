@@ -1,0 +1,628 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-03",
+  "scope": "OS architecture availability only; no build, bootstrap, compiler or io success inferred",
+  "sources": {
+    "qemu": "https://www.qemu.org/docs/master/system/targets.html",
+    "llvm": "https://github.com/llvm/llvm-project/blob/main/llvm/CMakeLists.txt",
+    "linux_sparc": "https://github.com/torvalds/linux/blob/master/arch/sparc/Kconfig",
+    "netbsd_mips": "https://wiki.netbsd.org/ports/evbmips/"
+  },
+  "systems": {
+    "linux": {
+      "release": "Debian / Buildroot (kernel support; distribution varies)",
+      "architectures": {
+        "x86": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch"
+        },
+        "x64": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch"
+        },
+        "aarch64": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch"
+        },
+        "arm32": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch"
+        },
+        "riscv32": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch"
+        },
+        "riscv64": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch"
+        },
+        "ppc32": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch",
+          "abi_notes": "32-bit big-endian SysV; record actual OS ABI"
+        },
+        "ppc64": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch",
+          "abi_notes": "Record BE/LE and ELFv1/ELFv2 explicitly; Linux ppc64le ELFv2 differs from historical Linux BE ELFv1; FreeBSD/OpenBSD ABI must be probed"
+        },
+        "mips32": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch",
+          "abi_notes": "Record BE/LE, O32 and hard/soft-float explicitly"
+        },
+        "mips64": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch",
+          "abi_notes": "Record BE/LE and N32/N64 explicitly; N32 has 32-bit pointers and does not validate a 64-bit-cell Factor port"
+        },
+        "sparc32": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch",
+          "abi_notes": "32-bit big-endian SPARC V8; record board/kernel compatibility",
+          "notes": "Kernel SPARC32 and SPARC_LEON configuration exist. Match kernel configuration to QEMU sun4m or LEON board; distribution/rootfs/toolchain availability is separate."
+        },
+        "sparc64": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch",
+          "abi_notes": "64-bit big-endian SPARC V9"
+        },
+        "m68k": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch",
+          "abi_notes": "32-bit big-endian; record 680x0 vs ColdFire CPU/FPU"
+        },
+        "m88k": {
+          "status": "unsupported",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch",
+          "abi_notes": "32-bit big-endian Motorola 88000",
+          "notes": "No upstream Linux arch/m88k, QEMU target, or upstream LLVM target; no runnable Linux/QEMU/Zig guest claimed."
+        },
+        "s390x": {
+          "status": "available",
+          "source": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch",
+          "abi_notes": "64-bit big-endian SystemZ"
+        },
+        "alpha": {
+          "status": "available",
+          "source": "https://github.com/torvalds/linux/tree/master/arch/alpha",
+          "abi_notes": "64-bit little-endian LP64; IEEE doubles; instruction-cache publication and weak memory barriers required",
+          "notes": "Kernel support; Debian Alpha is an unofficial Ports architecture, not a regular release architecture."
+        },
+        "hppa": {
+          "status": "available",
+          "source": "https://github.com/torvalds/linux/tree/master/arch/parisc",
+          "abi_notes": "32-bit big-endian PA-RISC; record PA1.x/PA2.x and ELF ABI",
+          "notes": "32-bit PA-RISC kernel port; Debian HPPA uses unofficial Debian Ports unstable packages."
+        },
+        "sh3": {
+          "status": "available",
+          "source": "https://github.com/torvalds/linux/tree/master/arch/sh",
+          "abi_notes": "32-bit SuperH; record endianness; SH3 has no hardware FPU",
+          "notes": "Kernel SH3 support; upstream QEMU has no SH3 CPU model, so a runnable emulated guest is not established."
+        },
+        "sh4": {
+          "status": "available",
+          "source": "https://github.com/torvalds/linux/tree/master/arch/sh",
+          "abi_notes": "32-bit SuperH; record endianness and hard/soft float ABI"
+        },
+        "vax": {
+          "status": "unsupported",
+          "source": "https://github.com/torvalds/linux/tree/master/arch",
+          "abi_notes": "32-bit little-endian VAX; native floating-point formats differ from IEEE"
+        },
+        "loongarch64": {
+          "status": "available",
+          "source": "https://github.com/torvalds/linux/tree/master/arch/loongarch",
+          "abi_notes": "64-bit little-endian LoongArch; record LP64D target and ABI"
+        }
+      }
+    },
+    "freebsd": {
+      "release": "14.5",
+      "architectures": {
+        "x86": {
+          "status": "available",
+          "source": "https://www.freebsd.org/platforms/"
+        },
+        "x64": {
+          "status": "available",
+          "source": "https://www.freebsd.org/platforms/"
+        },
+        "aarch64": {
+          "status": "available",
+          "source": "https://www.freebsd.org/platforms/"
+        },
+        "arm32": {
+          "status": "available",
+          "source": "https://www.freebsd.org/platforms/"
+        },
+        "riscv32": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/"
+        },
+        "riscv64": {
+          "status": "available",
+          "source": "https://www.freebsd.org/platforms/"
+        },
+        "ppc32": {
+          "status": "available",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "32-bit big-endian SysV; record actual OS ABI"
+        },
+        "ppc64": {
+          "status": "available",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "Record BE/LE and ELFv1/ELFv2 explicitly; Linux ppc64le ELFv2 differs from historical Linux BE ELFv1; FreeBSD/OpenBSD ABI must be probed"
+        },
+        "mips32": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "Record BE/LE, O32 and hard/soft-float explicitly",
+          "notes": "Retired after 13.5; unavailable in 14.5."
+        },
+        "mips64": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "Record BE/LE and N32/N64 explicitly; N32 has 32-bit pointers and does not validate a 64-bit-cell Factor port",
+          "notes": "Retired after 13.5; unavailable in 14.5."
+        },
+        "sparc32": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "32-bit big-endian SPARC V8; record board/kernel compatibility"
+        },
+        "sparc64": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "64-bit big-endian SPARC V9",
+          "notes": "Retired after 12.4; unavailable in 14.5."
+        },
+        "m68k": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "32-bit big-endian; record 680x0 vs ColdFire CPU/FPU"
+        },
+        "m88k": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "32-bit big-endian Motorola 88000"
+        },
+        "s390x": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "64-bit big-endian SystemZ"
+        },
+        "alpha": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "64-bit little-endian LP64; IEEE doubles; instruction-cache publication and weak memory barriers required"
+        },
+        "hppa": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "32-bit big-endian PA-RISC; record PA1.x/PA2.x and ELF ABI"
+        },
+        "sh3": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "32-bit SuperH; record endianness; SH3 has no hardware FPU"
+        },
+        "sh4": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "32-bit SuperH; record endianness and hard/soft float ABI"
+        },
+        "vax": {
+          "status": "unsupported",
+          "source": "https://www.freebsd.org/platforms/",
+          "abi_notes": "32-bit little-endian VAX; native floating-point formats differ from IEEE"
+        },
+        "loongarch64": {
+          "status": "experimental",
+          "source": "https://reviews.freebsd.org/D59889",
+          "abi_notes": "64-bit little-endian LoongArch; record LP64D target and ABI",
+          "notes": "Initial kernel, build and libc changes D59890/D59891/D59893 remain Needs Review. No released LoongArch userland or merged complete OS port established; planned experimental work only, foundation blocked. In-tree LLVM target support alone is not an OS port.",
+          "sources": [
+            "https://reviews.freebsd.org/D59923",
+            "https://www.freebsd.org/platforms/",
+            "https://reviews.freebsd.org/D59890",
+            "https://reviews.freebsd.org/D59891",
+            "https://reviews.freebsd.org/D59893",
+            "https://cgit.freebsd.org/src/tree/sys",
+            "https://www.freebsd.org/releases/"
+          ],
+          "os_port_exists": false,
+          "port_state": "proposed",
+          "release": "unreleased 16-CURRENT proposal",
+          "verified_at": "2026-10-03"
+        }
+      }
+    },
+    "netbsd": {
+      "release": "11.0",
+      "architectures": {
+        "x86": {
+          "status": "available",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html"
+        },
+        "x64": {
+          "status": "available",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html"
+        },
+        "aarch64": {
+          "status": "available",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html"
+        },
+        "arm32": {
+          "status": "available",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html"
+        },
+        "riscv32": {
+          "status": "unsupported",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html"
+        },
+        "riscv64": {
+          "status": "experimental",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "notes": "Release includes riscv port; experimental guest support, not a Factor acceptance pass."
+        },
+        "ppc32": {
+          "status": "available",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "abi_notes": "32-bit big-endian SysV; record actual OS ABI"
+        },
+        "ppc64": {
+          "status": "unverified",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "abi_notes": "Record BE/LE and ELFv1/ELFv2 explicitly; Linux ppc64le ELFv2 differs from historical Linux BE ELFv1; FreeBSD/OpenBSD ABI must be probed",
+          "notes": "Native 64-bit userland is not established by the release port list; experimental source paths require separate validation. 64-bit CPUs running powerpc userland count as ppc32."
+        },
+        "mips32": {
+          "status": "available",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "abi_notes": "Record BE/LE, O32 and hard/soft-float explicitly"
+        },
+        "mips64": {
+          "status": "available",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "abi_notes": "Record BE/LE and N32/N64 explicitly; N32 has 32-bit pointers and does not validate a 64-bit-cell Factor port",
+          "notes": "evbmips-mips64eb and evbmips-mips64el release sets exist; verify actual userland ABI and board before claiming a 64-bit Factor test."
+        },
+        "sparc32": {
+          "status": "available",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "abi_notes": "32-bit big-endian SPARC V8; record board/kernel compatibility"
+        },
+        "sparc64": {
+          "status": "available",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "abi_notes": "64-bit big-endian SPARC V9"
+        },
+        "m68k": {
+          "status": "available",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "abi_notes": "32-bit big-endian; record 680x0 vs ColdFire CPU/FPU"
+        },
+        "m88k": {
+          "status": "unsupported",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "abi_notes": "32-bit big-endian Motorola 88000"
+        },
+        "s390x": {
+          "status": "unsupported",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "abi_notes": "64-bit big-endian SystemZ"
+        },
+        "alpha": {
+          "status": "available",
+          "source": "https://wiki.netbsd.org/ports/alpha/",
+          "abi_notes": "64-bit little-endian LP64; IEEE doubles; instruction-cache publication and weak memory barriers required"
+        },
+        "hppa": {
+          "status": "available",
+          "source": "https://wiki.netbsd.org/ports/hppa/",
+          "abi_notes": "32-bit big-endian PA-RISC; record PA1.x/PA2.x and ELF ABI"
+        },
+        "sh3": {
+          "status": "available",
+          "source": "https://www.netbsd.org/ports/sh3/index.html",
+          "abi_notes": "32-bit SuperH; record endianness; SH3 has no hardware FPU",
+          "notes": "Release SuperH ports; MACHINE_ARCH sh3el can run on physical SH4 (landisk). Kernel FPU state support is absent; native hardware-FPU acceptance cannot be inferred.",
+          "sources": [
+            "https://wiki.netbsd.org/ports/landisk/",
+            "https://raw.githubusercontent.com/NetBSD/src/trunk/sys/arch/sh3/include/mcontext.h"
+          ]
+        },
+        "sh4": {
+          "status": "available",
+          "source": "https://www.netbsd.org/ports/sh3/index.html",
+          "abi_notes": "32-bit SuperH; record endianness and hard/soft float ABI",
+          "notes": "Release SuperH ports; MACHINE_ARCH sh3el can run on physical SH4 (landisk). Kernel FPU state support is absent; native hardware-FPU acceptance cannot be inferred.",
+          "sources": [
+            "https://wiki.netbsd.org/ports/landisk/",
+            "https://raw.githubusercontent.com/NetBSD/src/trunk/sys/arch/sh3/include/mcontext.h"
+          ]
+        },
+        "vax": {
+          "status": "available",
+          "source": "https://www.netbsd.org/ports/vax/index.html",
+          "abi_notes": "32-bit little-endian VAX; native floating-point formats differ from IEEE",
+          "notes": "NetBSD release port; SIMH guest route rather than upstream QEMU. Native compiler/toolchain and floating-point compatibility require separate evidence.",
+          "sources": [
+            "https://netbsd.org/ports/vax/emulator-howto.html",
+            "https://gcc.gnu.org/onlinedocs/gcc/VAX-Options.html"
+          ]
+        },
+        "loongarch64": {
+          "status": "unsupported",
+          "source": "https://www.netbsd.org/releases/formal-11/NetBSD-11.0.html",
+          "abi_notes": "64-bit little-endian LoongArch; record LP64D target and ABI"
+        }
+      }
+    },
+    "openbsd": {
+      "release": "7.9",
+      "architectures": {
+        "x86": {
+          "status": "available",
+          "source": "https://www.openbsd.org/plat.html"
+        },
+        "x64": {
+          "status": "available",
+          "source": "https://www.openbsd.org/plat.html"
+        },
+        "aarch64": {
+          "status": "available",
+          "source": "https://www.openbsd.org/plat.html"
+        },
+        "arm32": {
+          "status": "available",
+          "source": "https://www.openbsd.org/plat.html"
+        },
+        "riscv32": {
+          "status": "unsupported",
+          "source": "https://www.openbsd.org/plat.html"
+        },
+        "riscv64": {
+          "status": "available",
+          "source": "https://www.openbsd.org/plat.html"
+        },
+        "ppc32": {
+          "status": "available",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "32-bit big-endian SysV; record actual OS ABI"
+        },
+        "ppc64": {
+          "status": "available",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "Record BE/LE and ELFv1/ELFv2 explicitly; Linux ppc64le ELFv2 differs from historical Linux BE ELFv1; FreeBSD/OpenBSD ABI must be probed"
+        },
+        "mips32": {
+          "status": "unsupported",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "Record BE/LE, O32 and hard/soft-float explicitly"
+        },
+        "mips64": {
+          "status": "available",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "Record BE/LE and N32/N64 explicitly; N32 has 32-bit pointers and does not validate a 64-bit-cell Factor port"
+        },
+        "sparc32": {
+          "status": "unsupported",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "32-bit big-endian SPARC V8; record board/kernel compatibility"
+        },
+        "sparc64": {
+          "status": "available",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "64-bit big-endian SPARC V9"
+        },
+        "m68k": {
+          "status": "unsupported",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "32-bit big-endian; record 680x0 vs ColdFire CPU/FPU"
+        },
+        "m88k": {
+          "status": "available",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "32-bit big-endian Motorola 88000",
+          "notes": "Supported luna88k release port; upstream QEMU and LLVM lack m88k targets. Hardware or a separately verified emulator/GCC route is needed; Zig is blocked by target availability."
+        },
+        "s390x": {
+          "status": "unsupported",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "64-bit big-endian SystemZ"
+        },
+        "alpha": {
+          "status": "available",
+          "source": "https://www.openbsd.org/alpha.html",
+          "abi_notes": "64-bit little-endian LP64; IEEE doubles; instruction-cache publication and weak memory barriers required"
+        },
+        "hppa": {
+          "status": "available",
+          "source": "https://www.openbsd.org/hppa.html",
+          "abi_notes": "32-bit big-endian PA-RISC; record PA1.x/PA2.x and ELF ABI"
+        },
+        "sh3": {
+          "status": "unsupported",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "32-bit SuperH; record endianness; SH3 has no hardware FPU"
+        },
+        "sh4": {
+          "status": "unsupported",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "32-bit SuperH; record endianness and hard/soft float ABI"
+        },
+        "vax": {
+          "status": "unsupported",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "32-bit little-endian VAX; native floating-point formats differ from IEEE"
+        },
+        "loongarch64": {
+          "status": "unsupported",
+          "source": "https://www.openbsd.org/plat.html",
+          "abi_notes": "64-bit little-endian LoongArch; record LP64D target and ABI"
+        }
+      }
+    },
+    "dragonfly": {
+      "release": "6.4.2",
+      "architectures": {
+        "x86": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/"
+        },
+        "x64": {
+          "status": "available",
+          "source": "https://www.dragonflybsd.org/download/"
+        },
+        "aarch64": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/"
+        },
+        "arm32": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/"
+        },
+        "riscv32": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/"
+        },
+        "riscv64": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/"
+        },
+        "ppc32": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "32-bit big-endian SysV; record actual OS ABI"
+        },
+        "ppc64": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "Record BE/LE and ELFv1/ELFv2 explicitly; Linux ppc64le ELFv2 differs from historical Linux BE ELFv1; FreeBSD/OpenBSD ABI must be probed"
+        },
+        "mips32": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "Record BE/LE, O32 and hard/soft-float explicitly"
+        },
+        "mips64": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "Record BE/LE and N32/N64 explicitly; N32 has 32-bit pointers and does not validate a 64-bit-cell Factor port"
+        },
+        "sparc32": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "32-bit big-endian SPARC V8; record board/kernel compatibility"
+        },
+        "sparc64": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "64-bit big-endian SPARC V9"
+        },
+        "m68k": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "32-bit big-endian; record 680x0 vs ColdFire CPU/FPU"
+        },
+        "m88k": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "32-bit big-endian Motorola 88000"
+        },
+        "s390x": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "64-bit big-endian SystemZ"
+        },
+        "alpha": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "64-bit little-endian LP64; IEEE doubles; instruction-cache publication and weak memory barriers required"
+        },
+        "hppa": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "32-bit big-endian PA-RISC; record PA1.x/PA2.x and ELF ABI"
+        },
+        "sh3": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "32-bit SuperH; record endianness; SH3 has no hardware FPU"
+        },
+        "sh4": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "32-bit SuperH; record endianness and hard/soft float ABI"
+        },
+        "vax": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "32-bit little-endian VAX; native floating-point formats differ from IEEE"
+        },
+        "loongarch64": {
+          "status": "unsupported",
+          "source": "https://www.dragonflybsd.org/download/",
+          "abi_notes": "64-bit little-endian LoongArch; record LP64D target and ABI"
+        }
+      }
+    }
+  },
+  "vm_policy": {
+    "default": {
+      "required": [
+        "cpp"
+      ],
+      "zig": "optional",
+      "notes": "Port acceptance requires the C++ VM. Zig evidence is optional and does not block acceptance."
+    },
+    "architectures": {
+      "alpha": {
+        "required": [
+          "cpp"
+        ],
+        "zig": "unsupported"
+      },
+      "hppa": {
+        "required": [
+          "cpp"
+        ],
+        "zig": "unsupported"
+      },
+      "sh3": {
+        "required": [
+          "cpp"
+        ],
+        "zig": "unsupported"
+      },
+      "sh4": {
+        "required": [
+          "cpp"
+        ],
+        "zig": "unsupported"
+      },
+      "vax": {
+        "required": [
+          "cpp"
+        ],
+        "zig": "unsupported"
+      },
+      "m88k": {
+        "required": [
+          "cpp"
+        ],
+        "zig": "unsupported"
+      },
+      "m68k": {
+        "required": [
+          "cpp"
+        ],
+        "zig": "optional",
+        "notes": "Custom Zig toolchain remains optional and pending; C++ full compiler/io acceptance is sufficient."
+      }
+    }
+  }
+}

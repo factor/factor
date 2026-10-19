@@ -1,0 +1,5 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-arm.32.o $(BUILD_DIR)/cpu-arm.32-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-arm.32.hpp
+CFLAGS += -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard
+CXXFLAGS += -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard
+ASFLAGS += -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard

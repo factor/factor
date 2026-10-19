@@ -7,7 +7,7 @@ compiler.cfg.linearization compiler.cfg.optimizer
 compiler.cfg.registers compiler.cfg.representations
 compiler.cfg.save-contexts compiler.cfg.utilities
 compiler.tree.builder compiler.tree.optimizer formatting io
-kernel math namespaces prettyprint quotations sequences
+cpu.architecture kernel math namespaces prettyprint quotations sequences
 splitting strings words ;
 IN: compiler.cfg.debugger
 
@@ -33,6 +33,7 @@ M: word test-builder
     test-builder {
         optimize-cfg
         select-representations
+        lower-native-helpers
         insert-gc-checks
         insert-save-contexts
     } run-passes ;

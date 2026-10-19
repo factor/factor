@@ -90,12 +90,14 @@ M: gc-check-insn compute-live-intervals*
     [ uses-vregs* ] [ insn#>> ] bi '[ _ f record-use ] each ;
 
 UNION: hairy-clobber-insn
+    ##native-helper-long-long
     alien-call-insn
     ##callback-inputs
     ##callback-outputs
     ##unbox-long-long ;
 
 UNION: clobber-insn
+    ##native-helper
     hairy-clobber-insn
     ##unbox
     ##box

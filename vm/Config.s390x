@@ -1,0 +1,2 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-s390x.o $(BUILD_DIR)/cpu-s390x-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-s390x.hpp vm/s390x.hpp

@@ -1,0 +1,21 @@
+--- a/linux-user/s390x/cpu_loop.c
++++ b/linux-user/s390x/cpu_loop.c
+@@ -141,6 +141,18 @@
+                 n = TARGET_FPE_INTDIV;
+                 goto do_signal_pc;
+ 
++            case PGM_VECTOR_PROCESSING: {
++                static const int codes[] = {
++                    0, TARGET_FPE_FLTINV, TARGET_FPE_FLTDIV,
++                    TARGET_FPE_FLTOVF, TARGET_FPE_FLTUND, TARGET_FPE_FLTRES
++                };
++                /* Linux decodes VIC independently of the vector element. */
++                unsigned int vic = (env->fpc >> 8) & 0xf;
++                sig = TARGET_SIGFPE;
++                n = vic < ARRAY_SIZE(codes) ? codes[vic] : 0;
++                goto do_signal_pc;
++            }
++
+             case PGM_DATA:
+                 n = (env->fpc >> 8) & 0xff;
+                 if (n == 0) {

@@ -1,6 +1,7 @@
 USING: arrays alien.c-types classes.struct compiler.cfg.builder.alien.boxing
 compiler.cfg.instructions compiler.cfg.registers compiler.test
-cpu.architecture kernel layouts literals make sequences system tools.test ;
+cpu.architecture endian kernel layouts literals locals make math math.bitwise
+sequences system tools.test ;
 IN: compiler.cfg.builder.alien.boxing.tests
 
 STRUCT: some-struct
@@ -9,6 +10,11 @@ STRUCT: some-struct
     { f3 int }
     { f4 int } ;
 
+! Stack-only aggregate chunks carry the same marker on these ABIs.
+: stack-struct-chunks? ( -- ? )
+    cpu { x86.32 m68k.32 m88k.32 vax.32 } member?
+    cpu ppc.32? os { linux netbsd } member? and or ;
+
 ! flatten-c-type
 {
     { { int-rep f f 4 } }
@@ -16,9 +22,9 @@ STRUCT: some-struct
     int base-type flatten-c-type
 ] unit-test
 
-cpu riscv.32? [
+cell 4 = stack-struct-chunks? not and [
     { { { int-rep f f } { int-rep f f } { int-rep f f } { int-rep f f } } }
-] [ cpu x86.32?
+] [ cell 4 =
 {
     {
         { int-rep t f }
@@ -56,7 +62,7 @@ cell 4 =
     reset-vreg-counter [ 20 int base-type unbox ] { } make
 ] unit-test
 
-cpu riscv.32? [
+cell 4 = stack-struct-chunks? not and [
     {
         { 2 3 4 5 }
         { { int-rep f f } { int-rep f f } { int-rep f f } { int-rep f f } }
@@ -68,7 +74,7 @@ cpu riscv.32? [
             T{ ##load-memory-imm { dst 5 } { base 1 } { offset 12 } { rep int-rep } }
         }
     }
-] [ cpu x86.32?
+] [ cell 4 =
 {
     { 2 3 4 5 }
     {
@@ -136,12 +142,18 @@ cpu riscv.32? [
             T{ ##convert-integer { dst 2 } { src 1 } { c-type $[ c-string base-type ] } }
         }
     }
+] [ cpu mips? cpu hppa.32? or [
+    {
+        { 1 }
+        { { int-rep f f $[ cell ] 0 $[ cell ] } }
+        { T{ ##unbox-any-c-ptr { dst 1 } { src 77 } } }
+    }
 ] [
 {
     { 1 }
     { { int-rep f f $[ cell ] } }
     { T{ ##unbox-any-c-ptr { dst 1 } { src 77 } } }
-} ] if [
+} ] if ] if [
     [ 77 c-string base-type unbox-parameter ] { } make
 ] cfg-unit-test
 
@@ -155,7 +167,7 @@ cpu riscv.32? [
             T{ ##convert-integer { dst 2 } { src 1 } { c-type $[ int base-type ] } }
         }
     }
-] [ cpu riscv.64? [
+] [ cpu riscv.64? cpu loongarch.64? or [
     {
         { 2 }
         { { int-rep f f 4 } }
@@ -164,7 +176,17 @@ cpu riscv.32? [
             T{ ##convert-integer { dst 2 } { src 1 } { c-type $[ int base-type ] } }
         }
     }
-] [ cpu x86.32?
+] [ cpu mips? cpu hppa.32? or [
+    cell 4 = {
+        { 1 }
+        { { int-rep f f 4 0 4 } }
+        { T{ ##unbox { dst 1 } { src 77 } { unboxer "to_signed_4" } { rep int-rep } } }
+    } {
+        { 1 }
+        { { int-rep f f 4 0 4 } }
+        { T{ ##convert-integer { dst 1 } { src 77 } { c-type $[ int base-type ] } } }
+    } ?
+] [ cell 4 =
 {
     { 1 }
     { { int-rep f f 4 } }
@@ -178,6 +200,27 @@ cpu riscv.32? [
     }
 } {
     { 77 } { { int-rep f f 4 } } { }
-} ? ] if ] if [
+} ? ] if ] if ] if [
     [ 77 int base-type unbox-parameter ] { } make
 ] cfg-unit-test
+
+! Compare ABI register chunks against independently serialized native bytes.
+! These cover a partially populated 32-bit and 64-bit register.
+:: abi-byte-shifts ( bytes width big-endian? -- bits )
+    bytes 0 [| dst byte index |
+        byte index width big-endian? struct-byte-shift shift dst bitor
+    ] reduce-index ;
+
+{ 0x01020300 } [ B{ 1 2 3 } 4 t abi-byte-shifts ] unit-test
+{ 0x030201 } [ B{ 1 2 3 } 4 f abi-byte-shifts ] unit-test
+{ 0x0102030405060700 } [ B{ 1 2 3 4 5 6 7 } 8 t abi-byte-shifts ] unit-test
+{ 0x07060504030201 } [ B{ 1 2 3 4 5 6 7 } 8 f abi-byte-shifts ] unit-test
+{ B{ 1 2 3 0 } } [ B{ 1 2 3 } 4 t abi-byte-shifts 4 >be ] unit-test
+{ B{ 1 2 3 0 } } [ B{ 1 2 3 } 4 f abi-byte-shifts 4 >le ] unit-test
+{ t } [ "mips.64" cpu-name-big-endian? ] unit-test
+{ f } [ "mipsel.64" cpu-name-big-endian? ] unit-test
+{ t } [ "ppc.64" cpu-name-big-endian? ] unit-test
+{ f } [ "ppc.64le" cpu-name-big-endian? ] unit-test
+{ t } [ "sparc.64" cpu-name-big-endian? ] unit-test
+{ t } [ "m68k.32" cpu-name-big-endian? ] unit-test
+{ t } [ "s390x" cpu-name-big-endian? ] unit-test

@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.data arrays classes.struct
-compiler.units continuations destructors generic.single io
+compiler.units concurrency.futures continuations destructors generic.single io
 io.backend io.directories io.encodings io.encodings.ascii
 io.encodings.binary io.encodings.latin1 io.encodings.string
 io.encodings.utf16 io.encodings.utf8 io.files io.files.private
@@ -258,11 +258,17 @@ CONSTANT: pt-array-1
 
 ! Make sure that writing to a closed stream from another thread doesn't crash
 [
-    { } [ "test.txt" ascii [ [ yield "Hi" write ] "Test-write-file" spawn drop ] with-file-writer ] unit-test
+    { } [
+        "test.txt" ascii [ [ yield "Hi" write ] future ] with-file-writer
+        [ ?future ] ignore-errors drop
+    ] unit-test
 
     { } [ "test.txt" delete-file ] unit-test
 
-    { } [ "test.txt" ascii [ [ yield "Hi" write ] "Test-write-file" spawn drop ] with-file-writer ] unit-test
+    { } [
+        "test.txt" ascii [ [ yield "Hi" write ] future ] with-file-writer
+        [ ?future ] ignore-errors drop
+    ] unit-test
 
     { } [ "test.txt" "test2.txt" move-file ] unit-test
 

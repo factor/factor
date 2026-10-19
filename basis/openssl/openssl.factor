@@ -36,9 +36,12 @@ SINGLETON: openssl
     OPENSSL_INIT_ADD_ALL_DIGESTS f OPENSSL_init_ssl ssl-error ;
 
 : init-ssl ( -- )
-    "OPENSSL_init_ssl" "libssl" dlsym? >boolean
-    [ ssl-new-api? set-global ]
-    [ [ init-new-api ] [ init-old-api ] if ] bi
+    ! LibreSSL provides the modern initializer with the legacy stack ABI.
+    "OPENSSL_sk_num" "libcrypto" dlsym?
+    "OPENSSL_sk_value" "libcrypto" dlsym? and >boolean
+    ssl-new-api? set-global
+    "OPENSSL_init_ssl" "libssl" dlsym?
+    [ init-new-api ] [ init-old-api ] if
     "X509_check_host" "libcrypto" dlsym?
     "X509_check_ip_asc" "libcrypto" dlsym? and >boolean
     ssl-native-identity-checks? set-global ;

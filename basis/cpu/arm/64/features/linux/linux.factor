@@ -17,6 +17,6 @@ FUNCTION: ulong getauxval ( ulong type )
         { "i8mm" 13 }
     } [ second hwcap2 swap bit? ] filter [ first ] map append ;
 
-M: linux probe-arm64-features
+M: linux-kernel probe-arm64-features
     [ 16 getauxval 26 getauxval hwcaps>arm64-features ]
     [ drop { } ] recover ;

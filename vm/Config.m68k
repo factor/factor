@@ -1,0 +1,5 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-m68k.o
+PLAF_MASTER_HEADERS += vm/cpu-m68k.hpp vm/m68k.hpp
+CFLAGS += -m68020 -m68881
+CXXFLAGS += -m68020 -m68881
+ASFLAGS += -m68020 -m68881

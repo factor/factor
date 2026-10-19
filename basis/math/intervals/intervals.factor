@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
-combinators combinators.short-circuit generic layouts memoize ;
+combinators combinators.short-circuit generic layouts math.intervals.bounds memoize ;
 IN: math.intervals
 
 SINGLETON: empty-interval
@@ -11,60 +11,76 @@ UNION: special-interval empty-interval full-interval ;
 
 TUPLE: interval { from read-only } { to read-only } ;
 
-M: empty-interval from>> drop { 1/0. f } ;
-M: empty-interval to>> drop { -1/0. f } ;
-M: full-interval from>> drop { -1/0. t } ;
-M: full-interval to>> drop { 1/0. t } ;
+M: empty-interval from>> drop positive-bound f 2array ;
+M: empty-interval to>> drop negative-bound f 2array ;
+M: full-interval from>> drop negative-bound t 2array ;
+M: full-interval to>> drop positive-bound t 2array ;
 
 : closed-point? ( from to -- ? )
-    2dup [ first ] bi@ number=
+    2dup [ first ] bi@ bound=
     [ [ second ] both? ] [ 2drop f ] if ;
 
-: <interval> ( from to -- interval )
+: (interval) ( from to -- interval )
     {
-        { [ 2dup [ first ] bi@ > ] [ 2drop empty-interval ] }
-        { [ 2dup [ first ] bi@ number= ] [
+        { [ 2dup [ first ] bi@ bound> ] [ 2drop empty-interval ] }
+        { [ 2dup [ first ] bi@ bound= ] [
             2dup [ second ] both?
             [ interval boa ] [ 2drop empty-interval ] if
         ] }
-        { [ 2dup [ { -1/0. t } = ] [ { 1/0. t } = ] bi* and ] [
+        { [
+            2dup [ first negative-bound bound= ] [ first positive-bound bound= ] bi* and
+            2over [ second ] both? and
+        ] [
             2drop full-interval
         ] }
         [ interval boa ]
     } cond ;
+
+! Exact finite endpoints and symbolic infinities retain integer range precision.
+: <interval> ( from to -- interval )
+    floating-point-supported?
+    [ (interval) ] [
+        2dup [ first valid-bound? ] both? [
+            [ first2 [ normalize-bound ] dip 2array ] bi@ (interval)
+        ] [ 2drop full-interval ] if
+    ] if ;
 
 : open-point ( n -- endpoint ) f 2array ;
 
 : closed-point ( n -- endpoint ) t 2array ;
 
 : [a,b] ( a b -- interval )
-    [ closed-point ] dip closed-point <interval> ; foldable
+    [ closed-point ] dip closed-point <interval> ;
 
 : (a,b) ( a b -- interval )
-    [ open-point ] dip open-point <interval> ; foldable
+    [ open-point ] dip open-point <interval> ;
 
 : [a,b) ( a b -- interval )
-    [ closed-point ] dip open-point <interval> ; foldable
+    [ closed-point ] dip open-point <interval> ;
 
 : (a,b] ( a b -- interval )
-    [ open-point ] dip closed-point <interval> ; foldable
+    [ open-point ] dip closed-point <interval> ;
 
 : [a,a] ( a -- interval )
-    closed-point dup <interval> ; foldable
+    closed-point dup <interval> ;
 
-: [-inf,b] ( b -- interval ) -1/0. swap [a,b] ; inline
+: [-inf,b] ( b -- interval )
+    negative-bound swap [a,b] ;
 
-: [-inf,b) ( b -- interval ) -1/0. swap [a,b) ; inline
+: [-inf,b) ( b -- interval )
+    negative-bound swap [a,b) ;
 
-: [a,inf] ( a -- interval ) 1/0. [a,b] ; inline
+: [a,inf] ( a -- interval )
+    positive-bound [a,b] ;
 
-: (a,inf] ( a -- interval ) 1/0. (a,b] ; inline
+: (a,inf] ( a -- interval )
+    positive-bound (a,b] ;
 
 : [0,b] ( b -- interval ) 0 swap [a,b] ; inline
 
 : [0,b) ( b -- interval ) 0 swap [a,b) ; inline
 
-MEMO: [0,inf] ( -- interval ) 0 [a,inf] ; foldable
+: [0,inf] ( -- interval ) 0 [a,inf] ;
 
 MEMO: fixnum-interval ( -- interval )
     most-negative-fixnum most-positive-fixnum [a,b] ; inline
@@ -78,20 +94,20 @@ MEMO: array-capacity-interval ( -- interval )
     [ 2dup [ first ] bi@ 2dup ] dip call [
         4drop t
     ] [
-        number= [ [ second ] bi@ not or ] [ 2drop f ] if
+        bound= [ [ second ] bi@ not or ] [ 2drop f ] if
     ] if ; inline
 
 : endpoint= ( p1 p2 -- ? )
-    { [ [ first ] bi@ number= ] [ [ second ] bi@ eq? ] } 2&& ;
+    { [ [ first ] bi@ bound= ] [ [ second ] bi@ eq? ] } 2&& ;
 
 : endpoint< ( p1 p2 -- ? )
-    [ < ] compare-endpoints ;
+    [ bound< ] compare-endpoints ;
 
 : endpoint<= ( p1 p2 -- ? )
     { [ endpoint< ] [ endpoint= ] } 2|| ;
 
 : endpoint> ( p1 p2 -- ? )
-    [ > ] compare-endpoints ;
+    [ bound> ] compare-endpoints ;
 
 : endpoint>= ( p1 p2 -- ? )
     { [ endpoint> ] [ endpoint= ] } 2|| ;
@@ -104,7 +120,7 @@ MEMO: array-capacity-interval ( -- interval )
     [ from>> ] [ to>> ] bi ;
 
 : points>interval ( seq -- interval nan? )
-    [ first fp-nan? not ] partition
+    [ first bound-nan? not ] partition
     [
         [ [ ] [ endpoint-min ] map-reduce ]
         [ [ ] [ endpoint-max ] map-reduce ] bi
@@ -139,10 +155,10 @@ MEMO: array-capacity-interval ( -- interval )
     } cond ; inline
 
 : interval+ ( i1 i2 -- i3 )
-    [ [ + ] interval-op nan-ok ] do-empty-interval ;
+    [ [ bound+ ] interval-op nan-ok ] do-empty-interval ;
 
 : interval- ( i1 i2 -- i3 )
-    [ [ - ] interval-op nan-ok ] do-empty-interval ;
+    [ [ bound- ] interval-op nan-ok ] do-empty-interval ;
 
 : interval-intersect ( i1 i2 -- i3 )
     {
@@ -178,15 +194,15 @@ M: empty-interval interval-contains? 2drop f ;
 M: full-interval interval-contains? 2drop t ;
 M: interval interval-contains?
     {
-        [ from>> first2 [ >= ] [ > ] if ]
-        [ to>>   first2 [ <= ] [ < ] if ]
+        [ from>> first2 [ bound>= ] [ bound> ] if ]
+        [ to>>   first2 [ bound<= ] [ bound< ] if ]
     } 2&& ;
 
 : interval-zero? ( interval -- ? )
     0 swap interval-contains? ;
 
 : interval* ( i1 i2 -- i3 )
-    [ [ [ * ] interval-op nan-ok ] do-empty-interval ]
+    [ [ [ bound* ] interval-op nan-ok ] do-empty-interval ]
     [ [ interval-zero? ] either? ]
     2bi [ 0 [a,a] interval-union ] when ;
 
@@ -205,14 +221,14 @@ M: special-interval interval-singleton? drop f ;
 M: interval interval-singleton?
     interval>points
     2dup [ second ] both?
-    [ [ first ] bi@ number= ]
+    [ [ first ] bi@ bound= ]
     [ 2drop f ] if ;
 
 GENERIC: interval-length ( interval -- n )
 M: empty-interval interval-length drop 0 ;
-M: full-interval interval-length drop 1/0. ;
+M: full-interval interval-length drop positive-bound ;
 M: interval interval-length
-    interval>points [ first ] bi@ swap - ;
+    interval>points [ first ] bi@ swap bound- ;
 
 : interval-closure ( i1 -- i2 )
     dup [ interval>points [ first ] bi@ [a,b] ] when ;
@@ -233,7 +249,7 @@ M: interval interval-length
 
 : interval-shift-safe ( i1 i2 -- i3 )
     [
-        dup to>> first 100 > [
+        dup to>> first 100 bound> [
             2drop [-inf,inf]
         ] [
             interval-shift
@@ -247,7 +263,7 @@ M: interval interval-length
         { [ 2dup [ full-interval? ] both? ] [ drop ] }
         { [ over full-interval? ] [ nip from>> first [a,inf] ] }
         { [ dup full-interval? ] [ drop from>> first [a,inf] ] }
-        [ [ interval-closure ] bi@ [ max ] interval-op nan-not-ok ]
+        [ [ interval-closure ] bi@ [ bound-max ] interval-op nan-not-ok ]
     } cond ;
 
 : interval-min ( i1 i2 -- i3 )
@@ -257,7 +273,7 @@ M: interval interval-length
         { [ 2dup [ full-interval? ] both? ] [ drop ] }
         { [ over full-interval? ] [ nip to>> first [-inf,b] ] }
         { [ dup full-interval? ] [ drop to>> first [-inf,b] ] }
-        [ [ interval-closure ] bi@ [ min ] interval-op nan-not-ok ]
+        [ [ interval-closure ] bi@ [ bound-min ] interval-op nan-not-ok ]
     } cond ;
 
 : interval-interior ( i1 -- i2 )
@@ -273,7 +289,7 @@ M: interval interval-length
     } cond ; inline
 
 : interval/ ( i1 i2 -- i3 )
-    [ [ [ / ] interval-op nan-not-ok ] interval-division-op ] do-empty-interval ;
+    [ [ [ bound/ ] interval-op nan-not-ok ] interval-division-op ] do-empty-interval ;
 
 : interval/-safe ( i1 i2 -- i3 )
     ! Just a hack to make the compiler work if bootstrap.math
@@ -291,10 +307,12 @@ M: interval interval-length
     ] do-empty-interval ;
 
 : interval/f ( i1 i2 -- i3 )
-    [ [ [ /f ] interval-op nan-not-ok ] interval-division-op ] do-empty-interval ;
+    floating-point-supported? [
+        [ [ [ /f ] interval-op nan-not-ok ] interval-division-op ] do-empty-interval
+    ] [ 2drop full-interval ] if ;
 
 : (interval-abs) ( i1 -- i2 )
-    interval>points [ first2 [ abs ] dip 2array ] bi@ 2array ;
+    interval>points [ first2 [ bound-abs ] dip 2array ] bi@ 2array ;
 
 : interval-abs ( i1 -- i2 )
     {
@@ -364,7 +382,7 @@ SYMBOL: incomparable
         { [ over empty-interval? ] [ swap ] }
         { [ dup empty-interval? ] [ ] }
         { [ dup full-interval? ] [ ] }
-        [ interval-abs to>> first [ neg ] keep (a,b) ]
+        [ interval-abs to>> first [ bound-neg ] keep (a,b) ]
     } cond
     swap 0 [a,a] interval>= t eq? [ [0,inf] interval-intersect ] when ;
 
@@ -379,37 +397,45 @@ SYMBOL: incomparable
     } cond ;
 
 : interval-nonnegative? ( interval -- ? )
-    from>> first 0 >= ;
+    dup special-interval?
+    [ empty-interval? ] [ from>> first 0 bound>= ] if ;
+
+: interval-nonpositive? ( interval -- ? )
+    dup special-interval?
+    [ empty-interval? ] [ to>> first 0 bound<= ] if ;
 
 : interval-negative? ( interval -- ? )
-    to>> first 0 < ;
+    dup special-interval?
+    [ empty-interval? ] [ to>> first 0 bound< ] if ;
 
 <PRIVATE
 ! Return the weight of the MSB.  For signed numbers, this does
 ! not mean the sign bit.
-: bit-weight  ( n -- m )
-    dup [ -1/0. = ] [ 1/0. = ] bi or
-    [ drop 1/0. ]
-    [ dup 0 > [ 1 + ] [ neg ] if next-power-of-2 ] if ;
+: bit-weight ( n -- m )
+    normalize-bound dup infinite-bound? [ drop positive-bound ] [
+        dup integer? [ f ] [ dup [ -1/0. = ] [ 1/0. = ] bi or ] if
+        [ drop positive-bound ]
+        [ dup 0 > [ 1 + ] [ neg ] if next-power-of-2 ] if
+    ] if ;
 
 GENERIC: interval-bounds ( interval -- lower upper )
-M: full-interval interval-bounds drop -1/0. 1/0. ;
+M: full-interval interval-bounds drop negative-bound positive-bound ;
 M: interval interval-bounds interval>points [ first ] bi@ ;
 
 : min-lower-bound ( i1 i2 -- n )
-    [ from>> first ] bi@ min ;
+    [ from>> first ] bi@ bound-min ;
 
 : max-lower-bound ( i1 i2 -- n )
-    [ from>> first ] bi@ max ;
+    [ from>> first ] bi@ bound-max ;
 
 : min-upper-bound ( i1 i2 -- n )
-    [ to>> first ] bi@ min ;
+    [ to>> first ] bi@ bound-min ;
 
 : max-upper-bound ( i1 i2 -- n )
-    [ to>> first ] bi@ max ;
+    [ to>> first ] bi@ bound-max ;
 
 : interval-bit-weight ( i1 -- n )
-    interval-bounds [ bit-weight ] bi@ max ;
+    interval-bounds [ bit-weight ] bi@ bound-max ;
 PRIVATE>
 
 : interval-bitand ( i1 i2 -- i3 )
@@ -427,7 +453,7 @@ PRIVATE>
                 ]
             }
             [
-                [ min-lower-bound bit-weight neg ]
+                [ min-lower-bound bit-weight bound-neg ]
                 [
                     2dup [ interval-negative? ] both?
                     [ min-upper-bound ] [ max-upper-bound ] if
@@ -451,10 +477,10 @@ PRIVATE>
 : interval-bitor ( i1 i2 -- i3 )
     [
         { { [ 2dup [ interval-nonnegative? ] both? ]
-            [ [ max-lower-bound ] [ max-upper-bound ] 2bi bit-weight 1 - [a,b] ] }
+            [ [ max-lower-bound ] [ max-upper-bound ] 2bi bit-weight 1 bound- [a,b] ] }
           { [ 2dup [ interval-negative? ] both? ]
             [ max-lower-bound -1 [a,b] ] }
-          [ interval-union interval-bit-weight [ neg ] [ 1 - ] bi [a,b] ]
+          [ interval-union interval-bit-weight [ bound-neg ] [ 1 bound- ] bi [a,b] ]
         } cond
     ] do-empty-interval ;
 
@@ -465,10 +491,10 @@ PRIVATE>
 : interval-bitxor ( i1 i2 -- i3 )
     [
         { { [ 2dup [ interval-nonnegative? ] both? ]
-            [ max-upper-bound bit-weight 1 - [0,b] ] }
+            [ max-upper-bound bit-weight 1 bound- [0,b] ] }
           { [ 2dup [ interval-negative? ] both? ]
-            [ min-lower-bound bit-weight 1 - [0,b] ] }
-          [ interval-union interval-bit-weight [ neg ] [ 1 - ] bi [a,b] ]
+            [ min-lower-bound bit-weight 1 bound- [0,b] ] }
+          [ interval-union interval-bit-weight [ bound-neg ] [ 1 bound- ] bi [a,b] ]
         } cond
     ] do-empty-interval ;
 
@@ -476,7 +502,7 @@ GENERIC: interval-log2 ( i1 -- i2 )
 M: empty-interval interval-log2 ;
 M: full-interval interval-log2 drop [0,inf] ;
 M: interval interval-log2
-    to>> first 1 max dup most-positive-fixnum >
+    to>> first 1 bound-max dup most-positive-fixnum bound>
     [ drop full-interval interval-log2 ]
     [ 1 + >integer log2 [0,b] ]
     if ;
@@ -503,7 +529,7 @@ M: interval interval-log2
 
 : integral-closure ( i1 -- i2 )
     dup special-interval? [
-        [ from>> first2 [ 1 + ] unless ]
-        [ to>> first2 [ 1 - ] unless ]
+        [ from>> first2 [ 1 bound+ ] unless ]
+        [ to>> first2 [ 1 bound- ] unless ]
         bi [a,b]
     ] unless ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compiler.cfg.linear-scan
+USING: compiler.utilities accessors arrays assocs combinators compiler.cfg.linear-scan
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.state
@@ -53,7 +53,7 @@ TUPLE: greedy-progress stage cascade hint ;
     [ [ live-interval-end ] [ live-interval-start ] bi - 1 <= ] bi and ;
 
 : spill-weight ( interval -- weight )
-    dup minimal-interval? [ drop 1/0. ] [
+    dup minimal-interval? [ drop greedy-use-weights get compiler-spill-infinity ] [
         [ uses>> [ n>> greedy-use-weights get at 1 or ] map-sum ]
         [ interval-size ] bi /
     ] if ;

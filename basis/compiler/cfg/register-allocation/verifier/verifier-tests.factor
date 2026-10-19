@@ -485,13 +485,23 @@ CONSTANT: flow-allocators {
                         input seed generated-flow-result assert=
                     ] each
                 ] each
-                1.0 [ 4 [ fsin ] times ] compile-call
-                1.0 4 [ fsin ] times assert=
                 [ 1 2 5 [ swap ] times 2array ] compile-call { 2 1 } assert=
             ] with-variable
         ] each
     ] with-variable
 ] unit-test
+
+! Foreign floating-point execution is independent of the integer flow cases.
+{ } [
+    t check-allocation? [
+        flow-allocators [| allocator |
+            allocator register-allocator [
+                1.0 [ 4 [ fsin ] times ] compile-call
+                1.0 4 [ fsin ] times assert=
+            ] with-variable
+        ] each
+    ] with-variable
+] floating-point-unit-test
 
 ! Associations may be represented by mutable arrays of pairs. Cloning only
 ! the outer array lets SSA destruction rewrite the checker's original phi

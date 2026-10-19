@@ -34,7 +34,7 @@ static bool variadic_callback_p(code_block* stub) {
 }
 
 VM_C_API bool arm64_variadic_callbacks_supported() {
-#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
+#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_M68K) || defined(FACTOR_SH) || defined(FACTOR_S390X)
   return true;
 #else
   return false;
@@ -49,6 +49,9 @@ instruction_operand callback_heap::callback_operand(code_block* stub,
   tagged<byte_array> relocation_template(
       array_nth(code_template.untagged(), 0));
 
+  if (index >= (cell)untag_fixnum(relocation_template->capacity) /
+                   sizeof(relocation_entry))
+    critical_error("Missing callback relocation operand", index);
   relocation_entry entry(relocation_template->data<relocation_entry>()[index]);
   return instruction_operand(entry, stub, 0);
 }
@@ -61,8 +64,14 @@ void callback_heap::store_callback_operand(code_block* stub, cell index,
 
 void callback_heap::update(code_block* stub) {
   word* w = untag<word>(stub->owner);
-#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
+#if defined(FACTOR_VAX)
+  store_callback_operand(stub, 3, w->entry_point);
+#elif defined(FACTOR_SH)
+  store_callback_operand(stub, 2, w->entry_point);
+#elif defined(FACTOR_HPPA) || defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_S390X)
   store_callback_operand(stub, 6, w->entry_point);
+#elif defined(FACTOR_M88K)
+  store_callback_operand(stub, 4, w->entry_point);
 #else
   store_callback_operand(stub, 1, w->entry_point);
 #endif
@@ -105,7 +114,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   // optional third element contains the corresponding variadic template.
   tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
   bool variadic = false;
-#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
+#if defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_M68K) || defined(FACTOR_SH) || defined(FACTOR_S390X)
   variadic = return_rewind == (cell)-1;
   if (variadic) {
     if (array_capacity(code_template.untagged()) < 3)
@@ -157,16 +166,52 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   }
 #endif
 
+#if defined(FACTOR_VAX)
+  // Native FPU helpers surround the Factor JSB gate. Each CALLS operand
+  // names a real C entry point with a procedure entry mask.
+  store_callback_operand(stub, 0, (cell)&factor::vax_get_fpu_state);
+  store_callback_operand(stub, 1, (cell)parent);
+  store_callback_operand(stub, 2, (cell)&factor::vax_set_fpu_state);
+  store_callback_operand(stub, 4, (cell)parent);
+  store_callback_operand(stub, 5, (cell)&factor::vax_set_fpu_state);
+#else
   // Store VM pointer in two relocations.
   store_callback_operand(stub, 0, (cell)parent);
-#if defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_RISCV32)
+#if defined(FACTOR_SH)
+  // SuperH: VM, safepoint, callback word, then VM for native return.
+  store_callback_operand(stub, 1, parent->code->safepoint_page);
+  store_callback_operand(stub, 3, (cell)parent);
+#elif defined(FACTOR_HPPA)
+  store_callback_operand(stub, 1, parent->code->safepoint_page);
+  store_callback_operand(stub, 2, hppa_function_field((cell)&factor::trampoline, 0));
+  store_callback_operand(stub, 3, hppa_function_field((cell)&factor::trampoline2, 0));
+  store_callback_operand(stub, 4, (cell)&factor::inline_cache_miss);
+  store_callback_operand(stub, 5, (cell)&parent->dispatch_stats.megamorphic_cache_hits);
+#elif defined(FACTOR_ALPHA) || defined(FACTOR_ARM64) || defined(FACTOR_RISCV64) || defined(FACTOR_LOONGARCH64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_S390X)
   store_callback_operand(stub, 1, parent->code->safepoint_page);
   store_callback_operand(stub, 2, (cell)&factor::trampoline);
   store_callback_operand(stub, 3, (cell)&factor::trampoline2);
   store_callback_operand(stub, 4, (cell)&factor::inline_cache_miss);
   store_callback_operand(stub, 5, (cell)&parent->dispatch_stats.megamorphic_cache_hits);
-#else
+#elif defined(FACTOR_M88K)
+  store_callback_operand(stub, 1, parent->code->safepoint_page);
+  store_callback_operand(stub, 2, (cell)&factor::trampoline);
+  store_callback_operand(stub, 3, (cell)&factor::trampoline2);
+#elif !defined(FACTOR_SPARC)
   store_callback_operand(stub, 2, (cell)parent);
+#endif
+#endif
+
+#ifdef FACTOR_SPARC32
+  // New templates carry a third operand for GNU structure-return PC rewind.
+  // Older two-operand boot images remain usable for ordinary callbacks.
+  tagged<byte_array> callback_relocations(array_nth(code_template.untagged(), 0));
+  if (untag_fixnum(callback_relocations->capacity) >=
+      3 * (fixnum)sizeof(relocation_entry))
+    store_callback_operand(stub, 2, return_rewind);
+  else if (return_rewind != 0)
+    critical_error("SPARC32 structure callback needs a rewind template",
+                   return_rewind);
 #endif
 
   // On x86, the RET instruction takes an argument which depends on
@@ -190,7 +235,7 @@ void factor_vm::primitive_callback() {
 }
 
 void factor_vm::primitive_free_callback() {
-  void* entry_point = alien_offset(ctx->pop());
+  cell entry_point = FUNCTION_CODE_POINTER((cell)alien_offset(ctx->pop()));
   code_block* stub = (code_block*)entry_point - 1;
   // Writes a free-list header into the MAP_JIT callback heap.
   jit_writable_scope jit_writable;

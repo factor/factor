@@ -1,7 +1,7 @@
 USING: alien.c-types alien.data alien.libraries alien.syntax
 alien.utilities byte-arrays classes.struct environment.unix generalizations
 io.encodings.utf8 kernel libc literals math sequences simple-tokenizer
-strings system unix unix.types ;
+strings system unix unix.types vocabs ;
 QUALIFIED-WITH: alien.c-types ac
 IN: unix.process
 
@@ -60,6 +60,13 @@ FUNCTION: int sigdelset ( sigset_t* set, int signo )
 FUNCTION: int sigemptyset ( sigset_t* set )
 FUNCTION: int sigfillset ( sigset_t* set )
 FUNCTION: int sigismember ( sigset_t* set, int signo )
+FUNCTION: int pthread_sigmask ( int how, sigset_t* set, sigset_t* oldset )
+
+CONSTANT: SIG_BLOCK $[ os linux-kernel? cpu mips? cpu alpha.64? or cpu sparc? or not and 0 1 ? ]
+CONSTANT: SIG_SETMASK $[
+    os linux-kernel? cpu sparc? and [ 4 ]
+    [ os linux-kernel? cpu mips? cpu alpha.64? or not and 2 3 ? ] if
+]
 
 ! Not on macOS
 FUNCTION: int posix_spawnattr_getschedparam ( posix_spawnattr_t* attr, void* schedparam )
@@ -69,16 +76,19 @@ FUNCTION: int posix_spawnattr_setschedpolicy ( posix_spawnattr_t* attr, int poli
 
 CONSTANT: POSIX_SPAWN_RESETIDS            0x0001
 CONSTANT: POSIX_SPAWN_SETPGROUP           0x0002
-CONSTANT: POSIX_SPAWN_SETSIGDEF           0x0004
-CONSTANT: POSIX_SPAWN_SETSIGMASK          0x0008
+CONSTANT: POSIX_SPAWN_SETSIGDEF $[ os netbsd? os haiku? or 0x0010 0x0004 ? ]
+CONSTANT: POSIX_SPAWN_SETSIGMASK $[ os netbsd? os haiku? or 0x0020 0x0008 ? ]
 
-CONSTANT: POSIX_SPAWN_SETSCHEDPARAM       0x0010
-CONSTANT: POSIX_SPAWN_SETSCHEDULER        0x0020
+! NetBSD otherwise returns before the child has finished its spawn actions.
+CONSTANT: POSIX_SPAWN_RETURNERROR         0x0040
+
+CONSTANT: POSIX_SPAWN_SETSCHEDPARAM $[ os netbsd? os haiku? or 0x0004 0x0010 ? ]
+CONSTANT: POSIX_SPAWN_SETSCHEDULER $[ os netbsd? os haiku? or 0x0008 0x0020 ? ]
 
 ! Darwin-specific flags
 CONSTANT: POSIX_SPAWN_SETEXEC             0x0040
 CONSTANT: POSIX_SPAWN_START_SUSPENDED     0x0080
-CONSTANT: POSIX_SPAWN_SETSID $[ os linux? 0x0080 0x0400 ? ]
+CONSTANT: POSIX_SPAWN_SETSID $[ os haiku? [ 0x0040 ] [ os linux-kernel? 0x0080 0x0400 ? ] if ]
 CONSTANT: POSIX_SPAWN_CLOEXEC_DEFAULT     0x4000
 
 CONSTANT: POSIX_SPAWN_PCONTROL_NONE       0x0000
@@ -97,7 +107,9 @@ CONSTANT: POSIX_SPAWN_PCONTROL_KILL       0x0003
     posix_spawn_file_actions_destroy check-posix ;
 
 : posix-spawn-file-actions-addchdir ( posix_spawn_file_actions_t path -- )
-    posix_spawn_file_actions_addchdir_np check-posix ;
+    os netbsd? os openbsd? or os haiku? or
+    [ posix_spawn_file_actions_addchdir ]
+    [ posix_spawn_file_actions_addchdir_np ] if check-posix ;
 
 : posix-spawnattr-init ( -- posix_spawnattr_t )
     posix_spawnattr_t heap-size <byte-array>
@@ -178,13 +190,13 @@ FUNCTION: int setpriority ( int which, id_t who, int prio )
 
 ! Flags for waitpid
 
-CONSTANT: WNOHANG   1
-CONSTANT: WUNTRACED 2
+CONSTANT: WNOHANG   $[ os illumos? 0x40 1 ? ]
+CONSTANT: WUNTRACED $[ os illumos? 0x4 2 ? ]
 
-CONSTANT: WSTOPPED   2
-CONSTANT: WEXITED    4
-CONSTANT: WCONTINUED 8
-CONSTANT: WNOWAIT    0x1000000
+CONSTANT: WSTOPPED   $[ os illumos? 0x4 2 ? ]
+CONSTANT: WEXITED    $[ os illumos? 0x1 4 ? ]
+CONSTANT: WCONTINUED 0x8
+CONSTANT: WNOWAIT    $[ os illumos? 0x80 0x1000000 ? ]
 
 ! Examining status
 
@@ -214,3 +226,9 @@ CONSTANT: WNOWAIT    0x1000000
 
 FUNCTION: pid_t wait ( int* status )
 FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options )
+
+! NetBSD signal sets use the versioned 128-bit ABI.
+os netbsd? [ "unix.process.netbsd" require ] when
+
+! Haiku uses a native low-byte exit status and separate signal bytes.
+os haiku? [ "unix.process.haiku" require ] when

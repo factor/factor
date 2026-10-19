@@ -10,7 +10,7 @@ SHARED_FLAG := -shared
 
 PLAF_DLL_OBJS += $(BUILD_DIR)/os-unix.o
 PLAF_EXE_OBJS += $(BUILD_DIR)/main-unix.o
-PLAF_MASTER_HEADERS += vm/os-unix.hpp vm/atomic-gcc.hpp vm/atomic.hpp
+PLAF_MASTER_HEADERS += vm/os-unix.hpp vm/atomic-gcc.hpp vm/atomic.hpp vm/atomic-netbsd-sparc.hpp vm/atomic-netbsd-hppa.hpp
 
 # LINKER = gcc -shared -o
 # LINK_WITH_ENGINE = '-Wl,-rpath,$$ORIGIN' -lfactor

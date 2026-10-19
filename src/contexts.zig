@@ -12,13 +12,14 @@ const VMError = signals.VMError;
 // macOS 64 bit needs more than 8192. See issue #1419.
 pub const stack_reserved: Cell = 16384;
 
-pub const FRAME_RETURN_ADDRESS: Cell = if (builtin.cpu.arch == .riscv32) 4 else if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64) 8 else 0;
+pub const mips_frames = builtin.cpu.arch == .mips or builtin.cpu.arch == .mipsel or builtin.cpu.arch == .mips64 or builtin.cpu.arch == .mips64el;
+pub const FRAME_RETURN_ADDRESS: Cell = if (mips_frames) @sizeOf(Cell) else if (builtin.cpu.arch == .powerpc) 4 else if (builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le) 16 else if (builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64) 15 * @sizeOf(Cell) else if (builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .arm) 4 else if (builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or builtin.cpu.arch == .s390x) 8 else 0;
 
 // Number of cells subtracted from the callstack segment end to get the
 // callstack bottom. Must match the C++ VM (and thus the image's compiled
 // subprimitives): aarch64 uses end-32 (CALLSTACK_BOTTOM in cpu-arm.64.hpp),
 // x86-64 uses end-40 (cpu-x86.64.hpp).
-pub const CALLSTACK_BOTTOM_OFFSET: Cell = if (builtin.cpu.arch == .riscv32) 8 else if (builtin.cpu.arch == .aarch64 or builtin.cpu.arch == .riscv64) 4 else 5;
+pub const CALLSTACK_BOTTOM_OFFSET: Cell = if (mips_frames) 32 / @sizeOf(Cell) else if (builtin.cpu.arch == .powerpc) 8 else if (builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le) 4 else if (builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64) @import("sparc.zig").Frame(Cell).minimum_size / @sizeOf(Cell) else if (builtin.cpu.arch == .riscv32 or builtin.cpu.arch == .arm) 8 else if (builtin.cpu.arch == .aarch64 or (builtin.cpu.arch == .riscv64 or builtin.cpu.arch == .loongarch64) or builtin.cpu.arch == .s390x) 4 else 5;
 
 pub const Context = extern struct {
     callstack_top: Cell,
@@ -113,6 +114,10 @@ pub const Context = extern struct {
             const callstack_bottom_offset = @sizeOf(Cell) * CALLSTACK_BOTTOM_OFFSET;
             self.callstack_bottom = seg.end - callstack_bottom_offset;
             self.callstack_top = self.callstack_bottom;
+            if (sparc_frames) {
+                const root_window: [*]Cell = @ptrFromInt(self.callstack_bottom);
+                @memset(root_window[0..16], 0);
+            }
         }
     }
 
@@ -281,4 +286,91 @@ fn contextAllocationProbe(allocator: std.mem.Allocator) !void {
 
 test "context initialization releases earlier stacks on allocation failure" {
     try std.testing.checkAllAllocationFailures(std.testing.allocator, contextAllocationProbe, .{});
+}
+
+pub const sparc_frames = builtin.cpu.arch == .sparc or builtin.cpu.arch == .sparc64;
+pub const FRAME_CHAIN_OFFSET: Cell = if (sparc_frames) 14 * @sizeOf(Cell) else 0;
+pub fn frameReturnAddress(top: Cell) Cell {
+    if (sparc_frames) return @import("sparc.zig").Frame(Cell).codeAddress(top);
+    return @as(*const Cell, @ptrFromInt(top + FRAME_RETURN_ADDRESS)).*;
+}
+pub fn setFrameReturnAddress(top: Cell, address: Cell) void {
+    if (sparc_frames) return @import("sparc.zig").Frame(Cell).setCodeAddress(top, address);
+    @as(*Cell, @ptrFromInt(top + FRAME_RETURN_ADDRESS)).* = address;
+}
+pub fn frameParent(top: Cell) Cell {
+    if (sparc_frames) return @import("sparc.zig").Frame(Cell).parent(top);
+    const parent = @as(*const Cell, @ptrFromInt(top + FRAME_CHAIN_OFFSET)).*;
+    if (builtin.cpu.arch == .powerpc or builtin.cpu.arch == .powerpc64 or builtin.cpu.arch == .powerpc64le) {
+        if (parent <= top) {
+            std.debug.print("invalid live PowerPC frame top=0x{x} parent=0x{x} lr=0x{x}\n", .{ top, parent, frameReturnAddress(top) });
+            @panic("invalid live PowerPC backchain");
+        }
+    }
+    return parent;
+}
+pub fn capturedFrameSize(top: Cell) Cell {
+    return @as(*const Cell, @ptrFromInt(top + FRAME_CHAIN_OFFSET)).*;
+}
+
+// Continuation metadata is shared with vm/powerpc_frame.h and cpu-ppc.cpp.
+// PPC64 retains its existing signal and stack-walker behavior pending qualification.
+pub const powerpc_frames = builtin.cpu.arch == .powerpc and (builtin.os.tag == .linux or builtin.os.tag == .freebsd);
+pub const PpcSignalFrameState = enum(u3) { unknown, leaf, pre, active, post, temporary, temporary_leaf };
+pub const ppc_signal_marker: Cell = @truncate(@as(u64, 0x5050435349474e00));
+pub const ppc_signal_metadata: Cell = 8;
+
+pub inline fn ppcSignalFrameState(top: Cell, size: Cell) ?PpcSignalFrameState {
+    if (!powerpc_frames or size != 4 * @sizeOf(Cell)) return null;
+    const metadata = @as(*const Cell, @ptrFromInt(top + ppc_signal_metadata)).*;
+    const state = metadata & 7;
+    if ((metadata & ~@as(Cell, 7)) != ppc_signal_marker or state < 1 or state > 6) return null;
+    return @fromBackingInt(@intCast(@as(u3, @intCast(state))));
+}
+
+pub inline fn setPpcSignalFrameState(top: Cell, state: PpcSignalFrameState) void {
+    @as(*Cell, @ptrFromInt(top + ppc_signal_metadata)).* = ppc_signal_marker | @backingInt(state);
+}
+
+pub inline fn capturedFrameAdvance(top: Cell, size: Cell, remaining: Cell) Cell {
+    const state = ppcSignalFrameState(top, size);
+    if (state == .temporary_leaf) {
+        if (remaining < size + 32) @panic("missing PowerPC leaf temporary frame");
+        return size + 32;
+    }
+    if (state == .active or state == .temporary) {
+        const extra: Cell = if (state == .temporary) 32 else 0;
+        if (remaining <= size + extra) @panic("missing interrupted PowerPC frame");
+        const interrupted_size = capturedFrameSize(top + size + extra);
+        if (interrupted_size == 0 or interrupted_size > remaining - size - extra) @panic("invalid interrupted PowerPC frame size");
+        return size + extra + interrupted_size;
+    }
+    return size;
+}
+
+pub inline fn liveFrameNext(top: Cell, parent: Cell, bottom: Cell) Cell {
+    if (!powerpc_frames) return parent;
+    if (parent <= top or parent > bottom or parent & 15 != 0) @panic("invalid PowerPC frame bounds");
+    const state = ppcSignalFrameState(top, parent - top);
+    if (state != .active and state != .temporary and state != .temporary_leaf) return parent;
+    if (parent >= bottom) @panic("missing interrupted PowerPC frame");
+    var next = frameParent(parent);
+    if (next > bottom or next & 15 != 0) @panic("invalid interrupted PowerPC frame bounds");
+    if (state == .temporary) {
+        if (next >= bottom) @panic("missing PowerPC frame after temporary reservation");
+        next = frameParent(next);
+        if (next > bottom or next & 15 != 0) @panic("invalid interrupted PowerPC frame bounds");
+    }
+    return next;
+}
+
+pub inline fn frameSpillRootsPresent(top: Cell, size: Cell) bool {
+    const state = ppcSignalFrameState(top, size) orelse return true;
+    return state == .active or state == .temporary;
+}
+
+pub inline fn frameSpillBase(top: Cell, size: Cell) Cell {
+    const state = ppcSignalFrameState(top, size);
+    if (state == .temporary) return top + size + 32;
+    return top + if (state == .active or sparc_frames) size else 0;
 }

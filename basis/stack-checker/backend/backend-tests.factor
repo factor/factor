@@ -4,6 +4,23 @@ stack-checker.state stack-checker.values stack-checker.visitor
 tools.test ;
 IN: stack-checker.backend.tests
 
+! A nonreturning nested quotation consumes retained values in its callers.
+{ 2 } [
+    [
+        V{ } clone stack-visitor set
+        [ 1 [ 2 [ "terminal" throw ] dip ] dip ] infer-quot-here
+    ] with-infer nip
+    [ #terminate? ] find nip in-r>> length
+] unit-test
+
+{ 1 } [
+    [
+        V{ } clone stack-visitor set
+        [ 1 [ t [ "left" throw ] [ "right" throw ] if ] dip ] infer-quot-here
+    ] with-infer nip
+    [ #terminate? ] find nip in-r>> length
+] unit-test
+
 { } [
     V{ } clone (meta-d) set
     V{ } clone (meta-r) set

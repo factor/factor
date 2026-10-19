@@ -122,3 +122,13 @@ yield
         ] in-thread
     ] [ ?promise callstack>array length ] bi
 ] unit-test
+
+! GC must trace and relocate the callstack of a suspended context too.
+:: parked-context-gc ( -- value )
+    self :> parent
+    [ minor-gc gc compact-gc 73 parent resume-with ]
+    "parked context collector" spawn drop
+    "parked across collections" suspend ;
+
+{ 73 } [ parked-context-gc ] unit-test
+{ t } [ 20 [ parked-context-gc 73 = ] replicate [ ] all? ] unit-test

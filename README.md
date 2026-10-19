@@ -50,6 +50,134 @@ directory and run:
 
 Now you should have a complete Factor system ready to run.
 
+### NixOS and GNU Guix
+
+The development environments provide native compilers and the shared libraries
+used by Factor's FFI, including GTK4, Pango, GdkPixbuf, fonts, and OpenSSL.
+They work with a writable checkout, so images can be bootstrapped and saved
+without writing to the package store.
+
+For Nix, enter the pinned environment with `nix develop`. `nix-shell` also works
+with your configured Nixpkgs channel. Use `nix develop .#gtk3` for GTK3 or
+`nix develop .#headless` for command-line work. `nix develop .#tests` also
+provides Xvfb and software Mesa for UI checks. With `nix-shell`, the equivalent
+options are `--argstr uiBackend gtk3` and `--arg withUI false`.
+
+For Guix:
+
+```bash
+guix shell -m manifest.scm -- bash misc/guix-shell
+```
+
+The helper exposes the environment's libraries to Factor's runtime loader.
+Set `FACTOR_UI_BACKEND=gtk3` before `guix shell` to select GTK3, or
+`FACTOR_HEADLESS=1` to omit the UI packages. To use the pinned Guix revision:
+
+```bash
+guix time-machine -C channels.scm -- shell -m manifest.scm -- bash misc/guix-shell
+```
+
+Inside either environment, run `./build.sh compile`, supply a boot image matching
+the checkout, then run `./build.sh bootstrap`. The architecture names differ
+between the package managers and Factor:
+
+| Native architecture | Factor seed image |
+| --- | --- |
+| x86_64 | `boot.unix-x86.64.image` |
+| aarch64 / ARM64 | `boot.unix-arm.64.image` |
+| i686 | `boot.unix-x86.32.image` |
+| armhf / ARMv7 | `boot.unix-arm.32.image` |
+| riscv64 | `boot.unix-riscv.64.image` |
+| powerpc64le | `boot.linux-ppc.64le.image` |
+| powerpc64 (big endian) | `boot.linux-ppc.64.image` |
+| s390x | `boot.linux-s390x.image` |
+| loongarch64 | `boot.unix-loongarch.64.image` |
+
+GTK4 is the default on supported 64-bit Linux CPUs; 32-bit, s390x, and
+LoongArch64 environments select GTK3. Choose
+the backend when bootstrapping the image. The flake also exposes macOS shells;
+the Guix manifest uses the native Guix system and toolchain.
+To bootstrap a headless image, run the VM with the matching seed and
+`-exclude="ui ui.tools"`.
+
+The Linux flake shells cover `x86_64-linux`, `aarch64-linux`, `i686-linux`,
+`armv7l-linux`, `riscv64-linux`, `powerpc64-linux`, `powerpc64le-linux`,
+`s390x-linux`, and `loongarch64-linux`. These are native
+development environments, not cross-compilers. Package availability and
+distribution support differ: official NixOS system releases cover x86-64 and
+ARM64; Guix System also supports i686 and ARMv7. Guix's RISC-V64 and
+PowerPC64LE ports provide package-manager technology previews. Stock system
+images and package environments have different architecture coverage.
+Where the kernel can execute the corresponding 32-bit binaries, use
+`nix-shell --argstr system i686-linux` or
+`bash misc/qemu/store-linux/with-env guix --system=armhf-linux bash --norc`
+to enter a 32-bit environment explicitly. The Guix helper selects the target
+before package modules load, including their architecture-specific dependencies.
+
+In the Nix shell, `wrapLocalFactor "$PWD"` optionally makes the compiled VM
+launchable with its runtime libraries outside that shell. Re-run the helper
+after rebuilding the VM. It preserves the public `factor.image` name, including
+when using `save`, and accepts checkout paths containing spaces.
+
+For an installation in a read-only store, copy its image to a writable location
+and pass its absolute path with `-i=`, together with the installation's
+`-resource-path=`. Add writable vocabulary directories with `-roots=`. Staging
+images use the user cache directory. NixOS and Guix retain the Linux OS backend;
+their store layout is configured through library paths and environment data.
+`TZDIR` selects an alternative timezone database, and `FACTOR_LD_SO_CACHE`
+accepts the textual cache supplied by Nixpkgs wrappers.
+
+The QEMU runners in `misc/qemu/` build and check
+both distributions on x86-64 and ARM64, including the GTK4 smoke test and real
+listener rendering. Deterministic saved images and a published registry mapping
+source revisions to boot images remain separate work from this environment
+support; see [the NixOS compatibility issue](https://github.com/factor/factor/issues/2180).
+
+### Alpine Linux (musl, x86-64)
+
+Alpine's native GCC and G++ build Factor against dynamic musl libc. Use
+native Alpine libraries for the FFI and desktop; no glibc compatibility
+package is needed. Full static libc linking cannot provide Factor's dynamic
+library loading. The musl compatibility changes currently target x86-64.
+The native C++ build and ABI probe passed on Alpine 3.24.2 with musl 1.2.6.
+Fresh bootstrap, the entire Core, compiler and I/O suites, and the GTK4
+rendering and clipboard smoke test passed with those Alpine-built binaries
+and libraries on a Linux host. Factor loaded only native Alpine libraries;
+host Xvfb supplied the X11 server. The bounded Alpine VM run did not complete
+bootstrap; full runtime validation inside that VM remains unverified.
+
+With Bash and sudo available, install the build and GTK4 desktop dependencies
+from the checkout:
+
+```bash
+bash build.sh deps-apk
+MUSL=1 CC=gcc CXX=g++ bash build.sh compile
+```
+
+`MUSL=1` verifies that both compilers produce musl ELF interpreters. It does
+not turn a glibc toolchain into a musl toolchain or disable stack protection.
+
+Use a Unix x86-64 boot image matching this checkout. To generate one from
+the same sources in an already working Factor environment, run:
+
+```bash
+./factor -no-user-init -e='USING: bootstrap.image ; "unix-x86.64" make-image'
+```
+
+Copy `boot.unix-x86.64.image` into the Alpine checkout, then bootstrap and
+save the normal image:
+
+```bash
+./factor -i="$PWD/boot.unix-x86.64.image" -no-user-init \
+    -output-image=factor.image -ui-backend=gtk4
+./factor -i="$PWD/factor.image"
+```
+
+For GTK3, use `bash build.sh deps-apk -ui-backend=gtk3` and pass
+`-ui-backend=gtk3` during bootstrap. Launch the desktop from an X11 session
+or an environment providing XWayland. Musl's utmpx APIs do not provide login
+records; this functionality remains unsupported.
+
 The ARM64 assembler and compiler backend are in `cpu.arm.64`. RISC-V Linux
 development targets RV64GC with the LP64D ABI and RV32GC with the ILP32D ABI.
 Their assemblers and compiler backends are in `cpu.riscv.64` and `cpu.riscv.32`.

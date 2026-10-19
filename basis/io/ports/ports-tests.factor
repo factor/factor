@@ -1,6 +1,6 @@
 USING: accessors alien.c-types alien.data continuations destructors io
 io.buffers io.encodings.ascii io.encodings.binary io.encodings.string
-io.encodings.utf8 io.files io.pipes io.ports io.sockets kernel libc
+io.encodings.utf8 io.files io.pipes io.ports io.servers io.sockets kernel libc
 locals math namespaces sequences sets tools.annotations tools.test ;
 IN: io.ports.tests
 
@@ -80,9 +80,13 @@ M: allocation-test-handle dispose* drop ;
 
 ! Issue #1256 regression test
 ! Port length would be zero before data is received
-{ f } [
-    "google.com" 80 <inet> binary [
-        "GET /\n" utf8 encode write flush
-        input-stream get stream-contents
-    ] with-client empty?
+{ "loopback response\n" } [
+    binary <threaded-server>
+        "127.0.0.1" 0 <inet4> >>insecure
+        [ readln drop "loopback response\n" utf8 encode write flush ] >>handler [
+            insecure-addr binary [
+                "GET /\n" utf8 encode write flush
+                input-stream get stream-contents
+            ] with-client
+        ] with-threaded-server utf8 decode
 ] unit-test

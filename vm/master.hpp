@@ -65,40 +65,7 @@
   #define FACTOR_COMPILE_TIME  __DATE__ " " __TIME__
 #endif
 
-// Detect target CPU type
-#if defined(__arm__)
-#define FACTOR_ARM32
-#elif defined(__aarch64__) || defined(_M_ARM64)
-#define FACTOR_ARM64
-#define FACTOR_64
-#elif defined(__riscv) && __riscv_xlen == 32
-#define FACTOR_RISCV32
-#elif defined(__riscv) && __riscv_xlen == 64
-#define FACTOR_RISCV64
-#define FACTOR_64
-#elif defined(__amd64__) || defined(__x86_64__) || defined(_M_AMD64)
-#define FACTOR_AMD64
-#define FACTOR_64
-#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86)
-#define FACTOR_X86
-#elif(defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)) && \
-    (defined(__PPC64__) || defined(__64BIT__))
-#define FACTOR_PPC64
-#define FACTOR_PPC
-#define FACTOR_64
-#elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
-#define FACTOR_PPC32
-#define FACTOR_PPC
-#else
-#error "Unsupported architecture"
-#endif
-
-#if defined(_MSC_VER) || defined (__MINGW32__)
-#define WINDOWS
-#define WINNT
-#elif defined(WIN32)
-#define WINDOWS
-#endif
+#include "target.hpp"
 
 // Forward-declare this since it comes up in function prototypes
 namespace factor { struct factor_vm; }

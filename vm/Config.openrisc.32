@@ -1,0 +1,5 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-openrisc.32.o $(BUILD_DIR)/cpu-openrisc.32-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-openrisc.32.hpp vm/openrisc.hpp
+CFLAGS += -mhard-float -mdouble-float
+CXXFLAGS += -mhard-float -mdouble-float
+ASFLAGS += -mhard-float -mdouble-float

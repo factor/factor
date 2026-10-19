@@ -16,8 +16,23 @@ IN: opengl.capabilities
 : version-before? ( version1 version2 -- ? )
     [ version-seq ] bi@ before=? ;
 
+: normalize-gl-version-string ( string -- string )
+    "OpenGL ES GLSL ES " ?head [
+    ] [
+        "OpenGL ES-CM " ?head [
+        ] [
+            "OpenGL ES-CL " ?head [
+            ] [
+                "OpenGL ES " ?head drop
+            ] if
+        ] if
+    ] if ;
+
+: split-gl-version ( string -- version vendor )
+    os android? [ normalize-gl-version-string ] when " " split1 ;
+
 : (gl-version) ( -- version1 version2 )
-    GL_VERSION glGetString " " split1 ;
+    GL_VERSION glGetString split-gl-version ;
 : gl-version ( -- version ) (gl-version) drop ;
 : gl-vendor-version ( -- version ) (gl-version) nip ;
 : gl-vendor ( -- vendor ) GL_VENDOR glGetString ;
@@ -55,7 +70,7 @@ IN: opengl.capabilities
     (require-gl) ;
 
 : (glsl-version) ( -- version vendor )
-    GL_SHADING_LANGUAGE_VERSION glGetString " " split1 ;
+    GL_SHADING_LANGUAGE_VERSION glGetString split-gl-version ;
 : glsl-version ( -- version ) (glsl-version) drop ;
 : glsl-vendor-version ( -- version ) (glsl-version) nip ;
 : has-glsl-version? ( version -- ? ) glsl-version version-before? ;

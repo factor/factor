@@ -5,7 +5,7 @@ classes.algebra.private classes.maybe classes.tuple.private
 combinators combinators.short-circuit compiler.tree
 compiler.tree.propagation.constraints compiler.tree.propagation.info
 compiler.tree.propagation.inlining compiler.tree.propagation.nodes
-compiler.tree.propagation.slots continuations fry kernel make
+compiler.tree.propagation.slots continuations fry kernel make math
 sequences sets stack-checker.dependencies words ;
 IN: compiler.tree.propagation.simple
 
@@ -63,10 +63,18 @@ ERROR: invalid-outputs #call infos ;
     [ in-d>> ] [ "input-classes" word-prop ] bi*
     [ [ value-info literal>> ] dip instance? ] 2all? ;
 
+! Opaque IEEE payloads are valid literals even when their arithmetic is
+! unavailable. Keep calls with those inputs for runtime error reporting.
+: supported-literal-inputs? ( #call -- ? )
+    floating-point-supported? [ drop t ] [
+        in-d>> [ value-info literal>> float? not ] all?
+    ] if ;
+
 : foldable-call? ( #call word -- ? )
     {
         [ nip foldable? ]
         [ drop literal-inputs? ]
+        [ drop supported-literal-inputs? ]
         [ input-classes-match? ]
     } 2&& ;
 

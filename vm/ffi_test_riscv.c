@@ -2,12 +2,35 @@
 #if defined(__riscv)
 #include <stddef.h>
 #include <stdint.h>
+#ifdef __linux__
 #include <sys/epoll.h>
+#include <sys/statvfs.h>
+#endif
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <sys/statvfs.h>
 #include <unistd.h>
 #define RV_EXPORT __attribute__((visibility("default"), noinline))
+
+/* Clang can discard the signed field when an optimized reader consumes this
+ * packed six-byte mixed FP/integer aggregate. Keep these two C test oracles
+ * unoptimized so they actually observe the ABI payload. This does not change
+ * the type, calling convention, expected values, or Factor production code.
+ * Clang also coerces this six-byte type through an eight-byte temporary. Align
+ * only the two reader objects so that spill has padding before the stack guard;
+ * the packed struct type remains six bytes with alignment one.
+ */
+#if defined(__clang__) && defined(__has_attribute)
+# if __has_attribute(optnone)
+#  define RV_PACKED_BITFIELD_READER __attribute__((optnone))
+#  define RV_PACKED_BITFIELD_STORAGE __attribute__((aligned(8)))
+# else
+#  define RV_PACKED_BITFIELD_READER
+#  define RV_PACKED_BITFIELD_STORAGE
+# endif
+#else
+# define RV_PACKED_BITFIELD_READER
+# define RV_PACKED_BITFIELD_STORAGE
+#endif
 
 struct rv_bit_fp { unsigned int bits : 3; double number; };
 struct __attribute__((packed)) rv_fp_bit { float number; signed int bits : 13; };
@@ -28,7 +51,7 @@ RV_EXPORT double rv_call_return_bit_fp(struct rv_bit_fp (*callback)(unsigned int
   struct rv_bit_fp value = callback(5, -3.0);
   return value.bits + 2 * value.number;
 }
-RV_EXPORT double rv_take_fp_bit(struct rv_fp_bit value, long tail) {
+RV_EXPORT RV_PACKED_BITFIELD_READER double rv_take_fp_bit(struct rv_fp_bit value RV_PACKED_BITFIELD_STORAGE, long tail) {
   return value.bits + 2 * value.number + tail;
 }
 RV_EXPORT struct rv_fp_bit rv_return_fp_bit(float number, int bits) {
@@ -39,12 +62,13 @@ RV_EXPORT double rv_call_fp_bit(double (*callback)(struct rv_fp_bit, long)) {
   struct rv_fp_bit value = { 2.5f, -2047 };
   return callback(value, 11);
 }
-RV_EXPORT double rv_call_return_fp_bit(struct rv_fp_bit (*callback)(float, int)) {
-  struct rv_fp_bit value = callback(-3.0f, -4095);
+RV_EXPORT RV_PACKED_BITFIELD_READER double rv_call_return_fp_bit(struct rv_fp_bit (*callback)(float, int)) {
+  struct rv_fp_bit value RV_PACKED_BITFIELD_STORAGE = callback(-3.0f, -4095);
   return value.bits + 2 * value.number;
 }
 RV_EXPORT size_t rv_sizeof_nlink_t(void) { return sizeof(((struct stat*)0)->st_nlink); }
 RV_EXPORT size_t rv_sizeof_blksize_t(void) { return sizeof(((struct stat*)0)->st_blksize); }
+#ifdef __linux__
 RV_EXPORT size_t rv_sizeof_epoll_event(void) { return sizeof(struct epoll_event); }
 RV_EXPORT size_t rv_offsetof_epoll_data(void) { return offsetof(struct epoll_event, data); }
 /* RISC-V's native statvfs already uses the 64-bit filesystem counters. */
@@ -59,6 +83,7 @@ RV_EXPORT unsigned long rv_statvfs_namemax(const char* path) {
   struct statvfs value;
   return statvfs(path, &value) == 0 ? value.f_namemax : (unsigned long)-1;
 }
+#endif
 RV_EXPORT long rv_call_stack_gc(void (*callback)(void),
                                long a0, long a1, long a2, long a3, long a4,
                                long a5, long a6, long a7, long a8) {

@@ -1,0 +1,2 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-hppa.o $(BUILD_DIR)/cpu-hppa-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-hppa.hpp vm/hppa.hpp vm/hppa-cache.hpp

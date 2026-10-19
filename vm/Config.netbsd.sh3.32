@@ -1,0 +1,6 @@
+include vm/Config.netbsd
+include vm/Config.sh3
+PLAF_MASTER_HEADERS += vm/os-netbsd-sh.hpp
+# Native GCC cannot reserve its PCH arena on the NetBSD SH3/SH4 userland.
+# Compile headers with each translation unit instead.
+NO_PCH = 1

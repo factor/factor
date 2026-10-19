@@ -15,7 +15,9 @@ IN: compiler.cfg.value-numbering.simd
 : scalar-literal? ( insn rep -- ? )
     {
         { float-4-rep [
-            { [ ##load-reference? ] [ obj>> float? ] [ obj>> exact-single? ] } 1&&
+            floating-point-supported? [
+                { [ ##load-reference? ] [ obj>> float? ] [ obj>> exact-single? ] } 1&&
+            ] [ drop f ] if
         ] }
         { double-2-rep [ { [ ##load-reference? ] [ obj>> float? ] } 1&& ] }
         [ drop ##load-integer? ]

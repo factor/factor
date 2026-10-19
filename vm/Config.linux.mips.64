@@ -1,0 +1,3 @@
+include vm/Config.linux
+include vm/Config.mips.64
+PLAF_MASTER_HEADERS += vm/os-linux-mips.hpp

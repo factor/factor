@@ -131,9 +131,9 @@ PREDICATE: numba-ova-10 < union{ float integer }
 
 { f } [ 100/3 numba-ova-10? ] unit-test
 { t } [ 100 numba-ova-10? ] unit-test
-{ t } [ 100.0 numba-ova-10? ] unit-test
+{ t } [ 100.0 numba-ova-10? ] floating-point-unit-test
 { f } [ 5 numba-ova-10? ] unit-test
-{ f } [ 5.75 numba-ova-10? ] unit-test
+{ f } [ 5.75 numba-ova-10? ] floating-point-unit-test
 
 ! Issue #420 lol
 [ "IN: issue-420 UNION: omg omg ;" eval( -- ) ]

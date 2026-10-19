@@ -50,7 +50,7 @@ IN: compiler.tree.propagation.transforms.tests
     [ ] all?
 ] unit-test
 
-{ 0.25 } [ 1 0.75 [ mod ] compile-call ] unit-test
+{ 0.25 } [ 1 0.75 [ mod ] compile-call ] floating-point-unit-test
 
 : result-or-error ( stack quot -- result )
     [ with-datastack ] [ 2nip class-of ] recover ;

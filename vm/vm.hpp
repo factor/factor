@@ -1,4 +1,13 @@
 using namespace std;
+#ifdef FACTOR_SPARC
+#if defined(__NetBSD__)
+#include "sparc-netbsd-signal.h"
+#elif defined(__OpenBSD__)
+#include "sparc-openbsd-signal.h"
+#else
+#include "sparc-linux-signal.h"
+#endif
+#endif
 
 namespace factor {
 
@@ -39,7 +48,9 @@ struct factor_vm {
 
   // Various special objects, accessed by special-object and
   // set-special-object primitives
-  cell special_objects[special_object_count];
+  // Generated code uses a cell-sized slot for faulting_p, independently of
+  // the target C ABI (m68k Linux naturally aligns cells to two bytes).
+  alignas(sizeof(cell)) cell special_objects[special_object_count];
 
   // THESE FIELDS ARE ACCESSED DIRECTLY FROM FACTOR.
   // ^^^^^^
@@ -80,6 +91,22 @@ struct factor_vm {
   cell signal_fault_addr;
   cell signal_fault_pc;
   unsigned int signal_fpu_status;
+#ifdef FACTOR_SPARC
+  struct sparc_pending_signal {
+    factor_sparc_signal_storage saved;
+    context* owner;
+    cell frame;
+    bool active;
+#if defined(__OpenBSD__)
+    segment* region;
+#endif
+  };
+#if defined(__OpenBSD__)
+  void abandon_sparc_signals(context* owner, cell target);
+#endif
+  sparc_pending_signal sparc_signal_slots[8];
+  void dispatch_sparc_signal(void* raw, cell handler);
+#endif
 
   // Pipe used to notify Factor multiplexer of signals
   int signal_pipe_input, signal_pipe_output;
@@ -218,7 +245,7 @@ struct factor_vm {
   bignum* bignum_quotient(bignum* numerator, bignum* denominator);
   bignum* bignum_remainder(bignum* numerator, bignum* denominator);
   fixnum bignum_to_fixnum_strict(bignum* bn);
-  bignum* double_to_bignum(double x);
+  bignum* double_to_bignum(vm_float x);
   int bignum_equal_p_unsigned(bignum* x, bignum* y);
   enum bignum_comparison bignum_compare_unsigned(bignum* x, bignum* y);
   bignum* bignum_add_unsigned(bignum* x_, bignum* y_, int negative_p);
@@ -480,6 +507,7 @@ struct factor_vm {
   void primitive_bignum_bitp();
   void primitive_bignum_log2();
   inline cell unbox_array_size();
+  void primitive_floating_point_supported();
   void primitive_fixnum_to_float();
   void primitive_format_float();
   void primitive_float_eq();
@@ -517,13 +545,20 @@ struct factor_vm {
   inline void overflow_fixnum_multiply(fixnum x, fixnum y);
   inline cell from_signed_cell(fixnum x);
   inline cell from_unsigned_cell(cell x);
+  inline cell allot_float(vm_float n);
+#if defined(FACTOR_INVERSE_NAN_ENCODING) && !defined(FACTOR_INTEGER_ONLY)
+  inline cell allot_float(float n);
+#endif
+#if defined(__vax__) || defined(FACTOR_INTEGER_ONLY)
+  inline cell allot_float(float n);
   inline cell allot_float(double n);
+#endif
   inline cell allot_float_bits(uint64_t bits);
   inline bignum* float_to_bignum(cell tagged);
-  inline double untag_float(cell tagged);
-  inline double untag_float_check(cell tagged);
+  inline vm_float untag_float(cell tagged);
+  inline vm_float untag_float_check(cell tagged);
   inline fixnum float_to_fixnum(cell tagged);
-  inline double fixnum_to_float(cell tagged);
+  inline vm_float fixnum_to_float(cell tagged);
 
   // tagged
   template <typename Type> void check_tagged(tagged<Type> t) {
@@ -568,7 +603,7 @@ struct factor_vm {
   void update_word_references(code_block* compiled, bool reset_inline_caches,
                               const std::set<cell>* redefined_words);
   bool pic_references_words(code_block* compiled, const std::set<cell>& words);
-  void undefined_symbol();
+  void undefined_symbol(cell return_address);
   cell compute_dlsym_address(array* literals, cell index, bool toc);
   cell lookup_external_address(relocation_type rel_type,
                                code_block* compiled,
@@ -634,7 +669,10 @@ struct factor_vm {
 
   // cpu-*
   void dispatch_signal_handler(cell* sp, cell* pc, cell newpc);
-#if defined(FACTOR_X86) || defined(FACTOR_64) || defined(FACTOR_RISCV32)
+#ifdef FACTOR_PPC
+  void dispatch_ppc_signal(cell* sp, cell* pc, cell lr, cell handler);
+#endif
+#if defined(FACTOR_X86) || defined(FACTOR_64) || defined(FACTOR_RISCV32) || defined(FACTOR_OPENRISC32) || defined(FACTOR_M68K) || defined(FACTOR_HPPA) || defined(FACTOR_MIPS) || defined(FACTOR_ARM32) || defined(FACTOR_PPC) || defined(FACTOR_SPARC) || defined(FACTOR_M88K) || defined(FACTOR_VAX) || defined(FACTOR_SH)
   void dispatch_non_resumable_signal(cell* sp, cell* pc,
                                      cell handler,
                                      cell limit);

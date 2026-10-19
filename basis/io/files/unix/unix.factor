@@ -1,13 +1,15 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.destructors byte-arrays continuations
+USING: accessors alien.destructors alien.strings byte-arrays continuations
 destructors environment io.backend.unix io.files io.files.private
 io.pathnames io.ports kernel libc literals math system unix unix.ffi ;
 IN: io.files.unix
 
 : (cwd) ( bufsiz -- path )
     [
-        dup <byte-array> over [ getcwd ] unix-system-call nip
+        ! Decode the rooted buffer; getcwd's returned pointer aliases it.
+        dup <byte-array> dup rot [ getcwd-into ] unix-system-call
+        drop alien>native-string
     ] [
         dup errno>> ERANGE = [
             drop 2 * (cwd)

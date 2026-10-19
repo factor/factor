@@ -1,3 +1,5 @@
 linux
 macos
 bsd
+haiku
+illumos

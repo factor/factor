@@ -1,0 +1,22 @@
+.text
+addq $1,$2,$3
+subq $1,$2,$3
+and $1,31,$3
+bis $1,$2,$3
+ldq $1,-8($2)
+stq $1,16($2)
+ldt $f1,0($2)
+stt $f1,8($2)
+addt/sud $f1,$f2,$f3
+subt/sud $f1,$f2,$f3
+mult/sud $f1,$f2,$f3
+divt/sud $f1,$f2,$f3
+cvttq/svc $f1,$f2
+cvtqt/d $f1,$f2
+cvtst/s $f1,$f2
+cvtts/sud $f1,$f2
+cmptlt/su $f1,$f2,$f3
+cpys $f1,$f2,$f3
+mf_fpcr $f1
+mt_fpcr $f1
+sqrtt/sud $f1,$f2

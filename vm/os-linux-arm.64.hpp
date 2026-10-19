@@ -54,3 +54,5 @@ inline static unsigned int fpu_status(unsigned int status) {
 #define FUNCTION_TOC_POINTER(ptr) ptr
 
 }
+
+#include "os-linux-fpu.hpp"

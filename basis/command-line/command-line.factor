@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.strings assocs continuations
-io.encodings.utf8 io.files kernel kernel.private namespaces
+io.encodings.utf8 io.files io.pathnames kernel kernel.private namespaces
 parser sequences source-files.errors splitting system
 vocabs.loader ;
 IN: command-line
@@ -62,7 +62,8 @@ PRIVATE>
         ] when*
     ] when ;
 
-: var-param ( name value -- ) swap set-global ;
+: var-param ( name value -- )
+    over "resource-path" = [ absolute-path ] when swap set-global ;
 
 : bool-param ( name -- ) "no-" ?head not var-param ;
 
@@ -107,6 +108,8 @@ SYMBOL: main-vocab-hook
 : default-cli-args ( -- )
     [
         "e" off
+        ! Compilation tracing applies to this invocation, not a saved image.
+        "trace-compilation" off
         "user-init" on
         main-vocab "run" set
     ] with-global ;

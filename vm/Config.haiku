@@ -1,0 +1,7 @@
+include vm/Config.unix
+PLAF_DLL_OBJS += $(BUILD_DIR)/os-genunix.o $(BUILD_DIR)/os-haiku.o $(BUILD_DIR)/os-haiku-monitors.o $(BUILD_DIR)/mvm-unix.o
+PLAF_MASTER_HEADERS += vm/os-genunix.hpp vm/os-haiku.hpp
+LIBS := -lbe -lnetwork -lroot -Wl,--export-dynamic
+FFI_TEST_CFLAGS := -fPIC
+CFLAGS += -fPIC
+CXXFLAGS += -fPIC

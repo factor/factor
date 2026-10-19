@@ -1,10 +1,16 @@
-USING: accessors destructors io io.encodings.binary io.files io.pathnames
+USING: accessors destructors io io.backend io.encodings.binary io.files io.pathnames
 kernel libc locals tools.test unix unix.ffi ;
 FROM: io => write ;
 
 [
     "pipe" normalize-path 0o600 make-fifo
-    { f } [ "pipe" binary [ read1 ] with-file-reader ] unit-test
+    ! Connect and close a writer before checking EOF. A fresh nonblocking
+    ! FIFO with no writer may report EAGAIN on BSD.
+    { f } [
+        "pipe" binary [
+            "pipe" binary <file-writer> dispose read1
+        ] with-file-reader
+    ] unit-test
     [ "pipe" binary <file-writer> dispose ]
     [ errno>> ENXIO = ] must-fail-with
     { B{ 1 2 3 } } [

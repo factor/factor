@@ -1,4 +1,4 @@
-! Copyright (C) 2026 Factor authors.
+! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays classes.struct
 compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params

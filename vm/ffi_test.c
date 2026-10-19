@@ -272,6 +272,16 @@ _Complex float ffi_test_45(int x) { return x; }
 
 _Complex double ffi_test_46(int x) { return x; }
 
+float ffi_test_complex_float_callback(_Complex float (*callback)(int)) {
+  _Complex float result = callback(3);
+  return __real__ result + __imag__ result + 1.0f;
+}
+
+double ffi_test_complex_double_callback(_Complex double (*callback)(int)) {
+  _Complex double result = callback(3);
+  return __real__ result + __imag__ result + 1.0;
+}
+
 _Complex float ffi_test_47(_Complex float x, _Complex double y) {
   return x + 2 * y;
 }
@@ -423,11 +433,11 @@ void* bug1021_test_3(int x) {
 }
 
 #include "ffi_test_small.h"
-#if (defined(__APPLE__) && defined(__aarch64__)) || defined(__linux__)
+#if (defined(__APPLE__) && defined(__aarch64__)) || defined(__linux__) || defined(__FreeBSD__)
 #include "ffi_test_arm64.c"
 #endif
 
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
 #include "tests/ffi_uint_callback.c"
 #include "tests/ffi_array_struct.c"
 #include "tests/ffi_fp_status.c"
@@ -437,3 +447,4 @@ void* bug1021_test_3(int x) {
 #include "ffi_test_varargs_promotions.c"
 #include "ffi_test_arm64_unions.c"
 #include "ffi_test_riscv.c"
+#include "ffi_test_openrisc.c"

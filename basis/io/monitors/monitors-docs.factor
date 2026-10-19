@@ -87,6 +87,10 @@ $nl
 "Inside a single " { $link with-monitors } " scope, only one monitor may be created for any given directory."
 $nl
 "Both directories and files may be monitored. Unlike macOS and Windows, changes to the immediate directory being monitored (permissions, modification time, and so on) are reported."
+{ $heading "BSD" }
+"FreeBSD, NetBSD, OpenBSD and DragonFly BSD use portable polling monitors. Both files and directories are supported, and recursive directory scans do not follow symbolic links. Notifications contain absolute paths, including changes to the monitored path itself."
+$nl
+"Snapshots are taken approximately every 50 milliseconds. Changes between snapshots may be coalesced; a file created and deleted between snapshots may not be reported. Matching device and inode numbers identify rename pairs, while metadata and size changes produce modification notifications. Scanning a large hierarchy increases the polling interval."
 ;
 
 ARTICLE: "io.monitors" "File system change monitors"

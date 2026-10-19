@@ -4,7 +4,7 @@ USING: accessors arrays assocs byte-arrays classes
 classes.algebra classes.singleton classes.tuple
 classes.tuple.private combinators combinators.short-circuit
 compiler.tree.propagation.copy compiler.utilities kernel layouts math
-math.intervals namespaces sequences sequences.private strings
+math.intervals math.intervals.bounds namespaces sequences sequences.private strings
 words ;
 IN: compiler.tree.propagation.info
 
@@ -38,10 +38,15 @@ CONSTANT: object-info T{ value-info-state f object full-interval }
         2drop f f
     ] [
         dup from>> first {
-            { [ over interval-length 0 > ] [ 3drop f f ] }
+            { [ dup normalize-bound infinite-bound? ] [ 3drop f f ] }
+            { [ over interval-length 0 bound> ] [ 3drop f f ] }
             { [ pick bignum class<= ] [ 2nip >bignum t ] }
             { [ pick integer class<= ] [ 2nip >integer t ] }
-            { [ pick float class<= ] [ 2nip [ f f ] [ >float t ] if-zero ] }
+            { [ pick float class<= ] [
+                floating-point-supported?
+                [ 2nip [ f f ] [ >float t ] if-zero ]
+                [ 3drop f f ] if
+            ] }
             [ 3drop f f ]
         } cond
     ] if ;
@@ -92,7 +97,7 @@ UNION: fixed-length array byte-array string ;
         { fixnum [ most-negative-fixnum ] }
         { array-capacity [ 0 ] }
         { integer-array-capacity [ 0 ] }
-        [ drop -1/0. ]
+        [ drop negative-bound ]
     } case ;
 
 : max-value ( class -- n )
@@ -100,7 +105,7 @@ UNION: fixed-length array byte-array string ;
         { fixnum [ most-positive-fixnum ] }
         { array-capacity [ max-array-capacity ] }
         { integer-array-capacity [ max-array-capacity ] }
-        [ drop 1/0. ]
+        [ drop positive-bound ]
     } case ;
 
 : class-interval ( class -- i )
@@ -118,7 +123,13 @@ UNION: fixed-length array byte-array string ;
     } ?at drop ;
 
 : wrap-interval ( interval class -- interval' )
-    class-interval 2dup interval-subset? [ drop ] [ nip ] if ;
+    ! Integer bounds from conversions cannot describe executable floating-point
+    ! arithmetic on an integer-only target. Retain the type without that range.
+    dup float class<= floating-point-supported? not and [
+        2drop full-interval
+    ] [
+        class-interval 2dup interval-subset? [ drop ] [ nip ] if
+    ] if ;
 
 : init-interval ( info -- info )
     dup [ interval>> full-interval or ] [ class>> ] bi wrap-interval >>interval
@@ -143,7 +154,7 @@ UNION: fixed-length array byte-array string ;
     <value-info>
         swap >>interval
         swap >>class
-    init-value-info ; foldable
+    init-value-info ;
 
 : <class-info> ( class -- info )
     dup word? [
@@ -165,13 +176,13 @@ UNION: fixed-length array byte-array string ;
     <value-info>
         real >>class
         swap >>interval
-    init-value-info ; foldable
+    init-value-info ;
 
 : <literal-info> ( literal -- info )
     <value-info>
         swap >>literal
         t >>literal?
-    init-value-info ; foldable
+    init-value-info ;
 
 : <sequence-info> ( length class -- info )
     <value-info>

@@ -11,6 +11,9 @@ hashtables kernel math namespaces sequences stack-checker
 tools.test vectors vocabs words ;
 IN: compiler.test
 
+: intrinsic-enabled? ( word -- ? )
+    "intrinsic" word-prop >boolean ;
+
 : decompile ( word -- )
     dup def>> 2array 1array t t modify-code-heap ;
 

@@ -51,7 +51,9 @@ TUPLE: residency-plan resident cost ;
 
 :: augment-residual ( predecessors network -- amount )
     network sink>> :> node!
-    1/0. :> amount!
+    floating-point-supported? [ 1/0. ] [
+        network capacities>> values 0 [ max ] reduce
+    ] if :> amount!
     [ node network source>> = ] [
         node predecessors at :> from
         from node 2array network capacities>> at amount min amount!

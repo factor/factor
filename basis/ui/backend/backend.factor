@@ -5,6 +5,11 @@ IN: ui.backend
 
 SYMBOL: ui-backend
 
+! Loading another backend's vocabulary must not change the backend selected
+! when the image was bootstrapped. GTK versions cannot share an event loop.
+: register-ui-backend ( backend -- )
+    ui-backend get-global [ drop ] [ ui-backend set-global ] if ;
+
 SYMBOL: ui-stop-after-last-window?
 t ui-stop-after-last-window? set-global
 
