@@ -36,6 +36,25 @@ unit-test
 \"hello world\"" eval( -- string )
 ] unit-test
 
+{ "hello world" } [
+    "#!/usr/bin/env factor\n#!another directive\n\"hello world\""
+    eval( -- string )
+] unit-test
+
+{ f } [ "#!first\n#!second" <lexer> parse-token ] unit-test
+
+{ "hello" 3 } [
+    "#!first\n#!second\nhello" <lexer>
+    [ parse-token ] [ line>> ] bi
+] unit-test
+
+{ "#!later" } [ "#!first\n\n#!later" <lexer> parse-token ] unit-test
+{ "#!later" } [ "#!first\n! comment\n#!later" <lexer> parse-token ] unit-test
+{ "code" "#!later" } [
+    "code\n#!later" <lexer> [ parse-token ] [ parse-token ] bi
+] unit-test
+{ "#!indented" } [ " #!indented" <lexer> parse-token ] unit-test
+
 { "hello world" }
 [
     "IN: parser.tests : hello ( -- str ) \"hello world\" ;"

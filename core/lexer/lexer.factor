@@ -32,12 +32,15 @@ TUPLE: lexer-parsing-word word line line-text column ;
 : pop-parsing-word ( -- )
     lexer get lexer check-instance parsing-words>> pop* ;
 
+: skip-shebang ( lexer -- lexer )
+    [ dup line-text>> "#!" head? ] [ dup next-line ] while ;
+
 : new-lexer ( text class -- lexer )
     [ dup string? [ split-lines ] when ] dip new
         0 >>line
         swap >>text
         V{ } clone >>parsing-words
-    dup next-line ; inline
+    dup next-line skip-shebang ; inline
 
 : <lexer> ( text -- lexer )
     lexer new-lexer ;
@@ -53,13 +56,6 @@ ERROR: unexpected want got ;
 
 <PRIVATE
 
-: shebang? ( lexer -- lexer ? )
-    dup line>> 1 = [
-        dup column>> zero? [
-            dup line-text>> "#!" head?
-        ] [ f ] if
-    ] [ f ] if ; inline
-
 : (skip-blank) ( col line -- newcol )
     [ [ forbid-tab CHAR: \s eq? not ] find-from drop ]
     [ length or ] bi ;
@@ -73,11 +69,7 @@ PRIVATE>
 GENERIC: skip-blank ( lexer -- )
 
 M: lexer skip-blank
-    shebang? [
-        [ nip length ] change-lexer-column
-    ] [
-        [ (skip-blank) ] change-lexer-column
-    ] if ;
+    [ (skip-blank) ] change-lexer-column ;
 
 GENERIC: skip-word ( lexer -- )
 
