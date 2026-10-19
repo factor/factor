@@ -1,109 +1,112 @@
-USING: accessors alien.c-types alien.data grouping kernel
-math math.vectors namespaces opengl opengl.gl sequences
-specialized-arrays ui.gadgets ui.render ;
+USING: accessors alien.c-types alien.data continuations destructors
+grouping kernel math math.vectors namespaces opengl opengl.gl
+opengl.textures sequences specialized-arrays ui.gadgets
+ui.gadgets.worlds ui.render ;
 SPECIALIZED-ARRAY: uint
 IN: ui.gadgets.frame-buffer
 
-TUPLE: frame-buffer < gadget pixels last-dim texture-id ;
+TUPLE: frame-buffer < gadget pixels pixel-dim texture ;
 
 : <frame-buffer> ( -- frame-buffer ) frame-buffer new ;
 
 GENERIC: update-frame-buffer ( frame-buffer -- )
 
-: init-frame-buffer-pixels ( frame-buffer -- )
-  dup dim>> [ gl-scale ] map product >integer 4 * uint <c-array> >>pixels
-  drop ;
+: frame-buffer-dim ( frame-buffer -- dim )
+    dim>> [ gl-scale >fixnum ] map ;
 
-! GL3-compatible: upload pixels to texture and draw as textured quad
-:: draw-pixels-gl3 ( FRAME-BUFFER -- )
-    FRAME-BUFFER dim>> first2 [ gl-scale >fixnum ] bi@ :> ( width height )
-    ! Create or update texture
-    FRAME-BUFFER texture-id>> [
-        ! Update existing texture
-        GL_TEXTURE_2D over glBindTexture
-        GL_TEXTURE_2D 0 0 0 width height
-        GL_RGBA GL_UNSIGNED_INT FRAME-BUFFER pixels>>
-        glTexSubImage2D
-    ] [
-        ! Create new texture
-        1 { uint } [ glGenTextures ] with-out-parameters :> tex-id
-        tex-id FRAME-BUFFER texture-id<<
-        GL_TEXTURE_2D tex-id glBindTexture
-        GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_NEAREST glTexParameteri
-        GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_NEAREST glTexParameteri
-        GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP_TO_EDGE glTexParameteri
-        GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri
-        GL_TEXTURE_2D 0 GL_RGBA width height 0
-        GL_RGBA GL_UNSIGNED_INT FRAME-BUFFER pixels>>
-        glTexImage2D
-        tex-id
-    ] if*
-    drop
-    ! Draw the texture using GL3 texture drawing
-    { 0 0 } FRAME-BUFFER dim>> FRAME-BUFFER texture-id>> f gl3-draw-texture
-    GL_TEXTURE_2D 0 glBindTexture ;
-
-! Legacy GL: use glDrawPixels directly
-:: draw-pixels-legacy ( FRAME-BUFFER -- )
-    FRAME-BUFFER dim>> first2 [ gl-scale >fixnum ] bi@
-    GL_RGBA
-    GL_UNSIGNED_INT
-    FRAME-BUFFER pixels>>
-    glDrawPixels ;
-
-:: draw-pixels ( FRAME-BUFFER -- )
-    gl3-mode? get-global
-    [ FRAME-BUFFER draw-pixels-gl3 ]
-    [ FRAME-BUFFER draw-pixels-legacy ] if ;
-
-:: read-pixels ( FRAME-BUFFER -- )
-    0
-    0
-    FRAME-BUFFER dim>> first2 [ gl-scale >fixnum ] bi@
-    GL_RGBA
-    GL_UNSIGNED_INT
-    FRAME-BUFFER pixels>>
-    glReadPixels ;
-
-:: copy-row ( OLD NEW -- )
-    OLD NEW min-length :> LEN
-    OLD LEN head-slice 0 NEW copy ;
+:: copy-row ( old new -- )
+    old new min-length :> count
+    old count head-slice 0 new copy ;
 
 : copy-pixels ( old-pixels old-width new-pixels new-width -- )
-    [ [ drop { } ] [ 16 * <groups> ] if-zero ] 2bi@
+    ! Widths count pixels; each uint-array pixel has four components.
+    [ [ drop { } ] [ 4 * <groups> ] if-zero ] 2bi@
     [ copy-row ] 2each ;
 
-M:: frame-buffer layout* ( FRAME-BUFFER -- )
-    FRAME-BUFFER last-dim>> [
-        FRAME-BUFFER dim>> = [
-            FRAME-BUFFER pixels>> :> OLD-PIXELS
-            FRAME-BUFFER last-dim>> first gl-scale >fixnum :> OLD-WIDTH
-            FRAME-BUFFER init-frame-buffer-pixels
-            FRAME-BUFFER [ dim>> ] [ last-dim<< ] bi
-            FRAME-BUFFER pixels>> :> NEW-PIXELS
-            FRAME-BUFFER last-dim>> first gl-scale >fixnum :> NEW-WIDTH
-            OLD-PIXELS OLD-WIDTH NEW-PIXELS NEW-WIDTH copy-pixels
-            ! Delete old texture if exists, will be recreated
-            FRAME-BUFFER texture-id>> [ 1 swap uint <ref> glDeleteTextures ] when*
-            f FRAME-BUFFER texture-id<<
-        ] unless
-    ] [
-        FRAME-BUFFER init-frame-buffer-pixels
-        FRAME-BUFFER [ dim>> ] [ last-dim<< ] bi
-    ] if* ;
+:: resize-frame-buffer ( buffer -- )
+    buffer frame-buffer-dim :> dim
+    buffer pixel-dim>> dim = [
+        dim product 4 * uint <c-array> :> pixels
+        buffer pixel-dim>> [
+            buffer pixels>> swap first pixels dim first copy-pixels
+        ] when*
+        buffer pixels >>pixels dim >>pixel-dim drop
+    ] unless ;
 
-M:: frame-buffer draw-gadget* ( FRAME-BUFFER -- )
-    gl3-mode? get-global [
-        ! GL3 path: draw texture
-        FRAME-BUFFER draw-pixels
-        FRAME-BUFFER update-frame-buffer
-        glFlush
-        FRAME-BUFFER read-pixels
+M: frame-buffer layout* resize-frame-buffer ;
+
+<PRIVATE
+
+! The window owns the GL object; the gadget only caches a reference to it.
+TUPLE: frame-buffer-texture < disposable id dim owner ;
+
+M: frame-buffer-texture dispose* id>> delete-texture ;
+
+: <frame-buffer-texture> ( -- texture )
+    frame-buffer-texture new-disposable
+        gen-texture >>id
+        world get-global >>owner
+        window-resource
+    GL_TEXTURE0 glActiveTexture
+    dup id>> GL_TEXTURE_2D swap glBindTexture
+    GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_NEAREST glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_NEAREST glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP_TO_EDGE glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri ;
+
+: current-frame-buffer-texture? ( texture -- ? )
+    [ disposed>> not ] [ owner>> world get-global eq? ] bi and ;
+
+:: ensure-frame-buffer-texture ( buffer -- texture )
+    buffer texture>> :> texture
+    texture [ texture current-frame-buffer-texture? ] [ f ] if
+    [ texture ] [ <frame-buffer-texture> dup buffer texture<< ] if ;
+
+:: upload-frame-buffer ( buffer texture -- )
+    GL_TEXTURE0 glActiveTexture
+    GL_TEXTURE_2D texture id>> glBindTexture
+    buffer pixel-dim>> first2 :> ( width height )
+    texture dim>> buffer pixel-dim>> = [
+        GL_TEXTURE_2D 0 0 0 width height
+        GL_RGBA GL_UNSIGNED_INT buffer pixels>> glTexSubImage2D
     ] [
-        ! Legacy path
-        FRAME-BUFFER dim>> { 0 1 } v* first2 glRasterPos2i
-        FRAME-BUFFER draw-pixels
-        FRAME-BUFFER update-frame-buffer
-        glFlush
-        FRAME-BUFFER read-pixels
+        GL_TEXTURE_2D 0 GL_RGBA8 width height 0
+        GL_RGBA GL_UNSIGNED_INT buffer pixels>> glTexImage2D
+        texture buffer pixel-dim>> >>dim drop
     ] if ;
+
+:: without-frame-buffer-blending ( ..a quot: ( ..a -- ..b ) -- ..b )
+    ! Captured pixels are already composited. Reblending fades the saved image.
+    GL_BLEND glIsEnabled GL_TRUE = :> blending?
+    GL_BLEND glDisable
+    quot [ GL_BLEND blending? [ glEnable ] [ glDisable ] if ] finally ; inline
+
+PRIVATE>
+
+:: draw-pixels-gl3 ( buffer -- )
+    buffer ensure-frame-buffer-texture :> texture
+    buffer texture upload-frame-buffer
+    ! Readback stores the bottom row first; the UI's texture coordinates do not.
+    { 0 0 } buffer dim>> texture id>> t gl3-draw-texture ;
+
+:: draw-pixels-legacy ( buffer -- )
+    buffer dim>> { 0 1 } v* first2 glRasterPos2i
+    buffer pixel-dim>> first2 GL_RGBA GL_UNSIGNED_INT
+    buffer pixels>> glDrawPixels ;
+
+: draw-pixels ( buffer -- )
+    gl3-mode? get-global [ draw-pixels-gl3 ] [ draw-pixels-legacy ] if ;
+
+:: read-pixels ( buffer -- )
+    origin get first gl-scale >fixnum
+    viewport-translation get second origin get second -
+    buffer dim>> second - gl-scale >fixnum
+    buffer pixel-dim>> first2 GL_RGBA GL_UNSIGNED_INT
+    buffer pixels>> glReadPixels ;
+
+M: frame-buffer draw-gadget*
+    ! Recheck device dimensions in the owning context, including scale changes.
+    dup resize-frame-buffer
+    [ [ draw-pixels ] without-frame-buffer-blending ]
+    [ update-frame-buffer ]
+    [ glFlush read-pixels ] tri ;
