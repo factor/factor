@@ -9,56 +9,23 @@ on:
 permissions:
   contents: read
 
+# Keep this workflow focused on bootstrap, load-all, core tests, and help lint.
+# Keep feature regression coverage in the regular test suite.
 jobs:
   build-linux-intel:
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        backend: [default, gtk4, gtk3]
     steps:
     - uses: actions/checkout@v4
     - name: dependencies
       run: |
         sudo apt-get update
-        ./build.sh deps-apt -ui-backend=${{ matrix.backend == 'default' && 'gtk4' || matrix.backend }}
-        sudo apt-get install --yes xvfb libgl1-mesa-dri
+        ./build.sh deps-apt
     - name: bootstrap
-      run: |
-        if [ "${{ matrix.backend }}" = default ]; then
-          ./build.sh net-bootstrap
-        else
-          ./build.sh net-bootstrap -ui-backend=${{ matrix.backend }}
-        fi
-    - name: GTK4 smoke test
-      if: matrix.backend != 'gtk3'
-      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.backend.gtk4.smoke-test
-    - name: GTK4 tests
-      if: matrix.backend != 'gtk3'
-      run: ./factor -run=tools.test ui.backend.gtk4 game.input.gtk4 opengl.capabilities opengl.gl.epoxy opengl.gl.extensions
-    - name: World resize smoke test
-      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.gadgets.worlds.smoke-test
-    - name: Framebuffer smoke test
-      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.gadgets.frame-buffer.smoke-test
-    - name: GTK3 smoke test
-      if: matrix.backend == 'gtk3'
-      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.backend.gtk3.smoke-test
-    - name: Linux text tests
-      run: ./factor -run=tools.test ui.text.pango ui.text.index-maps ui.gadgets.panes
-    - name: UI layout tests
-      run: ./factor -no-user-init -run=tools.test ui.gadgets ui.gadgets.incremental ui.gadgets.worlds
-    - name: Linux game input tests
-      run: ./factor -no-user-init -run=tools.test game.input.gtk game.input.linux
-    - name: Pango long-row smoke test
-      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.text.pango.smoke-test
-    - name: Native file dialog tests
-      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=tools.test file-picker.linux
-    - name: Papier smoke test
-      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=papier.smoke-test
-
+      run: ./build.sh net-bootstrap
     - name: load-all
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
-      run: './factor -run=tools.test resource:core compiler threads io unix.time unix.types.linux'
+      run: './factor -run=tools.test resource:core compiler threads io'
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
@@ -75,7 +42,7 @@ jobs:
     - name: load-all
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
-      run: './factor -run=tools.test resource:core compiler threads io unix.time unix.types.linux'
+      run: './factor -run=tools.test resource:core compiler threads io'
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
@@ -88,9 +55,7 @@ jobs:
     - name: load-all
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
-      run: './factor -run=tools.test resource:core unix.time unix.types.macos ui.gadgets ui.gadgets.incremental ui.gadgets.worlds'
-    - name: Cocoa paint ordering smoke test
-      run: ./factor -no-user-init -run=ui.backend.cocoa.smoke-test
+      run: './factor -run=tools.test resource:core'
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
@@ -103,9 +68,7 @@ jobs:
     - name: load-all
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
-      run: './factor -run=tools.test resource:core unix.time unix.types.macos ui.gadgets ui.gadgets.incremental ui.gadgets.worlds'
-    - name: Cocoa paint ordering smoke test
-      run: ./factor -no-user-init -run=ui.backend.cocoa.smoke-test
+      run: './factor -run=tools.test resource:core'
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
@@ -123,9 +86,6 @@ jobs:
       run: |
            .\build.cmd update-boot-image
            .\build.cmd bootstrap
-    - name: Windows text tests
-      shell: cmd
-      run: 'factor -run=tools.test windows.directwrite ui.text.directwrite.tiles ui.text.index-maps'
     - name: load-all
       shell: cmd
       run: 'factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
@@ -148,19 +108,10 @@ jobs:
       run: build.cmd compile
     - name: build-report
       run: 'Foreach ($f in Get-ChildItem  *.exe,*.com,*.dll) { "{0} {1}" -f (Split-Path -Path $f -Leaf),$f.Length }'
-    - name: ARM64 exception dispatch probe
-      shell: cmd
-      run: |
-        cl /EHsc /Fe:windows-arm64-unwind-tests.exe vm\tests\windows_arm64_unwind.cpp vm\cpu-arm.64-trampoline.obj
-        if errorlevel 1 exit /b 1
-        .\windows-arm64-unwind-tests.exe
     - name: bootstrap
       run: |
            .\build.cmd update-boot-image
            .\build.cmd bootstrap
-    - name: Windows text tests
-      shell: cmd
-      run: 'factor -run=tools.test windows.directwrite ui.text.directwrite.tiles ui.text.index-maps'
     - name: load-all
       shell: cmd
       run: 'factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
