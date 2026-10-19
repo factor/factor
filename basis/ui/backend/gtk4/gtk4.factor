@@ -285,7 +285,9 @@ M:: gtk4-ui-backend (open-window) ( world -- )
     gtk_gl_area_new :> drawable
     drawable f gtk_gl_area_set_use_es
     drawable 3 3 gtk_gl_area_set_required_version
-    drawable f gtk_gl_area_set_auto_render
+    ! GTK may snapshot the area without a Factor redraw request, using a
+    ! different color texture. Paint every snapshot, including its alpha.
+    drawable t gtk_gl_area_set_auto_render
     drawable world pixel-format-attributes>> [ depth-bits? ] any?
     gtk_gl_area_set_has_depth_buffer
     drawable world pixel-format-attributes>> [ stencil-bits? ] any?
