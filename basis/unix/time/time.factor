@@ -1,8 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.syntax
-classes.struct kernel math unix.types ;
+USING: accessors alien.c-types alien.syntax classes.struct kernel
+math sequences system unix.types vocabs ;
 IN: unix.time
+
+! Platform typedefs may be pending refresh while unix.types is already loaded.
+<< "unix.types." os name>> append require >>
 
 STRUCT: timeval
     { sec time_t }
