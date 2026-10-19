@@ -14,7 +14,7 @@ CONSTANT: default-vocab-roots {
     "resource:core"
     "resource:basis"
     "resource:extra"
-    "resource:work"
+    "work:"
 }
 
 STARTUP-HOOK: [

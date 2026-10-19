@@ -89,6 +89,14 @@ HELP: user-resource-path
 { $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
 { $description "Resolve a path relative to the user's " { $snippet "HOME/.factor" } " directory." } ;
 
+HELP: work-directory
+{ $description "The configured work vocabulary directory, or f to use the installation's work directory. Set this to an absolute directory path in .factor-rc before loading user vocabularies. Changing it does not move source files or reload already loaded vocabularies." }
+{ $examples { $code "\"~/factor-work\" absolute-path work-directory set-global" } } ;
+
+HELP: work-path
+{ $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
+{ $description "Resolves a relative path under " { $link work-directory } ", defaulting to " { $snippet "resource:work" } ". The " { $snippet "work:" } " prefix uses this directory." } ;
+
 HELP: pathname
 { $class-description "Class of path name objects. Path name objects can be created by calling " { $link <pathname> } "." } ;
 
@@ -136,6 +144,8 @@ ARTICLE: "io.pathnames.special" "Special pathnames"
 "If a pathname begins with " { $snippet "resource:" } ", it is resolved relative to the directory containing the current image (see " { $link image-path } ")."
 $nl
 "If a pathname begins with " { $snippet "vocab:" } ", then it will be searched for in all current vocabulary roots (see " { $link "add-vocab-roots" } ")."
+$nl
+"If a pathname begins with " { $snippet "work:" } ", it is resolved under the configurable " { $link work-directory } ", defaulting to resource:work. This is the root used by scaffold-work and the default work vocabulary search path."
 $nl
 "If a pathname begins with " { $snippet "~" } ", it will be searched for in the home directory. Subsequent tildes in the pathname will be construed as literal tilde path or filenames and will not be treated specially. To access a filename named " { $snippet "~" } ", you must construct a path to reference the filename, even if it's within the current directory such as " { $snippet "./~" } "." ;
 

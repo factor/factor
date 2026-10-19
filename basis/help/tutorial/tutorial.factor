@@ -13,7 +13,7 @@ $nl
 "If you look at the output, you will see that a few files were created in your \"work\" directory, and that the new source file was loaded."
 $nl
 "The following phrase will print the full path of your work directory:"
-{ $code "\"work\" resource-path ." }
+{ $code "\"work:\" absolute-path ." }
 "The work directory is one of several " { $link "vocabs.roots" } " where Factor searches for vocabularies. It is possible to define new vocabulary roots; see " { $link "add-vocab-roots" } ". To keep things simple in this tutorial, we'll just use the work directory, though."
 $nl
 "Open the work directory in your file manager, and open the subdirectory named " { $snippet "palindrome" } ". Inside this subdirectory you will see a file named " { $snippet "palindrome.factor" } ". Open this file in your text editor."

@@ -194,3 +194,26 @@ os windows? [
 
 { f } [ f normalize-path ] unit-test
 { f } [ f absolute-path ] unit-test
+
+{ t } [ "work:" absolute-path? ] unit-test
+{ "work:project/file.factor" } [ "/elsewhere" "work:project/file.factor" append-path ] unit-test
+{ "file.factor" } [ "work:file.factor" file-name ] unit-test
+
+{ t } [
+    f work-directory [
+        "work:" absolute-path "resource:work" absolute-path =
+    ] with-variable
+] unit-test
+
+{ t t t } [
+    "custom-work" absolute-path work-directory [
+        "work:" absolute-path work-directory get =
+        "work:/project/file.factor" absolute-path
+        work-directory get "project/file.factor" append-path =
+        "resource:work" absolute-path "work" resource-path absolute-path =
+    ] with-variable
+] unit-test
+
+{ t } [
+    "work:" default-vocab-roots member?
+] unit-test

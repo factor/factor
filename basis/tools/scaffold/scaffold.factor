@@ -328,7 +328,7 @@ M: vocab-link scaffold-docs vocab-name scaffold-docs ;
     "resource:extra" swap scaffold-vocab-in ;
 
 : scaffold-work ( string -- )
-    "resource:work" swap scaffold-vocab-in  ;
+    "work:" swap scaffold-vocab-in ;
 
 : scaffold-vocab ( string -- )
     "Choose a vocabulary root:" vocab-roots get

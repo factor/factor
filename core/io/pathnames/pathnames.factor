@@ -74,6 +74,7 @@ ERROR: no-parent-directory path ;
 : special-path? ( path -- rest ? )
     {
         { [ "resource:" ?head ] [ t ] }
+        { [ "work:" ?head ] [ t ] }
         { [ "vocab:" ?head ] [ t ] }
         [ f ]
     } cond ;
@@ -158,6 +159,11 @@ M: object resolve-symlinks normalize-path ;
 
 ALIAS: resource-path site-resource-path
 
+SYMBOL: work-directory
+
+: work-path ( path -- newpath )
+    work-directory get [ "work" resource-path ] unless* prepend-path ;
+
 HOOK: home io-backend ( -- dir )
 
 M: object home "" resource-path ;
@@ -174,6 +180,7 @@ GENERIC: absolute-path ( path -- path' )
 M: string absolute-path
     {
         { [ "resource:" ?head ] [ trim-head-separators resource-path absolute-path ] }
+        { [ "work:" ?head ] [ trim-head-separators work-path absolute-path ] }
         { [ "vocab:" ?head ] [ trim-head-separators vocab-path absolute-path ] }
         { [ "~" ?head ] [ trim-head-separators home prepend-path absolute-path ] }
         [ current-directory get prepend-path ]
