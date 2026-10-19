@@ -231,10 +231,10 @@ icon-data [ default-icon-data ] initialize
 
 : on-resize ( glarea width height user-data -- )
     drop [ gl-unscale ] bi@ 2array swap gtk_widget_get_toplevel window
-    dup active?>> [ swap >>dim relayout ] [ 2drop ] if ;
+    dup active?>> [ swap >>dim layout-resized-world ] [ 2drop ] if ;
 
 : connect-resize-signal ( drawable -- )
-    ! Resize is also emitted during painting; leave scheduling to with-timer.
+    ! Resize runs inside GTK's paint cycle, so do not yield here.
     "resize" [ on-resize ]
     GtkGLArea:resize connect-signal ;
 
@@ -415,6 +415,8 @@ M:: gtk3-ui-backend (open-window) ( world -- )
     gtk_gl_area_new :> drawable
     drawable f gtk_gl_area_set_use_es
     drawable 3 3 gtk_gl_area_set_required_version
+    ! GTK3 keeps its color buffer between draws and invalidates it on resize.
+    ! Factor requests other updates through gtk_gl_area_queue_render.
     drawable f gtk_gl_area_set_auto_render
     drawable world pixel-format-attributes>> [ depth-bits? ] any?
     gtk_gl_area_set_has_depth_buffer

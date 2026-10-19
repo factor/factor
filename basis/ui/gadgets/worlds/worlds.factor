@@ -3,8 +3,8 @@
 USING: accessors assocs cache colors combinators
 combinators.short-circuit concurrency.promises continuations
 destructors kernel literals math models namespaces opengl opengl.gl
-sequences strings ui.backend ui.gadgets ui.gadgets.private
-ui.gadgets.tracks ui.gestures ui.pixel-formats ui.render ui.theme ;
+sequences strings ui.backend ui.gadgets ui.gadgets.tracks
+ui.gestures ui.pixel-formats ui.render ui.theme ;
 IN: ui.gadgets.worlds
 
 SYMBOLS:
@@ -196,8 +196,6 @@ GENERIC: draw-world* ( world -- )
 
 M: world draw-world*
     {
-        ! Native paint callbacks can run before the UI thread drains layout.
-        [ t in-layout? [ layout ] with-variable ]
         [ gl-draw-init ]
         [ draw-gadget ]
         [ text-handle>> [ purge-cache ] when* ]

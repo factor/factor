@@ -3,7 +3,8 @@ USING: accessors alien.c-types alien.data arrays calendar colors command-line
 concurrency.promises continuations debugger destructors io kernel locals
 math math.bitwise math.order math.vectors namespaces opengl opengl.gl sequences
 specialized-arrays system threads ui ui.backend ui.gadgets
-ui.gadgets.borders ui.gadgets.frame-buffer ui.gadgets.worlds ui.pixel-formats ;
+ui.gadgets.borders ui.gadgets.frame-buffer ui.gadgets.worlds ui.pixel-formats
+ui.render ;
 SPECIALIZED-ARRAY: uint
 IN: ui.gadgets.frame-buffer.smoke-test
 
@@ -22,10 +23,17 @@ M: test-frame-buffer update-frame-buffer
         { 45 37 } { 13 9 } gl-fill-rect
     ] [ drop ] if ;
 
+: readback-ready? ( window -- ? )
+    dup draw-world? [
+        dup set-gl-context
+        gl-render-state>> gl3-mode? get-global not or
+        framebuffer-ready? and
+    ] [ drop f ] if ;
+
 :: await-window-size ( window gadget dim -- )
     250 [
         drop
-        window draw-world? window dim>> dim = and
+        window readback-ready? window dim>> dim [ number= ] 2all? and
         gadget dim>> dim { 10 18 } v- [ number= ] 2all? and
         [ t ] [ 20 milliseconds sleep f ] if
     ] find-integer [ drop ] [
@@ -41,15 +49,25 @@ M: test-frame-buffer update-frame-buffer
 :: check-saved-frames ( window gadget pixels -- )
     5 [ window gadget saved-frame pixels assert= ] times ;
 
+: framebuffer-alpha? ( -- ? )
+    gl3-mode? get-global [
+        GL_DRAW_FRAMEBUFFER_BINDING { int } [ glGetIntegerv ] with-out-parameters
+        0 = [ GL_FRONT_LEFT ] [ GL_COLOR_ATTACHMENT0 ] if
+        GL_FRAMEBUFFER swap GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE { int }
+        [ glGetFramebufferAttachmentParameteriv ] with-out-parameters
+    ] [ GL_ALPHA_BITS { int } [ glGetIntegerv ] with-out-parameters ] if
+    0 > gl-error ;
+
 ! An independent coordinate-based oracle, rather than the production row copier.
 :: resized-pixels ( pixels old-dim dim -- resized )
     old-dim first2 :> ( old-width old-height )
+    framebuffer-alpha? [ 0 ] [ 0xffffffff ] if :> clear-alpha
     dim product 4 * <iota> [| i |
         i 4 /mod :> ( pixel component )
         pixel dim first /mod :> ( row column )
         row old-height < column old-width < and [
             row old-width * column + 4 * component + pixels nth
-        ] [ 0 ] if
+        ] [ component 3 = [ clear-alpha ] [ 0 ] if ] if
     ] uint-array{ } map-as ;
 
 :: check-resize ( window gadget dim -- )
@@ -57,6 +75,7 @@ M: test-frame-buffer update-frame-buffer
     gadget pixel-dim>> :> old-dim
     window dim resize-window
     window gadget dim await-window-size
+    window set-gl-context
     before old-dim gadget frame-buffer-dim resized-pixels :> expected
     window gadget expected check-saved-frames ;
 
@@ -73,7 +92,9 @@ M: test-frame-buffer update-frame-buffer
     ! The translucent marker must have been blended onto transparent black.
     gadget { 10 15 } sample-pixel first4 :> ( r2 g2 b2 a2 )
     r2 127 128 between? t assert= g2 31 32 between? t assert=
-    b2 0 assert= a2 63 64 between? t assert= ;
+    b2 0 assert=
+    framebuffer-alpha?
+    [ a2 63 64 between? t assert= ] [ a2 255 assert= ] if ;
 
 :: check-frame-buffer ( window gadget -- )
     window gadget { 138 114 } await-window-size
@@ -113,6 +134,7 @@ M: test-frame-buffer update-frame-buffer
     gadget detach-test-gadget
     gadget legacy? open-test-window :> destination
     destination gadget { 138 114 } await-window-size
+    destination set-gl-context
     pixels dim gadget frame-buffer-dim resized-pixels :> expected
     destination gadget expected check-saved-frames
     old-texture [
@@ -133,6 +155,7 @@ M: test-frame-buffer update-frame-buffer
     gadget detach-test-gadget
     gadget legacy? open-test-window :> window
     window gadget { 138 114 } await-window-size
+    window set-gl-context
     pixels dim gadget frame-buffer-dim resized-pixels :> expected
     window gadget expected check-saved-frames
     window gadget close-test-window ;

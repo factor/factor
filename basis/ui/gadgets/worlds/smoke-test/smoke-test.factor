@@ -3,19 +3,17 @@
 ! Requires a display. Run with -run=ui.gadgets.worlds.smoke-test [--legacy].
 USING: accessors alien.c-types alien.data arrays calendar colors
 command-line continuations debugger io kernel locals math
-math.vectors namespaces opengl opengl.gl opengl.textures sequences
+math.vectors namespaces opengl opengl.gl sequences
 specialized-arrays system threads ui ui.backend ui.gadgets
 ui.gadgets.worlds ui.pixel-formats ui.render ;
 SPECIALIZED-ARRAY: uchar
 IN: ui.gadgets.worlds.smoke-test
 
+SYMBOL: painted-dims
+
 TUPLE: resize-marker < gadget ;
 
 M: resize-marker pref-dim* drop { 128 96 } ;
-
-M: resize-marker draw-gadget*
-    dim>> { 13 11 } v- { 13 11 }
-    COLOR: red gl-color gl-fill-rect ;
 
 :: check-pixels ( window -- )
     window dim>> [ gl-scale >fixnum ] map first2 :> ( width height )
@@ -30,37 +28,32 @@ M: resize-marker draw-gadget*
         i 4 * dup 4 + pixels subseq >array assert=
     ] each ;
 
+M: resize-marker draw-gadget*
+    ! Check every frame, including native paint immediately after resize.
+    dup dim>> over parent>> dim>> [ [ >float ] map ] bi@ assert=
+    dup dim>> { 13 11 } v- { 13 11 }
+    COLOR: red gl-color gl-fill-rect
+    find-world [ dup check-pixels dim>> painted-dims get-global push ] when* ;
+
 :: check-resizes ( window -- )
-    window set-gl-context
-    gen-texture :> texture
-    GL_TEXTURE_2D texture glBindTexture
-    GL_TEXTURE_2D 0 GL_RGBA8 256 gl-scale >fixnum 192 gl-scale >fixnum
-    0 GL_RGBA GL_UNSIGNED_BYTE f glTexImage2D
-    1 { uint } [ glGenFramebuffers ] with-out-parameters :> framebuffer
-    [
-        GL_FRAMEBUFFER framebuffer glBindFramebuffer
-        GL_FRAMEBUFFER GL_COLOR_ATTACHMENT0 GL_TEXTURE_2D texture 0
-        glFramebufferTexture2D
-        GL_FRAMEBUFFER glCheckFramebufferStatus GL_FRAMEBUFFER_COMPLETE assert=
-        ! Model a native resize followed immediately by paint, before the UI
-        ! thread drains its layout queue. No sleep or layout between these calls.
-        { { 128 96 } { 186 150 } { 110 90 } { 154 126 } } [| dim |
-            window dim >>dim drop
-            ! Resizing may reselect a toolkit-owned presentation framebuffer.
-            GL_FRAMEBUFFER framebuffer glBindFramebuffer
-            window draw-world*
-            window check-pixels
-        ] each
-    ] [
-        window handle>> window-framebuffer GL_FRAMEBUFFER swap glBindFramebuffer
-        1 framebuffer uint <ref> glDeleteFramebuffers
-        texture delete-texture
-    ] finally ;
+    { { 256 192 } { 480 320 } { 320 240 } { 400 280 } } [| dim |
+        window dim>> :> previous
+        painted-dims get-global delete-all
+        window dim resize-window
+        nano-count 10,000,000,000 + :> deadline
+        [
+            painted-dims get-global [ previous = not ] any? not
+            nano-count deadline < and
+        ] [ 20 milliseconds sleep ] while
+        painted-dims get-global [ previous = not ] any? t assert=
+        painted-dims get-global last window dim>> assert=
+    ] each ;
 
 : smoke-error ( error -- ) print-error nl flush 1 exit ;
 
 :: worlds-smoke-test ( -- )
     [ smoke-error ] ui-error-hook set-global
+    V{ } clone painted-dims set-global
     command-line get "--legacy" swap member? :> legacy?
     [
         resize-marker new <world-attributes> "Window resize regression" >>title

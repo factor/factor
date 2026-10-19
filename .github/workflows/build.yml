@@ -36,8 +36,9 @@ jobs:
       if: matrix.backend != 'gtk3'
       run: ./factor -run=tools.test ui.backend.gtk4 game.input.gtk4 opengl.capabilities opengl.gl.epoxy opengl.gl.extensions
     - name: World resize smoke test
-      if: matrix.backend != 'gtk3'
       run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.gadgets.worlds.smoke-test
+    - name: Framebuffer smoke test
+      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.gadgets.frame-buffer.smoke-test
     - name: GTK3 smoke test
       if: matrix.backend == 'gtk3'
       run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.backend.gtk3.smoke-test

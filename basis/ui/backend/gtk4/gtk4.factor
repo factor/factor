@@ -221,7 +221,8 @@ CONSTANT: gtk4-modifiers
 : on-resize ( area width height data -- )
     3drop dup [ gtk_widget_get_width ] [ gtk_widget_get_height ] bi 2array
     dup [ 0 > ] all? [
-        swap gtk_widget_get_root window t >>active? swap >>dim relayout
+        swap gtk_widget_get_root window t >>active? swap >>dim
+        layout-resized-world
     ] [ 2drop ] if ;
 
 : on-map ( win data -- )
