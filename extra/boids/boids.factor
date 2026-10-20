@@ -8,7 +8,7 @@ models.range namespaces opengl opengl.demo-support opengl.gl sequences
 system threads ui ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.labeled ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.sliders ui.render ui.theme ui.tools.common ;
+ui.gadgets.sliders ui.gadgets.tracks ui.render ui.theme ui.tools.common ;
 
 QUALIFIED-WITH: models.range mr
 IN: boids
@@ -199,13 +199,13 @@ PRIVATE>
 
     "simulation" toolbar-background <framed-labeled-gadget> ;
 
-TUPLE: boids-frame < pack ;
+TUPLE: boids-frame < track ;
 
 :: <boids-frame> ( -- boids-frame )
-    boids-frame new horizontal >>orientation
+    horizontal boids-frame new-track
     <boids-gadget> :> boids-gadget
     boids-gadget [ start-boids-thread ] keep
-    add-gadget
+    1 track-add
 
     <pile> { 5 5 } >>gap 1.0 >>fill
 
@@ -215,7 +215,7 @@ TUPLE: boids-frame < pack ;
     boids-gadget behaviors>>
     [ behavior-panel add-gadget ] each
 
-    { 5 5 } <border> add-gadget ;
+    { 5 5 } <filled-border> f track-add ;
 
 boids-frame "touchbar" f {
     { f com-pause }
