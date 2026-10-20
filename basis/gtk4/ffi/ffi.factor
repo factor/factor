@@ -8,8 +8,6 @@ IN: gtk4.ffi
 "gsk4.ffi" require
 >>
 
-LIBRARY: gtk4
-
 C-LIBRARY: gtk4 {
     { linux "libgtk-4.so.1" }
     { unix "libgtk-4.so" }

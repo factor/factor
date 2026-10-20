@@ -6,8 +6,6 @@ IN: atk.ffi
 
 << "gobject.ffi" require >>
 
-LIBRARY: atk
-
 C-LIBRARY: atk {
     { windows "libatk-1.0-0.dll" }
     { macos "libatk-1.0.dylib" }

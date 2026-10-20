@@ -6,8 +6,6 @@ IN: gmodule.ffi
 
 << "glib.ffi" require >>
 
-LIBRARY: gmodule
-
 C-LIBRARY: gmodule {
     { windows "libgmodule-2.0-0.dll" }
     { macos "libgmodule-2.0.dylib" }

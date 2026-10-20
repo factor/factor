@@ -11,8 +11,6 @@ C-LIBRARY: readline {
     { unix "libreadline.so" }
 }
 
-LIBRARY: readline
-
 TYPEDEF: void* histdata_t
 
 STRUCT: HIST_ENTRY

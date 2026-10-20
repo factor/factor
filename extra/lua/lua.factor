@@ -14,8 +14,6 @@ C-LIBRARY: liblua5.5 {
     { unix "liblua-5.5.so" }
 }
 
-LIBRARY: liblua5.5
-
 TYPEDEF: double LUA_NUMBER
 TYPEDEF: longlong LUA_INTEGER
 TYPEDEF: ulonglong LUA_UNSIGNED

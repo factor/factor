@@ -13,8 +13,6 @@ C-LIBRARY: libcapstone {
     { unix "libcapstone.so" }
 }
 
-LIBRARY: libcapstone
-
 TYPEDEF: size_t csh
 
 ENUM: cs_arch

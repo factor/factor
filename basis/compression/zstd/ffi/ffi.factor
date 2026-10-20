@@ -12,8 +12,6 @@ C-LIBRARY: zstd {
     { unix "libzstd.so" }
 }
 
-LIBRARY: zstd
-
 FUNCTION: uint ZSTD_versionNumber ( )
 
 FUNCTION: c-string ZSTD_versionString ( )

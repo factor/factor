@@ -84,8 +84,6 @@ STRUCT: MEVENT
     { x int } { y int } { z int }
     { bstate mmask_t } ;
 
-LIBRARY: curses
-
 C-GLOBAL: void* stdscr
 
 FUNCTION: WINDOW* initscr ( )

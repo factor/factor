@@ -13,8 +13,6 @@ IN: gdk3.ffi
 "gdk-pixbuf.ffi" require
 >>
 
-LIBRARY: gdk3
-
 C-LIBRARY: gdk3 {
     { linux "libgdk-3.so.0" }
     { unix "libgdk-3.so" }

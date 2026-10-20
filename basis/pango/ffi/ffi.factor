@@ -7,8 +7,6 @@ IN: pango.ffi
 
 << "gobject.ffi" require >>
 
-LIBRARY: pango
-
 C-LIBRARY: pango {
     { windows "libpango-1.0-0.dll" }
     { macos "libpango-1.0.dylib" }

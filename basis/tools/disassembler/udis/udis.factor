@@ -13,8 +13,6 @@ C-LIBRARY: libudis86 {
     { unix "libudis86.so" }
 }
 
-LIBRARY: libudis86
-
 TYPEDEF: void ud
 
 FUNCTION: void ud_translate_intel ( ud* u )

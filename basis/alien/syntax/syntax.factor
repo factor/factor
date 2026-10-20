@@ -47,7 +47,7 @@ SYNTAX: INITIALIZE-ALIEN:
 ERROR: library-not-found name os ;
 
 SYNTAX: C-LIBRARY:
-    scan-token scan-object os
+    scan-token dup scan-object os
     '[ drop _ swap instance? ] assoc-find
     [ nip ] [ 2drop os library-not-found ] if
-    cdecl add-library ;
+    cdecl add-library current-library set ;

@@ -9,6 +9,4 @@ C-LIBRARY: graphene {
     { unix "libgraphene-1.0.so.0" }
 }
 
-LIBRARY: graphene
-
 GIR: vocab:gir/Graphene-1.0.gir

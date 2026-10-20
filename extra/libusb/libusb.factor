@@ -12,8 +12,6 @@ C-LIBRARY: libusb {
     { unix "libusb-1.0.so" }
 }
 
-LIBRARY: libusb
-
 : libusb_cpu_to_le16 ( x -- y )
     2 >native-endian le> ; inline
 

@@ -12,8 +12,6 @@ C-LIBRARY: libtls {
 C-TYPE: tls_config
 C-TYPE: tls_ctx
 
-LIBRARY: libtls
-
 FUNCTION: int tls_init ( )
 FUNCTION: c-string tls_error ( tls_ctx* ctx )
 FUNCTION: tls_config*  tls_config_new ( )

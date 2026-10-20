@@ -49,8 +49,6 @@ CONSTANT: BIO_C_SET_FILENAME        108
 CONSTANT: BIO_C_SET_SSL             109
 CONSTANT: BIO_C_GET_SSL             110
 
-LIBRARY: libcrypto
-
 ! ===============================================
 ! crypto.h
 ! ===============================================

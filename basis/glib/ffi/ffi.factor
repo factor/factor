@@ -6,8 +6,6 @@ gobject-introspection.standard-types io.encodings.utf8 kernel
 system ;
 IN: glib.ffi
 
-LIBRARY: glib
-
 C-LIBRARY: glib {
     { windows "libglib-2.0-0.dll" }
     { macos "libglib-2.0.dylib" }

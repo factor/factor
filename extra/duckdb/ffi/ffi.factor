@@ -10,8 +10,6 @@ C-LIBRARY: duckdb {
     { unix "libduckdb.so" }
 }
 
-LIBRARY: duckdb
-
 CONSTANT: DUCKDB_API_0_3_2 2
 
 TYPEDEF: uint64_t idx_t

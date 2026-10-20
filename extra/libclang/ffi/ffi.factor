@@ -11,8 +11,6 @@ C-LIBRARY: clang {
     { unix "libclang.so.23.1" }
 }
 
-LIBRARY: clang
-
 ! Enum values and function signatures checked against LLVM 21 clang-c headers.
 
 CONSTANT: UINT_MAX 4294967295

@@ -10,8 +10,6 @@ C-LIBRARY: curl {
     { unix "libcurl.so" }
 }
 
-LIBRARY: curl
-
 ! curl.h
 
 FUNCTION: c-string curl_version ( )

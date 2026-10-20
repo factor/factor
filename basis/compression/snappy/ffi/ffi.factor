@@ -11,8 +11,6 @@ C-LIBRARY: snappy {
     { unix "libsnappy.so" }
 }
 
-LIBRARY: snappy
-
 ENUM: snappy_status SNAPPY_OK SNAPPY_INVALID_INPUT SNAPPY_BUFFER_TOO_SMALL ;
 
 FUNCTION: snappy_status snappy_compress ( char* input,

@@ -13,8 +13,6 @@ C-LIBRARY: libzydis {
     { unix "libZydis.so" }
 }
 
-LIBRARY: libzydis
-
 ENUM: ZydisMachineMode
     ZYDIS_MACHINE_MODE_LONG_64
     ZYDIS_MACHINE_MODE_LONG_COMPAT_32

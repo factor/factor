@@ -15,8 +15,6 @@ C-LIBRARY: rocksdb {
 
 ! Exported types
 
-LIBRARY: rocksdb
-
 C-TYPE: rocksdb_t
 C-TYPE: rocksdb_backup_engine_t
 C-TYPE: rocksdb_backup_engine_info_t

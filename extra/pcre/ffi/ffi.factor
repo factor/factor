@@ -8,8 +8,6 @@ C-LIBRARY: pcre {
     { unix "libpcre.so" }
 }
 
-LIBRARY: pcre
-
 CONSTANT: PCRE_CASELESS           0x00000001
 CONSTANT: PCRE_MULTILINE          0x00000002
 CONSTANT: PCRE_DOTALL             0x00000004

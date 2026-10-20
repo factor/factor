@@ -323,8 +323,6 @@ CONSTANT: SQLITE_TXN_NONE  0
 CONSTANT: SQLITE_TXN_READ  1
 CONSTANT: SQLITE_TXN_WRITE 2
 
-LIBRARY: sqlite
-
 FUNCTION: c-string sqlite3_libversion ( )
 
 FUNCTION: c-string sqlite3_sourceid ( )

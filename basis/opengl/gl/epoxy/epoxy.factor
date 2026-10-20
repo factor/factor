@@ -7,8 +7,6 @@ IN: opengl.gl.epoxy
 : gl-function-context ( -- context )
     current-gl-context ; inline
 
-LIBRARY: epoxy
-
 C-LIBRARY: epoxy {
     { linux "libepoxy.so.0" }
     { unix "libepoxy.so" }

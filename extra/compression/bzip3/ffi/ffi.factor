@@ -13,8 +13,6 @@ C-LIBRARY: bzip3 {
     { unix "libbzip3.so" }
 }
 
-LIBRARY: bzip3
-
 ! typedef struct {
 !     /* Input/output. */
 !     u8 *in_queue, *out_queue;

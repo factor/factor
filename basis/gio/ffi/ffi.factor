@@ -6,8 +6,6 @@ IN: gio.ffi
 
 << "gobject.ffi" require >>
 
-LIBRARY: gio
-
 C-LIBRARY: gio {
     { windows "libgio-2.0-0.dll" }
     { macos "libgio-2.0.dylib" }

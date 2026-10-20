@@ -6,8 +6,6 @@ alien.syntax combinators system ;
 
 IN: fftw.ffi
 
-LIBRARY: fftw3
-
 C-LIBRARY: fftw3 {
     { windows "libfftw3-3.dll" }
     { macos "libfftw3.dylib" }

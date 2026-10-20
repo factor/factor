@@ -15,8 +15,6 @@ C-LIBRARY: cairo {
     { unix "libcairo.so" }
 }
 
-LIBRARY: cairo
-
 FUNCTION: int cairo_version ( )
 FUNCTION: c-string cairo_version_string ( )
 

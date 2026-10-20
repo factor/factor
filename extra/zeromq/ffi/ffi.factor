@@ -14,8 +14,6 @@ C-LIBRARY: zmq {
     { unix "libzmq.so" }
 }
 
-LIBRARY: zmq
-
 !
 ! 0MQ versioning support.
 !

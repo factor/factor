@@ -72,8 +72,6 @@ C-TYPE: PQprintOpt
 C-TYPE: SSL
 C-TYPE: FILE
 
-LIBRARY: postgresql
-
 ! Exported functions of libpq
 
 ! make a new client connection to the backend

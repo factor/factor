@@ -9,9 +9,6 @@ C-LIBRARY: xinput2 {
     { unix "libXi.so" }
 }
 
-LIBRARY: xinput2
-
-
 ! *********
 ! * XI2.h *
 ! *********

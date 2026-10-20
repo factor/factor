@@ -10,8 +10,6 @@ C-LIBRARY: zlib {
     { unix "libz.so" }
 }
 
-LIBRARY: zlib
-
 TYPEDEF: void Bytef
 TYPEDEF: ulong uLongf
 TYPEDEF: ulong uLong

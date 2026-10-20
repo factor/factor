@@ -29,7 +29,7 @@ HELP: LIBRARY:
 HELP: C-LIBRARY:
 { $syntax "C-LIBRARY: name paths" }
 { $values { "name" "a logical library name" } { "paths" { "an alist of {os,path} pairs" } } }
-{ $description "Adds the appropriate library path for the current " { $link os } " using " { $link cdecl } " calling convention." } ;
+{ $description "Adds the appropriate library path for the current " { $link os } " using " { $link cdecl } " calling convention, then selects the logical library for subsequent FFI declarations and " { $link POSTPONE: &: } " forms, as with " { $link POSTPONE: LIBRARY: } ". A separate " { $link POSTPONE: LIBRARY: } " form is not required." } ;
 
 HELP: FUNCTION:
 { $syntax "FUNCTION: return name ( parameters )" }

@@ -15,8 +15,6 @@ C-LIBRARY: gdk4 {
     { unix "libgtk-4.so" }
 }
 
-LIBRARY: gdk4
-
 GIR: vocab:gir/Gdk-4.0.gir
 
 : gdk_gl_get_proc_address ( name -- address )

@@ -11,8 +11,6 @@ C-LIBRARY: sodium {
     { unix "libsodium.so" }
 }
 
-LIBRARY: sodium
-
 FUNCTION: int sodium_init ( )
 
 ! randombytes_H

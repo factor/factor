@@ -8,8 +8,6 @@ IN: gdk-pixbuf.ffi
 
 << "gio.ffi" require >>
 
-LIBRARY: gdk-pixbuf
-
 C-LIBRARY: gdk-pixbuf {
     { windows "libgdk_pixbuf-2.0-0.dll" }
     { macos "libgdk_pixbuf-2.0.dylib" }

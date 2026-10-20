@@ -9,8 +9,6 @@ IN: pango.cairo.ffi
 "cairo.gobject.ffi" require
 >>
 
-LIBRARY: pango.cairo
-
 C-LIBRARY: pango.cairo {
     { windows "libpangocairo-1.0-0.dll" }
     { macos "libpangocairo-1.0.dylib" }

@@ -9,8 +9,6 @@ IN: gobject.ffi
 << "glib.ffi" require >>
 USE: glib.ffi
 
-LIBRARY: gobject
-
 C-LIBRARY: gobject {
     { windows "libgobject-2.0-0.dll" }
     { macos "libgobject-2.0.dylib" }
