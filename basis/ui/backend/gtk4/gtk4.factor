@@ -10,6 +10,7 @@ ui.backend.gtk4.input-methods ui.backend.input-state ui.backend.x11.keys ui.clip
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.pixel-formats ui.private ui.render ui.text.pango
 vocabs.loader ;
+FROM: ui.gadgets => layout ;
 IN: ui.backend.gtk4
 
 SINGLETON: gtk4-ui-backend
@@ -213,7 +214,10 @@ CONSTANT: gtk4-modifiers
         dup draw-world? [
             [
                 dup set-gl-context framebuffer-ready?
-                [ draw-world* gl-error ] [ drop ] if
+                [
+                    dup t in-layout? [ layout ] with-variable
+                    draw-world* gl-error
+                ] [ drop ] if
             ] [ nip ui-error ] recover
         ] [ drop ] if
     ] [ drop ] if t ;

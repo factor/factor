@@ -2,10 +2,10 @@
 ! Copyright (C) 2011 Anton Gorenko.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays boids.simulation calendar classes colors combinators
-kernel literals math math.functions math.vectors models
+USING: accessors arrays boids.simulation classes colors combinators
+kernel literals math math.functions math.order math.vectors models
 models.range namespaces opengl opengl.demo-support opengl.gl sequences
-threads ui ui.commands ui.gadgets ui.gadgets.borders
+system threads ui ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.labeled ui.gadgets.labels ui.gadgets.packs
 ui.gadgets.sliders ui.render ui.theme ui.tools.common ;
@@ -17,6 +17,7 @@ TUPLE: boids-gadget < gadget paused boids behaviors dt ;
 
 CONSTANT: initial-population 100
 CONSTANT: initial-dt 5
+CONSTANT: boids-interval 10,000,000
 
 : initial-behaviors ( -- seq )
     1.0 75 -0.1 <cohesion>
@@ -94,17 +95,29 @@ CONSTANT: boid-triangle { { -6.0 4.0 } { -6.0 -4.0 } { 8.0 0.0 } }
 M: boids-gadget draw-gadget* ( boids-gadget -- )
     boids>> draw-boids ;
 
+<PRIVATE
+:: iterate-system-dt ( gadget dt -- )
+    gadget boids>> gadget behaviors>> dt gadget dim>>
+    simulate-in gadget boids<< ;
+PRIVATE>
+
 : iterate-system ( boids-gadget -- )
-    dup { [ boids>> ] [ behaviors>> ] [ dt>> ] [ dim>> ] } cleave
-    simulate-in >>boids drop ;
+    dup dt>> iterate-system-dt ;
+
+:: advance-system ( gadget elapsed -- )
+    elapsed 0 100,000,000 clamp boids-interval /f gadget dt>> *
+    dup 0 > [ gadget swap iterate-system-dt ] [ drop ] if ;
 
 :: start-boids-thread ( gadget -- )
     [
+        nano-count :> previous!
         [ gadget paused>> ]
         [
-            gadget iterate-system
+            nano-count :> current
+            gadget current previous - advance-system
+            current previous!
             gadget relayout-1
-            10 milliseconds sleep
+            boids-interval sleep
         ] until
     ] in-thread ;
 

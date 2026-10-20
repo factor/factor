@@ -80,7 +80,7 @@ PRIVATE>
 :: with-timer ( quot -- )
     <timer-funcs> &free
     GSource heap-size g_source_new &g_source_unref :> source
-    source G_PRIORITY_DEFAULT_IDLE g_source_set_priority
+    source G_PRIORITY_DEFAULT g_source_set_priority
     source f g_source_attach drop
     [ quot call( -- ) ]
     [ source g_source_destroy ] finally ;
