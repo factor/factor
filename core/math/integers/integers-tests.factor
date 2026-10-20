@@ -427,7 +427,14 @@ IN: math.integers.tests
 { 0 } [ 200 2^ neg checked-power-of-two ] unit-test
 [ 12 200 2^ 1 - checked-shift ] [ second 7 = ] must-fail-with
 [ 200 2^ 1 - checked-power-of-two ] [ second 7 = ] must-fail-with
-{ f } [ 1 >bignum 32 2^ checked-bit? ] unit-test
+! 2^32 detects truncated indices on 64-bit, but exceeds the 32-bit fixnum range.
+64-bit? [
+    { f } [ 1 >bignum 32 2^ checked-bit? ] unit-test
+] [
+    [ 1 >bignum 32 2^ checked-bit? ] [
+        ${ KERNEL-ERROR ERROR-OUT-OF-FIXNUM-RANGE 4294967296 f } =
+    ] must-fail-with
+] if
 { t } [ -13 -1 checked-bit? ] unit-test
 { f } [ 13 -1 checked-bit? ] unit-test
 { f } [ 1 32 checked-bit? ] unit-test
