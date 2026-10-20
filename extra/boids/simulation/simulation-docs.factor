@@ -8,7 +8,7 @@ HELP: wrap-pos-in
 HELP: simulate-in
 { $values { "boids" sequence } { "behaviors" sequence } { "dt" number }
     { "dim" sequence } }
-{ $description "Advances the flock by one step and wraps positions within the given dimensions. The boids gadget supplies its current allocated size." } ;
+{ $description "Advances the two-dimensional flock by one step and wraps positions within the given dimensions. The boids gadget supplies its current allocated size. A spatial grid limits neighbor searches to nearby cells, using the largest behavior radius as the cell size. Distances and viewing angles use the original positions; opposite edges are not adjacent for neighbor searches. Grid traversal can change floating-point summation order." } ;
 
 HELP: random-boids-in
 { $values { "count" integer } { "dim" sequence } { "boids" sequence } }

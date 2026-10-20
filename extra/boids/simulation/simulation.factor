@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! Copyright (C) 2011 Anton Gorenko.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators.short-circuit kernel math
-math.order math.vectors random sequences ;
+USING: accessors arrays assocs combinators.short-circuit kernel math
+math.functions math.order math.vectors random sequences ;
 IN: boids.simulation
 
 CONSTANT: WIDTH 512
@@ -63,9 +63,45 @@ GENERIC: force ( neighbors boid behavior -- force )
 : wrap-pos ( pos -- pos )
     WIDTH HEIGHT 2array wrap-pos-in ;
 
-:: simulate-in ( boids behaviors dt dim -- boids )
+<PRIVATE
+
+CONSTANT: neighboring-cells
+    { { -1 -1 } { 0 -1 } { 1 -1 }
+      { -1 0 } { 0 0 } { 1 0 }
+      { -1 1 } { 0 1 } { 1 1 } }
+
+: position>cell ( pos cell-size -- cell )
+    '[ _ / floor >integer ] map ;
+
+: indexable-boid? ( boid -- ? )
+    pos>> [ fp-special? not ] all? ;
+
+:: index-boids ( boids cell-size -- grid )
+    H{ } clone :> grid
     boids [| boid |
-        boid boids behaviors
+        boid indexable-boid? [
+            boid boid pos>> cell-size position>cell grid push-at
+        ] when
+    ] each
+    grid ;
+
+:: nearby-boids ( boid grid cell-size -- candidates )
+    boid indexable-boid? [
+        boid pos>> cell-size position>cell :> cell
+        neighboring-cells [ cell v+ grid at ] map concat
+    ] [ { } ] if ;
+
+PRIVATE>
+
+:: simulate-in ( boids behaviors dt dim -- boids )
+    behaviors [ radius>> ] map 1.0 [ max ] reduce :> cell-size
+    behaviors empty? [ f ] [
+        boids cell-size index-boids
+        dup assoc-size 1 > [ ] [ drop f ] if
+    ] if :> grid
+    boids [| boid |
+        grid [ boid grid cell-size nearby-boids ] [ boids ] if :> candidates
+        boid candidates behaviors
         [ [ (force) ] keep weight>> v*n ] 2with map vsum :> a
 
         boid vel>> a dt v*n v+ normalize :> vel
