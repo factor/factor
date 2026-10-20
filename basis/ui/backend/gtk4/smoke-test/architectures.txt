@@ -1,4 +1,0 @@
-x86.64
-arm
-ppc
-riscv.64

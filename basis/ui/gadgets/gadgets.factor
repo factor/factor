@@ -136,10 +136,6 @@ DEFER: relayout
 <PRIVATE
 
 SYMBOL: ui-notify-flag
-SYMBOL: in-layout?
-
-: with-layout ( quot -- )
-    t in-layout? rot with-variable ; inline
 
 : notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
 
@@ -153,15 +149,10 @@ SYMBOL: in-layout?
 
 CONSTANT: layout-queue-limit 8000
 
-: ?yield-layout ( -- )
-    ! A scheduler yield must not expose a partially completed layout pass.
-    in-layout? get [
-        layout-queue [ length layout-queue-limit > [ yield ] when ] when*
-    ] unless ;
-
 : layout-later ( gadget -- )
     layout-queue [
-        push notify-ui-thread ?yield-layout
+        [ push notify-ui-thread ]
+        [ length layout-queue-limit > [ yield ] when ] bi
     ] [ drop ] if* ;
 
 : invalidate* ( gadget -- )
@@ -185,6 +176,8 @@ PRIVATE>
 : hide-gadget ( gadget -- ) f >>visible? drop ;
 
 <PRIVATE
+
+SYMBOL: in-layout?
 
 GENERIC: dim-changed ( gadget -- )
 
@@ -216,19 +209,12 @@ M: object layout* drop ;
 
 : prefer ( gadget -- ) dup pref-dim >>dim drop ;
 
-<PRIVATE
-
-: (layout) ( gadget -- )
+: layout ( gadget -- )
     dup layout-state>> [
         f >>layout-state
         dup layout*
-        dup [ (layout) ] each-child
+        dup [ layout ] each-child
     ] when drop ;
-
-PRIVATE>
-
-: layout ( gadget -- )
-    [ (layout) ] with-layout ;
 
 GENERIC: graft* ( gadget -- )
 

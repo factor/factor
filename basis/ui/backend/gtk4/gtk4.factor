@@ -5,7 +5,7 @@ assocs cairo.ffi classes.struct combinators combinators.short-circuit concurrenc
 continuations destructors environment gdk4.ffi gio.ffi glib.backend
 glib.ffi gobject gobject.ffi gtk4.ffi io.encodings.string
 io.encodings.utf8 kernel literals locals math math.bitwise math.vectors memoize namespaces
-opengl opengl.gl sequences strings system threads ui ui.backend ui.backend.gl-area
+opengl opengl.gl sequences strings system threads ui ui.backend
 ui.backend.gtk4.input-methods ui.backend.input-state ui.backend.x11.keys ui.clipboards
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.pixel-formats ui.private ui.render ui.text.pango
@@ -14,9 +14,9 @@ IN: ui.backend.gtk4
 
 SINGLETON: gtk4-ui-backend
 
-TUPLE: window-handle window drawable im-context { framebuffer integer initial: 0 } frame ;
+TUPLE: window-handle window drawable im-context { framebuffer integer initial: 0 } ;
 : <window-handle> ( window drawable im-context -- handle )
-    0 f window-handle boa ;
+    0 window-handle boa ;
 
 ! GTK owns the display's clipboards. Reading text is asynchronous; suspend
 ! the Factor caller while the GLib loop continues servicing the request.
@@ -205,22 +205,18 @@ CONSTANT: gtk4-modifiers
     im "delete-surrounding" [ on-delete-surrounding yield ]
     GtkIMContext:delete-surrounding win connect-signal-with-data ;
 
-: drawable-pixel-dim ( area -- dim )
-    [ [ gtk_widget_get_width ] [ gtk_widget_get_height ] bi 2array ]
-    [ gtk_widget_get_scale_factor ] bi v*n ;
-
-! GTK owns the current framebuffer here. Present a completed Factor frame;
-! grafting, layout and user drawing belong to the normal UI update cycle.
-:: on-render ( area context data -- ? )
-    area gtk_widget_get_root window :> w
-    w [
-        [
-            area gtk_gl_area_make_current
-            area gtk_gl_area_attach_buffers
-            w handle>> frame>> area drawable-pixel-dim
-            w background-color>> present-gl-area-frame
-        ] [ ui-error ] recover
-    ] when t ;
+! GtkGLArea owns the presentation framebuffer and may replace it between
+! frames. Paint inside render as well as servicing Factor's redraw requests.
+: on-render ( area context data -- ? )
+    2drop dup update-scale-factor gtk_widget_get_root window
+    dup gl-render-state>> [
+        dup draw-world? [
+            [
+                dup set-gl-context framebuffer-ready?
+                [ draw-world* gl-error ] [ drop ] if
+            ] [ nip ui-error ] recover
+        ] [ drop ] if
+    ] [ drop ] if t ;
 
 : on-resize ( area width height data -- )
     3drop dup [ gtk_widget_get_width ] [ gtk_widget_get_height ] bi 2array
@@ -261,7 +257,7 @@ M: window-handle window-drawable?
 ERROR: gtk4-incomplete-framebuffer framebuffer status ;
 
 M: window-handle select-gl-context
-    dup drawable>> dup update-scale-factor
+    dup drawable>>
     [ gtk_gl_area_make_current ]
     [ gtk_gl_area_get_error [ message>> utf8 alien>string throw ] when* ]
     [
@@ -281,18 +277,15 @@ M: window-handle select-gl-context
     GL_DRAW_FRAMEBUFFER_BINDING 0 int <ref>
     [ glGetIntegerv ] keep int deref >>framebuffer drop ;
 
-M:: window-handle flush-gl-context ( handle -- )
-    handle frame>> handle framebuffer>> handle drawable>> drawable-pixel-dim
-    cache-gl-area-frame handle frame<<
-    handle drawable>> gtk_gl_area_queue_render ;
+M: window-handle flush-gl-context
+    drawable>> gtk_gl_area_queue_render ;
 
 M:: gtk4-ui-backend (open-window) ( world -- )
     gtk_window_new :> win
     gtk_gl_area_new :> drawable
     drawable f gtk_gl_area_set_use_es
     drawable 3 3 gtk_gl_area_set_required_version
-    ! GTK may snapshot the area without a Factor redraw request, using a
-    ! different color texture. Paint every snapshot, including its alpha.
+    ! GTK4 can acquire a fresh backing texture on any widget repaint.
     drawable t gtk_gl_area_set_auto_render
     drawable world pixel-format-attributes>> [ depth-bits? ] any?
     gtk_gl_area_set_has_depth_buffer

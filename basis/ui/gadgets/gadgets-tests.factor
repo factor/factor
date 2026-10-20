@@ -1,5 +1,5 @@
-USING: accessors arrays assocs concurrency.flags continuations deques dlists io
-io.streams.string kernel locals math math.parser math.rectangles models
+USING: accessors arrays assocs concurrency.flags deques dlists io
+io.streams.string kernel math math.parser math.rectangles models
 namespaces prettyprint sequences threads tools.test ui ui.gadgets
 ui.gadgets.private ui.private ;
 FROM: sets => members ;
@@ -168,58 +168,3 @@ ui-running? [
         layout-queue delete-all
     ] unit-test
 ] unless
-
-TUPLE: layout-test-parent < gadget ;
-TUPLE: layout-test-child < gadget { passes initial: 0 } ;
-
-M: layout-test-parent layout*
-    [ gadget-child ] [ dim>> ] bi >>dim drop ;
-
-M: layout-test-child layout* [ 1 + ] change-passes drop ;
-
-: <layout-test-root> ( child -- root )
-    f \ layout-queue [
-        layout-test-parent new t >>root? { 20 30 } >>dim
-        swap add-gadget
-    ] with-variable ;
-
-:: check-direct-layout ( -- root-state child-state passes empty? outside? queued? )
-    layout-test-child new :> child
-    child <layout-test-root> :> root
-    V{ } clone \ layout-queue [
-        f in-layout? [
-            root layout
-            root layout-state>> child layout-state>> child passes>>
-            layout-queue empty? in-layout? get not
-            ! Once the pass returns, dimension changes must propagate again.
-            child { 1 2 } >>dim drop
-            layout-queue [ length 1 = ] [ ?first root eq? ] bi and
-        ] with-variable
-    ] with-variable ;
-
-{ f f 1 t t t } [ check-direct-layout ] unit-test
-
-ERROR: layout-test-error in-phase? ;
-TUPLE: failing-layout-test < gadget ;
-M: failing-layout-test layout* drop in-layout? get layout-test-error ;
-
-{ t f 1 } [
-    f \ layout-queue [
-        f in-layout? [
-            failing-layout-test new { 1 1 } >>dim
-            [ dup layout f ] [ in-phase?>> ] recover
-            in-layout? get
-            rot <gadget> add-gadget children>> length
-        ] with-variable
-    ] with-variable
-] unit-test
-
-TUPLE: mutating-layout-test < gadget ;
-M: mutating-layout-test layout* <gadget> add-gadget drop ;
-
-{ t } [
-    f \ layout-queue [
-        mutating-layout-test new { 1 1 } >>dim
-        [ layout f ] [ nip "Cannot add/remove gadgets in layout*" = ] recover
-    ] with-variable
-] unit-test

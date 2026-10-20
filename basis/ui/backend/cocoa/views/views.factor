@@ -358,9 +358,7 @@ PRIVATE>
     ! Rendering
     METHOD: void drawRect: NSRect rect [
         self window [
-            ! Native paint can precede pending grafts and layout. Let the UI
-            ! update cycle finish them before it renders the scene.
-            [ relayout-1 yield ] [ print-error drop ] recover
+            [ draw-world yield ] [ print-error drop ] recover
         ] when*
     ] ;
 

@@ -53,17 +53,17 @@ M: incremental dim-changed drop ;
     not-in-layout
     dup scroll-children
     2dup (add-gadget)
-    [
+    t in-layout? [
         {
             [ drop prefer-incremental ]
-            [ drop layout-later ]
             [ incremental-loc ]
             [ update-cursor ]
             [ nip prefer-incremental ]
             [ nip parent>> [ invalidate* ] when* ]
+            ! Queueing can yield; finish the geometry updates first.
+            [ drop layout-later ]
         } 2cleave
-    ] with-layout
-    ?yield-layout ;
+    ] with-variable ;
 
 : clear-incremental ( incremental -- )
     not-in-layout

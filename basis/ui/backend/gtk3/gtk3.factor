@@ -7,7 +7,7 @@ glib.ffi gobject gobject.ffi gtk3.ffi io io.encodings.binary
 io.encodings.utf8 io.files io.pathnames kernel libc literals
 locals math math.bitwise math.functions math.order math.parser
 math.vectors memoize namespaces opengl opengl.gl opengl.textures
-prettyprint sequences strings system threads ui ui.backend ui.backend.gl-area
+prettyprint sequences strings system threads ui ui.backend
 ui.backend.gtk3.input-methods ui.backend.input-state ui.backend.x11.keys ui.clipboards
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.pixel-formats ui.private ui.render
@@ -16,10 +16,10 @@ IN: ui.backend.gtk3
 
 SINGLETON: gtk3-ui-backend
 
-TUPLE: window-handle window drawable im-context fullscreen? { framebuffer integer initial: 0 } frame ;
+TUPLE: window-handle window drawable im-context fullscreen? { framebuffer integer initial: 0 } ;
 
 : <window-handle> ( window drawable im-context -- window-handle )
-    f 0 f window-handle boa ;
+    f 0 window-handle boa ;
 
 ! Clipboards
 
@@ -50,13 +50,12 @@ M: gtk3-clipboard set-clipboard-contents
     ] 2bi@ ;
 
 : update-scale-factor ( widget -- )
-    gtk_widget_get_scale_factor >float dup 1.0 > [ drop f ] unless
-    dup gl-scale-factor get-global = [ drop ] [
-        gl-scale-factor set-global
-        \ (cache-font-description) reset-memoized
-        \ missing-font-metrics reset-memoized
-        cached-layouts get-global clear-assoc
-    ] if ;
+    gtk_widget_get_window gdk_window_get_scale_factor >float
+    [ 1.0 > ] keep f ? gl-scale-factor set-global
+    \ (cache-font-description) reset-memoized
+    \ missing-font-metrics reset-memoized
+    cached-layouts get-global clear-assoc
+    ;
 
 ! User input
 
@@ -212,21 +211,17 @@ icon-data [ default-icon-data ] initialize
         event-scale-factor set-global
     ] [ 2drop ] if ;
 
-: drawable-pixel-dim ( area -- dim )
-    [ [ gtk_widget_get_allocated_width ] [ gtk_widget_get_allocated_height ] bi 2array ]
-    [ gtk_widget_get_scale_factor ] bi v*n ;
-
-:: on-render ( glarea context user-data -- ? )
-    glarea gtk_widget_get_toplevel window :> w
-    w [
-        [
-            glarea gtk_gl_area_make_current
-            glarea gtk_gl_area_attach_buffers
-            glarea w calc-event-scale-factor
-            w handle>> frame>> glarea drawable-pixel-dim
-            w background-color>> present-gl-area-frame
-        ] [ ui-error ] recover
-    ] when t ;
+: on-render ( glarea context user-data -- ? )
+    2drop dup gtk_widget_get_toplevel window
+    [ calc-event-scale-factor ] keep
+    dup gl-render-state>> [
+        dup draw-world? [
+            [
+                dup set-gl-context framebuffer-ready?
+                [ draw-world* gl-error ] [ drop ] if
+            ] [ nip ui-error ] recover
+        ] [ drop ] if
+    ] [ drop ] if t ;
 
 : connect-render-signal ( drawable -- )
     ! GTK still uses the drawable after this callback returns. Yielding here
@@ -235,12 +230,11 @@ icon-data [ default-icon-data ] initialize
     GtkGLArea:render connect-signal ;
 
 : on-resize ( glarea width height user-data -- )
-    drop 2array over gtk_widget_get_scale_factor v/n
-    swap gtk_widget_get_toplevel window
+    drop [ gl-unscale ] bi@ 2array swap gtk_widget_get_toplevel window
     dup active?>> [ swap >>dim relayout ] [ 2drop ] if ;
 
 : connect-resize-signal ( drawable -- )
-    ! Resize runs inside GTK's paint cycle, so do not yield here.
+    ! Resize is also emitted during painting; leave scheduling to with-timer.
     "resize" [ on-resize ]
     GtkGLArea:resize connect-signal ;
 
@@ -394,7 +388,7 @@ M: gtk3-ui-backend current-gl-context
 M: window-handle window-framebuffer framebuffer>> ;
 
 M: window-handle select-gl-context
-    dup drawable>> dup update-scale-factor
+    dup drawable>>
     [ gtk_gl_area_make_current ]
     [ gtk_gl_area_get_error [ message>> utf8 alien>string throw ] when* ]
     [
@@ -404,10 +398,8 @@ M: window-handle select-gl-context
     GL_DRAW_FRAMEBUFFER_BINDING 0 int <ref>
     [ glGetIntegerv ] keep int deref >>framebuffer drop ;
 
-M:: window-handle flush-gl-context ( handle -- )
-    handle frame>> handle framebuffer>> handle drawable>> drawable-pixel-dim
-    cache-gl-area-frame handle frame<<
-    handle drawable>> gtk_gl_area_queue_render ;
+M: window-handle flush-gl-context
+    drawable>> gtk_gl_area_queue_render ;
 
 ! Window
 
@@ -423,8 +415,6 @@ M:: gtk3-ui-backend (open-window) ( world -- )
     gtk_gl_area_new :> drawable
     drawable f gtk_gl_area_set_use_es
     drawable 3 3 gtk_gl_area_set_required_version
-    ! GTK3 keeps its color buffer between draws and invalidates it on resize.
-    ! Factor requests other updates through gtk_gl_area_queue_render.
     drawable f gtk_gl_area_set_auto_render
     drawable world pixel-format-attributes>> [ depth-bits? ] any?
     gtk_gl_area_set_has_depth_buffer

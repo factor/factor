@@ -128,6 +128,7 @@ M: world ungraft*
 
 : layout-queued ( -- seq )
     layout-queue [
+        in-layout? on
         [
             dup select-layout-context
             dup layout find-world [ , ] when*

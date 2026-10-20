@@ -98,7 +98,7 @@ HELP: pref-dims
 HELP: layout*
 { $values { "gadget" gadget } }
 { $contract "Lays out the children of the gadget according to the gadget's policy. The dimensions of the gadget are already set by the parent by the time this word is called." }
-{ $notes "The gadget hierarchy must not be modified during layout. User code should not call this word directly, instead call " { $link relayout } " and " { $link relayout-1 } "." } ;
+{ $notes "User code should not call this word directly, instead call " { $link relayout } " and " { $link relayout-1 } "." } ;
 
 HELP: prefer
 { $values { "gadget" gadget } }
@@ -183,7 +183,7 @@ HELP: focusable-child
 
 HELP: layout-later
 { $values { "gadget" gadget } }
-{ $description "Adds the gadget to the " { $link layout-queue } " and notifies the UI thread that there is a gadget to layout. Outside a layout pass, if the length of the queue is larger than " { $link layout-queue-limit } ", the current thread yields so that the UI thread has a chance to run." } ;
+{ $description "Adds the gadget to the " { $link layout-queue } " and notifies the UI thread that there is a gadget to layout. If the length of the queue is larger than " { $link layout-queue-limit } ", then the current thread is yielded so that the UI thread has a chance to run." } ;
 
 HELP: parents
 { $values { "gadget" gadget } { "seq" "a sequence of gadgets" } }
