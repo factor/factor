@@ -4,7 +4,7 @@
 USING: accessors alien.libraries.finder assocs bootstrap.image
 combinators.short-circuit hashtables io io.directories
 io.encodings.utf8 io.files io.files.temp io.launcher
-io.pathnames kernel make namespaces prettyprint sequences
+io.pathnames kernel make math.combinatorics namespaces prettyprint sequences sets
 splitting system tools.deploy.config tools.deploy.config.editor
 tools.deploy.embed vocabs.loader vocabs.metadata.resources
 webbrowser ;
@@ -82,6 +82,19 @@ ERROR: can't-deploy-library-file library ;
     { } [ suffix ] accumulate* [ staging-image-name file-exists? ] reject
     [ staging-command-line ] map
     [ vm-path swap run-factor ] each ;
+
+: staging-profiles ( -- profiles )
+    {
+        { deploy-ui? t }
+        { deploy-unicode? t }
+        { deploy-help? t }
+    } all-subsets [
+        >hashtable "" default-config swap assoc-union config>profile
+    ] map members ;
+
+: make-staging-images ( -- )
+    make-boot-image
+    staging-profiles [ make-staging-image ] each ;
 
 : make-deploy-config ( vocab -- file )
     [ deploy-config vocab-roots get vocab-roots associate assoc-union unparse-use ]

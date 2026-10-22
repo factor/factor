@@ -1,6 +1,23 @@
-USING: bootstrap.image io.pathnames kernel pcre2 sequences
+USING: bootstrap.image io.pathnames kernel pcre2 sequences sets
 tools.deploy.backend tools.test ;
 IN: tools.deploy.backend.tests
+
+{ 8 8 } [ staging-profiles [ length ] [ members length ] bi ] unit-test
+{ t } [
+    { "math" "threads" "compiler" "io" } staging-profiles member?
+] unit-test
+{ t } [
+    { "math" "threads" "compiler" "io" "ui" "unicode" "help" }
+    staging-profiles member?
+] unit-test
+{ t } [
+    staging-profiles [
+        { "math" "threads" "compiler" "io" } head?
+    ] all?
+] unit-test
+{ 11 } [
+    staging-profiles [ { } [ suffix ] accumulate* ] map concat members length
+] unit-test
 
 : complete-match? ( str regexp -- ? )
     "^" "$" surround matches? ;
