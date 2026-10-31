@@ -3,7 +3,7 @@
 
 USING: io io.encodings.utf8 io.launcher system text-to-speech ;
 
-IN: text-to-speech.linux
+IN: text-to-speech.unix
 
-M: linux speak-text
+M: unix speak-text
     "festival --tts" utf8 [ print ] with-process-writer ;
