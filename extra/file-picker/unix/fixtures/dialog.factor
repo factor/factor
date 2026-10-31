@@ -8,7 +8,7 @@ ui-backend get name>> {
     { "gtk3-ui-backend" [ "gtk3.ffi" use-vocab ] }
 } case
 >>
-IN: file-picker.linux.tests
+IN: file-picker.unix.tests
 TUPLE: picker-parent window ;
 SYMBOLS: observed-action observed-name inspection-attempts ;
 

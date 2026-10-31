@@ -1,10 +1,10 @@
 ! Exercise the public picker API with real GTK4 dialogs and Factor's UI loop.
 USING: accessors alien alien.strings arrays assocs calendar continuations
-debugger destructors environment file-picker file-picker.linux.gtk4.private gio.ffi
+debugger destructors environment file-picker file-picker.unix.gtk4.private gio.ffi
 glib.ffi gobject.ffi gtk4.ffi io io.encodings.utf8 io.pathnames kernel
 locals math namespaces sequences system threads tools.test ui ui.backend.gtk4 ui.gadgets.labels
 ui.gadgets.worlds ;
-IN: file-picker.linux.gtk4.tests
+IN: file-picker.unix.gtk4.tests
 
 ! Inspect GTK's in-process dialogs regardless of the desktop portal service.
 ! Production leaves portal selection to GTK and the desktop.

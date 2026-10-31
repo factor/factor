@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.libraries alien.strings
 arrays assocs classes.struct concurrency.promises continuations destructors file-picker
 gio.ffi glib.ffi gobject gobject.ffi gtk4.ffi io.encodings.utf8 io.pathnames
 kernel locals namespaces sequences system ui.gadgets.worlds ;
-IN: file-picker.linux.gtk4
+IN: file-picker.unix.gtk4
 
 <PRIVATE
 

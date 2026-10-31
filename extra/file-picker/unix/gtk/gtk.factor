@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.parser alien.strings alien.syntax
 combinators destructors
 file-picker glib.ffi gobject-introspection.standard-types
 io.encodings.utf8 io.pathnames kernel locals namespaces system ui.backend ui.gadgets.worlds vocabs.parser ;
-IN: file-picker.linux.gtk
+IN: file-picker.unix.gtk
 
 <PRIVATE
 
