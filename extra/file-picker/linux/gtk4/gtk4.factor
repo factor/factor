@@ -122,5 +122,5 @@ ERROR: nonlocal-file-selection ;
 
 PRIVATE>
 
-M: linux open-file-dialog f run-picker ;
-M: linux save-file-dialog run-picker ;
+M: unix open-file-dialog f run-picker ;
+M: unix save-file-dialog run-picker ;

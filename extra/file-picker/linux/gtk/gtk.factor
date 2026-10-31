@@ -48,13 +48,13 @@ FUNCTION: GtkWidget* gtk_file_chooser_dialog_new (
 
 PRIVATE>
 
-M: linux open-file-dialog
+M: unix open-file-dialog
     [
         "Open File" GTK_FILE_CHOOSER_ACTION_OPEN "Open" <gtk-file-chooser-dialog>
         run-and-get-filename
     ] with-destructors ;
 
-M: linux save-file-dialog
+M: unix save-file-dialog
     [
         "Save File" GTK_FILE_CHOOSER_ACTION_SAVE "Save" <gtk-file-chooser-dialog>
         dup t gtk_file_chooser_set_do_overwrite_confirmation
