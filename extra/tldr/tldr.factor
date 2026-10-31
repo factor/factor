@@ -16,6 +16,7 @@ tldr-platform [
     os {
         { macos [ "osx" ] }
         { linux [ "linux" ] }
+        { freebsd [ "freebsd" ] }
         { windows [ "windows" ] }
     } case
 ] initialize
