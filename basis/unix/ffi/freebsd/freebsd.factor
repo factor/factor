@@ -1,5 +1,15 @@
-USING: alien.c-types alien.syntax classes.struct unix.types unix.ffi.bsd ;
+USING: alien.c-types alien.syntax classes.struct unix.time unix.types unix.ffi.bsd ;
 IN: unix.ffi
+
+STRUCT: utmpx
+    { ut_type short }
+    { ut_tv timeval }
+    { ut_id char[8] }
+    { ut_pid pid_t }
+    { ut_user char[32] }
+    { ut_line char[16] }
+    { ut_host char[128] }
+    { __ut_spare char[64] } ;
 
 FUNCTION: int getgrouplist ( c-string name, int basegid, int* groups, int* ngroups )
 FUNCTION: int setgroups ( int ngroups, gid_t* gidset )

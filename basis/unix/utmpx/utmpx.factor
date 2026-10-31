@@ -1,22 +1,22 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax
-continuations io.encodings.string io.encodings.utf8 kernel
+continuations io.encodings.string io.encodings.utf8 kernel literals
 sequences system unix.ffi vocabs ;
 IN: unix.utmpx
 
 CONSTANT: EMPTY 0
 CONSTANT: RUN_LVL 1
-CONSTANT: BOOT_TIME 2
-CONSTANT: OLD_TIME 3
-CONSTANT: NEW_TIME 4
+CONSTANT: BOOT_TIME $[ os freebsd? 1 2 ? ]
+CONSTANT: OLD_TIME $[ os freebsd? 2 3 ? ]
+CONSTANT: NEW_TIME $[ os freebsd? 3 4 ? ]
 CONSTANT: INIT_PROCESS 5
 CONSTANT: LOGIN_PROCESS 6
-CONSTANT: USER_PROCESS 7
-CONSTANT: DEAD_PROCESS 8
+CONSTANT: USER_PROCESS $[ os freebsd? 4 7 ? ]
+CONSTANT: DEAD_PROCESS $[ os freebsd? 7 8 ? ]
 CONSTANT: ACCOUNTING 9
 CONSTANT: SIGNATURE 10
-CONSTANT: SHUTDOWN_TIME 11
+CONSTANT: SHUTDOWN_TIME $[ os freebsd? 8 11 ? ]
 
 FUNCTION: void setutxent ( )
 FUNCTION: void endutxent ( )
