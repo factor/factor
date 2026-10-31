@@ -38,11 +38,14 @@ SYMBOL: call-count
 ] unit-test
 
 : interrupted-change ( a b c d e f -- n )
-    3drop 3drop EINTR set-errno -1 ;
+    3drop 3drop call-count [ 1 + ] change EINTR set-errno -1 ;
 
 ! kevent(2) has six arguments; the old wrapper left all six on the stack.
-{ -1 } [
-    1 2 3 4 5 6 [ interrupted-change ] unix-system-call-allow-eintr
+{ -1 1 } [
+    0 call-count [
+        1 2 3 4 5 6 [ interrupted-change ] unix-system-call-allow-eintr
+        call-count get
+    ] with-variable
 ] unit-test
 
 [ 19 23 [ fail-with-arguments ] unix-system-call-allow-eintr ]

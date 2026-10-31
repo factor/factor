@@ -1,6 +1,6 @@
-USING: accessors assocs continuations destructors io.backend.unix.multiplexers
-io.backend.unix.multiplexers.kqueue kernel libc locals math namespaces sequences
-tools.annotations tools.test unix unix.ffi unix.kqueue unix.process ;
+USING: accessors assocs destructors io.backend.unix io.backend.unix.multiplexers
+io.backend.unix.multiplexers.kqueue io.sockets kernel libc locals namespaces sequences
+tools.test unix unix.ffi unix.kqueue unix.process ;
 IN: io.backend.unix.multiplexers.kqueue.tests
 
 SYMBOL: signal-received?
@@ -18,39 +18,25 @@ SYMBOL: signal-received?
 ! Backends without signal support must keep the polling fallback.
 { f } [ [ ] SIGCHLD f add-signal-callback ] unit-test
 
-SYMBOL: kevent-calls
-
-: interrupted-kevent ( kq changes nchanges events nevents timeout -- n )
-    3drop 3drop kevent-calls [ 1 + ] change EINTR set-errno -1 ;
-
-! Keep real event-loop callbacks working while the syscall is annotated.
-:: mock-kevent ( kq changes nchanges events nevents timeout original mock -- n )
-    kq changes nchanges events nevents timeout
-    kq -1234 = [ mock ] [ original ] if
-    call( kq changes nchanges events nevents timeout -- n ) ;
-
-! Replay would apply the same deletion twice. EINTR already applied changes.
-{ 1 } [
+! Exercise the real kernel registration and deletion paths.
+{ 1 t } [
     [
-        \ kevent-func [ [ interrupted-kevent ] '[ _ _ mock-kevent ] ] annotate
-        0 kevent-calls [
-            42 EVFILT_READ EV_DELETE make-kevent kqueue-mx new -1234 >>fd
-            register-kevent kevent-calls get
-        ] with-variable
-    ] [ \ kevent-func reset ] finally
+      [let
+        <kqueue-mx> &dispose :> mx
+        "127.0.0.1" 0 <inet4> <datagram> &dispose handle>> handle-fd :> fd
+        f fd mx add-input-callback
+        fd mx remove-input-callbacks length
+        mx reads>> assoc-empty?
+      ]
+    ] with-destructors
 ] unit-test
 
-: invalid-kevent ( kq changes nchanges events nevents timeout -- n )
-    3drop 3drop EBADF set-errno -1 ;
-
-:: failed-registration-keeps-callbacks ( -- ? )
-    kqueue-mx new -1234 >>fd H{ } clone >>reads H{ } clone >>writes :> mx
-    [ f 42 mx add-input-callback ] [ errno>> EBADF = ] must-fail-with
-    mx reads>> assoc-empty? ;
-
-{ t } [
-    [
-        \ kevent-func [ [ invalid-kevent ] '[ _ _ mock-kevent ] ] annotate
-        failed-registration-keeps-callbacks
-    ] [ \ kevent-func reset ] finally
+! A failed kernel registration must not add a callback to either table.
+{ t t } [
+    [let
+        kqueue-mx new -1 >>fd H{ } clone >>reads H{ } clone >>writes :> mx
+        [ f 42 mx add-input-callback ] [ errno>> EBADF = ] must-fail-with
+        [ f 42 mx add-output-callback ] [ errno>> EBADF = ] must-fail-with
+        mx [ reads>> assoc-empty? ] [ writes>> assoc-empty? ] bi
+    ]
 ] unit-test
