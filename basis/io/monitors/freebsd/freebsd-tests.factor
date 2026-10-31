@@ -1,6 +1,6 @@
-USING: accessors assocs calendar combinators continuations destructors io.directories
+USING: accessors assocs calendar combinators continuations destructors io.backend io.directories
 io.encodings.utf8 io.files io.files.links io.monitors io.monitors.freebsd
-io.pathnames io.timeouts kernel locals namespaces sequences sets
+io.pathnames io.timeouts kernel libc locals namespaces sequences sets
 tools.test unix unix.ffi ;
 IN: io.monitors.freebsd.tests
 
