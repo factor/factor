@@ -28,4 +28,7 @@ M: unix already-root?
 M: unix elevated
     2drop posix-elevated ;
 
+M: unix lowered
+    posix-lowered ;
+
 PRIVATE>

@@ -33,4 +33,5 @@ os unix? [ "elevate.unix" require ] when
     { [ os windows? ] [ "elevate.windows" require ] }
     { [ os linux? ] [ "elevate.linux" require ] }
     { [ os macos? ] [ "elevate.macos" require ] }
+    { [ os unix? ] [ ] }
 } cond
