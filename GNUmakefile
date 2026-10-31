@@ -257,6 +257,7 @@ help:
 	@echo "linux-riscv-64"
 	@echo "freebsd-x86-32"
 	@echo "freebsd-x86-64"
+	@echo "freebsd-arm-64"
 	@echo "macos-x86-32"
 	@echo "macos-x86-64"
 	@echo "macos-x86-fat"
@@ -282,6 +283,9 @@ freebsd-x86-32:
 
 freebsd-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64
+
+freebsd-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.arm.64
 
 macos-x86-32:
 	$(MAKE) $(ALL) macos.app CONFIG=vm/Config.macos.x86.32
@@ -459,4 +463,4 @@ clean:
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
 .PHONY: factor-executable factor-lib factor-console factor-ffi-test test-vm tags clean help macos.app
-.PHONY: linux-riscv-32 linux-riscv-64 linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64
+.PHONY: linux-riscv-32 linux-riscv-64 linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 freebsd-arm-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64
