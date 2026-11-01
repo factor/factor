@@ -90,7 +90,8 @@ IN: io.sockets.secure.tests
     <promise> "port" set
     [ drop "hi" write ] server-test
     <secure-config> [
-        "localhost" "port" get ?promise-test <inet> f <secure> ascii
+        ! Match the IPv4 listener while retaining hostname/SNI verification.
+        "127.0.0.1" "port" get ?promise-test <inet4> "localhost" <secure> ascii
         <client> drop dispose
     ] with-secure-context
 ] [ certificate-verify-error? ] must-fail-with

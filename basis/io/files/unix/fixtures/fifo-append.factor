@@ -1,4 +1,4 @@
-USING: destructors io io.backend.unix io.encodings.binary io.files io.pathnames
+USING: destructors io io.backend io.backend.unix io.encodings.binary io.files io.pathnames
 io.ports literals locals tools.test unix unix.ffi ;
 FROM: io => write ;
 
