@@ -64,23 +64,6 @@ jobs:
           ./factor -run=tools.test resource:core compiler threads io
           ./factor -run=help.lint resource:core resource:basis resource:extra
 
-  build-openbsd-intel:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: build and test in OpenBSD
-      uses: vmactions/openbsd-vm@v1
-      with:
-        arch: x86_64
-        prepare: |
-          pkg_add bash git gmake curl pango cairo gtk+4 libepoxy
-        run: |
-          set -eu
-          ./build.sh net-bootstrap
-          ./factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"
-          ./factor -run=tools.test resource:core compiler threads io
-          ./factor -run=help.lint resource:core resource:basis resource:extra
-
   build-macos-intel:
     runs-on: macos-15-intel
     steps:
