@@ -26,6 +26,8 @@ SYMBOL: vocab-articles
             "layout" ! ui.text.pango
             "script-string" ! windows.uniscribe
             "linux-monitor" ! github issue #2014, race condition in disposing of child monitors
+            "freebsd-monitor"
+            "vnode-watch"
             "event-stream"
             "macos-monitor"
             "recursive-monitor"
