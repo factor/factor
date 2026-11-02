@@ -15,7 +15,7 @@ C-LIBRARY: libssl {
             [ drop "" ]
         } case "libssl-3" ".dll" surround
     ] }
-    { macos "libssl.35.dylib" }
+    { macos "libssl.48.dylib" }
     { linux $[ 32-bit? "libssl.so.1.1" "libssl.so.3" ? ] }
     { unix "libssl.so" }
 }

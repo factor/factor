@@ -14,7 +14,7 @@ C-LIBRARY: libcrypto {
             [ drop "" ]
         } case "libcrypto-3" ".dll" surround
     ] }
-    { macos "libcrypto.35.dylib" }
+    { macos "libcrypto.46.dylib" }
     { linux $[ 32-bit? "libcrypto.so.1.1" "libcrypto.so.3" ? ] }
     { unix "libcrypto.so" }
 }
