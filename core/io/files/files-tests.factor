@@ -382,7 +382,7 @@ CONSTANT: pt-array-1
 
 { f t t } [
     [
-        "resource:core" normalize-path
+        "resource:core" normalize-path resolve-symlinks
         [ cwd = ] [ cd ] [ cwd = ] tri
     ] cwd '[ _ dup cd cwd = ] finally
 ] unit-test
