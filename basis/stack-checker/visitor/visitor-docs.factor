@@ -12,7 +12,7 @@ HELP: #>r,
   { $example
     "USING: namespaces prettyprint stack-checker.visitor ;"
     "V{ } stack-visitor set { 123 } { 124 } #>r, stack-visitor get ."
-    "V{\n    T{ #shuffle\n        { mapping { { 124 123 } } }\n        { in-d { 123 } }\n        { out-r { 124 } }\n    }\n}"
+    "V{\n    T{ #shuffle\n        { mapping AL{ { 124 123 } } }\n        { in-d { 123 } }\n        { out-r { 124 } }\n    }\n}"
   }
 } ;
 

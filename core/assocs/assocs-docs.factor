@@ -8,6 +8,7 @@ HELP: immutable-assoc
 { $class-description "An assoc with read-only collection operations. Mutation and mutable builder allocation throw immutable-assoc-error." } ;
 
 HELP: immutable-assoc-error
+{ $values { "assoc" immutable-assoc } }
 { $description "Thrown when a mutating operation or mutable builder allocation is requested on an immutable assoc." } ;
 
 HELP: alist
@@ -22,6 +23,7 @@ HELP: <alist>
 { $description "Copies a sequence of two-element sequences into an explicit association list. Each entry is copied into a fresh two-element array in the backing array. Preserves order and duplicate keys. Throws not-a-pair for entries with a length other than two." } ;
 
 HELP: not-a-pair
+{ $values { "pair" sequence } }
 { $description "Thrown when alist construction receives an entry whose length is not two." } ;
 
 ARTICLE: "alists" "Association lists"
