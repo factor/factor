@@ -38,3 +38,12 @@ namespaces accessors sequences assocs ;
 { f f } [
     "meat" VA{ { "rice" 5 } { "beans" 10 } { "rice" 6 } } at*
 ] unit-test
+
+! >alist must materialize array pairs, rather than expose grouping slices.
+{ t t t } [
+    VA{ { "rice" 5 } { "beans" 10 } } >alist
+    [ alist? ] [ underlying>> array? ] [ [ pair? ] all? ] tri
+] unit-test
+{ t t t } [
+    VA{ } >alist [ alist? ] [ underlying>> array? ] [ dup >alist eq? ] tri
+] unit-test

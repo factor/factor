@@ -38,7 +38,7 @@ M: persistent-hash pluck-at
         [ count>> 1 - persistent-hash boa ]
     } cond ;
 
-M: persistent-hash >alist [ root>> >alist% ] { } make ;
+M: persistent-hash >alist [ root>> >alist% ] { } make alist boa ;
 
 M: persistent-hash keys >alist keys ;
 

@@ -164,8 +164,10 @@ M: object sort-keys >alist sort-keys ;
 M: sequence sort-keys
     0 check-bounds [ first-unsafe ] sort-by ;
 
-M: hashtable sort-keys
-    >alist [ { array } declare first-unsafe ] sort-by ;
+M: alist sort-keys
+    underlying>> [ { array } declare first-unsafe ] sort-by ;
+
+M: hashtable sort-keys >alist sort-keys ;
 
 GENERIC: inv-sort-keys ( obj -- sortedseq )
 
@@ -174,8 +176,10 @@ M: object inv-sort-keys >alist inv-sort-keys ;
 M: sequence inv-sort-keys
     0 check-bounds [ first-unsafe ] inv-sort-by ;
 
-M: hashtable inv-sort-keys
-    >alist [ { array } declare first-unsafe ] inv-sort-by ;
+M: alist inv-sort-keys
+    underlying>> [ { array } declare first-unsafe ] inv-sort-by ;
+
+M: hashtable inv-sort-keys >alist inv-sort-keys ;
 
 GENERIC: sort-values ( obj -- sortedseq )
 
@@ -184,8 +188,10 @@ M: object sort-values >alist sort-values ;
 M: sequence sort-values
     1 check-bounds [ second-unsafe ] sort-by ;
 
-M: hashtable sort-values
-    >alist [ { array } declare second-unsafe ] sort-by ;
+M: alist sort-values
+    underlying>> [ { array } declare second-unsafe ] sort-by ;
+
+M: hashtable sort-values >alist sort-values ;
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;
 
@@ -196,5 +202,7 @@ M: object inv-sort-values >alist inv-sort-values ;
 M: sequence inv-sort-values
     1 check-bounds [ second-unsafe ] inv-sort-by ;
 
-M: hashtable inv-sort-values
-    >alist [ { array } declare second-unsafe ] inv-sort-by ;
+M: alist inv-sort-values
+    underlying>> [ { array } declare second-unsafe ] inv-sort-by ;
+
+M: hashtable inv-sort-values >alist inv-sort-values ;

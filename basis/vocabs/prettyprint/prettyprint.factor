@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs colors io io.styles kernel
 make namespaces prettyprint.backend prettyprint.sections
-prettyprint.stylesheet sequences sorting vocabs vocabs.parser ;
+prettyprint.stylesheet sequences sequences.private sorting vocabs
+vocabs.parser ;
 FROM: io.styles => inset ;
 IN: vocabs.prettyprint
 
@@ -60,7 +61,7 @@ M: rename pprint-qualified
         \ RENAME: pprint-word
         [ word>> text ]
         [ vocab>> text "=>" text ]
-        [ words>> >alist first first text ]
+        [ words>> >alist first first-unsafe text ]
         tri
     ] with-pprint ;
 

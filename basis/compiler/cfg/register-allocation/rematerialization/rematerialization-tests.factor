@@ -198,7 +198,7 @@ IN: compiler.cfg.register-allocation.rematerialization.tests
     graph allocate-registers
     graph build-stack-frame
     gensym [ graph generate ] dip
-    [ associate >alist t t modify-code-heap ] keep ;
+    [ swap 2array 1array t t modify-code-heap ] keep ;
 
 { t } [
     value-flow-verifier-enabled? t assert=

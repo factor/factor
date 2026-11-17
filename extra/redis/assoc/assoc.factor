@@ -10,7 +10,7 @@ M: redis at* [ 1array redis-get dup >boolean ] with-redis ;
 M: redis assoc-size [ { } redis-dbsize ] with-redis ;
 
 M: redis >alist
-    [ { "*" } redis-keys [ { } ] [ dup redis-mget zip ] if-empty ] with-redis ;
+    [ { "*" } redis-keys [ AL{ } ] [ dup redis-mget zip ] if-empty ] with-redis ;
 
 M: redis set-at [ swap 2array redis-set drop ] with-redis ;
 

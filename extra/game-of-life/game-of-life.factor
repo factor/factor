@@ -178,7 +178,7 @@ SYMBOL: last-click
 
 :: com-glider ( gadget -- )
     gadget grid>> :> grid
-    { { 2 1 } { 3 2 } { 1 3 } { 2 3 } { 3 3 } }
+    AL{ { 2 1 } { 3 2 } { 1 3 } { 2 3 } { 3 3 } }
     [ grid nth t -rot set-nth ] assoc-each
     gadget relayout-1 ;
 

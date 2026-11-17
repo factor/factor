@@ -11,7 +11,8 @@ IN: tools.destructors
     members [ class-of ] collect-by ;
 
 : (disposables.) ( set -- )
-    class-tally >alist [ first2 [ length ] keep 3array ] map [ second ] sort-by
+    class-tally [ [ length ] keep 3array ] { } assoc>map
+    [ second ] sort-by
     standard-table-style [
         [
             [ "Disposable class" write ] with-cell

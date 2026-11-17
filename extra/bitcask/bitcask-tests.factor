@@ -4,11 +4,11 @@ sorting tools.test ;
 {
     f f
     "value" t
-    { { "key" "value" } }
+    AL{ { "key" "value" } }
     f t
     f f
-    { { "key" "value2" } }
-    { }
+    AL{ { "key" "value2" } }
+    AL{ }
 } [
     [
         "key" "data.log" <bitcask> {
@@ -29,7 +29,7 @@ sorting tools.test ;
 ] unit-test
 
 
-{ 10 5 { 1 3 5 7 9 } 0 { } } [
+{ 10 5 { 1 3 5 7 9 } 0 AL{ } } [
     [
         "data.log" <bitcask>
         10,000 10 randoms [ dup pick set-at ] each

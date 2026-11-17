@@ -303,7 +303,7 @@ M: real json-coerce >float number>string ;
     [ CHAR: , stream stream-write1 ]
     json-friendly-keys? get
     json-coerce-keys? get '[
-        first2 [
+        first2-unsafe [
             dup string?
             [ _ [ json-friendly ] when ]
             [ _ [ json-coerce ] when ] if

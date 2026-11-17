@@ -183,7 +183,7 @@ INSTANCE: quadtree assoc
 
 M: quadtree at* ( key assoc -- value/f ? ) at-point ;
 M: quadtree assoc-size ( assoc -- n ) quadtree-size ;
-M: quadtree >alist ( assoc -- alist ) quadtree>alist ;
+M: quadtree >alist ( assoc -- alist ) quadtree>alist alist boa ;
 M: quadtree set-at ( value key assoc -- ) insert ;
 M: quadtree delete-at ( key assoc -- ) erase ;
 M: quadtree clear-assoc ( assoc -- )

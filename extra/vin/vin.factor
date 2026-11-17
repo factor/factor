@@ -313,7 +313,7 @@ H{
 
 CONSTANT: REGIONS H{ }
 
-{
+AL{
     { "12345" "North America" }
     { "STUVWXYZ" "Europe" }
     { "ABCDEFGH" "Africa" }

@@ -3,7 +3,7 @@
 
 USING: accessors ascii assocs classes.tuple combinators
 hash-sets io io.streams.string kernel linked-assocs make math
-math.parser namespaces sequences sets splitting strings
+math.parser namespaces sequences sequences.private sets splitting strings
 strings.parser vectors words ;
 
 IN: edn
@@ -178,7 +178,7 @@ M: sequence write-edn
 M: assoc write-edn
     "{" write >alist
     [ ", " write ]
-    [ first2 [ write-edn CHAR: \s write1 ] [ write-edn ] bi* ] interleave
+    [ first2-unsafe [ write-edn CHAR: \s write1 ] [ write-edn ] bi* ] interleave
     "}" write ;
 
 M: sets:set write-edn

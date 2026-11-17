@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs assocs.extras combinators
 combinators.short-circuit html.parser http.client io kernel math
-math.statistics sequences sets splitting unicode urls
+math.statistics sequences sequences.private sets splitting unicode urls
 urls.encoding ;
 IN: html.parser.analyzer
 
@@ -19,7 +19,7 @@ IN: html.parser.analyzer
     swap attributes>> key? ;
 
 : find-all ( seq quot -- alist )
-    [ <enumerated> >alist ] [ '[ second @ ] ] bi* filter ; inline
+    [ <enumerated> >alist ] [ '[ second-unsafe @ ] ] bi* filter ; inline
 
 : html-class? ( tag string -- ? )
     swap "class" attribute [ blank? ] split-when member? ;

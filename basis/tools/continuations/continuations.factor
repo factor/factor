@@ -116,7 +116,7 @@ PRIVATE>
 : continuation-step-out ( continuation -- continuation' )
     [ nip \ break suffix ] change-frame ;
 
-{
+AL{
     { call [ (step-into-quotation) ] }
     { dip [ (step-into-dip) ] }
     { 2dip [ (step-into-2dip) ] }

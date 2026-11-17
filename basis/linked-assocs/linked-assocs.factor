@@ -40,7 +40,7 @@ M: linked-assoc set-at
     [ set-at ] 2bi ;
 
 M: linked-assoc >alist
-    dlist>> dlist>sequence ;
+    dlist>> dlist>sequence >array alist boa ;
 
 M: linked-assoc clear-assoc
     [ assoc>> clear-assoc ] [ dlist>> clear-deque ] bi ;

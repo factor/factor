@@ -13,6 +13,7 @@ IN: bootstrap.syntax
         ":"
         ";"
         "<PRIVATE"
+        "AL{"
         "B{"
         "BV{"
         "C:"

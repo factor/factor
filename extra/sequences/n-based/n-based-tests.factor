@@ -28,7 +28,7 @@ IN: sequences.n-based.tests
 
 { 12 } [ months assoc-size ] unit-test
 
-{ {
+{ AL{
     {  1 "January" }
     {  2 "February" }
     {  3 "March" }

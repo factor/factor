@@ -8,7 +8,7 @@ compiler.cfg.representations.preferred compiler.cfg.rpo
 compiler.cfg.utilities compiler.utilities cpu.architecture
 compiler.cfg.value-numbering.folding
 disjoint-sets fry kernel locals math math.functions namespaces
-sequences sets ;
+sequences sequences.private sets ;
 IN: compiler.cfg.representations.selection
 
 SYMBOL: tagged-vregs
@@ -170,7 +170,7 @@ M: vreg-insn compute-shared-conversion-costs
 
 : minimize-costs ( costs -- representations )
     [ assoc-empty? ] reject-values
-    [ >alist alist-min first ] assoc-map ;
+    [ >alist alist-min first-unsafe ] assoc-map ;
 
 : compute-representations ( cfg -- )
     compute-costs costs get minimize-costs

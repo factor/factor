@@ -162,7 +162,7 @@ M: hashtable set-at
 
 PRIVATE>
 
-M: hashtable >alist [ 2array ] collect-pairs ;
+M: hashtable >alist [ 2array ] collect-pairs alist boa ;
 
 M: hashtable keys [ drop ] collect-pairs ;
 

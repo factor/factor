@@ -78,7 +78,7 @@ DEFER: dump-tnetstring
     [ dump-tnetstring ] map "" concat-as "]" dump ;
 
 : dump-dict ( data -- string )
-    >alist [ first2 [ dump-tnetstring ] bi@ append ] map
+    [ [ dump-tnetstring ] bi@ append ] { } assoc>map
     "" concat-as "}" dump ;
 
 : dump-bool ( ? -- string )

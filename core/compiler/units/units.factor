@@ -58,7 +58,7 @@ M: generic update-generic
 M: sequence update-methods
     implementors [ update-generic ] with each ;
 
-HOOK: recompile compiler-impl ( words -- alist )
+HOOK: recompile compiler-impl ( words -- definitions )
 
 HOOK: to-recompile compiler-impl ( -- words )
 
@@ -69,7 +69,7 @@ HOOK: process-forgotten-words compiler-impl ( words -- )
 SYMBOL: pending-new-words
 pending-new-words [ V{ } clone ] initialize
 
-: update-code-heap ( alist update-existing? reset-pics? -- changed? )
+: update-code-heap ( definitions update-existing? reset-pics? -- changed? )
     pick empty? not [ modify-code-heap ] dip ;
 
 : invalidate-new-words ( -- )
@@ -96,7 +96,7 @@ M: f to-recompile
     changed-definitions get filter-word-defs ;
 
 M: f recompile
-    [ def>> ] zip-with ;
+    [ def>> ] { } zip-with-as ;
 
 M: f process-forgotten-words drop ;
 

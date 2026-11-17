@@ -1,12 +1,12 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes classes.algebra combinators
+USING: accessors arrays assocs classes classes.algebra combinators
 combinators.short-circuit compiler.cfg compiler.cfg.build-stack-frame
 compiler.cfg.builder compiler.cfg.builder.alien compiler.cfg.finalization
 compiler.cfg.optimizer compiler.cfg.registers compiler.codegen compiler.crossref
 compiler.errors compiler.tree.builder compiler.tree.optimizer
 compiler.units compiler.utilities continuations definitions
-generic generic.single io kernel macros make namespaces
+generic generic.single hashtables.private io kernel macros make namespaces
 sequences sets stack-checker.dependencies stack-checker.errors
 stack-checker.inlining vocabs.loader words ;
 IN: compiler
@@ -154,11 +154,11 @@ M: optimizing-compiler update-call-sites ( class generic -- words )
         [ classes-intersect? ] [ 2drop f ] if
     ] filter ;
 
-M: optimizing-compiler recompile ( words -- alist )
+M: optimizing-compiler recompile ( words -- definitions )
     H{ } clone compiled [
         [ compile? ] filter
         [ compile-word yield-hook get call( -- ) ] each
-        compiled get >alist
+        compiled get [ 2array ] collect-pairs
     ] with-variable
     "--- compile done" compiler-message ;
 

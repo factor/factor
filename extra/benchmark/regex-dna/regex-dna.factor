@@ -27,7 +27,7 @@ IN: benchmark.regex-dna
     ] with each ;
 
 : do-replacements ( string -- string' )
-    {
+    AL{
         { R/ B/ "(c|g|t)" }
         { R/ D/ "(a|g|t)" }
         { R/ H/ "(a|c|t)" }

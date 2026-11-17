@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays byte-vectors classes
+USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
 classes.predicate classes.singleton classes.tuple
@@ -99,6 +99,7 @@ IN: bootstrap.syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-core-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-core-syntax
     "BV{" [ \ } [ >byte-vector ] parse-literal ] define-core-syntax
+    "AL{" [ \ } [ <alist> ] parse-literal ] define-core-syntax
     "H{" [ \ } [ parse-hashtable ] parse-literal ] define-core-syntax
     "IH{" [ \ } [ >identity-hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal suffix! ] define-core-syntax

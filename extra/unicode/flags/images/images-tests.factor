@@ -7,11 +7,11 @@ IN: unicode.flags.images.tests
 [ valid-flag-biassoc ] must-not-fail
 
 ! Windows doesn't seem to have these flags yet (!)
-{ { } } [
+{ AL{ } } [
     os macos? [
         valid-flag-names alpha-2 keys diff
         [ dup unicode>flag ] map>alist
     ] [
-        { }
+        AL{ }
     ] if
 ] unit-test

@@ -9,7 +9,7 @@ punycode.private tools.test urls ;
 { 35 } [ CHAR: 9 decode-digit ] unit-test
 [ CHAR: & decode-digit ] [ invalid-digit? ] must-fail-with
 
-{
+AL{
     ! Wikipedia Examples
 
     { "" "" }
@@ -147,7 +147,7 @@ punycode.private tools.test urls ;
     [ 1array swap '[ _ >punycode ] unit-test ] 2bi
 ] assoc-each
 
-{
+AL{
     { "😉.com" "xn--n28h.com" }
     { "💩.la" "xn--ls8h.la" }
     { "са.com" "xn--80a7a.com" } ! phishing

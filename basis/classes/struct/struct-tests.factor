@@ -93,7 +93,7 @@ STRUCT: struct-test-bar
 { 7654 } [ S{ struct-test-foo f 98 7654 f } y>> ] unit-test
 { 7654 } [ S{ struct-test-foo { y 7654 } } y>> ] unit-test
 
-{ {
+{ AL{
     { "underlying" B{ 98 0 0 98 127 0 0 127 0 0 0 0 } }
     { { "x" char } 98            }
     { { "y" int  } 0x7F00007F }
@@ -103,7 +103,7 @@ STRUCT: struct-test-bar
     make-mirror >alist
 ] unit-test
 
-{ { { "underlying" f } } } [
+{ AL{ { "underlying" f } } } [
     f struct-test-foo memory>struct
     make-mirror >alist
 ] unit-test

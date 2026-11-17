@@ -1,7 +1,7 @@
 USING: arrays assocs calendar cbor hex-strings kernel
 linked-assocs literals math ranges tools.test urls ;
 
-{
+AL{
     { 0 "00" }
     { 1 "01" }
     { 10 "0a" }

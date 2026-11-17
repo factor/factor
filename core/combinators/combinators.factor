@@ -133,7 +133,7 @@ ERROR: no-case object ;
     [
         [ 1quotation \ dup prefix \ = suffix ]
         [ \ drop prefix ] bi*
-    ] assoc-map reverse! alist>quot ;
+    ] { } assoc-map-as reverse! alist>quot ;
 
 <PRIVATE
 

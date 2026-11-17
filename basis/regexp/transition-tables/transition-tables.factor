@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs hashtables kernel regexp.classes
+USING: accessors arrays assocs hashtables kernel locals regexp.classes
 sequences sets vectors ;
 IN: regexp.transition-tables
 
@@ -42,14 +42,16 @@ TUPLE: transition-table transitions start-state final-states ;
     [ '[ [ _ at ] map-set ] change-final-states ]
     [ '[ _ number-transitions ] change-transitions ] tri ;
 
-: expand-one-or ( or-class transition -- alist )
-    [ seq>> ] dip '[ _ 2array ] map ;
-
-: expand-or ( state-transitions -- new-transitions )
-    >alist [
-        first2 over or-class?
-        [ expand-one-or ] [ 2array 1array ] if
-    ] map concat >hashtable ;
+:: expand-or ( state-transitions -- new-transitions )
+    H{ } clone :> expanded
+    state-transitions [| class transition |
+        class or-class? [
+            class seq>> [ transition swap expanded set-at ] each
+        ] [
+            transition class expanded set-at
+        ] if
+    ] assoc-each
+    expanded ;
 
 : expand-ors ( transition-table -- transition-table )
     [ [ expand-or ] assoc-map ] change-transitions ;

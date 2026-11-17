@@ -94,7 +94,7 @@ M: bitcask >alist
     dup path>> binary [
         index>> [
             seek-absolute seek-input read-entry t assert=
-        ] { } assoc-map-as
+        ] AL{ } assoc-map-as
     ] with-file-reader ;
 
 M: bitcask keys index>> keys ;

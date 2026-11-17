@@ -16,4 +16,4 @@ tools.test ;
     3/2 of
 ] unit-test
 
-{ { { 1.0 1000 } } } [ NH{ { 1.0 1000 } } >alist ] unit-test
+{ AL{ { 1.0 1000 } } } [ NH{ { 1.0 1000 } } >alist ] unit-test

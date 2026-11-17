@@ -43,7 +43,7 @@ M: TYPE assoc-size handle>> DBRNUM ;
     ] while* 2drop ;
 
 M: TYPE >alist
-    [ DBKEYS dup ] keep '[ dup _ at 2array ] map! drop ;
+    [ DBKEYS ] keep '[ dup _ at ] map>alist ;
 
 M: TYPE set-at
     handle>> spin [ object>bytes dup length ] bi@ DBPUT drop ;

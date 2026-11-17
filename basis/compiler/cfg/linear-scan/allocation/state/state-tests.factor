@@ -19,7 +19,7 @@ IN: compiler.cfg.linear-scan.allocation.state.tests
 
 ! add-active
 {
-    {
+    AL{
         {
             int-regs
             V{
@@ -104,7 +104,7 @@ ${
 } [
     H{ } clone spill-slots set
     { } insns>cfg cfg set
-    { { 55 int-rep } { 44 int-rep } { 55 int-rep } } [
+    AL{ { 55 int-rep } { 44 int-rep } { 55 int-rep } } [
         assign-spill-slot drop
     ] assoc-each
     spill-slots get

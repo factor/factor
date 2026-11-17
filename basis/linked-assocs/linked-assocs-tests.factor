@@ -56,7 +56,7 @@ tools.test ;
     + swap values <reversed> [ second call ] each
 ] unit-test
 
-{ V{ { "az" 1 } { "by" 2 } { "cx" 3 } } } [
+{ AL{ { "az" 1 } { "by" 2 } { "cx" 3 } } } [
     <linked-hash>
     1 "az" pick set-at
     2 "by" pick set-at
@@ -64,12 +64,12 @@ tools.test ;
     >alist
 ] unit-test
 
-{ t V{ { 1 20 } { 3 40 } { 5 60 } } } [
+{ t AL{ { 1 20 } { 3 40 } { 5 60 } } } [
     { { 1 2 } { 3 4 } { 5 6 } } >linked-hash
     [ 10 * ] assoc-map [ linked-assoc? ] [ >alist ] bi
 ] unit-test
 
-{ V{ { 1 2 } { 3 4 } { 5 6 } } } [
+{ AL{ { 1 2 } { 3 4 } { 5 6 } } } [
     { { 1 2 } { 3 4 } { 5 6 } }
     { } <linked-assoc> assoc-like >alist
 ] unit-test

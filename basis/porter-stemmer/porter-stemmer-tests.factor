@@ -55,7 +55,7 @@ tools.test io.files io.encodings.utf8 ;
 { "hell" } [ "hell" step5 "" like ] unit-test
 { "mate" } [ "mate" step5 "" like ] unit-test
 
-{ { } } [
+{ AL{ } } [
     "vocab:porter-stemmer/test/voc.txt" utf8 file-lines
     [ stem ] map
     "vocab:porter-stemmer/test/output.txt" utf8 file-lines

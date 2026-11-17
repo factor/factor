@@ -112,7 +112,7 @@ SYMBOL: loop-pressure-clobber?
         gensym :> word
         graph generate :> code
         code 4 swap nth length "code-bytes" metrics set-at
-        code word associate >alist t t modify-code-heap
+        code word swap 2array 1array t t modify-code-heap
         word metrics
     ] with-scope ;
 

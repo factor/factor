@@ -1,7 +1,8 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables io io.encodings.utf8 io.files
-io.streams.string json kernel math namespaces sequences strings
+io.streams.string json kernel math namespaces sequences sequences.private
+strings
 ;
 IN: json.prettyprint
 
@@ -41,7 +42,7 @@ M: assoc pprint-json*
         indent-level inc
         >alist
         [ "," print ] [
-            first2 [ write-spaces pprint-json* ": " write ] [ pprint-json* ] bi*
+            first2-unsafe [ write-spaces pprint-json* ": " write ] [ pprint-json* ] bi*
         ] interleave nl
         indent-level dec
         write-spaces "}" write

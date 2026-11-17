@@ -18,7 +18,7 @@ CONSTANT: will
 { t } [ will clone the-real-slim-shady please-stand-up ] unit-test
 
 { 2 } [ will assoc-size ] unit-test
-{ { { "marshall mathers" f } } } [
+{ AL{ { "marshall mathers" f } } } [
     the-real-slim-shady will clone
     [ delete-at ] [ >alist ] bi
 ] unit-test

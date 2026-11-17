@@ -122,7 +122,7 @@ IN: compiler.cfg.register-allocation.chordal.bases.tests
     dup cfg set
     gensym [
         [ chordal-allocation ] [ build-stack-frame ] [ generate ] tri
-    ] dip [ associate >alist t t modify-code-heap ] keep ;
+    ] dip [ swap 2array 1array t t modify-code-heap ] keep ;
 
 :: execute-derived-gc ( word flag -- ? )
     10 1array :> left

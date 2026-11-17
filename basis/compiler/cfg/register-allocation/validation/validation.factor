@@ -221,7 +221,7 @@ M: constrained-allocator allocator-statistics
     graph allocate-registers
     graph build-stack-frame
     gensym [ graph generate ] dip
-    [ associate >alist t t modify-code-heap ] keep ;
+    [ swap 2array 1array t t modify-code-heap ] keep ;
 
 ! Five independent vectors remain live across a native ABI call. Their bank
 ! aliases the scalar result's bank; preserving only scalar spill width loses

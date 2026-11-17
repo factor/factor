@@ -3,7 +3,7 @@
 
 USING: accessors arrays assocs io io.encodings.utf8 io.files
 io.files.temp io.launcher io.pathnames kernel math math.parser
-prettyprint sequences tools.profiler.sampling webbrowser ;
+prettyprint sequences sequences.private tools.profiler.sampling webbrowser ;
 
 IN: flamegraph
 
@@ -19,7 +19,7 @@ IN: flamegraph
     ] bi ;
 
 : write-flamegraph ( -- )
-    top-down >alist first second children>>
+    top-down >alist first second-unsafe children>>
     [ { } write-flamegraph-node ] assoc-each ;
 
 PRIVATE>

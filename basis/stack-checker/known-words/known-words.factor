@@ -60,7 +60,7 @@ IN: stack-checker.known-words
         [ dup required-stack-effect apply-word/effect ]
     } cond ;
 
-{
+AL{
     { drop  ( x         --                 ) }
     { 2drop ( x y       --                 ) }
     { 3drop ( x y z     --                 ) }

@@ -4,7 +4,7 @@
 USING: accessors ascii assocs calendar calendar.format
 calendar.parser classes hashtables io io.encodings.utf8 io.files
 io.streams.string kernel linked-assocs make math math.parser peg
-peg.parsers prettyprint regexp sequences splitting strings
+peg.parsers prettyprint regexp sequences sequences.private splitting strings
 strings.parser ;
 
 ! https://github.com/toml-lang/toml/blob/main/toml.abnf
@@ -349,7 +349,7 @@ M: timestamp write-toml-value write-rfc3339 ;
 
 M: assoc write-toml-value
     "{ " write >alist [ ", " write ] [
-        first2
+        first2-unsafe
         [ string check-instance write " = " write ]
         [ write-toml-value ] bi*
     ] interleave " }" write ;

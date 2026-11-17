@@ -392,6 +392,13 @@ TUPLE: final-tuple ; final
 ] unit-test
 
 { "H{ { 1 2 } }\n" } [ [ H{ { 1 2 } } short. ] with-string-writer ] unit-test
+{ "AL{ { 4 3 } { 2 1 } }\n" } [
+    [ AL{ { 4 3 } { 2 1 } } short. ] with-string-writer
+] unit-test
+{ "AL{ { 1 ~array~ } }\n" } [
+    [ AL{ { 1 { 2 } } } short. ] with-string-writer
+] unit-test
+{ "AL{ }\n" } [ [ AL{ } short. ] with-string-writer ] unit-test
 
 { "H{ { 1 ~array~ } }\n" } [ [ H{ { 1 { 2 } } } short. ] with-string-writer ] unit-test
 

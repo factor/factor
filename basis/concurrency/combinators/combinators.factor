@@ -52,7 +52,7 @@ PRIVATE>
     result seq like ; inline
 
 : parallel-assoc-map-as ( assoc quot: ( key value -- newkey newvalue ) exemplar -- newassoc )
-    [ >alist ] [ '[ first2 @ 2array ] parallel-map ] [ assoc-like ] tri* ; inline
+    [ >alist ] [ '[ first2-unsafe @ 2array ] parallel-map ] [ assoc-like ] tri* ; inline
 
 : parallel-assoc-map ( assoc quot: ( key value -- newkey newvalue ) -- newassoc )
     over parallel-assoc-map-as ;

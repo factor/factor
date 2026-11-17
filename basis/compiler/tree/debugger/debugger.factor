@@ -141,7 +141,7 @@ M: node node>quot drop ;
     ] assoc-map :> mapping
     stack consumed head* second out-d>> append :> outputs
     prefix first in-d>> append outputs
-    outputs first mapping>> mapping assoc-union extract-keys
+    outputs first mapping>> mapping { } assoc-union-as extract-keys
     <#data-shuffle> ;
 
 :: (nodes>quot) ( nodes -- )
@@ -205,7 +205,7 @@ SYMBOL: node-count
         "==== Total number of IR nodes:" print
         node-count get .
 
-        {
+        AL{
             { generics-called "==== Generic word calls:" }
             { words-called "==== Ordinary word calls:" }
             { methods-called "==== Non-inlined method calls:" }

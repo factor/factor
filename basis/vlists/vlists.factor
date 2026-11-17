@@ -74,7 +74,7 @@ M: valist new-at
     vlist>> ppush ppush valist boa ;
 
 M: valist >alist
-    vlist>> 2 <groups> [ { } like ] map ;
+    vlist>> 2 <groups> [ { } like ] map alist boa ;
 
 : >valist ( assoc -- valist )
     >alist concat >vlist valist boa ; inline

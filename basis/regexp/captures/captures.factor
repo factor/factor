@@ -121,11 +121,11 @@ M: tagged-epsilon prepare-capture-label
 : prepare-capture-table ( table -- table' )
     [
         [
-            >alist [ first2
+            [
                 [ prepare-capture-label ]
                 [ [ prepare-capture-target ] map ] bi*
                 capture-edge boa
-            ] map
+            ] { } assoc>map
         ] assoc-map
     ] change-transitions
     [ prepare-capture-target ] change-start-state ;

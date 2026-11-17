@@ -152,7 +152,7 @@ IN: compiler.tree.propagation.known-words
         mod-merge-classes/intervals
     ] dip execute( cls int -- cls' int' ) <class/interval-info> ;
 
-{
+AL{
     { mod real-valued }
     { fmod real-valued }
     { mod-integer-integer integer-valued }
@@ -256,7 +256,7 @@ generic-comparison-ops [
     } 2&& maybe-or-never
 ] "outputs" set-word-prop
 
-{
+AL{
     { >fixnum fixnum }
     { bignum>fixnum fixnum }
     { bignum>fixnum-strict fixnum }
@@ -278,7 +278,7 @@ generic-comparison-ops [
 ] "outputs" set-word-prop
 
 ! For these we limit the output interval
-{
+AL{
     { fixnum>bignum bignum }
     { fixnum>float float }
 } [
@@ -288,7 +288,7 @@ generic-comparison-ops [
     ] "outputs" set-word-prop
 ] assoc-each
 
-{
+AL{
     { >array array }
     { >vector vector }
     { >string string }
@@ -415,7 +415,7 @@ generic-comparison-ops [
 : propagate-resize-fixed-length-sequence ( n-info in-info class -- out-info )
     nip <sequence-info> ;
 
-{ { resize-array array }
+AL{ { resize-array array }
   { resize-byte-array byte-array }
   { resize-string string } }
 [

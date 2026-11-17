@@ -4,17 +4,32 @@ USING: assocs assocs.private help.markup help.syntax kernel math
 namespaces quotations sequences ;
 IN: assocs
 
+HELP: immutable-assoc
+{ $class-description "An assoc with read-only collection operations. Mutation and mutable builder allocation throw immutable-assoc-error." } ;
+
+HELP: immutable-assoc-error
+{ $description "Thrown when a mutating operation or mutable builder allocation is requested on an immutable assoc." } ;
+
+HELP: alist
+{ $class-description "An ordered, read-only association list backed by an array of two-element arrays. Implements the immutable sequence and assoc protocols. Duplicate keys are retained; lookup uses the first matching key and is linear."
+$nl
+"Construction validates pairs and copies each entry into its own two-element array. clone returns the same object. Indexed replacement, insertion, deletion, clearing and mutable builder allocation are unsupported. General sequence transformations produce ordinary arrays. assoc-map and assoc-filter preserve the alist type; operations that require a mutable builder are unsupported."
+$nl
+"Indexed access returns the stored pair array without allocation. underlying>> exposes the backing array for interoperability; treat it and the pair arrays as read-only. Keys and values are not recursively immutable." } ;
+
+HELP: <alist>
+{ $values { "pairs" sequence } { "alist" alist } }
+{ $description "Copies a sequence of two-element sequences into an explicit association list. Each entry is copied into a fresh two-element array in the backing array. Preserves order and duplicate keys. Throws not-a-pair for entries with a length other than two." } ;
+
+HELP: not-a-pair
+{ $description "Thrown when alist construction receives an entry whose length is not two." } ;
+
 ARTICLE: "alists" "Association lists"
-"An " { $emphasis "association list" } ", abbreviated " { $emphasis "alist" } ", is an association represented as a sequence where all elements are key/value pairs. The " { $link sequence } " mixin is an instance of the " { $link assoc } " mixin, hence all sequences support the " { $link "assocs-protocol" } " in this way."
+"An association list is an ordered sequence of key/value pairs. The explicit alist class stores an array of two-element arrays. Both assoc and sequence iteration read these stored pairs directly."
+{ $subsections alist <alist> >alist POSTPONE: AL{ }
+"Use AL{ ... } literal syntax to write an explicit alist. General sequences currently also implement the assoc protocol for compatibility during migration to explicit association lists."
 $nl
-"While not an association list, note that " { $link f } " also implements the associative mapping protocol in a trivial way; it is an immutable assoc with no entries."
-$nl
-"An alist is slower to search than a hashtable for a large set of associations. The main advantage of an association list is that the elements are ordered; also sometimes it is more convenient to construct an association list with sequence words than to construct a hashtable with association words. Much of the time, hashtables are more appropriate. See " { $link "hashtables" } "."
-$nl
-"There is no special syntax for literal alists since they are just sequences; in practice, literals look like so:"
-{ $code "{" "    { key1 value1 }" "    { key2 value2 }" "}" }
-"To make an assoc into an alist:"
-{ $subsections >alist } ;
+"An alist is slower to search than a hashtable for a large set of associations. Its advantages are preserving entry order and duplicate keys." ;
 
 ARTICLE: "enumerateds" "Enumerated sequences"
 "An enumerated sequence provides a view of a sequence as an assoc mapping integer indices to elements:"
@@ -475,7 +490,7 @@ HELP: map>assoc
 { $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new assoc having the same type as " { $snippet "exemplar" } "." } ;
 
 HELP: map>alist
-{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "alist" "a new alist" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "alist" alist } }
 { $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new alist." } ;
 
 { map>assoc map>alist } related-words
@@ -507,8 +522,8 @@ HELP: inc-at
 { $side-effects "assoc" } ;
 
 HELP: >alist
-{ $values { "assoc" assoc } { "newassoc" "an array of key/value pairs" } }
-{ $contract "Converts an associative structure into an association list." } ;
+{ $values { "assoc" assoc } { "alist" alist } }
+{ $contract "Converts an associative structure into an explicit alist backed by an array of two-element arrays. Both sequence access and assoc iteration read the stored pairs directly. Converting an alist returns the same object without validation or allocation. Legacy sequence entries are copied using their first two elements." } ;
 
 HELP: assoc-clone-like
 { $values
@@ -582,12 +597,12 @@ HELP: unzip
 HELP: zip
 { $values
     { "keys" sequence } { "values" sequence }
-    { "alist" "an array of key/value pairs" } }
-{ $description "Combines two sequences pairwise into a single sequence of key/value pairs." }
+    { "alist" alist } }
+{ $description "Combines two sequences pairwise into a read-only alist of key/value pairs." }
 { $examples
     { $example "USING: prettyprint assocs ;"
                "{ 1 2 3 } { 4 5 6 } zip ."
-               "{ { 1 4 } { 2 5 } { 3 6 } }"
+               "AL{ { 1 4 } { 2 5 } { 3 6 } }"
     }
 } ;
 
@@ -611,13 +626,13 @@ HELP: zip-as
 HELP: zip-index
 { $values
     { "keys" sequence }
-    { "alist" "an array of key/value pairs" }
+    { "alist" alist }
 }
 { $examples
     "Zip a sequence with its indices:"
     { $example "USING: assocs prettyprint ;"
         "{ 100 200 300 } zip-index ."
-        "{ { 100 0 } { 200 1 } { 300 2 } }"
+        "AL{ { 100 0 } { 200 1 } { 300 2 } }"
     }
 }
 { $description "Zip a sequence with its index and return an associative list where the input sequence is the keys and the indices are the values." } ;
@@ -639,12 +654,12 @@ HELP: zip-index-as
 HELP: zip-with
 { $values
     { "seq" sequence } { "quot" { $quotation ( ... key -- ... value ) } }
-    { "alist" assoc }
+    { "alist" alist }
 }
 { $examples
     { $example "USING: assocs math prettyprint ;"
         "{ 1 2 3 4 } [ sq ] zip-with ."
-        "{ { 1 1 } { 2 4 } { 3 9 } { 4 16 } }"
+        "AL{ { 1 1 } { 2 4 } { 3 9 } { 4 16 } }"
     }
 }
 { $description "Zip a sequence with values generated by applying " { $snippet "quot" } " to each element in the sequence." } ;

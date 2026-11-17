@@ -407,6 +407,10 @@ HELP: union{
 
 { POSTPONE: intersection{ POSTPONE: union{ POSTPONE: not{ POSTPONE: maybe{ } related-words
 
+HELP: AL{
+{ $syntax "AL{ { key value } ... }" }
+{ $description "Literal syntax for a read-only association list. Each entry is a two-element sequence. Use sequence and assoc iteration words to process the entries." } ;
+
 HELP: H{
 { $syntax "H{ { key value }... }" }
 { $values { "key" object } { "value" object } }

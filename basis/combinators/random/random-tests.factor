@@ -43,7 +43,7 @@ USING: combinators.random combinators.random.private tools.test ;
     { 1/3 [ 3 ] } } }
 [ { [ 1 ] [ 2 ] [ 3 ] } call-random>casep ] unit-test
 
-{ { { 1/2 [ 1 ] }
+{ AL{ { 1/2 [ 1 ] }
     { 1/4 [ 2 ] }
     { 1/4 [ 3 ] } } }
 [ { { 1/2 [ 1 ] }

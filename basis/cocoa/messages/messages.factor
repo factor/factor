@@ -4,7 +4,8 @@ USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes.struct cocoa.runtime cocoa.types
 combinators continuations core-graphics.types destructors
 generalizations io io.encodings.utf8 kernel layouts libc make math
-math.order math.parser namespaces sequences sets specialized-arrays
+math.order math.parser namespaces sequences sequences.private sets
+specialized-arrays
 splitting stack-checker strings system words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
@@ -261,8 +262,8 @@ ERROR: no-objc-type name ;
 
 : method-collisions ( -- collisions )
     objc-methods get >alist
-    [ first CHAR: . swap member? ] filter
-    [ first "." split1 nip ] collect-by
+    [ first-unsafe CHAR: . swap member? ] filter
+    [ first-unsafe "." split1 nip ] collect-by
     [ values members length 1 > ] filter-values ;
 
 : method-count ( class -- c-direct-array )

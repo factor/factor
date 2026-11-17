@@ -5,7 +5,7 @@ IN: urls.tests
 { "localhost" f } [ "localhost" parse-host ] unit-test
 { "localhost" 8888 } [ "localhost:8888" parse-host ] unit-test
 
-CONSTANT: urls {
+CONSTANT: urls AL{
     {
         T{ url
            { protocol "http" }

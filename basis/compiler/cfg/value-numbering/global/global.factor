@@ -5,7 +5,7 @@ compiler.cfg.dataflow-analysis compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.predecessors compiler.cfg.rpo
 compiler.cfg.utilities compiler.cfg.value-numbering.expressions
 compiler.cfg.value-numbering.graph compiler.utilities grouping hashtables kernel locals math namespaces
-sequences sorting ;
+sequences sequences.private sorting ;
 IN: compiler.cfg.value-numbering.global
 
 ! Adapted from compiler.cfg.gvn. Numbering analyzes a fixed instruction
@@ -48,8 +48,8 @@ M: ##copy number-insn
 : phi-expression ( insn -- expr )
     ! Values alone lose the association with predecessor edges. Sort by
     ! predecessor number to make the key independent of hash iteration.
-    inputs>> >alist [ first number>> ] sort-by
-    [ second vreg>vn ] map
+    inputs>> >alist [ first-unsafe number>> ] sort-by
+    [ second-unsafe vreg>vn ] map
     basic-block get 2array ;
 
 M: ##phi number-insn

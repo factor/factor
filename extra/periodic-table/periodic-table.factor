@@ -12,7 +12,7 @@ SYMBOLS: +alkali-metal+ +alkaline-earth-metal+ +lanthanide+
     +post-transition-metal+ +metalloid+ +reactive-non-metal+
     +halogen+ +noble-gas+ ;
 
-CONSTANT: group-colors {
+CONSTANT: group-colors AL{
     { +alkali-metal+          COLOR: #ff6268 }
     { +alkaline-earth-metal+  COLOR: #ffddb2 }
     { +lanthanide+            COLOR: #ffbffb }

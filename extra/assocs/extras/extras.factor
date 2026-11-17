@@ -294,11 +294,8 @@ PRIVATE>
 : collect-value-by-multi ( ... assoc quot: ( ... value -- ... new-keys ) -- ... assoc )
     [ H{ } clone ] 2dip collect-value-by-multi! ; inline
 
-: assoc-operator* ( assoc quot -- alist quot' )
-    [ >alist ] dip [ first2 swap ] prepose ; inline
-
 : assoc-each* ( ... assoc quot: ( ... value key -- ... ) -- ... )
-    assoc-operator* each ; inline
+    [ swap ] prepose assoc-each ; inline
 
 : collect-index-by! ( ... assoc seq quot: ( ... obj -- ... key ) -- ... assoc )
     rot [ '[ @ swap _ push-at ] each-index ] keep ; inline
@@ -307,7 +304,7 @@ PRIVATE>
     [ H{ } clone ] 2dip collect-index-by! ; inline
 
 : assoc-interleave ( ... assoc between quot: ( ... key value -- ... ) -- ... )
-    [ >alist ] 2dip [ first2 ] prepose interleave ; inline
+    swap [ assoc-operator ] dip swap interleave ; inline
 
 MACRO: nzip ( n -- quot )
     dup '[ [ _ narray ] { } _ nmap-as ] ;

@@ -1,10 +1,12 @@
 ! Copyright (C) 2007, 2010 Daniel Ehrenberg, Slava Pestov
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel math sequences sequences.private
-vectors ;
+USING: accessors arrays kernel kernel.private math sequences
+sequences.private vectors ;
 IN: assocs
 
 MIXIN: assoc
+MIXIN: immutable-assoc
+INSTANCE: immutable-assoc assoc
 
 GENERIC: at* ( key assoc -- value/f ? )
 GENERIC: value-at* ( value assoc -- key/f ? )
@@ -15,10 +17,34 @@ GENERIC: clear-assoc ( assoc -- )
 GENERIC: assoc-size ( assoc -- n )
 GENERIC: assoc-like ( assoc exemplar -- newassoc )
 GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
-GENERIC: >alist ( assoc -- newassoc )
+GENERIC: >alist ( assoc -- alist )
 GENERIC: keys ( assoc -- keys )
 GENERIC: values ( assoc -- values )
 GENERIC: unzip ( assoc -- keys values )
+
+TUPLE: alist { underlying array read-only } ;
+
+ERROR: not-a-pair pair ;
+
+<PRIVATE
+
+: collect-alist ( ... seq quot: ( ... elt -- ... key value ) -- ... alist )
+    [ 2array ] compose { } map-as alist boa ; inline
+
+PRIVATE>
+
+: <alist> ( pairs -- alist )
+    [ dup length 2 = [ not-a-pair ] unless first2-unsafe ]
+    collect-alist ;
+
+M: alist length underlying>> length ; inline
+M: alist nth-unsafe underlying>> nth-unsafe { array } declare ; inline
+M: alist new-sequence drop f <array> ; inline
+M: alist like drop >array ; inline
+M: alist clone ; inline
+M: alist hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
+INSTANCE: alist immutable-sequence
 
 M: assoc assoc-like drop ; inline
 
@@ -35,8 +61,9 @@ M: assoc assoc-like drop ; inline
 
 <PRIVATE
 
-: assoc-operator ( assoc quot -- alist quot' )
-    [ >alist ] dip [ first2 ] prepose ; inline
+: assoc-operator ( assoc quot -- pairs quot' )
+    [ >alist { alist } declare underlying>> ] dip
+    [ { array } declare first2-unsafe ] prepose ; inline
 
 : assoc-stack-from ( key i seq -- value/f )
     over 0 < [
@@ -55,7 +82,8 @@ M: assoc assoc-like drop ; inline
 PRIVATE>
 
 : assoc-find ( ... assoc quot: ( ... key value -- ... ? ) -- ... key value ? )
-    assoc-operator find swap [ first2-unsafe t ] [ drop f f f ] if ; inline
+    assoc-operator find swap
+    [ { array } declare first2-unsafe t ] [ drop f f f ] if ; inline
 
 : assoc-each ( ... assoc quot: ( ... key value -- ... ) -- ... )
     assoc-operator each ; inline
@@ -64,13 +92,17 @@ PRIVATE>
     [ assoc-operator ] dip map-as ; inline
 
 : assoc-map-as ( ... assoc quot: ( ... key value -- ... newkey newvalue ) exemplar -- ... newassoc )
-    [ [ 2array ] compose { } assoc>map ] dip assoc-like ; inline
+    dup alist? [
+        drop assoc-operator collect-alist
+    ] [
+        [ [ 2array ] compose { } assoc>map ] dip assoc-like
+    ] if ; inline
 
 : assoc-map ( ... assoc quot: ( ... key value -- ... newkey newvalue ) -- ... newassoc )
     over assoc-map-as ; inline
 
 : assoc-filter-as ( ... assoc quot: ( ... key value -- ... ? ) exemplar -- ... subassoc )
-    [ assoc-operator filter ] dip assoc-like ; inline
+    [ assoc-operator filter alist boa ] dip assoc-like ; inline
 
 : assoc-filter ( ... assoc quot: ( ... key value -- ... ? ) -- ... subassoc )
     over assoc-filter-as ; inline
@@ -102,13 +134,13 @@ PRIVATE>
     [ nip empty? ] assoc-reject ; inline
 
 : assoc-partition ( ... assoc quot: ( ... key value -- ... ? ) -- ... true-assoc false-assoc )
-    [ assoc-operator partition ] keepd '[ _ assoc-like ] bi@ ; inline
+    [ assoc-operator partition [ alist boa ] bi@ ] keepd '[ _ assoc-like ] bi@ ; inline
 
 : assoc-any? ( ... assoc quot: ( ... key value -- ... ? ) -- ... ? )
-    assoc-find 2nip ; inline
+    assoc-operator any? ; inline
 
 : assoc-all? ( ... assoc quot: ( ... key value -- ... ? ) -- ... ? )
-    [ not ] compose assoc-any? not ; inline
+    assoc-operator all? ; inline
 
 : at ( key assoc -- value/f )
     at* drop ; inline
@@ -199,15 +231,20 @@ M: assoc assoc-clone-like
 : inc-at ( key assoc -- ) [ 1 ] 2dip at+ ; inline
 
 : map>assoc ( ... seq quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
-    dup sequence? [
-        [ [ 2array ] compose ] dip map-as
+    dup alist? [
+        drop collect-alist
     ] [
-        [ over assoc-size ] dip new-assoc
-        [ [ swapd set-at ] curry compose each ] keep
+        dup sequence? [
+            [ [ 2array ] compose ] dip map-as
+        ] [
+            [ over assoc-size ] dip new-assoc
+            [ [ swapd set-at ] curry compose each ] keep
+        ] if
     ] if ; inline
 
+! Core assocs loads before AL{ syntax; T{ alist } is its empty exemplar.
 : map>alist ( ... seq quot: ( ... elt -- ... key value ) -- ... alist )
-    { } map>assoc ; inline
+    T{ alist } map>assoc ; inline
 
 : extract-keys ( seq assoc -- subassoc )
     [ [ dupd at ] curry ] keep map>assoc ;
@@ -225,30 +262,34 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
     [ ?push ] change-at ;
 
 : zip-as ( keys values exemplar -- assoc )
-    dup sequence? [
-        [ 2array ] swap 2map-as
+    dup alist? [
+        drop [ 2array ] { } 2map-as alist boa
     ] [
-        [ 2dup min-length ] dip new-assoc
-        [ '[ swap _ set-at ] 2each ] keep
+        dup sequence? [
+            [ 2array ] swap 2map-as
+        ] [
+            [ 2dup min-length ] dip new-assoc
+            [ '[ swap _ set-at ] 2each ] keep
+        ] if
     ] if ; inline
 
 : zip ( keys values -- alist )
-    { } zip-as ; inline
+    T{ alist } zip-as ; inline
 
 : zip-index-as ( keys exemplar -- assoc )
     [ dup length <iota> ] dip zip-as ; inline
 
 : zip-index ( keys -- alist )
-    { } zip-index-as ; inline
+    T{ alist } zip-index-as ; inline
 
 M: assoc unzip
-    dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
+    >alist { alist } declare [ keys ] [ values ] bi ;
 
 : zip-with-as ( ... seq quot: ( ... key -- ... value ) exemplar -- ... assoc )
     [ [ 1check ] curry ] dip map>assoc ; inline
 
 : zip-with ( ... seq quot: ( ... key -- ... value ) -- ... alist )
-    { } zip-with-as ; inline
+    T{ alist } zip-with-as ; inline
 
 : collect-by! ( ... assoc seq quot: ( ... obj -- ... key ) -- ... assoc )
     [ 1check ] curry rot [
@@ -277,12 +318,16 @@ M: sequence delete-at
 M: sequence assoc-size length ; inline
 
 M: sequence assoc-clone-like
-    [ >alist ] dip clone-like ; inline
+    [ dup sequence? [ >alist ] unless ] dip clone-like ; inline
 
 M: sequence assoc-like
-    [ >alist ] dip like ; inline
+    [
+        dup sequence? [ >alist ] unless
+        dup alist? [ underlying>> ] when
+    ] dip like ; inline
 
-M: sequence >alist ; inline
+M: sequence >alist
+    [ first2 ] collect-alist ;
 
 ! Override sequence => assoc instance for f
 M: f at* 2drop f f ; inline
@@ -294,6 +339,27 @@ M: f clear-assoc drop ; inline
 M: f assoc-like drop dup assoc-empty? [ drop f ] when ; inline
 
 INSTANCE: sequence assoc
+
+ERROR: immutable-assoc-error assoc ;
+
+M: immutable-assoc set-at 2nip immutable-assoc-error ;
+M: immutable-assoc delete-at nip immutable-assoc-error ;
+M: immutable-assoc clear-assoc immutable-assoc-error ;
+M: immutable-assoc new-assoc nip immutable-assoc-error ;
+
+M: alist at*
+    underlying>> [ { array } declare first-unsafe = ] with find nip
+    [ { array } declare second-unsafe t ] [ f f ] if* ;
+
+M: alist assoc-size length ; inline
+M: alist >alist ; inline
+M: alist keys underlying>> [ { array } declare first-unsafe ] map ;
+M: alist values underlying>> [ { array } declare second-unsafe ] map ;
+M: alist unzip [ keys ] [ values ] bi ;
+M: alist assoc-like drop >alist ; inline
+M: alist assoc-clone-like drop >alist ; inline
+
+INSTANCE: alist immutable-assoc
 
 TUPLE: enumerated { seq read-only } ;
 
@@ -307,7 +373,7 @@ M: enumerated set-at seq>> set-nth ; inline
 
 M: enumerated delete-at seq>> remove-nth! drop ; inline
 
-M: enumerated >alist ; inline
+M: enumerated >alist seq>> dup length <iota> swap zip ;
 
 M: enumerated keys seq>> length <iota> >array ; inline
 
@@ -328,19 +394,19 @@ M: enumerated nth-unsafe dupd seq>> nth-unsafe 2array ; inline
 INSTANCE: enumerated immutable-sequence
 
 : any-key? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
-    [ drop ] prepose assoc-find 2nip ; inline
+    [ drop ] prepose assoc-any? ; inline
 
 : any-value? ( ... assoc quot: ( ... value -- ... ? ) -- ... ? )
-    [ nip ] prepose assoc-find 2nip ; inline
+    [ nip ] prepose assoc-any? ; inline
 
 : all-keys? ( ... assoc quot: ( ... key -- ... ? ) -- ... ? )
-    [ not ] compose any-key? not ; inline
+    [ drop ] prepose assoc-all? ; inline
 
 : all-values? ( ... assoc quot: ( ... value -- ... ? ) -- ... ? )
-    [ not ] compose any-value? not ; inline
+    [ nip ] prepose assoc-all? ; inline
 
 : assoc-reduce ( ... assoc identity quot: ( ... prev key value -- next ) -- ... result )
-    [ >alist ] 2dip [ first2 ] prepose reduce ; inline
+    [ swap ] dip assoc-each ; inline
 
 : reduce-keys ( ... assoc identity quot: ( ... prev elt -- ... next ) -- ... result )
     [ drop ] prepose assoc-reduce ; inline

@@ -150,7 +150,7 @@ M: mock-gadget ungraft*
             [ { { t t } } ] [ status-flags ] unit-test
         ] with-variable ;
 
-    { { f f } { f t } { t f } { t t } } [ notify-combo ] assoc-each
+    AL{ { f f } { f t } { t f } { t t } } [ notify-combo ] assoc-each
 ] with-string-writer print
 
 : fake-ui-loop ( -- )

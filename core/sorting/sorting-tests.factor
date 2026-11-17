@@ -1,4 +1,4 @@
-USING: grouping kernel math math.order random sequences sets
+USING: assocs grouping kernel math math.order random sequences sets
 sorting splitting tools.test unicode vocabs ;
 
 { { } } [ { } sort ] unit-test
@@ -25,6 +25,25 @@ unit-test
 
 { { { 1 "a" } { 1 "b" } { 1 "c" } { 1 "e" } { 2 "d" } } }
 [ { { 1 "a" } { 1 "b" } { 1 "c" } { 2 "d" } { 1 "e" } } sort-keys ] unit-test
+
+{ { { 2 1 } { 4 3 } { 4 0 } } } [
+    AL{ { 4 3 } { 2 1 } { 4 0 } } sort-keys
+] unit-test
+{ { { 4 3 } { 4 0 } { 2 1 } } } [
+    AL{ { 4 3 } { 2 1 } { 4 0 } } inv-sort-keys
+] unit-test
+{ { { 4 0 } { 2 1 } { 4 3 } } } [
+    AL{ { 4 3 } { 2 1 } { 4 0 } } sort-values
+] unit-test
+{ { { 4 3 } { 2 1 } { 4 0 } } } [
+    AL{ { 4 3 } { 2 1 } { 4 0 } } inv-sort-values
+] unit-test
+{ AL{ { 4 3 } { 2 1 } } { { 2 1 } { 4 3 } } } [
+    AL{ { 4 3 } { 2 1 } } dup sort-keys
+] unit-test
+{ t } [
+    AL{ { 4 3 } { 2 1 } } dup first swap sort-keys last eq?
+] unit-test
 
 [ all-words sort ] must-not-fail
 

@@ -18,7 +18,7 @@ compiler.cfg.loop-detection
 compiler.cfg.registers compiler.cfg.rpo
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities compiler.utilities
 cpu.architecture heaps kernel locals make math math.functions math.order namespaces sequences
-sets sorting ;
+sequences.private sets sorting ;
 IN: compiler.cfg.register-allocation.chordal
 
 SINGLETON: chordal-allocator
@@ -348,8 +348,8 @@ ERROR: uncolorable-spill-result vertex neighbors capacity ;
 
 :: affinity-misses ( affinities colors -- n )
     affinities >alist [| pair |
-        pair first colors at :> color
-        pair second [ colors at color = not ] count
+        pair first-unsafe colors at :> color
+        pair second-unsafe [ colors at color = not ] count
     ] map-sum 2 / ;
 
 ! Exact SSA copies denote the same value on every path dominated by the

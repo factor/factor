@@ -4,7 +4,7 @@ USING: accessors assocs combinators combinators.short-circuit
 continuations formatting generalizations io io.streams.string
 kernel kernel.private layouts math math.parser math.vectors
 memory namespaces prettyprint sequences
-sequences.generalizations sets sorting ;
+sequences.private sequences.generalizations sets sorting ;
 IN: tools.profiler.sampling
 
 <PRIVATE
@@ -207,7 +207,7 @@ SYMBOL: report-total-time
     H{ } [ "  " <repetition> concat ] cache write ;
 
 : by-total-time ( nodes -- nodes' )
-    >alist [ second total-time>> ] inv-sort-by ;
+    >alist [ second-unsafe total-time>> ] inv-sort-by ;
 
 : duration. ( duration -- )
     1000 * "%9.1f" printf ;

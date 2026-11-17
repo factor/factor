@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math.order quotations sequences
-sorting ;
+sequences.private sorting ;
 IN: sorting.specification
 
 <PRIVATE
@@ -32,7 +32,7 @@ PRIVATE>
 : sort-with-spec ( seq sort-spec -- seq' ) [ ] sort-with-spec-by ;
 
 : sort-keys-with-spec ( assoc sort-spec -- alist )
-    [ >alist ] dip [ first ] sort-with-spec-by ;
+    [ >alist ] dip [ first-unsafe ] sort-with-spec-by ;
 
 : sort-values-with-spec ( assoc sort-spec -- alist )
-    [ >alist ] dip [ second ] sort-with-spec-by ;
+    [ >alist ] dip [ second-unsafe ] sort-with-spec-by ;

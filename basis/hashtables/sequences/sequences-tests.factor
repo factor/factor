@@ -16,4 +16,4 @@ tools.test ;
     "asdf" of
 ] unit-test
 
-{ { { "asdf" 1000 } } } [ SH{ { "asdf" 1000 } } >alist ] unit-test
+{ AL{ { "asdf" 1000 } } } [ SH{ { "asdf" 1000 } } >alist ] unit-test

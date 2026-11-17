@@ -24,7 +24,7 @@ IN: trees.splay.tests
 { t } [ <splay> f 4 pick set-at 4 swap key? ] unit-test
 
 {
-    { { 1 "a" } { 2 "b" } { 3 "c" } { 4 "d" } { 5 "e" } { 6 "f" } }
+    AL{ { 1 "a" } { 2 "b" } { 3 "c" } { 4 "d" } { 5 "e" } { 6 "f" } }
 } [
     {
         { 4 "d" } { 5 "e" } { 6 "f" }

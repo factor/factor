@@ -11,7 +11,7 @@ IN: compiler.tests.low-level-ir
     gensym [
         [ linear-scan ] [ build-stack-frame ] [ generate ] tri
     ] dip
-    [ associate >alist t t modify-code-heap ] keep ;
+    [ swap 2array 1array t t modify-code-heap ] keep ;
 
 : compile-test-cfg ( -- word )
     0 get block>cfg {

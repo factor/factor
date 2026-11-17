@@ -233,6 +233,7 @@ M: quotation pprint-delims drop \ [ \ ] ;
 M: curried pprint-delims drop \ [ \ ] ;
 M: composed pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;
+M: alist pprint-delims drop \ AL{ \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
 M: byte-vector pprint-delims drop \ BV{ \ } ;
 M: vector pprint-delims drop \ V{ \ } ;
@@ -254,6 +255,7 @@ M: vector >pprint-sequence ;
 M: byte-vector >pprint-sequence ;
 M: callable >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
+M: alist >pprint-sequence ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
 M: hash-set >pprint-sequence sets:members ;
@@ -321,6 +323,8 @@ M: +nil+ pprint*
     [ nesting-limit set ] curry finally ; inline
 
 M: hashtable pprint*
+    [ pprint-object ] with-extra-nesting-level ;
+M: alist pprint*
     [ pprint-object ] with-extra-nesting-level ;
 M: curried pprint* pprint-object ;
 M: composed pprint* pprint-object ;

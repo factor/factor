@@ -87,7 +87,7 @@ HELP: with-nested-compilation-unit
 { $notes "This word is used by " { $link "syntax-immediate" } " to ensure that definitions in nested blocks are correctly recorded. User code should not depend on parser internals in such a way that calling this combinator is required." } ;
 
 HELP: recompile
-{ $values { "words" { $sequence word } } { "alist" "an association list mapping words to compiled definitions" } }
+{ $values { "words" { $sequence word } } { "definitions" "an array of word/compiled-definition pair arrays" } }
 { $contract "Internal word which compiles words. Called at the end of " { $link with-compilation-unit } "." } ;
 
 HELP: to-recompile
@@ -100,7 +100,7 @@ HELP: no-compilation-unit
 { $error-description "Thrown when an attempt is made to define a word outside of a " { $link with-compilation-unit } " combinator." } ;
 
 HELP: modify-code-heap
-{ $values { "alist" "an association list with words as keys" } { "update-existing?" boolean } { "reset-pics?" boolean } }
+{ $values { "alist" "an array of word/code pairs" } { "update-existing?" boolean } { "reset-pics?" boolean } }
 { $description "Lowest-level primitive for defining words. Associates words with code blocks in the code heap."
 $nl
 "The alist maps words to one of the following:"

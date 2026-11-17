@@ -15,7 +15,7 @@ IN: stack-checker.known-words.tests
     ] with-infer nip V{
         T{ #introduce { out-d { 1 2 } } }
         T{ #shuffle
-           { mapping { { 3 2 } { 4 1 } } }
+           { mapping AL{ { 3 2 } { 4 1 } } }
            { in-d V{ 1 2 } }
            { out-d V{ 3 4 } }
         }

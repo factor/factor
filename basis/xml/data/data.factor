@@ -52,7 +52,7 @@ M: attrs set-at
 
 M: attrs assoc-size alist>> length ;
 M: attrs new-assoc drop <vector> <attrs> ;
-M: attrs >alist alist>> ;
+M: attrs >alist alist>> >alist ;
 
 : >attrs ( assoc -- attrs )
     dup [

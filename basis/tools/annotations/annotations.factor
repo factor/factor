@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators.short-circuit
 compiler.units continuations effects generalizations generic inspector io
 kernel math namespaces parser prettyprint quotations sequences
-sequences.deep sequences.generalizations sorting summary
+sequences.private sequences.deep sequences.generalizations sorting summary
 system threads vocabs words ;
 IN: tools.annotations
 
@@ -161,6 +161,6 @@ PRIVATE>
 
 : word-timing. ( -- )
     word-timing get >alist
-    [ second first ] sort-by
-    [ first2 first2 [ 1,000,000,000 /f ] dip 3array ] map
+    [ second-unsafe first ] sort-by
+    [ first2-unsafe first2 [ 1,000,000,000 /f ] dip 3array ] map
     simple-table. ;

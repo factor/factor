@@ -419,7 +419,7 @@ CONSTANT: flow-allocators {
     graph allocate-registers
     graph build-stack-frame
     gensym [ graph generate ] dip
-    [ associate >alist t t modify-code-heap ] keep ;
+    [ swap 2array 1array t t modify-code-heap ] keep ;
 
 :: compile-moving-offset ( allocator -- word )
     H{ { 0 tagged-rep } { 1 int-rep } { 2 int-rep }
@@ -443,7 +443,7 @@ CONSTANT: flow-allocators {
     graph allocate-registers
     graph build-stack-frame
     gensym [ graph generate ] dip
-    [ associate >alist t t modify-code-heap ] keep ;
+    [ swap 2array 1array t t modify-code-heap ] keep ;
 
 { t } [
     t check-allocation? [

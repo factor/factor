@@ -671,9 +671,9 @@ M: backtracking-register-home emit-restore
     affinities backtracking-affinities set ;
 
 : prepare-backtracking-phase-weights ( -- )
-    spill-site-weights get >alist [
-        first2 swap 1 + spill-site-weights get set-at
-    ] each
+    spill-site-weights get [
+        swap 1 + spill-site-weights get set-at
+    ] assoc-each
     cold-definition-sites get keys [
         1 + t swap cold-definition-sites get set-at
     ] each ;

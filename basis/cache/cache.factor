@@ -32,7 +32,7 @@ M: cache-assoc delete-at
 M: cache-assoc clear-assoc
     assoc>> [ values dispose-each ] [ clear-assoc ] bi ;
 
-M: cache-assoc >alist assoc>> [ value>> ] { } assoc-map-as ;
+M: cache-assoc >alist assoc>> [ value>> ] AL{ } assoc-map-as ;
 
 INSTANCE: cache-assoc assoc
 

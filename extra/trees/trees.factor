@@ -136,7 +136,7 @@ M: tree set-at
     ] when* ;
 
 M: tree >alist
-    [ root>> (node>alist) ] { } make ;
+    [ root>> (node>alist) ] { } make alist boa ;
 
 :: (node>subalist-right) ( to-key node end-comparator: ( key1 key2 -- ? ) -- )
     node [

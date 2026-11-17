@@ -123,7 +123,7 @@ M: struct-mirror >alist
             _ struct>assoc
             [ [ [ name>> ] [ type>> ] bi 2array ] dip ] assoc-map
         ] [ drop { } ] recover
-    ] bi append ;
+    ] bi append alist boa ;
 
 M: struct make-mirror <struct-mirror> ;
 

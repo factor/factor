@@ -429,7 +429,7 @@ M:: yaml-alias emit-value ( emitter event unused obj -- )
     ] withd withd assoc-each ;
 
 : emit-linked-assoc-body ( emitter event linked-assoc -- )
-    >alist [ first2 swap associate ] map emit-sequence-body ;
+    [ swap associate ] { } assoc>map emit-sequence-body ;
 
 : emit-set-body ( emitter event set -- )
     [ members ] [ cardinality f <array> ] bi zip concat emit-sequence-body ;

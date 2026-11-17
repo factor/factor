@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes classes.algebra
 combinators combinators.private definitions effects generic
 hashtables kernel layouts make math namespaces quotations
-sequences words ;
+sequences sequences.private words ;
 IN: generic.single
 
 <PRIVATE
@@ -175,7 +175,7 @@ M: echelon-dispatch-engine compile-engine
     dup n>> 0 = [
         methods>> dup assoc-size {
             { 0 [ drop default get ] }
-            { 1 [ >alist first second compile-engine ] }
+            { 1 [ >alist first second-unsafe compile-engine ] }
         } case
     ] [
         methods>> compile-engines* build-fast-hash

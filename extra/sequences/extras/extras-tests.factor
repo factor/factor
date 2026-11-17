@@ -3,7 +3,7 @@ io io.streams.string kernel make math math.order math.parser
 prettyprint ranges sequences sequences.extras strings tools.test
 ;
 
-{ V{ { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
+{ { { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
 
 { { "a" "b" "c" "d" "ab" "bc" "cd" "abc" "bcd" "abcd" } } [ "abcd" all-subseqs ] unit-test
 
@@ -577,11 +577,11 @@ prettyprint ranges sequences sequences.extras strings tools.test
 { 20 1 } [ 0 { 10 20 30 } [ drop 20 = ] find-index-from* ] unit-test
 { f f } [ 0 { 10 20 30 } [ drop 21 = ] find-index-from* ] unit-test
 
-{ { { 1 1 } { 2 2 } { 0 3 } { 0 4 } { 0 5 } } } [
+{ AL{ { 1 1 } { 2 2 } { 0 3 } { 0 4 } { 0 5 } } } [
     { 1 2 } { 1 2 3 4 5 } 0 zip-longest-with
 ] unit-test
 
-{ { { 1 1 } { 2 2 } { f 3 } { f 4 } { f 5 } } } [
+{ AL{ { 1 1 } { 2 2 } { f 3 } { f 4 } { f 5 } } } [
     { 1 2 } { 1 2 3 4 5 } zip-longest
 ] unit-test
 

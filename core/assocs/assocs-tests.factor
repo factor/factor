@@ -1,5 +1,7 @@
-USING: alien.c-types ascii assocs kernel make math namespaces
-sequences specialized-arrays tools.test ;
+USING: accessors alien.c-types ascii arrays assocs
+kernel kernel.private make math namespaces
+prettyprint sequences sequences.private sorting specialized-arrays
+tools.test ;
 IN: assocs.tests
 SPECIALIZED-ARRAY: double
 IN: assocs.tests
@@ -161,7 +163,7 @@ unit-test
 ] unit-test
 
 {
-    { { 1.0 1.0 } { 2.0 2.0 } }
+    AL{ { 1.0 1.0 } { 2.0 2.0 } }
 } [
     double-array{ 1.0 2.0 } [ dup ] map>alist
 ] unit-test
@@ -265,11 +267,11 @@ unit-test
 
 ! zip, zip-as
 {
-    { { 1 4 } { 2 5 } { 3 6 } }
+    AL{ { 1 4 } { 2 5 } { 3 6 } }
 } [ { 1 2 3 } { 4 5 6 } zip ] unit-test
 
 {
-    { { 1 4 } { 2 5 } { 3 6 } }
+    AL{ { 1 4 } { 2 5 } { 3 6 } }
 } [ V{ 1 2 3 } { 4 5 6 } zip ] unit-test
 
 {
@@ -301,11 +303,11 @@ unit-test
 
 ! zip-index, zip-index-as
 {
-    { { 11 0 } { 22 1 } { 33 2 } }
+    AL{ { 11 0 } { 22 1 } { 33 2 } }
 } [ { 11 22 33 } zip-index ] unit-test
 
 {
-    { { 11 0 } { 22 1 } { 33 2 } }
+    AL{ { 11 0 } { 22 1 } { 33 2 } }
 } [ V{ 11 22 33 } zip-index ] unit-test
 
 {
@@ -322,7 +324,7 @@ unit-test
 
 ! zip-with, zip-with-as
 {
-    { { "cat" 3 } { "food" 4 } { "is" 2 } { "yummy" 5 } }
+    AL{ { "cat" 3 } { "food" 4 } { "is" 2 } { "yummy" 5 } }
 } [
     { "cat" "food" "is" "yummy" } [ length ] zip-with
 ] unit-test
@@ -414,4 +416,158 @@ unit-test
 
 { H{ { { 1 2 } 3 } } 3 } [
     H{ } dup '[ 1 2 _ [ + ] 2cache ] call
+] unit-test
+
+! Explicit alists support ordinary iteration over known array pairs.
+{ t t { 3 7 } } [
+    { { 1 2 } { 3 4 } } <alist>
+    [ assoc? ] [ sequence? ]
+    [ >alist [ { array } declare first2-unsafe + ] map ] tri
+] unit-test
+{ t } [ { { 1 2 } } <alist> dup >alist eq? ] unit-test
+{ t t } [ { { 1 2 } } >alist [ alist? ] [ first pair? ] bi ] unit-test
+{ t AL{ { 1 1 } { 2 2 } } } [
+    { 1 2 } [ dup ] { } <alist> map>assoc [ alist? ] [ ] bi
+] unit-test
+{ t AL{ { 1 3 } { 2 4 } } } [
+    { 1 2 } { 3 4 } { } <alist> zip-as [ alist? ] [ ] bi
+] unit-test
+[ { { 1 } } >alist ] must-fail
+{ AL{ { 1 2 } } } [ { { 1 2 3 } } >alist ] unit-test
+{ 10 } [ { { 1 2 } { 3 4 } } <alist> 0 [ + + ] assoc-reduce ] unit-test
+
+! The default unzip reads the two columns of nonempty validated pairs.
+{ { } { } } [ { } <alist> unzip ] unit-test
+{ { "a" } { f } } [ { { "a" f } } <alist> unzip ] unit-test
+{ { "a" "a" } { 1 2 } } [
+    { { "a" 1 } { "a" 2 } } <alist> unzip
+] unit-test
+{ f t f f } [
+    { { "a" f } } <alist> [ "a" swap at* ] [ "b" swap at* ] bi
+] unit-test
+
+{ t t } [ H{ { 1 2 } } >alist [ alist? ] [ dup >alist eq? ] bi ] unit-test
+
+{ t } [
+    { { 1 2 } { 3 4 } } dup <alist> [ hashcode ] bi@ =
+] unit-test
+
+! Read-only alist literals and collection operations.
+
+{ t t t } [ AL{ } [ assoc? ] [ immutable-assoc? ] [ immutable-sequence? ] tri ] unit-test
+{ 2 { "a" 1 } } [ AL{ { "a" 1 } { "b" 2 } } [ length ] [ first ] bi ] unit-test
+{ { "a" "b" } } [ AL{ { "a" 1 } { "b" 2 } } [ first ] map ] unit-test
+{ { { "b" 2 } } } [ AL{ { "a" 1 } { "b" 2 } } [ second 1 > ] filter ] unit-test
+{ { { "a" 1 } { "b" 2 } } } [ AL{ { "b" 2 } { "a" 1 } } sort-keys ] unit-test
+{ 1 t f t f f } [
+    AL{ { "a" 1 } { "b" f } }
+    [ "a" swap at* ] [ "b" swap at* ] [ "c" swap at* ] tri
+] unit-test
+{ { "a" "a" "b" } 1 } [
+    AL{ { "a" 1 } { "a" 2 } { "b" 3 } } [ keys ] [ "a" swap at ] bi
+] unit-test
+{ t } [ AL{ { "a" 1 } } dup clone eq? ] unit-test
+{ 1 } [
+    { { "a" 1 } } clone [ clone ] map dup <alist>
+    [ first 9 swap set-second ] dip "a" swap at
+] unit-test
+{ t t } [ AL{ { "a" 1 } } >alist [ alist? ] [ [ pair? ] all? ] bi ] unit-test
+{ t AL{ { "a" 2 } } } [
+    AL{ { "a" 1 } } [ 1 + ] map-values [ alist? ] [ ] bi
+] unit-test
+{ "AL{ { \"a\" 1 } }" } [ AL{ { "a" 1 } } unparse ] unit-test
+[ { 1 } <alist> ] must-fail
+[ { { 1 } } <alist> ] [ not-a-pair? ] must-fail-with
+[ { { 1 2 3 } } <alist> ] [ not-a-pair? ] must-fail-with
+{ AL{ { "a" 1 } } } [ { V{ "a" 1 } } <alist> ] unit-test
+{ AL{ { "a" 1 } } } [ V{ V{ "a" 1 } } <alist> ] unit-test
+{ AL{ { "a" 1 } } } [
+    1 3 { "unused" "a" 1 "unused" } <slice> 1array <alist>
+] unit-test
+
+[ 9 "a" AL{ { "a" 1 } } set-at ] [ immutable-assoc-error? ] must-fail-with
+[ 9 "b" AL{ { "a" 1 } } set-at ] [ immutable-assoc-error? ] must-fail-with
+[ "a" AL{ { "a" 1 } } delete-at ] [ immutable-assoc-error? ] must-fail-with
+[ AL{ { "a" 1 } } clear-assoc ] [ immutable-assoc-error? ] must-fail-with
+[ 3 AL{ } new-assoc ] [ immutable-assoc-error? ] must-fail-with
+[ { "b" 2 } 0 AL{ { "a" 1 } } set-nth ] [ immutable? ] must-fail-with
+[ { "b" 2 } 0 AL{ { "a" 1 } } set-nth-unsafe ] [ immutable? ] must-fail-with
+
+{ "a" 1 "b" 2 } [
+    AL{ { "a" 1 } { "b" 2 } } [ first first2-unsafe ] [ second first2-unsafe ] bi
+] unit-test
+{ { "a" "a" } { 1 f } } [ AL{ { "a" 1 } { "a" f } } unzip ] unit-test
+{ { 3 7 } } [
+    AL{ { 1 2 } { 3 4 } } >alist
+    [ { array } declare first2-unsafe + ] map
+] unit-test
+{ 1 2 t } [ AL{ { 1 2 } } [ + 3 = ] assoc-find ] unit-test
+{ t AL{ { "b" 2 } } } [
+    { "b" } AL{ { "a" 1 } { "b" 2 } } extract-keys
+    [ alist? ] [ ] bi
+] unit-test
+
+! Sequence exemplars retain their representation during the legacy migration.
+{ t { { 1 2 } } } [
+    H{ { 1 2 } } { } assoc-like [ array? ] [ ] bi
+] unit-test
+{ t { { 1 2 } } } [
+    AL{ { 1 2 } } { } assoc-like [ array? ] [ ] bi
+] unit-test
+{ t } [ { { 1 2 3 4 } } dup { } assoc-like eq? ] unit-test
+
+! Default pair constructors return alists, including empty inputs.
+{ AL{ } } [ { } [ dup ] map>alist ] unit-test
+{ AL{ } } [ { } { } zip ] unit-test
+{ AL{ } } [ { } zip-index ] unit-test
+{ AL{ } } [ { } [ dup ] zip-with ] unit-test
+{ AL{ { "a" 1 } { "a" 2 } } } [ { "a" "a" } { 1 2 } zip ] unit-test
+{ AL{ { "a" 1 } } } [ { "a" "b" } { 1 } zip ] unit-test
+{ 6 AL{ { 1 1 } { 2 2 } { 3 3 } } } [
+    0 { 1 2 3 } [ dup [ + ] dip dup ] map>alist
+] unit-test
+{ 3 AL{ { 1 11 } { 2 21 } } } [
+    0 AL{ { 1 10 } { 2 20 } }
+    [ [ dup [ + ] dip ] dip 1 + ] AL{ } assoc-map-as
+] unit-test
+
+! Nested backing storage and stable pair access.
+{ { { "a" 1 } { "b" f } } } [ AL{ { "a" 1 } { "b" f } } underlying>> ] unit-test
+{ "a" 1 "b" f } [ AL{ { "a" 1 } { "b" f } } [ first first2-unsafe ] [ second first2-unsafe ] bi ] unit-test
+{ t } [ AL{ { "a" 1 } } dup first swap first eq? ] unit-test
+{ { "a" "a" "b" } } [ AL{ { "a" 1 } { "a" f } { "b" 2 } } keys ] unit-test
+{ { 1 f 2 } } [ AL{ { "a" 1 } { "a" f } { "b" 2 } } values ] unit-test
+
+! Assoc iteration preserves predicate state and stops at the first match.
+{ 1 f f t } [
+    0 AL{ { f f } { "later" 2 } }
+    [ [ 1 + ] 2dip 2drop t ] assoc-find
+] unit-test
+{ 2 f f f } [
+    0 AL{ { "a" 1 } { "b" 2 } }
+    [ [ 1 + ] 2dip 2drop f ] assoc-find
+] unit-test
+{ 1 t } [
+    0 AL{ { "a" 1 } { "b" 2 } }
+    [ [ 1 + ] 2dip 2drop t ] assoc-any?
+] unit-test
+{ 1 f } [
+    0 AL{ { "a" 1 } { "b" 2 } }
+    [ [ 1 + ] 2dip 2drop f ] assoc-all?
+] unit-test
+{ f t } [ AL{ } [ 2drop t ] assoc-any? AL{ } [ 2drop f ] assoc-all? ] unit-test
+
+! Selectors visit each entry once and retain duplicate keys and false values.
+{ 3 AL{ { "a" 1 } { "a" f } } } [
+    0 AL{ { "a" 1 } { "b" 2 } { "a" f } }
+    [ [ 1 + ] 2dip drop "a" = ] assoc-filter
+] unit-test
+{ 3 AL{ { "a" 1 } { "a" f } } AL{ { "b" 2 } } } [
+    0 AL{ { "a" 1 } { "b" 2 } { "a" f } }
+    [ [ 1 + ] 2dip drop "a" = ] assoc-partition
+] unit-test
+{ AL{ } AL{ } } [ AL{ } [ 2drop t ] assoc-partition ] unit-test
+{ V{ { "a" f } { "a" 2 } } } [
+    AL{ { "a" f } { "b" 1 } { "a" 2 } }
+    [ drop "a" = ] V{ } assoc-filter-as
 ] unit-test

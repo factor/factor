@@ -1,4 +1,5 @@
-USING: arrays assocs assocs.extras kernel math math.order
+USING: arrays assocs assocs.extras io io.streams.string kernel make
+math math.order math.parser
 sequences tools.test ;
 
 {
@@ -394,3 +395,15 @@ sequences tools.test ;
 ] unit-test
 
 { { 10 20 30 } } [ { 1 2 3 } [ 10 * ] map-unzip ] unit-test
+
+
+{ { { 1 "a" } { f "b" } } } [
+    [ AL{ { "a" 1 } { "b" f } } [ 2array , ] assoc-each* ] { } make
+] unit-test
+{ "a=1,b=2" } [
+    [ AL{ { "a" 1 } { "b" 2 } } [ "," write ]
+      [ [ write "=" write ] [ number>string write ] bi* ] assoc-interleave ] with-string-writer
+] unit-test
+{ "" } [
+    [ AL{ } [ "unexpected" write ] [ 2drop ] assoc-interleave ] with-string-writer
+] unit-test

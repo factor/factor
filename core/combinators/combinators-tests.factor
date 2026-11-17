@@ -366,3 +366,8 @@ DEFER: corner-case-1
         { 3 [ "three" ] }
     } linear-case-quot
 ] unit-test
+
+! Case generation accepts the read-only result of alist constructors.
+{ [ dup 1 = [ drop "one" ] [ drop f ] if ] } [
+    [ drop f ] AL{ { 1 [ "one" ] } } linear-case-quot
+] unit-test

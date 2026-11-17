@@ -270,7 +270,7 @@ PRIVATE>
     dup recip <array> ; inline
 
 : mode ( seq -- x )
-    histogram >alist [ second ] maximum-by first ;
+    histogram >alist [ second-unsafe ] maximum-by first-unsafe ;
 
 : minmax ( seq -- min max )
     [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] 1 each-from ;

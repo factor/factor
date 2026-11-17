@@ -36,6 +36,7 @@ M: pair delete-at
     ] if-key ; inline
 
 M: pair >alist
-    [ hash>> >alist ] [ [ key>> ] [ value>> ] bi 2array ] bi suffix ; inline
+    [ hash>> >alist underlying>> ]
+    [ [ key>> ] [ value>> ] bi 2array ] bi suffix alist boa ; inline
 
 INSTANCE: pair assoc

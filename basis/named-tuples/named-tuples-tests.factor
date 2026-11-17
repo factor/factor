@@ -16,10 +16,10 @@ INSTANCE: foo named-tuple
 { T{ foo f 1 2 } } [ { 1 2 } T{ foo } like ] unit-test
 { T{ foo f 1 2 3 } } [ { 1 2 3 } T{ foo } like ] unit-test
 
-{ { { "x" f } { "y" f } { "z" f } } } [ T{ foo } >alist ] unit-test
-{ { { "x" 1 } { "y" f } { "z" f } } } [ T{ foo f 1 } >alist ] unit-test
-{ { { "x" 1 } { "y" 2 } { "z" f } } } [ T{ foo f 1 2 } >alist ] unit-test
-{ { { "x" 1 } { "y" 2 } { "z" 3 } } } [ T{ foo f 1 2 3 } >alist ] unit-test
+{ AL{ { "x" f } { "y" f } { "z" f } } } [ T{ foo } >alist ] unit-test
+{ AL{ { "x" 1 } { "y" f } { "z" f } } } [ T{ foo f 1 } >alist ] unit-test
+{ AL{ { "x" 1 } { "y" 2 } { "z" f } } } [ T{ foo f 1 2 } >alist ] unit-test
+{ AL{ { "x" 1 } { "y" 2 } { "z" 3 } } } [ T{ foo f 1 2 3 } >alist ] unit-test
 
 { f } [ T{ foo } "x" of ] unit-test
 { f } [ T{ foo } "y" of ] unit-test

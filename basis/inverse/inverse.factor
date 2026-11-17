@@ -182,7 +182,7 @@ DEFER: __
 
 \ both [ dup ] define-inverse
 
-{
+AL{
     { >array array? }
     { >vector vector? }
     { >fixnum fixnum? }
